@@ -1,0 +1,20 @@
+name: tests
+on: [push, pull_request]
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    env:
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -e ".[dev,simulation]"
+      - run: python -m pytest -q
+      - run: contact-transfer demo-refinement
+      - run: python examples/dual_arm_keyframe.py
+      - run: contact-transfer demo-control franka_panda --seconds 1.4
+      - run: python -m build

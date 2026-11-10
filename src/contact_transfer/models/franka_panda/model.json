@@ -1,0 +1,26 @@
+{
+  "name": "franka_panda",
+  "source_repository": "https://github.com/Gepetto/example-robot-data.git",
+  "commit": "78b6101a6387de721316b0db717351d899f97b4f",
+  "source_path": "robots/panda_description/urdf/panda.urdf",
+  "license": "Apache-2.0",
+  "license_path": "robots/panda_description/LICENSE",
+  "frame": "panda_link8",
+  "floating_base": false,
+  "locked_joints": {
+    "panda_finger_joint1": 0.0,
+    "panda_finger_joint2": 0.0
+  },
+  "geometry": "dynamics_only",
+  "control_default": "torque",
+  "inertia_status": "upstream_not_independently_identified",
+  "expanded_urdf_sha256": "63792d2679f22c4e41cda2c4d9d903644e628970ad0656b9eec8485113941555",
+  "source_file_sha256": "63792d2679f22c4e41cda2c4d9d903644e628970ad0656b9eec8485113941555",
+  "modifications": [
+    "xacro expanded where applicable",
+    "visual/collision geometry removed",
+    "vendor controller/transmission tags removed",
+    "joint dynamics/safety/calibration tags removed for ideal rigid-body comparison"
+  ],
+  "packaged_urdf_sha256": "97aa343fe916068c2b8e25ee22c1365672827a992dbb90db25737ccabdf895dc"
+}

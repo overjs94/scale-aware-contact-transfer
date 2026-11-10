@@ -1,0 +1,23 @@
+{
+  "name": "kinova_gen3",
+  "source_repository": "https://github.com/Kinovarobotics/ros_kortex.git",
+  "commit": "c3280d8a6a6b5d96590d51538e3f265710a6c77d",
+  "source_path": "kortex_description/arms/gen3/7dof/urdf/GEN3-7DOF-VISION_ARM_URDF_V12.urdf",
+  "license": "BSD-3-Clause",
+  "license_path": "LICENSE",
+  "frame": "end_effector_link",
+  "floating_base": false,
+  "locked_joints": {},
+  "geometry": "dynamics_only",
+  "control_default": "position",
+  "inertia_status": "upstream_not_independently_identified",
+  "expanded_urdf_sha256": "262a15a7c86fc484b99087be8d787d00d442241421fcc274c8da26117d03a9bf",
+  "source_file_sha256": "262a15a7c86fc484b99087be8d787d00d442241421fcc274c8da26117d03a9bf",
+  "modifications": [
+    "xacro expanded where applicable",
+    "visual/collision geometry removed",
+    "vendor controller/transmission tags removed",
+    "joint dynamics/safety/calibration tags removed for ideal rigid-body comparison"
+  ],
+  "packaged_urdf_sha256": "637b4e167627edc0ab20cb878640deaeb2daf780f941862f6da494955503aa98"
+}

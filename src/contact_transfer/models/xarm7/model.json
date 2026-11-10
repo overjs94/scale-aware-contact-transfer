@@ -1,0 +1,23 @@
+{
+  "name": "xarm7",
+  "source_repository": "https://github.com/xArm-Developer/xarm_ros2.git",
+  "commit": "ac736c92b02de7ca7e0be6f737d77d46707464d8",
+  "source_path": "xarm_description/urdf/xarm_device.urdf.xacro",
+  "license": "BSD-3-Clause",
+  "license_path": "LICENSE",
+  "frame": "link_eef",
+  "floating_base": false,
+  "locked_joints": {},
+  "geometry": "dynamics_only",
+  "control_default": "position",
+  "inertia_status": "upstream_not_independently_identified",
+  "expanded_urdf_sha256": "c5f1fde4bb888ecb08059e7425ee3cf886d92d6f345313efe050661b1d036d1e",
+  "source_file_sha256": "effbda7f945fcee8347c8e1f3bec59bbeea38f60a6e9a5b75aea221b3ed4e81a",
+  "modifications": [
+    "xacro expanded where applicable",
+    "visual/collision geometry removed",
+    "vendor controller/transmission tags removed",
+    "joint dynamics/safety/calibration tags removed for ideal rigid-body comparison"
+  ],
+  "packaged_urdf_sha256": "f75e1f89f86e31a88f28ee90bb8aa4f8cf363b41df7277c7c9110bda8331942b"
+}

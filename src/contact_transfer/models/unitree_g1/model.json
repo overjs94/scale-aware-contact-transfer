@@ -1,0 +1,23 @@
+{
+  "name": "unitree_g1",
+  "source_repository": "https://github.com/unitreerobotics/unitree_ros.git",
+  "commit": "725b59b6de39a26c425632120c89f23c49a36f1e",
+  "source_path": "robots/g1_description/g1_29dof.urdf",
+  "license": "BSD-3-Clause",
+  "license_path": "LICENSE",
+  "frame": "right_wrist_yaw_link",
+  "floating_base": true,
+  "locked_joints": {},
+  "geometry": "dynamics_only",
+  "control_default": "torque",
+  "inertia_status": "upstream_not_independently_identified",
+  "expanded_urdf_sha256": "e1dc89366bf96aa33ba4ef211884f6d81320ddd2ac6f8b1ad82986e64008be31",
+  "source_file_sha256": "e1dc89366bf96aa33ba4ef211884f6d81320ddd2ac6f8b1ad82986e64008be31",
+  "modifications": [
+    "xacro expanded where applicable",
+    "visual/collision geometry removed",
+    "vendor controller/transmission tags removed",
+    "joint dynamics/safety/calibration tags removed for ideal rigid-body comparison"
+  ],
+  "packaged_urdf_sha256": "ab0edf65e606904f319703dfb0b0a1ec428660625f75d6032245a00a9bc6aa1e"
+}

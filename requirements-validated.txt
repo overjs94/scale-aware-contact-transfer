@@ -1,0 +1,7 @@
+# Validated on CPython 3.12, Linux x86_64
+casadi==3.7.2
+pin==4.1.0
+mujoco==4.0.0
+numpy==2.3.5
+scipy==1.17.0
+pytest==9.2.0
