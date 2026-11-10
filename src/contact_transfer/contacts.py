@@ -74,6 +74,8 @@ class Capability:
                 raise ValueError("gripper H must be (6,d), bounds must be (d,)")
             if not np.isfinite(H).all() or not np.isfinite(b).all() or np.any(b <= 0):
                 raise ValueError("gripper capability requires finite calibrated bounds")
+            if np.linalg.norm(H[:3]) > 1e-12 and np.linalg.matrix_rank(H) < 6:
+                raise ValueError("Partial-moment interfaces need a matching custom closure model; use force-only or full-rank rigid holding.")
 
     @classmethod
     def force_gripper(cls, force_bounds):

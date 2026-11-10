@@ -7,3 +7,5 @@ build/
 dist/
 outputs/
 .cache/
+node_modules/
+web/dist/

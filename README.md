@@ -135,14 +135,46 @@ target torque balance, CITO impulse balance, MuJoCo 제어 추종을 포함합�
 .devcontainer 또는 Dockerfile로 같은 Linux 환경을 구성할 수 있습니다.
 GitHub Actions는 설치·테스트·CLI 예제를 실행합니다.
 
+저장소: [overjs94/scale-aware-contact-transfer](https://github.com/overjs94/scale-aware-contact-transfer) (private).
+
 ~~~bash
-git init -b main
-git add .
-git commit -m "Add URDF-driven contact-transfer package"
-gh auth login
-python tools/publish_github.py --owner overjs94
+git clone https://github.com/overjs94/scale-aware-contact-transfer.git
+cd scale-aware-contact-transfer
 ~~~
 
-위 명령은 새 private 저장소를 생성하고 현재 commit을 push합니다.
-기존 저장소/브랜치를 덮어쓰지 않으며 원격 저장소 생성은 실행 시 수행합니다.
+GitHub의 Code → Codespaces에서 컨테이너를 생성해 같은 환경을 구성할 수 있습니다.
 원본 reference와 대용량 third_party/build 결과물은 저장소에 포함하지 않습니다.
+
+## 브라우저에서 보기
+
+[웹 시뮬레이션 뷰어 열기](https://overjs94-contact-transfer-lab.engagingchina4.chatgpt.site)
+(계산 결과 재생용, 본인 계정 접근).
+
+web/에는 3D 결과 뷰어와 Python 계산 서버가 있습니다.
+
+~~~bash
+npm --prefix web ci
+npm --prefix web run build
+python web/server.py --host 127.0.0.1 --port 8000
+~~~
+
+브라우저에서 http://127.0.0.1:8000 을 열면 녹화 결과를 확인하고,
+진폭·시간을 바꾸어 새 MuJoCo 시뮬레이션을 계산할 수 있습니다.
+Codespaces에서는 같은 서버의 8000번 포트를 전달해 브라우저로 사용합니다.
+단순 GitHub 저장소 페이지가 Python을 실행하는 것은 아닙니다.
+
+별도로 배포한 정적 웹 링크는 **사전에 계산한 결과의 3D 재생용**입니다.
+Python 서버가 연결되지 않은 화면에서는 새 계산 버튼이 비활성화됩니다.
+7종 fixed-base arm은 실제 MuJoCo 폐루프 시뮬레이션 결과입니다.
+G1 화면은 기구학 미리보기이며 동적 보행/균형 제어 시뮬레이션으로 표시하지 않습니다.
+CITO 화면은 두 Cartesian arm의 3 cm 물체 이동 제한 모델입니다.
+WebGL이 제공되지 않는 브라우저에서는 같은 좌표를 CPU로 3D 투영하며,
+카메라 회전·확대와 재생 조작을 유지합니다. 전체 형상의 mesh renderer는 아닙니다.
+
+## 최신 draft 대조
+
+2026-11-10 갱신된 TeX/PDF v12과 대조한 결과는
+[docs/draft_v12_code_check.md](docs/draft_v12_code_check.md)에 있습니다.
+특히 draft의 선택 솔버는 SNOPT/SQP이며 검증된 기본 구현은 IPOPT입니다.
+SolverSettings.backend="snopt" 선택 경로를 제공하지만 SNOPT plugin/설치/라이선스가
+있는 환경에서의 실행 검증은 아직 수행하지 않았습니다.

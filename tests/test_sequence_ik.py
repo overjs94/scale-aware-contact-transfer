@@ -12,14 +12,14 @@ def test_sequence_compares_all_feasible_types_and_checks_transitions():
         visited.append((k, types))
         return SimpleNamespace(objective=4. if types[0] == "P" else 1.)
     def transition(k, left, right, types, assignments):
-        return SimpleNamespace(objective=0.)
+        return SimpleNamespace(objective=0., full_geometry_checked=True)
     result = choose_sequence([("P", "G")], [((0,), (0,))], keyframe, transition)
     assert result.best.types == ("G",)
     assert len(result.candidates) == 2 and len(visited) == 4
     def reject_gripper(k, left, right, types, assignments):
         if types[0] == "G":
             raise RuntimeError("transition infeasible")
-        return SimpleNamespace(objective=0.)
+        return SimpleNamespace(objective=0., full_geometry_checked=True)
     result = choose_sequence([("P", "G")], [((0,), (0,))], keyframe, reject_gripper)
     assert result.best.types == ("P",) and len(result.failures) == 1
 

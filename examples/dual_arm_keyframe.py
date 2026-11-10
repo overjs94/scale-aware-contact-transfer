@@ -10,7 +10,7 @@ import numpy as np
 from contact_transfer.contacts import Capability, SurfacePatch, TaskWrench, gravity_wrench
 from contact_transfer.embodiments import load
 from contact_transfer.realization import Arm, realize_keyframe
-from contact_transfer.refinement import refine_contacts
+from contact_transfer.pipeline import source_prior, scale_prior
 
 
 def main():
@@ -30,9 +30,12 @@ def main():
     capabilities = [Capability.force_gripper([40., 40., 40.]) for _ in robots]
     # The explicitly configured masses differ; no source-force scaling is used.
     source_task = TaskWrench(gravity_wrench(.25, np.zeros(3)), E, D)
-    source = refine_contacts([SurfacePatch.fixed(p, n) for p, n in zip(source_points, normals)],
-                             source_task, capabilities)
-    target_patches = [SurfacePatch.fixed(scale*p, n) for p, n in zip(source.positions, normals)]
+    source = source_prior([SurfacePatch.fixed(p, n) for p, n in zip(source_points, normals)],
+                          source_task, [Capability(normal_max=40) for _ in robots],
+                          group_ids=("left_support", "right_support"))
+    transferred = scale_prior(source, scale)
+    target_patches = [SurfacePatch.fixed(p, n) for p, n in
+                      zip(transferred["positions"], transferred["normals"])]
     target_task = TaskWrench(gravity_wrench(2., np.zeros(3)), E, D)
     arms = [Arm(r.symbolic(), "panda_link8", q0) for r in robots]
     target = realize_keyframe(arms, target_patches, capabilities, [0, 1],
@@ -40,7 +43,8 @@ def main():
                               posture_weight=.1, robustness_weight=1.)
     print(json.dumps({
         "scale": scale, "source_mass": .25, "target_mass": 2.,
-        "source_rho": source.rho, "target_rho": target.rho,
+        "source_rho": source.source_rho, "source_status": source.source_status,
+        "source_certificate": source.source_certificate, "target_rho": target.rho,
         "target_primal_residual": target.primal_residual,
         "max_absolute_joint_torque": float(np.max(abs(target.torques))),
         "target_q": [q.tolist() for q in target.q],

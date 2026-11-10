@@ -31,7 +31,7 @@ def export_mjcf(robot, *, timestep=.002, markers=True):
     ET.SubElement(root, "option", timestep=str(timestep), gravity=_text(robot.gravity_world),
                   integrator="implicitfast")
     world = ET.SubElement(root, "worldbody")
-    base = ET.SubElement(world, "body", name=robot.tree.root,
+    base = ET.SubElement(world, "body", name="urdf_"+robot.tree.root,
                          pos=_text(robot.base_pose[:3, 3]), quat=_text(_quat(robot.base_pose[:3, :3])))
     if robot.floating_base:
         ET.SubElement(base, "freejoint", name="floating_base")

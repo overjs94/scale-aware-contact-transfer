@@ -52,7 +52,7 @@ def test_urdf_symbolic_pinocchio_and_frame_derivatives(name):
 
 def test_mimic_reduction_and_fixed_inertias(tmp_path):
     path = tmp_path/"mimic.urdf"
-    inertia = '<inertial><mass value="1"/><inertia ixx=".1" iyy=".1" izz=".1"/></inertial>'
+    inertia = '<inertial><mass value="1"/><inertia ixx=".1" iyy=".1" izz=".1" ixy="0" ixz="0" iyz="0"/></inertial>'
     path.write_text(f'''<robot name="mimic"><link name="base"/>
     <link name="one">{inertia}</link><link name="two">{inertia}</link>
     <joint name="j1" type="prismatic"><parent link="base"/><child link="one"/>
@@ -79,3 +79,11 @@ def test_export_reload_and_lie_zero_derivatives(tmp_path, slider_urdf):
     v = ca.SX.sym("v", 6)
     derivative = ca.Function("dexp", [v], [ca.jacobian(ca.vec(se3_exp(v)), v)])
     assert np.isfinite(derivative(np.zeros(6))).all()
+
+
+def test_missing_inertia_entries_are_not_silently_discarded(tmp_path):
+    path = tmp_path/"invalid.urdf"
+    path.write_text('<robot name="invalid"><link name="root"><inertial><mass value="1"/>'
+                    '<inertia ixx=".1" iyy=".1" izz=".1"/></inertial></link></robot>')
+    with pytest.raises(ValueError, match="all six tensor entries"):
+        Robot(path)

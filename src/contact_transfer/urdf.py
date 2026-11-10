@@ -67,6 +67,8 @@ class URDFTree:
                 R, com = origin(inertial)
                 mass = float(inertial.find("mass").attrib["value"])
                 a = inertial.find("inertia").attrib
+                if not {"ixx", "ixy", "ixz", "iyy", "iyz", "izz"} <= set(a):
+                    raise ValueError(f"URDF inertia requires all six tensor entries: {name}")
                 I = np.array([[float(a["ixx"]), float(a.get("ixy", 0)), float(a.get("ixz", 0))],
                               [float(a.get("ixy", 0)), float(a["iyy"]), float(a.get("iyz", 0))],
                               [float(a.get("ixz", 0)), float(a.get("iyz", 0)), float(a["izz"])]])

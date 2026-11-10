@@ -22,7 +22,8 @@ class SequenceSearchResult:
 
 
 def choose_sequence(allowed_types_by_arm, assignment_sequences, keyframe_solver,
-                    transition_solver, *, transition_weight=1., type_validator=None):
+                    transition_solver, *, transition_weight=1., type_validator=None,
+                    require_full_geometry=True):
     """Evaluate every specified discrete candidate, never stop at first feasible.
 
     keyframe_solver(k, types, assignment, previous) -> result with objective.
@@ -46,6 +47,9 @@ def choose_sequence(allowed_types_by_arm, assignment_sequences, keyframe_solver,
                                                      keyframes[-1] if keyframes else None))
                 transitions = [transition_solver(k, keyframes[k], keyframes[k+1], types, assignments)
                                for k in range(len(keyframes)-1)]
+                if require_full_geometry and any(
+                    not getattr(t, "full_geometry_checked", False) for t in transitions):
+                    raise RuntimeError("transition lacks required full-geometry validation")
                 value = sum(r.objective for r in keyframes)+transition_weight*sum(r.objective for r in transitions)
                 if not math.isfinite(value):
                     raise RuntimeError("nonfinite objective")

@@ -27,6 +27,11 @@ class Contact:
     nodes: tuple | None = None
     attached_steps: tuple = ()
     environment_robot_index: int | None = None
+    maintained_steps: tuple = ()
+    sticking_steps: tuple = ()
+    released_steps: tuple = ()
+    group_id: str | None = None
+    release_at_end: bool = False
 
     def __post_init__(self):
         self.point_object = np.asarray(self.point_object, float).reshape(3)
@@ -35,6 +40,8 @@ class Contact:
             raise ValueError("contact normal must be unit length")
         if self.robot_index is None and self.capability.kind == "G":
             raise ValueError("environment plane contacts are unilateral")
+        if set(self.released_steps)&(set(self.maintained_steps)|set(self.sticking_steps)):
+            raise ValueError("released and maintained/sticking phases cannot overlap")
 
     def geometry(self, system, q):
         """Return gap, local relative velocity Jacobian, positional closure."""
@@ -93,12 +100,27 @@ def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
                dt_bounds=(.01, .2), desired_object_poses=None, fixed_dt=True,
                relaxations=(1e-3, 1e-5, 1e-8), acceptance=2e-5,
                kinematic_tolerance=1e-7,
+               characteristic_length=1., Kp=None, kR=1., Q_tau=None, Q_v=None,
+               duration_weight=1.,
                initial=None, collision_margins=None, full_geometry_validator=None,
                settings=None):
     if steps < 2 or duration <= 0 or not relaxations or min(relaxations) < 0 or kinematic_tolerance <= 0:
         raise ValueError("invalid transcription or continuation")
     if fixed_dt and not dt_bounds[0] <= duration/steps <= dt_bounds[1]:
         raise ValueError("fixed step falls outside dt_bounds")
+    if characteristic_length <= 0 or kR <= 0 or duration_weight <= 0:
+        raise ValueError("object length and orientation/duration weights must be positive")
+    def weight(value, size, default):
+        value = np.eye(size)*default if value is None else np.asarray(value, float)
+        if np.ndim(value) == 0:
+            value = np.eye(size)*value
+        if value.shape != (size, size) or not np.allclose(value, value.T):
+            raise ValueError("cost weights must be symmetric with compatible dimensions")
+        if size and np.linalg.eigvalsh(value)[0] < -1e-12:
+            raise ValueError("cost weights must be positive semidefinite")
+        return ca.DM(value)
+    Kp = weight(Kp, 3, 20.)
+    Qt, Qv = weight(Q_tau, system.nu, 1e-4), weight(Q_v, system.nv, 1e-3)
     q_start, q_goal = np.asarray(q_start, float).reshape(system.nq), np.asarray(q_goal, float).reshape(system.nq)
     opti = ca.Opti()
     Q, V = opti.variable(system.nq, steps+1), opti.variable(system.nv, steps+1)
@@ -150,10 +172,15 @@ def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
             _, Jnow, _ = contact.geometry(system, Q[:, l])
             vel = Jnext@V[:, l+1]
             cap = contact.capability
-            active = contact.nodes is None or l in contact.nodes
+            active = (contact.nodes is None or l in contact.nodes) and l not in contact.released_steps
             if cap.kind == "P":
                 opti.subject_to(gap >= 0)
                 gap_records.append(gap)
+                if l in contact.maintained_steps or l in contact.sticking_steps:
+                    equality(opti, gap)
+                if l in contact.sticking_steps:
+                    opti.subject_to(opti.bounded(-kinematic_tolerance, vel[:2], kinematic_tolerance))
+                    grasp_velocities.append(vel[:2])
                 P = opti.variable(3) if active else ca.DM.zeros(3)
                 if active:
                     opti.subject_to(opti.bounded(0, P[2], h*cap.normal_max))
@@ -196,7 +223,7 @@ def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
                         before = before if np.linalg.norm(np.asarray(cap.H)[:3]) > 1e-12 else before[3:]
                         opti.subject_to(opti.bounded(-kinematic_tolerance, before, kinematic_tolerance))
                         grasp_velocities.append(before)
-                    if l+1 not in contact.attached_steps and l < steps-1:
+                    if l+1 not in contact.attached_steps and (l < steps-1 or contact.release_at_end):
                         equality(opti, P)  # unload before release
                 else:
                     P = ca.DM.zeros(6)
@@ -206,10 +233,12 @@ def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
                h*(system.B@U[:, l]-system.bias(Q[:, l], V[:, l]))-generalized_impulse)
         equality(opti, dyn)
         equality(opti, Q[:, l+1]-system.integrate(Q[:, l], h*V[:, l+1]))
-        objective += h*(1e-4*ca.sumsqr(U[:, l])+1e-3*ca.sumsqr(V[:, l])+1.)
+        objective += h*(ca.mtimes([U[:, l].T, Qt, U[:, l]])+
+                        ca.mtimes([V[:, l].T, Qv, V[:, l]])+duration_weight)
         if desired_object_poses is not None:
             T, Td = system.object_pose(Q[:, l]), ca.DM(desired_object_poses[l])
-            objective += h*(10*ca.sumsqr(T[:3, 3]-Td[:3, 3])+rotation_cost(T[:3, :3], Td[:3, :3]))
+            ep = (T[:3, 3]-Td[:3, 3])/characteristic_length
+            objective += h*(.5*ca.mtimes([ep.T, Kp, ep])+kR*rotation_cost(T[:3, :3], Td[:3, :3]))
     opti.minimize(objective)
     residual = np.inf
     for relaxation in relaxations:

@@ -7,7 +7,7 @@ from contact_transfer.embodiments import load
 from contact_transfer.simulation import MujocoRobot
 
 
-@pytest.mark.parametrize("name", ["franka_panda", "rb3", "rb5"])
+@pytest.mark.parametrize("name", ["franka_panda", "rb3", "rb5", "kuka_iiwa7", "ur5e", "kinova_gen3", "xarm7"])
 def test_mujoco_computed_torque_tracking(name):
     pytest.importorskip("mujoco")
     r = load(name)

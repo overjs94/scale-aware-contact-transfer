@@ -44,6 +44,7 @@ class RealizationResult:
 def realize_keyframe(arms, patches, capabilities, assignment, object_pose,
                      task: TaskWrench, *, rho_min=0., characteristic_length=1.,
                      position_radius=.05, normal_radius=.2, geometry_weight=1.,
+                     normal_weight=1.,
                      posture_weight=.01, robustness_weight=1., collision_margins=None,
                      settings=None):
     m = len(patches)
@@ -80,7 +81,7 @@ def realize_keyframe(arms, patches, capabilities, assignment, object_pose,
             opti.subject_to(ca.sumsqr(p-p0) <= position_radius**2)
             opti.subject_to(1-ca.dot(R[:, 2], R0[:, 2]) <= normal_radius)
         objective += geometry_weight*(ca.sumsqr(p-p0)/characteristic_length**2
-                                     +1-ca.dot(R[:, 2], R0[:, 2]))
+                                     +normal_weight*(1-ca.dot(R[:, 2], R0[:, 2])))
         # Moment capability must be accompanied by matching orientation closure.
         cap = capabilities[i]
         if cap.kind == "G" and np.linalg.norm(np.asarray(cap.H)[:3]) > 1e-12:

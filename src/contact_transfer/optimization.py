@@ -1,6 +1,6 @@
 """Shared NLP configuration and independent primal-residual acceptance."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import casadi as ca
 import numpy as np
@@ -12,6 +12,12 @@ class SolverSettings:
     tolerance: float = 1e-8
     acceptance_tolerance: float = 2e-6
     verbose: bool = False
+    backend: str = "ipopt"
+    options: dict = field(default_factory=dict)
+
+    def __post_init__(self):
+        if self.backend not in {"ipopt", "snopt"}:
+            raise ValueError("backend must be ipopt or snopt")
 
 
 def equality(opti, expression):
@@ -33,19 +39,27 @@ def equality(opti, expression):
 
 def solve(opti, settings=None):
     settings = settings or SolverSettings()
-    opti.solver("ipopt", {
+    options = {
         "expand": True, "print_time": settings.verbose,
         "ipopt.print_level": 5 if settings.verbose else 0,
         "ipopt.sb": "yes", "ipopt.max_iter": settings.max_iterations,
         "ipopt.tol": settings.tolerance,
         "ipopt.acceptable_tol": settings.tolerance*10,
         "ipopt.bound_relax_factor": 0,
-    })
+    } if settings.backend == "ipopt" else {
+        "expand": True, "print_time": settings.verbose,
+    }
+    options.update(settings.options)
+    opti.solver(settings.backend, options)
     try:
         solution = opti.solve()
     except RuntimeError as error:
-        status = opti.stats().get("return_status", "unknown")
-        raise RuntimeError(f"NLP rejected: {status}") from error
+        try:
+            status = opti.stats().get("return_status", "unknown")
+        except RuntimeError:
+            status = "solver initialization failed"
+        suffix = "; SNOPT requires a working CasADi plugin and solver installation/license" if settings.backend == "snopt" else ""
+        raise RuntimeError(f"NLP rejected [{settings.backend}]: {status}{suffix}") from error
     g = np.asarray(solution.value(opti.g)).reshape(-1)
     lo = np.asarray(solution.value(opti.lbg)).reshape(-1)
     hi = np.asarray(solution.value(opti.ubg)).reshape(-1)

@@ -21,7 +21,7 @@ class RefinementResult:
 
 def refine_contacts(patches, task: TaskWrench, capabilities=None, *,
                     position_radius=.03, normal_radius=.1, rho_min=0.,
-                    geometry_weight=1e-4, settings=None):
+                    geometry_weight=0., settings=None):
     m = len(patches)
     caps = capabilities or [Capability() for _ in patches]
     if not m or len(caps) != m:

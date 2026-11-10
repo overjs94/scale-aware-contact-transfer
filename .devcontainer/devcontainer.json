@@ -6,7 +6,9 @@
     "OPENBLAS_NUM_THREADS": "1",
     "MKL_NUM_THREADS": "1"
   },
-  "postCreateCommand": "python -m pip install -e '.[dev,simulation]'",
+  "postCreateCommand": "python -m pip install -e '.[dev,simulation]' && npm --prefix web ci && npm --prefix web run build",
+  "forwardPorts": [8000],
+  "portsAttributes": {"8000": {"label": "Contact Transfer Lab", "onAutoForward": "notify"}},
   "customizations": {
     "vscode": {
       "extensions": ["ms-python.python"],
