@@ -244,8 +244,9 @@ results using actual URDF/mesh playback. The Panda baseline optimizes forces and
 torques on an IK-prescribed path; the original Cartesian example uses CITO.
 See [experiment scope and validation](docs/three_arm_experiment.md).
 
-The free public viewer is published from
-[overjs94/Contact_contraction](https://github.com/overjs94/Contact_contraction).
+The free public viewer is live at
+[Contact Transfer Lab](https://overjs94.github.io/Contact_contraction/), published
+from [overjs94/Contact_contraction](https://github.com/overjs94/Contact_contraction).
 This source repository stays private. Only the built web UI, recorded examples,
 URDF manifests and required licenses are exported:
 

@@ -127,7 +127,9 @@ the built static UI, 11 recorded examples, model URDF/manifests and licenses.
 The public repository's `verify_site.py` passed checksum/reference checks for 62
 static files and validates the recorded Panda report. The private source history,
 optimizer and Python simulation backend were not copied. Public Pages deployment
-is prepared but initial site creation was rejected with `Resource not accessible
-by integration`; an owner must enable GitHub Actions as the Pages source once.
+passed after initial owner activation. The post-publish check fetched the live
+HTML/JS/CSS, recording, three Panda URDFs and real upstream DAE/STL assets with
+permissive CORS. The live URL is https://overjs94.github.io/Contact_contraction/.
+Cloud-browser visual inspection remains blocked by ERR_TUNNEL_CONNECTION_FAILED.
 The private workflow now packages export artifacts without requesting Pages or
 OIDC write permissions.
