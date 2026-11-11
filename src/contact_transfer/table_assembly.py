@@ -133,7 +133,16 @@ def plan_assembly(case,settings=None,progress=None):
             j=ids.index(spec['object']);Rc=R[j]@contact_basis(spec['normal_object']);w=ca.vertcat(ca.DM(Rc)@force[:3],ca.DM(Rc)@force[3:]);world.append(w)
             T=robot.fk(Q[k,sl],spec['tool_frame']);dual=ca.vertcat(ca.DM(T[:3,:3].T)@w[:3],w[3:])
             tau=ca.DM(robot.inverse_dynamics(Q[k,sl],V[k,sl],A[k,sl]))-ca.DM(robot.jacobian(Q[k,sl],spec['tool_frame']).T)@dual
-            opti.subject_to(opti.bounded(-robot.effort,tau,robot.effort));taus.append(tau)
+            if tau.is_constant():
+                # After release this arm has no reaction decision variables.
+                # Check its prescribed-path torque numerically; newer CasADi
+                # rejects a constant constraint passed to Opti.subject_to.
+                value=np.asarray(ca.evalf(tau)).reshape(-1)
+                if not np.isfinite(value).all() or np.any(abs(value)>robot.effort+1e-9):
+                    raise RuntimeError('Released arm exceeds URDF torque limits')
+            else:
+                opti.subject_to(opti.bounded(-robot.effort,tau,robot.effort))
+            taus.append(tau)
             objective+=1e-3*ca.sumsqr(force[3:])+20*ca.sumsqr(force[:3])+1e-5*ca.sumsqr(tau)
         reactions.append(ca.horzcat(*world).T);torques.append(ca.vertcat(*taus))
     opti.minimize(objective);sol,residual=solve(opti,settings or SolverSettings(options={'expand':False}))

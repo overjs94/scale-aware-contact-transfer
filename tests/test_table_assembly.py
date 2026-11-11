@@ -76,6 +76,9 @@ def test_30_second_grip_support_reorient_insert_and_release(execution):
     assert not data['tool_states']['leg_gripper_contact'][-1] and data['tool_states']['socket_contact'][-1]
     assert (root/'viewer/models/assembly_tabletop/robot.urdf').is_file()
     assert not (root/'result/worker.log').exists() and not (root/'result/status.json').exists()
+    planned=np.load(root/'result/plan.npz');case=AssemblyCase.load(root/'result/case.json')
+    limits=np.concatenate([robot.effort for robot in case.robots])
+    assert np.all(abs(planned['torque'])<=limits+1e-8)
     # Both free bodies are observed throughout; leg was lifted off its cradle.
     lift=int(round(6/.001));assert t.object_pose[lift,1,2]>t.object_pose[0,1,2]+.10
     np.testing.assert_allclose(np.linalg.norm(t.object_pose[:,:,3:],axis=2),1,atol=1e-8)
