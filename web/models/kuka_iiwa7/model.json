@@ -1,0 +1,41 @@
+{
+  "id": "kuka_iiwa7",
+  "urdf": "robot.urdf",
+  "packages": {
+    "upstream": "https://raw.githubusercontent.com/epfl-lasa/iiwa_ros/9d2b99f1c62e1dd57c9c351958206a7ee5066785"
+  },
+  "source_repository": "https://github.com/epfl-lasa/iiwa_ros.git",
+  "commit": "9d2b99f1c62e1dd57c9c351958206a7ee5066785",
+  "source_path": "iiwa_description/urdf/iiwa7.urdf.xacro",
+  "source_file_sha256": "7ded29f098f9d3898b5e388f9f65af4edff491a69731d7e0637370740862f0e9",
+  "urdf_sha256": "7e16dac0ed1f464a7fdc2cd090da77edda999c008121f350342d8d31e43abc62",
+  "license": "GPL-3.0-or-later",
+  "license_file": "LICENSE.upstream",
+  "assets": [
+    "https://raw.githubusercontent.com/epfl-lasa/iiwa_ros/9d2b99f1c62e1dd57c9c351958206a7ee5066785/iiwa_description/meshes/iiwa7/collision/link_0.stl",
+    "https://raw.githubusercontent.com/epfl-lasa/iiwa_ros/9d2b99f1c62e1dd57c9c351958206a7ee5066785/iiwa_description/meshes/iiwa7/collision/link_1.stl",
+    "https://raw.githubusercontent.com/epfl-lasa/iiwa_ros/9d2b99f1c62e1dd57c9c351958206a7ee5066785/iiwa_description/meshes/iiwa7/collision/link_2.stl",
+    "https://raw.githubusercontent.com/epfl-lasa/iiwa_ros/9d2b99f1c62e1dd57c9c351958206a7ee5066785/iiwa_description/meshes/iiwa7/collision/link_3.stl",
+    "https://raw.githubusercontent.com/epfl-lasa/iiwa_ros/9d2b99f1c62e1dd57c9c351958206a7ee5066785/iiwa_description/meshes/iiwa7/collision/link_4.stl",
+    "https://raw.githubusercontent.com/epfl-lasa/iiwa_ros/9d2b99f1c62e1dd57c9c351958206a7ee5066785/iiwa_description/meshes/iiwa7/collision/link_5.stl",
+    "https://raw.githubusercontent.com/epfl-lasa/iiwa_ros/9d2b99f1c62e1dd57c9c351958206a7ee5066785/iiwa_description/meshes/iiwa7/collision/link_6.stl",
+    "https://raw.githubusercontent.com/epfl-lasa/iiwa_ros/9d2b99f1c62e1dd57c9c351958206a7ee5066785/iiwa_description/meshes/iiwa7/collision/link_7.stl",
+    "https://raw.githubusercontent.com/epfl-lasa/iiwa_ros/9d2b99f1c62e1dd57c9c351958206a7ee5066785/iiwa_description/meshes/iiwa7/visual/link_0.stl",
+    "https://raw.githubusercontent.com/epfl-lasa/iiwa_ros/9d2b99f1c62e1dd57c9c351958206a7ee5066785/iiwa_description/meshes/iiwa7/visual/link_1.stl",
+    "https://raw.githubusercontent.com/epfl-lasa/iiwa_ros/9d2b99f1c62e1dd57c9c351958206a7ee5066785/iiwa_description/meshes/iiwa7/visual/link_2.stl",
+    "https://raw.githubusercontent.com/epfl-lasa/iiwa_ros/9d2b99f1c62e1dd57c9c351958206a7ee5066785/iiwa_description/meshes/iiwa7/visual/link_3.stl",
+    "https://raw.githubusercontent.com/epfl-lasa/iiwa_ros/9d2b99f1c62e1dd57c9c351958206a7ee5066785/iiwa_description/meshes/iiwa7/visual/link_4.stl",
+    "https://raw.githubusercontent.com/epfl-lasa/iiwa_ros/9d2b99f1c62e1dd57c9c351958206a7ee5066785/iiwa_description/meshes/iiwa7/visual/link_5.stl",
+    "https://raw.githubusercontent.com/epfl-lasa/iiwa_ros/9d2b99f1c62e1dd57c9c351958206a7ee5066785/iiwa_description/meshes/iiwa7/visual/link_6.stl",
+    "https://raw.githubusercontent.com/epfl-lasa/iiwa_ros/9d2b99f1c62e1dd57c9c351958206a7ee5066785/iiwa_description/meshes/iiwa7/visual/link_7.stl"
+  ],
+  "geometry": "upstream_visual_and_collision",
+  "asset_transport": "pinned_upstream_https",
+  "modifications": [
+    "xacro expanded where applicable",
+    "mesh/texture URIs rewritten to pinned upstream package",
+    "controller tags omitted",
+    "upstream comments retained in header"
+  ],
+  "mechanics_verified": true
+}

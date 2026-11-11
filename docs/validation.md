@@ -5,7 +5,7 @@ Exact selected package versions are recorded in requirements-validated.txt.
 
 ## Automated tests
 
-40 pytest tests passed on the implementation workspace.
+48 pytest tests passed on the implementation workspace.
 One warning originates from an inherited anyio pytest plugin's deprecated
 pytest internal import; it is not a package test failure.
 
@@ -62,10 +62,14 @@ RB3 simulation request (0.5 s, 0.04 rad, 121 samples); maximum effort-limit
 ratio was 0.25923.
 
 Browser QA confirmed model selection, G1 labeling, pause, timeline scrubbing
-and the CITO endpoint (0.8 s, 0.0300 m). The QA browser disables WebGL, so
-the CPU camera-projection fallback was exercised. The WebGL renderer was
-not exercised in that browser. Both renderers use the same URDF-derived
-coordinates. Static hosting replays records and does not execute Python.
+and the CITO endpoint (0.8 s, 0.0300 m). The initial browser exercised the CPU
+coordinate fallback. Updated Chromium QA with software WebGL loaded the actual
+upstream visual and collision meshes for all eight robots. Ten browser tests
+with deterministic local mesh fixtures verify recorded FK in both geometry
+modes, origin/scale/joint rotation composition, mode switching and asset errors.
+Eight additional Python tests verify full-URDF mechanics against the packaged
+subsets and recorded joint names. Static hosting replays records and does not
+execute Python. This source update does not deploy a new hosted viewer version.
 
 The Dockerfile/dev-container configuration was not executed on a remote
 Docker/Codespaces service. GitHub Actions successfully ran the initial

@@ -1,0 +1,34 @@
+{
+  "id": "xarm7",
+  "urdf": "robot.urdf",
+  "packages": {
+    "upstream": "https://raw.githubusercontent.com/xArm-Developer/xarm_ros2/ac736c92b02de7ca7e0be6f737d77d46707464d8"
+  },
+  "source_repository": "https://github.com/xArm-Developer/xarm_ros2.git",
+  "commit": "ac736c92b02de7ca7e0be6f737d77d46707464d8",
+  "source_path": "xarm_description/urdf/xarm_device.urdf.xacro",
+  "source_file_sha256": "effbda7f945fcee8347c8e1f3bec59bbeea38f60a6e9a5b75aea221b3ed4e81a",
+  "urdf_sha256": "ebbf4c4107674e78e355394921aad3ed4e310f64b6bb39c0b13066382c5a83bf",
+  "license": "BSD-3-Clause",
+  "license_file": "LICENSE.upstream",
+  "assets": [
+    "https://raw.githubusercontent.com/xArm-Developer/xarm_ros2/ac736c92b02de7ca7e0be6f737d77d46707464d8/xarm_description/meshes/end_tool/collision/end_tool.stl",
+    "https://raw.githubusercontent.com/xArm-Developer/xarm_ros2/ac736c92b02de7ca7e0be6f737d77d46707464d8/xarm_description/meshes/xarm7/visual/link1.stl",
+    "https://raw.githubusercontent.com/xArm-Developer/xarm_ros2/ac736c92b02de7ca7e0be6f737d77d46707464d8/xarm_description/meshes/xarm7/visual/link2.stl",
+    "https://raw.githubusercontent.com/xArm-Developer/xarm_ros2/ac736c92b02de7ca7e0be6f737d77d46707464d8/xarm_description/meshes/xarm7/visual/link3.stl",
+    "https://raw.githubusercontent.com/xArm-Developer/xarm_ros2/ac736c92b02de7ca7e0be6f737d77d46707464d8/xarm_description/meshes/xarm7/visual/link4.stl",
+    "https://raw.githubusercontent.com/xArm-Developer/xarm_ros2/ac736c92b02de7ca7e0be6f737d77d46707464d8/xarm_description/meshes/xarm7/visual/link5.stl",
+    "https://raw.githubusercontent.com/xArm-Developer/xarm_ros2/ac736c92b02de7ca7e0be6f737d77d46707464d8/xarm_description/meshes/xarm7/visual/link6.stl",
+    "https://raw.githubusercontent.com/xArm-Developer/xarm_ros2/ac736c92b02de7ca7e0be6f737d77d46707464d8/xarm_description/meshes/xarm7/visual/link7.stl",
+    "https://raw.githubusercontent.com/xArm-Developer/xarm_ros2/ac736c92b02de7ca7e0be6f737d77d46707464d8/xarm_description/meshes/xarm7/visual/link_base.stl"
+  ],
+  "geometry": "upstream_visual_and_collision",
+  "asset_transport": "pinned_upstream_https",
+  "modifications": [
+    "xacro expanded where applicable",
+    "mesh/texture URIs rewritten to pinned upstream package",
+    "controller tags omitted",
+    "upstream comments retained in header"
+  ],
+  "mechanics_verified": true
+}

@@ -16,6 +16,7 @@ paper component is not complete.
 | Collision | Differentiable margins and trajectory validator callbacks | Bundled dynamics-only models do not provide full mesh clearances |
 | Control | Computed torque, Cartesian admittance, position servo | Simulation level; no hard real-time guarantee |
 | MuJoCo | URDF inertia export, state mapping, headless tracking | Markers are not collision geometry |
+| Mesh visualization | Eight full upstream URDFs, STL/DAE loading, visual/collision selector and recorded joint/base poses | Upstream mesh network access and WebGL required; display does not enable contact dynamics |
 | Fixed-geometry SOCP | Clarabel box margin, exact friction cones, fixed-posture torque bounds | Geometry/closure/collision remain NLP or scene checks |
 | Contact scene replay | Supplied MJCF, scalar-joint torque control, free objects, contact traces, equality hold/release | Real furniture collision assets and gripper calibration external |
 | Engine comparison | Validated portable trace and matched endpoint comparisons | CRISP C++ runner/adapter and insertion/jam classifier not implemented |

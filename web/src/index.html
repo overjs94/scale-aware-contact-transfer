@@ -39,7 +39,7 @@
             <select id="speed" aria-label="재생 속도"><option value=".5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
             <button id="loop" class="loop-button active" aria-label="반복 재생" aria-pressed="true">↻</button>
           </div>
-          <div class="geometry-note"><span>◈</span><p><b>기구학 좌표를 표시하는 형상입니다.</b> 링크·관절은 시각화 proxy이며, 실제 mesh 접촉·충돌 검증을 나타내지 않습니다.</p></div>
+          <div class="geometry-note"><span>◈</span><p id="geometry-status" role="status">URDF visual과 mesh를 준비하고 있습니다.</p><label class="geometry-control">표시 형상 <select id="geometry-mode" aria-label="표시 형상"><option value="visual">URDF visual</option><option value="collision">URDF collision</option><option value="skeleton">링크 좌표</option></select></label></div>
         </section>
         <aside class="details">
           <section class="panel"><div class="section-label">MODEL SNAPSHOT</div><div class="stat-grid">
@@ -51,7 +51,7 @@
             <div class="chart-footer"><span>0 s</span><span id="chart-end">—</span></div><p id="chart-note" class="fine">관절 위치 오차의 2-norm</p>
           </section>
           <section class="panel torque-panel"><div class="section-label">ACTUATION UTILIZATION</div><div class="torque-value"><strong id="torque-now">—</strong><span>of URDF effort limit</span></div><div class="meter"><span id="torque-meter"></span></div><div class="meter-label"><span>0%</span><span>100%</span></div></section>
-          <div class="validation"><span class="checkmark">✓</span><div><b><span id="test-count">30</span> automated tests passed</b><p>Mechanics · Jacobians · Contact · Control</p></div></div>
+          <div class="validation"><span class="checkmark">✓</span><div><b><span id="test-count">48</span> automated tests passed</b><p>Mechanics · Jacobians · Contact · Control</p></div></div>
         </aside>
       </div>
       <section class="run-panel">

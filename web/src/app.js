@@ -1,9 +1,11 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { applyRecordedPose, disposeModel, loadURDFModel } from "./urdf-view.js";
 
 const $ = (id) => document.getElementById(id);
 let dataset, frameFloat = 0, playing = true, loop = true, speed = 1, loadToken = 0;
 let backend = false, geometry = [], objectMesh, chartValues = [], downloadUrl, displayedPositions = [];
+let urdfModel, geometryToken = 0;
 const scene = new THREE.Scene();
 scene.fog = new THREE.FogExp2(0x0c1423, .06);
 const camera = new THREE.PerspectiveCamera(39, 1, .01, 100);
@@ -54,9 +56,9 @@ function resetCamera() {
   controls.update();
 }
 function buildGeometry(data) {
+  ++geometryToken; urdfModel = undefined;
   while (robotGroup.children.length) {
-    const child = robotGroup.children[0]; robotGroup.remove(child);
-    child.geometry?.dispose();
+    disposeModel(robotGroup.children[0]);
   }
   geometry = []; objectMesh = undefined;
   const points = data.positions[0].map(p => new THREE.Vector3(...p));
@@ -91,20 +93,57 @@ function buildGeometry(data) {
   grid.material.transparent = true; grid.material.opacity = .8; scene.add(grid);
   resetCamera();
 }
+async function loadGeometry() {
+  const token = ++geometryToken, data = dataset, mode = $("geometry-mode").value;
+  if (urdfModel) { disposeModel(urdfModel); urdfModel = undefined; }
+  $("geometry-status").dataset.state = "loading";
+  updateGeometry(frameFloat);
+  if (mode === "skeleton") {
+    $("geometry-status").textContent = data.id === "dual_cito"
+      ? "두 Cartesian arm과 물체의 좌표 재생입니다. 이 제한 모델에는 외형 mesh가 없습니다."
+      : "URDF 링크 좌표를 표시합니다. Visual 또는 collision을 선택하면 원본 형상을 불러옵니다.";
+    $("geometry-status").dataset.state = "skeleton";
+    $("loading").classList.add("hidden"); return;
+  }
+  $("geometry-status").textContent = "URDF와 mesh를 불러오는 중입니다…";
+  $("loading").classList.remove("hidden");
+  try {
+    const model = await loadURDFModel(`./models/${data.id}/model.json`, mode);
+    if (token !== geometryToken || data !== dataset) { disposeModel(model); return; }
+    applyRecordedPose(model, data, frameFloat);
+    urdfModel = model; robotGroup.add(model);
+    $("geometry-status").textContent = canvasFallback
+      ? "URDF/mesh 로드 완료. WebGL을 사용할 수 없어 링크 좌표를 CPU로 표시합니다."
+      : mode === "collision"
+        ? "URDF collision 형상을 표시합니다. 형상 표시는 접촉 계산·충돌 검증 결과와 별개입니다."
+        : "URDF visual·mesh의 origin과 scale을 적용했습니다. 기록된 시뮬레이션은 관절 추종 검증입니다.";
+    $("geometry-status").dataset.state = "ready";
+    $("geometry-status").dataset.model = data.id;
+    updateGeometry(frameFloat);
+  } catch (error) {
+    if (token !== geometryToken) return;
+    $("geometry-status").textContent = error.message + " 링크 좌표 표시를 선택하거나 네트워크를 확인해 주세요.";
+    $("geometry-status").dataset.state = "error";
+    toast(error.message);
+  } finally {
+    if (token === geometryToken) $("loading").classList.add("hidden");
+  }
+}
 function updateGeometry(value) {
   if (!dataset) return;
   const lo = Math.floor(value), hi = Math.min(lo + 1, dataset.times.length - 1), f = value - lo;
   const positions = dataset.positions[lo].map((p, i) => new THREE.Vector3(...p).lerp(new THREE.Vector3(...dataset.positions[hi][i]), f));
   geometry.forEach(item => {
     const a = positions[item.a];
-    if (!item.cylinder) { item.mesh.position.copy(a); return; }
+    if (!item.cylinder) { item.mesh.visible = $("geometry-mode").value === "skeleton"; item.mesh.position.copy(a); return; }
     const b = positions[item.b], delta = b.clone().sub(a), length = delta.length();
-    item.mesh.visible = length > 1e-6;
+    item.mesh.visible = $("geometry-mode").value === "skeleton" && length > 1e-6;
     item.mesh.position.copy(a).add(b).multiplyScalar(.5);
     item.mesh.scale.set(1, length, 1);
     if (length > 1e-6) item.mesh.quaternion.setFromUnitVectors(up, delta.normalize());
   });
   if (objectMesh) objectMesh.position.copy(positions[dataset.object.index]);
+  if (urdfModel) applyRecordedPose(urdfModel, dataset, value);
   displayedPositions = positions;
 }
 // Preserve orbit/zoom and real URDF coordinates when WebGL is unavailable.
@@ -163,7 +202,10 @@ function drawChart() {
   $("chart-area").setAttribute("d", "M0,85 L" + points.map(p => p.join(",")).join(" L") + " L260,85 Z");
 }
 function showData(data) {
+  if (dataset?.id === "dual_cito" && data.id !== "dual_cito") $("geometry-mode").value = "visual";
   dataset = data; frameFloat = 0;
+  $("geometry-mode").disabled = data.id === "dual_cito";
+  if (data.id === "dual_cito") $("geometry-mode").value = "skeleton";
   $("model-title").textContent = data.title;
   $("model-description").textContent = data.engine === "kinematic_preview" ? "29개 관절과 floating base를 가진 휴머노이드의 기구학을 확인합니다." : data.engine === "cito_trajectory" ? "접촉을 유지하며 물체를 들어 올리는 제한 모델의 최적화 결과입니다." : "URDF 관성으로 계산한 폐루프 토크 제어 결과를 재생합니다.";
   $("engine-badge").innerHTML = "<span></span>" + engineLabel(data);
@@ -185,7 +227,7 @@ function showData(data) {
   $("download-data").href = downloadUrl; $("download-data").download = data.id + "-simulation.json";
   $("run").disabled = !backend || data.engine === "kinematic_preview" || data.id === "dual_cito";
   buildGeometry(data); drawChart(); updateFrame();
-  $("loading").classList.add("hidden");
+  loadGeometry();
 }
 function updateFrame() {
   if (!dataset) return;
@@ -208,13 +250,14 @@ async function selectModel(id) {
     if (!response.ok) throw Error("데이터를 불러오지 못했습니다.");
     const data = await response.json();
     if (token === loadToken) showData(data);
-  } catch (error) { toast(error.message); $("loading").classList.add("hidden"); }
+  } catch (error) { if (token === loadToken) { toast(error.message); $("loading").classList.add("hidden"); } }
 }
 $("play").onclick = () => { playing = !playing; $("play").textContent = playing ? "Ⅱ" : "▶"; $("play").setAttribute("aria-label", playing ? "일시 정지" : "재생"); };
 $("timeline").oninput = event => { if (dataset) { frameFloat = Number(event.target.value) * (dataset.times.length - 1); updateFrame(); } };
 $("speed").onchange = event => speed = Number(event.target.value);
 $("loop").onclick = () => { loop = !loop; $("loop").classList.toggle("active", loop); $("loop").setAttribute("aria-pressed", loop); };
 $("reset-camera").onclick = resetCamera;
+$("geometry-mode").onchange = loadGeometry;
 $("run").onclick = async () => {
   $("run").disabled = true; $("run").textContent = "계산 중…";
   try {

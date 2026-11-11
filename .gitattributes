@@ -1,0 +1,2 @@
+# Preserve imported licenses byte-for-byte, including upstream whitespace.
+**/LICENSE.upstream -whitespace

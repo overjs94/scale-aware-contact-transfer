@@ -4,6 +4,7 @@ from pathlib import Path
 import json
 import platform
 import numpy as np
+from scipy.spatial.transform import Rotation
 
 from contact_transfer.embodiments import catalog, load
 from contact_transfer.control import ComputedTorque
@@ -75,6 +76,9 @@ def generate(name, duration=3., amplitude=.12, frame_count=121):
         "floating_base": robot.floating_base,
         "frame": catalog()[name]["frame"], "times": times.round(6).tolist(),
         "link_names": names, "edges": parents, "positions": positions,
+        "joint_names": robot.joint_names, "locked_joints": robot.tree.locked,
+        "base_pose": {"position": robot.base_pose[:3, 3].tolist(),
+                      "quaternion_xyzw": Rotation.from_matrix(robot.base_pose[:3, :3]).as_quat().tolist()},
         "q": np.array(states).round(7).tolist(), "torques": torques,
         "errors": errors, "torque_ratio": torque_ratio,
         "summary": {"final_error": errors[-1], "max_error": None if robot.floating_base else max(errors),
@@ -87,7 +91,8 @@ def generate(name, duration=3., amplitude=.12, frame_count=121):
                         "no standing controller or humanoid dynamics simulation is claimed."
                         if robot.floating_base else
                         "Recorded closed-loop MuJoCo computed-torque tracking using URDF inertias. "
-                        "Link geometry is a visual proxy with collision disabled."),
+                        "Viewer visual/collision geometry is loaded separately from matching upstream URDFs. "
+                        "The recorded tracking simulation has collision disabled."),
     }
 
 
@@ -148,7 +153,7 @@ def export_all(directory):
         print("Recorded",name,flush=True)
     data=generate_cito(directory/"dual_cito.json")
     entries.append({k:data[k] for k in ("id","title","engine","dof","floating_base")})
-    (directory/"index.json").write_text(json.dumps({"models":entries,"tests_passed":30,"draft_version":"12"},indent=2))
+    (directory/"index.json").write_text(json.dumps({"models":entries,"tests_passed":48,"draft_version":"12"},indent=2))
 
 
 if __name__ == "__main__":

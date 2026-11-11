@@ -168,8 +168,14 @@ Python 서버가 연결되지 않은 화면에서는 새 계산 버튼이 비활
 7종 fixed-base arm은 실제 MuJoCo 폐루프 시뮬레이션 결과입니다.
 G1 화면은 기구학 미리보기이며 동적 보행/균형 제어 시뮬레이션으로 표시하지 않습니다.
 CITO 화면은 두 Cartesian arm의 3 cm 물체 이동 제한 모델입니다.
-WebGL이 제공되지 않는 브라우저에서는 같은 좌표를 CPU로 3D 투영하며,
-카메라 회전·확대와 재생 조작을 유지합니다. 전체 형상의 mesh renderer는 아닙니다.
+8종 로봇은 원본 URDF의 visual mesh를 로드하고 기록된 관절 자세로 재생합니다.
+표시 형상에서 URDF visual, URDF collision, 링크 좌표를 선택할 수 있습니다.
+URDF origin·mesh scale·material과 floating-base pose를 적용하며, mesh 로딩 실패를
+화면에 표시합니다. Mesh는 모델과 동일한 upstream commit의 HTTPS 경로에서
+불러오므로 네트워크 연결이 필요합니다. WebGL이 없는 브라우저는 명시적으로
+표시한 CPU 링크 좌표 미리보기를 사용합니다. 원본 형상을 보여도 기존 추종
+시뮬레이션의 충돌이 켜지는 것은 아니며, CITO 제한 모델은 좌표 재생을 유지합니다.
+표시용 URDF·라이선스·재생성 절차는 [docs/models.md](docs/models.md)에 있습니다.
 
 ## 최신 draft 대조
 

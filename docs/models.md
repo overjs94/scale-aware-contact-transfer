@@ -1,6 +1,6 @@
 # Bundled embodiment models
 
-All eight are offline, expanded URDF dynamics/kinematics subsets of upstream descriptions.
+All eight mechanics presets are offline, expanded URDF dynamics/kinematics subsets of upstream descriptions.
 Mass, COM, inertial rotation, joint axes, limits and origins are retained.
 Meshes/collisions and vendor simulation/controller/transmission tags were removed.
 Joint damping/friction tags are omitted for ideal rigid-body model comparison.
@@ -38,3 +38,50 @@ The KUKA model subset includes its upstream GPL-3.0-or-later license.
 
 To regenerate, check out the source repositories at the model.json revisions and
 run tools/rebuild_models.py --references /path/to/source-checkouts.
+
+## Viewer URDF and mesh loading
+
+`web/models/<id>/robot.urdf` retains the upstream visual and collision elements
+for all eight presets. It is separate from the dynamics-only URDF used by the
+tracking simulations. A manifest beside each viewer model records the matching
+upstream commit, original and prepared URDF hashes, mesh paths, modifications
+and model license. Upstream copyright comments and license files are retained.
+
+The viewer uses Three.js and URDFLoader to apply joint origins/axes, visual and
+collision origins, mesh scales, materials, locked/mimic joints and recorded
+floating-base world poses. STL and DAE meshes are loaded from immutable
+`raw.githubusercontent.com/<owner>/<repo>/<commit>/...` URLs, including DAE
+relative textures. Binary meshes are not duplicated in this repository; viewing
+them requires network access to upstream assets. The loader also supports OBJ
+geometry with the URDF material; external OBJ MTL materials are not imported.
+
+The geometry selector switches between visual, collision and link-coordinate
+views. Collision is shown as a wireframe; it does not enable collision dynamics
+in a previously recorded tracking run. Missing mesh/texture requests produce a
+visible loading error rather than silently claiming a complete robot. Without
+WebGL, the viewer explicitly uses the CPU link-coordinate projection. The
+synthetic dual-Cartesian-arm CITO recording has no full robot mesh model.
+
+To regenerate the prepared descriptions in a dedicated source directory:
+
+~~~bash
+python -m pip install -e ".[model-tools]"
+python tools/prepare_viewer_models.py --sources /path/to/viewer-sources --fetch
+npm --prefix web ci
+npm --prefix web run build
+~~~
+
+The fetch step creates sparse source checkouts at the mechanics manifests'
+exact commits. Subsequent generation can omit `--fetch`. Xacro is expanded in
+temporary copies; the mechanics presets and source checkouts are not rewritten.
+Preparation rejects different source hashes, link/joint trees, inertias, axes,
+origins or bounds before preparing a display model.
+
+Python tests compare the full URDF against the mechanics model for all eight
+presets at recorded configurations. Browser regression tests use local triangle
+fixtures to verify recorded FK, mesh origin/scale/rotation, geometry-mode
+switching and missing-asset errors without depending on upstream availability.
+Run them with `npx --prefix web playwright install chromium` and
+`npm --prefix web test`. Real upstream visual and collision meshes were also
+loaded for all eight models during integration QA. URDFLoader's Apache-2.0
+license is in `web/URDF-LOADER-LICENSE.txt`; Three.js retains its MIT license.
