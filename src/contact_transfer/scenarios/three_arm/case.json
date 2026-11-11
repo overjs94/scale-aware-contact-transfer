@@ -1,0 +1,238 @@
+{
+  "schema_version": 1,
+  "prediction_source": "assumed_contracted_network_output",
+  "units": "SI",
+  "contact_frame": "object",
+  "quaternion_order": "xyzw",
+  "object": {
+    "name": "panel",
+    "size": [
+      0.5,
+      0.3,
+      0.04
+    ],
+    "mass": 1.0,
+    "com": [
+      0,
+      0,
+      0
+    ],
+    "inertia_diagonal": [
+      0.007633333333333333,
+      0.020966666666666665,
+      0.028333333333333332
+    ]
+  },
+  "keyframes": [
+    {
+      "id": "support",
+      "time": 0.0,
+      "object_pose": [
+        0,
+        0,
+        0.6,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "lift",
+      "time": 1.2,
+      "object_pose": [
+        0,
+        0,
+        0.66,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "transfer",
+      "time": 2.4,
+      "object_pose": [
+        0.08,
+        0,
+        0.66,
+        0,
+        0,
+        0,
+        1
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "point",
+      "urdf": "point_arm.urdf",
+      "base_position": [
+        -0.45,
+        -0.35,
+        0.1
+      ],
+      "base_rpy": [
+        0,
+        0,
+        0
+      ],
+      "tool_frame": "tip",
+      "capability": {
+        "kind": "P",
+        "mu": 0.5,
+        "normal_max": 30
+      },
+      "retract_world": [
+        0,
+        -0.35,
+        -0.1
+      ]
+    },
+    {
+      "id": "gripper",
+      "urdf": "gripper_arm.urdf",
+      "base_position": [
+        -0.65,
+        0.35,
+        0.35
+      ],
+      "base_rpy": [
+        3.141592653589793,
+        -1.5707963267948966,
+        0.0
+      ],
+      "tool_frame": "tip",
+      "locked_joints": {
+        "left_finger_joint": 0.026,
+        "right_finger_joint": 0.026
+      },
+      "capability": {
+        "kind": "G",
+        "force_bounds": [
+          12,
+          12,
+          12
+        ]
+      },
+      "retract_world": [
+        -0.15,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "suction",
+      "urdf": "suction_arm.urdf",
+      "base_position": [
+        0.45,
+        0.35,
+        0.9
+      ],
+      "base_rpy": [
+        3.141592653589793,
+        0,
+        0
+      ],
+      "tool_frame": "tip",
+      "capability": {
+        "kind": "S",
+        "mu": 0.8,
+        "normal_max": 12,
+        "adhesion_max": 15
+      },
+      "retract_world": [
+        0,
+        0,
+        0.12
+      ]
+    }
+  ],
+  "contracted_contacts": [
+    {
+      "group_id": "support_sphere",
+      "arm_id": "point",
+      "point_object": [
+        -0.05,
+        -0.06,
+        -0.02
+      ],
+      "normal_object": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "group_id": "jaw_hold",
+      "arm_id": "gripper",
+      "point_object": [
+        -0.25,
+        0,
+        0
+      ],
+      "normal_object": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "group_id": "vacuum_hold",
+      "arm_id": "suction",
+      "point_object": [
+        0.15,
+        0.06,
+        0.02
+      ],
+      "normal_object": [
+        0,
+        0,
+        1
+      ]
+    }
+  ],
+  "optimization": {
+    "steps_per_interval": 8,
+    "rho_min": 0.05,
+    "disturbance_scale": [
+      0.15,
+      0.15,
+      0.15,
+      1,
+      1,
+      1
+    ]
+  },
+  "simulation": {
+    "timestep": 0.001,
+    "preparation_seconds": 0.3,
+    "hold_seconds": 0.3,
+    "release_seconds": 0.8,
+    "fixture_top": 0.45,
+    "fixture_half_size": [
+      0.5,
+      0.4
+    ],
+    "arm_kp": 1600,
+    "arm_kd": 90,
+    "finger_kp": 3000,
+    "finger_kd": 10,
+    "finger_open": 0.05,
+    "finger_closed_command": 0.0225,
+    "tracking_tolerance_m": 0.015,
+    "tracking_tolerance_rad": 0.12,
+    "vacuum": {
+      "stiffness": 6000,
+      "damping": 35,
+      "acquire_gap": 0.001,
+      "break_gap": 0.006,
+      "seal_radius": 0.012,
+      "max_angle_rad": 0.15,
+      "pressure_pa": 35000,
+      "area_efficiency": 0.95
+    },
+    "fixture_thickness": 0.04
+  }
+}

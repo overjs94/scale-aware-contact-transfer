@@ -62,8 +62,15 @@
       "engine": "cito_trajectory",
       "dof": 6,
       "floating_base": false
+    },
+    {
+      "id": "three_arm",
+      "title": "Three-arm contracted contacts",
+      "engine": "mujoco_contact_recording",
+      "dof": 11,
+      "floating_base": false
     }
   ],
-  "tests_passed": 48,
+  "tests_passed": 58,
   "draft_version": "12"
 }

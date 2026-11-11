@@ -20,6 +20,7 @@ paper component is not complete.
 | Fixed-geometry SOCP | Clarabel box margin, exact friction cones, fixed-posture torque bounds | Geometry/closure/collision remain NLP or scene checks |
 | Contact scene replay | Supplied MJCF, scalar-joint torque control, free objects, contact traces, equality hold/release | Real furniture collision assets and gripper calibration external |
 | Engine comparison | Validated portable trace and matched endpoint comparisons | CRISP C++ runner/adapter and insertion/jam classifier not implemented |
+| Three-arm contact experiment | Assumed network groups, 3 keyframes, 2 CITO solves, URDF sphere/fingers/cup, actual dynamic replay and vent/release | Authored Cartesian arms, fixed contact assignments; force-only gripper and lumped suction model |
 | Solver comparison | Fresh stationary CITO trials and residual-qualified timing tool | SNOPT unavailable in validated runtime; no assembly benchmark |
 | Hardware | Position/velocity/effort separation | No physical communication or validation |
 

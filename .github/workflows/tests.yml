@@ -17,6 +17,7 @@ jobs:
       - run: contact-transfer demo-refinement
       - run: python examples/dual_arm_keyframe.py
       - run: python examples/fixed_wrench_margin.py
+      - run: python examples/three_arm_contracted.py
       - run: python tools/benchmark_cito_solvers.py --repeats 1
       - run: contact-transfer demo-control franka_panda --seconds 1.4
       - run: python -m build

@@ -15,7 +15,7 @@
   </header>
   <div class="layout">
     <aside class="sidebar">
-      <div class="section-label">EXPERIMENT LIBRARY <span>09</span></div>
+      <div class="section-label">EXPERIMENT LIBRARY <span id="model-count">10</span></div>
       <h1>Embodiments</h1><p class="subtle">같은 모델 규약, 다른 로봇 구조.</p>
       <div id="model-list" class="model-list" aria-label="로봇 모델 선택"></div>
       <div class="side-note"><span class="tiny-icon">◇</span><div><b>URDF에서 직접 계산</b><p>링크 기하·질량·관성으로<br>동역학과 기구학을 생성합니다.</p></div></div>
@@ -40,6 +40,8 @@
             <button id="loop" class="loop-button active" aria-label="반복 재생" aria-pressed="true">↻</button>
           </div>
           <div class="geometry-note"><span>◈</span><p id="geometry-status" role="status">URDF visual과 mesh를 준비하고 있습니다.</p><label class="geometry-control">표시 형상 <select id="geometry-mode" aria-label="표시 형상"><option value="visual">URDF visual</option><option value="collision">URDF collision</option><option value="skeleton">링크 좌표</option></select></label></div>
+          <div id="keyframe-list" class="keyframe-list" aria-label="Keyframe와 도구 이벤트"></div>
+          <div id="tool-state" class="tool-state" aria-label="실제 도구 접촉 상태"></div>
         </section>
         <aside class="details">
           <section class="panel"><div class="section-label">MODEL SNAPSHOT</div><div class="stat-grid">
@@ -51,7 +53,7 @@
             <div class="chart-footer"><span>0 s</span><span id="chart-end">—</span></div><p id="chart-note" class="fine">관절 위치 오차의 2-norm</p>
           </section>
           <section class="panel torque-panel"><div class="section-label">ACTUATION UTILIZATION</div><div class="torque-value"><strong id="torque-now">—</strong><span>of URDF effort limit</span></div><div class="meter"><span id="torque-meter"></span></div><div class="meter-label"><span>0%</span><span>100%</span></div></section>
-          <div class="validation"><span class="checkmark">✓</span><div><b><span id="test-count">48</span> automated tests passed</b><p>Mechanics · Jacobians · Contact · Control</p></div></div>
+          <div class="validation"><span class="checkmark">✓</span><div><b><span id="test-count">58</span> automated tests passed</b><p>Mechanics · Jacobians · Contact · Control</p></div></div>
         </aside>
       </div>
       <section class="run-panel">

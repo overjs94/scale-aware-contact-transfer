@@ -38,7 +38,7 @@ class Contact:
         self.normal = np.asarray(self.normal, float).reshape(3)
         if not np.isclose(np.linalg.norm(self.normal), 1):
             raise ValueError("contact normal must be unit length")
-        if self.robot_index is None and self.capability.kind == "G":
+        if self.robot_index is None and self.capability.kind != "P":
             raise ValueError("environment plane contacts are unilateral")
         if set(self.released_steps)&(set(self.maintained_steps)|set(self.sticking_steps)):
             raise ValueError("released and maintained/sticking phases cannot overlap")
@@ -199,11 +199,10 @@ def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
             else:
                 attached = l in contact.attached_steps
                 if attached:
-                    z = opti.variable(len(cap.bounds))
-                    opti.subject_to(opti.bounded(-h*np.asarray(cap.bounds), z, h*np.asarray(cap.bounds)))
-                    P = ca.DM(cap.H)@z
+                    warm_reaction = initial.impulses[contact.name][l] if initial is not None and contact.name in initial.impulses else None
+                    P = cap.reaction(opti, scale=h, initial=warm_reaction)
                     equality(opti, closure)
-                    if np.linalg.norm(np.asarray(cap.H)[:3]) > 1e-12:
+                    if cap.has_moment:
                         Tee = system.robots[contact.robot_index].fk(
                             Q[system.q_slices[contact.robot_index], l+1], contact.frame)
                         Rwc = system.object_pose(Q[:, l+1])[:3, :3]@contact_basis(contact.normal)
@@ -220,7 +219,7 @@ def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
                     if l == min(contact.attached_steps):
                         # No attachment impulse: acquisition starts at zero relative velocity.
                         before = Jnow@V[:, l]
-                        before = before if np.linalg.norm(np.asarray(cap.H)[:3]) > 1e-12 else before[3:]
+                        before = before if cap.has_moment else before[3:]
                         opti.subject_to(opti.bounded(-kinematic_tolerance, before, kinematic_tolerance))
                         grasp_velocities.append(before)
                     if l+1 not in contact.attached_steps and (l < steps-1 or contact.release_at_end):

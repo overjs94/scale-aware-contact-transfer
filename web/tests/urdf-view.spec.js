@@ -89,3 +89,43 @@ test("missing mesh rejects the model and mode switching preserves playback", asy
   await page.locator("#geometry-mode").selectOption("skeleton");
   await expect(page.locator("#geometry-status")).toHaveAttribute("data-state", "skeleton");
 });
+
+test("three physical tools replay as three URDF instances with keyframe events", async ({ page }) => {
+  await page.locator('.model-choice[data-id="three_arm"]').click();
+  await expect(page.locator("#geometry-status")).toHaveAttribute("data-state", "ready");
+  await expect(page.locator("#geometry-status")).toHaveAttribute("data-model", "three_arm");
+  await expect(page.locator(".keyframe-choice")).toHaveCount(4);
+  await page.getByRole("button", { name: "lift · 1.5 s", exact: true }).click();
+  await expect(page.locator("#time-now")).toHaveText("1.50 s");
+  await expect(page.locator("#tool-state")).toContainText("seal 유지");
+  await expect(page.locator("#torque-now")).toContainText("%");
+  await page.getByRole("button", { name: "vent_and_release · 3.0 s", exact: true }).click();
+  await expect(page.locator("#tool-state")).toContainText("Suction: 해제");
+  const errors = await page.evaluate(async () => {
+    const data = await (await fetch("/data/three_arm.json")).json();
+    const {loadURDFModel, applyRecordedPose, disposeModel} = window.modelAPI;
+    const errors = [];
+    for (const spec of data.instances) {
+      const model = await loadURDFModel(spec.manifest);
+      const recording = {...spec, q: data.q.map(q => spec.q_indices.map(i => q[i]))};
+      let error = 0;
+      for (const frame of [15, 75, 135, data.times.length-1]) {
+        applyRecordedPose(model, recording, frame);
+        for (const [name, link] of Object.entries(model.links)) {
+          const index = data.link_names.indexOf(spec.id+"_"+name);
+          link.matrixWorld.elements.slice(12,15).forEach((v,j) => {error=Math.max(error,Math.abs(v-data.positions[frame][index][j]));});
+        }
+      }
+      errors.push(error); disposeModel(model);
+    }
+    return errors;
+  });
+  expect(errors).toHaveLength(3);
+  errors.forEach(error => expect(error).toBeLessThan(1e-7));
+  await page.locator("#geometry-mode").selectOption("collision");
+  await expect(page.locator("#geometry-status")).toHaveAttribute("data-state", "ready");
+  await page.goto("/?model=three_arm");
+  await expect(page.locator("#geometry-status")).toHaveAttribute("data-model", "three_arm");
+  await expect(page.locator("#geometry-status")).toHaveAttribute("data-state", "ready");
+  await expect(page.locator("#amplitude")).toBeDisabled();
+});

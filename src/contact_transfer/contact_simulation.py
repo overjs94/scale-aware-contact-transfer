@@ -94,13 +94,19 @@ class MujocoContactScene:
         self.qadr = self.model.jnt_qposadr[self.joints]
         self.vadr = self.model.jnt_dofadr[self.joints]
 
-    def run(self, controller, reference, duration, *, case_id, plan_id, attachments=()):
+    def run(self, controller, reference, duration, *, case_id, plan_id, attachments=(),
+            initial_q=None, external_forces=None):
         """reference(t)->(q_d,v_d,a_d); controller.command returns joint torques.
 
         attachments contains (time, equality_name, active). Named equality
         constraints are scene-defined grasp models. They model ideal holding,
         not finger closure or verified grasp retention. Start at the scene's
         initial state, never at interpolated optimized object poses.
+
+        initial_q sets controlled scalar joints once, before stepping. Optional
+        external_forces(mj, model, data, t) may add generalized/body forces after
+        the runner clears applied-force arrays each step; it must not prescribe
+        object state. Stateful force models are owned/reset by the caller.
         """
         mj, model, data = self.mj, self.model, self.data
         dt = float(model.opt.timestep)
@@ -118,6 +124,11 @@ class MujocoContactScene:
                 raise ValueError("attachment event needs a known equality and an in-range step time")
             events.append((round(t/dt), eid, bool(active)))
         mj.mj_resetData(model, data)
+        if initial_q is not None:
+            initial_q = np.asarray(initial_q, float).reshape(len(self.joints))
+            if not np.isfinite(initial_q).all():
+                raise ValueError("initial_q must be finite")
+            data.qpos[self.qadr] = initial_q
         mj.mj_forward(model, data)
         times, qs, refs, poses, torques, contacts = [], [], [], [], [], []
         for k in range(steps+1):
@@ -126,6 +137,11 @@ class MujocoContactScene:
                     data.eq_active[eid] = active
             mj.mj_forward(model, data)
             t = k*dt
+            data.qfrc_applied[:] = 0
+            data.xfrc_applied[:] = 0
+            if external_forces is not None:
+                external_forces(mj, model, data, t)
+                mj.mj_forward(model, data)
             desired = tuple(np.asarray(x, float).reshape(len(self.joints)) for x in reference(t))
             if len(desired) != 3 or not all(np.isfinite(x).all() for x in desired):
                 raise ValueError("reference must return finite q/v/a")

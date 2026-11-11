@@ -61,7 +61,7 @@ def fixed_wrench_margin(positions, rotations, task, capabilities, *, arms=(),
             raise ValueError("object_pose must be a finite rigid transform")
     elif len(q) or len(assignment):
         raise ValueError("q/assignment require arms")
-    Hs = [np.vstack((np.zeros((3, 3)), np.eye(3))) if c.kind == "P"
+    Hs = [np.vstack((np.zeros((3, 3)), np.eye(3))) if c.kind in {"P", "S"}
           else np.asarray(c.H, float) for c in caps]
     for c in caps:
         if c.kind == "P" and not np.isfinite([c.mu, c.normal_max]).all():
@@ -110,11 +110,12 @@ def fixed_wrench_margin(positions, rotations, task, capabilities, *, arms=(),
         for i, (cap, Hi) in enumerate(zip(caps, Hs)):
             sl = slice(start+offsets[i], start+offsets[i+1])
             select = np.zeros((Hi.shape[1], n)); select[:, sl] = np.eye(Hi.shape[1])
-            if cap.kind == "P":
-                upper(-select[2:], [0.])
+            if cap.kind in {"P", "S"}:
+                adhesion = cap.adhesion_max if cap.kind == "S" else 0.
+                upper(-select[2:], [adhesion])
                 upper(select[2:], [cap.normal_max])
                 # b-Ax = [mu*f_n, f_t1, f_t2] in the Lorentz cone.
-                rows(-np.vstack((cap.mu*select[2], select[:2])), np.zeros(3),
+                rows(-np.vstack((cap.mu*select[2], select[:2])), [cap.mu*adhesion, 0., 0.],
                      clarabel.SecondOrderConeT(3))
             else:
                 upper(select, cap.bounds)
@@ -148,8 +149,9 @@ def fixed_wrench_margin(positions, rotations, task, capabilities, *, arms=(),
         residual = max(residual, np.max(abs(balance-required)))
         for i, (cap, f) in enumerate(zip(caps, lam)):
             zi = z[offsets[i]:offsets[i+1]]
-            violations = ([-f[5], f[5]-cap.normal_max, np.linalg.norm(f[3:5])-cap.mu*f[5]]
-                          if cap.kind == "P" else abs(zi)-np.asarray(cap.bounds))
+            adhesion = cap.adhesion_max if cap.kind == "S" else 0.
+            violations = ([-f[5]-adhesion, f[5]-cap.normal_max, np.linalg.norm(f[3:5])-cap.mu*(f[5]+adhesion)]
+                          if cap.kind in {"P", "S"} else abs(zi)-np.asarray(cap.bounds))
             residual = max(residual, np.max(violations))
         tau = [G+B@z for G, B in zip(gravity, torque_blocks)]
         for arm, value in zip(arms, tau):

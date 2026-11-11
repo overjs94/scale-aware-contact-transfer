@@ -149,8 +149,11 @@ wrench는 동일 기준점/좌표로 합산한 뒤 calibrated grasp·joint bound
 각 엔진의 timestep과 접촉 설정을 기록하고 더 작은 timestep에서도 판정을
 비교합니다. MuJoCo soft contact의 침투량과 마찰 설정 민감도도 함께 보고합니다.
 Trace 비교 함수의 endpoint 차이만으로 삽입 성공이나 걸림을 판정하지 않습니다.
-현재 자동 검증은 합성 물체 낙하·바닥 지지력·이상적 hold/release·관절 추종까지이며,
-실제 가구 collision asset과 CRISP replay가 준비되어야 위 실험을 완료할 수 있습니다.
+현재 자동 검증은 합성 물체 낙하·바닥 지지력·hold/release·관절 추종과,
+구형 point tool·두 손가락 gripper·흡착 cup을 쓰는 세 URDF Cartesian arm의
+3-keyframe 실행을 포함합니다. [세 팔 예제](three_arm_experiment.md)의 force-only
+gripper와 lumped seal 가정을 적용하며, 실제 가구 collision asset과 CRISP replay가
+준비되어야 위 실험을 완료할 수 있습니다.
 
 CRISP 실행 후 contact position/normal/gap은 실패 구간의 추가 후보를 만드는
 관측 자료로 사용할 수 있습니다. 임의 최적화 상태의 거리·미분 oracle로 쓰는

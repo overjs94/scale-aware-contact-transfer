@@ -210,3 +210,21 @@ CRISP C++ 실행기는 아직 연결하지 않았습니다. 같은 부품·fixtu
 실행 결과를 공통 trace 형식으로 옮겨 비교하는 경계와, 실제 dual-arm 패널 운반 및
 정밀 삽입 실험의 완료 조건은 [docs/contact_execution.md](docs/contact_execution.md)에
 정리했습니다. 현재의 합성 접촉 테스트가 실제 가구 조립 성공을 의미하지는 않습니다.
+
+## Contracted contact에서 세 팔 실행까지
+
+네트워크가 준 contact group을 가정한 3-keyframe·3-arm 예제를 실행할 수 있습니다.
+URDF Cartesian arm 세 개에 구형 point tool, 두 손가락 gripper, 흡착 cup을 붙이고,
+keyframe 최적화와 두 CITO 전이를 거쳐 자유 패널의 실제 MuJoCo 동역학을 실행합니다.
+세 keyframe 뒤에는 손가락을 열고 흡착을 vent하며 도구를 물립니다.
+
+~~~bash
+contact-transfer demo-three-arm --output outputs/three_arm --viewer web
+npm --prefix web run build
+python web/server.py --host 127.0.0.1 --port 8000
+~~~
+
+뷰어에서 **Three-arm contracted contacts**를 선택하면 실제 도구·물체 상태를
+재생하고 keyframe와 release 시점으로 이동할 수 있습니다. 입력 JSON, 도구 모델,
+힘 한계 및 검증 범위는 [docs/three_arm_experiment.md](docs/three_arm_experiment.md)에
+있습니다. 현재 팔은 접촉 검증용 Cartesian 모델이며 실제 vendor arm 실험은 아닙니다.

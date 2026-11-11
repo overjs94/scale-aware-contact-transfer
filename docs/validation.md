@@ -5,7 +5,7 @@ Exact selected package versions are recorded in requirements-validated.txt.
 
 ## Automated tests
 
-48 pytest tests passed on the implementation workspace.
+58 pytest tests passed on the implementation workspace.
 One warning originates from an inherited anyio pytest plugin's deprecated
 pytest internal import; it is not a package test failure.
 
@@ -89,3 +89,22 @@ the installed CasADi; no SNOPT timing or success comparison is claimed.
 CRISP execution, an external C++ trace adapter, real furniture collision scenes,
 precision insertion/jam/retention classification and timestep-sensitivity
 experiments remain pending. See [contact_execution.md](contact_execution.md).
+
+## Three arm contracted contact execution
+
+The authored URDF Cartesian testbed accepts assumed network contact groups and
+solves three keyframes plus two eight-step CITO transitions. Spherical point
+contact, actuated parallel-jaw fingers and a pressure-limited compliant suction
+seal move a 1 kg free panel; no equality/weld attachment is present in the scene.
+The three dynamic keyframe errors were 0.94, 1.17 and 1.17 mm, with rotations
+below 0.009 rad. The seal acquired at 0.0 s and vented at 3.0 s; the free panel
+then fell to the receiver. Measured force envelopes passed over 0.3–3.0 s.
+
+Ten Python tests cover external network-group ingestion/identity, suction NLP/SOCP margins, invalid contact predictions,
+pressure-area rejection, Pinocchio/symbolic/MuJoCo tool mechanics, actual
+three-keyframe execution and release, force clipping, seal loss and power duality.
+Eleven browser tests now include the three-instance URDF replay and keyframe
+navigation. Desktop and mobile software-WebGL QA checked actual tool geometry,
+contact/seal indicators and release navigation. The gripper's finite-pad moments
+are recorded but not certified by the force-only planning approximation. See
+[three_arm_experiment.md](three_arm_experiment.md) for scope and reproduction.

@@ -84,7 +84,7 @@ def realize_keyframe(arms, patches, capabilities, assignment, object_pose,
                                      +normal_weight*(1-ca.dot(R[:, 2], R0[:, 2])))
         # Moment capability must be accompanied by matching orientation closure.
         cap = capabilities[i]
-        if cap.kind == "G" and np.linalg.norm(np.asarray(cap.H)[:3]) > 1e-12:
+        if cap.has_moment:
             desired = Tobj[:3, :3]@R@ca.diag(ca.DM([1, -1, -1]))
             opti.subject_to(rotation_cost(Tee[:3, :3], desired) <= 1e-7)
     if collision_margins is not None:

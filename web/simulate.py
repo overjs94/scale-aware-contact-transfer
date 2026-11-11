@@ -153,7 +153,10 @@ def export_all(directory):
         print("Recorded",name,flush=True)
     data=generate_cito(directory/"dual_cito.json")
     entries.append({k:data[k] for k in ("id","title","engine","dof","floating_base")})
-    (directory/"index.json").write_text(json.dumps({"models":entries,"tests_passed":48,"draft_version":"12"},indent=2))
+    existing = directory/"index.json"
+    previous = json.loads(existing.read_text()) if existing.exists() else {"models": []}
+    entries += [entry for entry in previous["models"] if entry["id"] not in {x["id"] for x in entries}]
+    (directory/"index.json").write_text(json.dumps({"models":entries,"tests_passed":58,"draft_version":"12"},indent=2))
 
 
 if __name__ == "__main__":
