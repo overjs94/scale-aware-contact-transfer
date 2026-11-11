@@ -228,3 +228,18 @@ python web/server.py --host 127.0.0.1 --port 8000
 재생하고 keyframe와 release 시점으로 이동할 수 있습니다. 입력 JSON, 도구 모델,
 힘 한계 및 검증 범위는 [docs/three_arm_experiment.md](docs/three_arm_experiment.md)에
 있습니다. 현재 팔은 접촉 검증용 Cartesian 모델이며 실제 vendor arm 실험은 아닙니다.
+
+Three real Panda arms and the experiment web UI are available:
+
+```sh
+python tools/fetch_panda_meshes.py
+contact-transfer demo-three-arm --scenario franka --output outputs/three_franka --viewer web
+npm --prefix web ci && npm --prefix web run build
+.venv/bin/python web/server.py
+```
+
+Open `http://localhost:8000` to edit three keyframes, panel mass and contracted
+contact JSON, run optimization and MuJoCo, cancel a job, and inspect measured
+results using actual URDF/mesh playback. The Panda baseline optimizes forces and
+torques on an IK-prescribed path; the original Cartesian example uses CITO.
+See [experiment scope and validation](docs/three_arm_experiment.md).

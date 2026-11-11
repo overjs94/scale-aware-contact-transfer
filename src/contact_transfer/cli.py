@@ -33,7 +33,8 @@ def main(argv=None):
     sim.add_argument("model", nargs="?", default="franka_panda")
     sim.add_argument("--seconds", type=float, default=1.)
     sim.add_argument("--output", default="outputs/control.npz")
-    three = sub.add_parser("demo-three-arm", help="Assumed network contacts -> 3 keyframes -> CITO -> physical MuJoCo tools")
+    three = sub.add_parser("demo-three-arm", help="Assumed contacts -> 3 keyframes -> optimization -> MuJoCo tools")
+    three.add_argument("--scenario", choices=["cartesian", "franka"], default="cartesian")
     three.add_argument("--case")
     three.add_argument("--contacts", help="External contracted-contact predictions JSON")
     three.add_argument("--output", default="outputs/three_arm")
@@ -74,11 +75,14 @@ def main(argv=None):
     elif args.command == "demo-three-arm":
         from .three_arm import run_three_arm
         from .three_arm_view import export_three_arm_view
-        plan, trace, seal, report = run_three_arm(args.output, case_path=args.case, contacts_path=args.contacts)
+        case_path = args.case
+        if case_path is None and args.scenario == "franka":
+            case_path = Path(__file__).parent/"scenarios/three_franka/case.json"
+        plan, trace, seal, report = run_three_arm(args.output, case_path=case_path, contacts_path=args.contacts)
         if args.viewer:
             export_three_arm_view(plan, trace, report, args.viewer)
         print(json.dumps(report, indent=2))
-        if not (report["tracking_passed"] and report["seal_retained_before_vent"] and report["force_envelopes_passed"]):
+        if not (report["tracking_passed"] and report["seal_retained_before_vent"] and report["force_envelopes_passed"] and report["sampled_collision_check_passed"]):
             raise SystemExit("Three-arm physical execution rejected; inspect report and traces.")
     else:
         robot = _robot(args.model, args.fixed_base)

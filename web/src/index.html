@@ -26,6 +26,14 @@
         <div><div class="eyebrow">MODEL-BASED MANIPULATION</div><h2 id="model-title">Loading simulation…</h2><p id="model-description" class="subtle">검증된 모델의 계산 결과를 불러오고 있습니다.</p></div>
         <div id="engine-badge" class="engine-badge"><span></span>Loading</div>
       </section>
+      <section class="experiment-builder" aria-label="세 Franka 실험 설정">
+        <div class="builder-heading"><div><div class="eyebrow">CONTRACTED CONTACT → OPTIMIZATION → DYNAMICS</div><h3>Three Franka experiment</h3><p>실제 Panda URDF × 3 · 21 arm DoF + 2 finger DoF · 3 keyframes</p></div><span class="preset-tag">PANDA × 3</span></div>
+        <form id="experiment-form">
+          <div class="builder-columns"><div><div class="section-label">01 / TOOLS & OBJECT</div><div class="tool-chips"><span>● Sphere · point</span><span>⋈ Panda hand</span><span>⊙ Vacuum seal</span></div><label class="mass-label">패널 질량 <input id="panel-mass" type="number" min=".1" max="2" step=".1" value="1" required> kg</label><p class="fine">기본 접촉 위치와 도구 방향을 유지하는 IK 경로에서 접촉력·관절 토크를 최적화합니다. 전체 CITO 탐색은 별도 Cartesian 예제입니다.</p><details><summary>Contracted contact JSON 편집 / 가져오기</summary><label class="file-label">JSON 파일 <input id="contacts-file" type="file" accept=".json,application/json"></label><textarea id="contacts-json" aria-label="Contracted contact JSON" spellcheck="false"></textarea><p class="fine">SI · object frame · point → gripper → suction 순서. 네트워크 추론 대신 주어진 예측값을 사용합니다.</p></details></div><div><div class="section-label">02 / OBJECT KEYFRAMES</div><div id="keyframe-inputs"></div><p class="fine">위치 m · 시간 s · 고정 자세 xyzw = [0, 0, 0, 1]</p></div></div>
+          <div class="experiment-actions"><p id="experiment-state" role="status" aria-live="polite">계산 서버 확인 중…</p><button id="experiment-reset" type="button" class="small-button">기본값</button><button id="experiment-cancel" type="button" class="small-button" disabled>취소</button><button id="experiment-run" type="submit" disabled>Optimize & simulate ↗</button></div>
+        </form>
+        <div id="experiment-results" hidden><div class="result-grid"><div><span>KEYFRAME TRACKING</span><strong id="result-tracking">—</strong></div><div><span>FORCE ENVELOPES</span><strong id="result-forces">—</strong></div><div><span>SUCTION SEAL</span><strong id="result-seal">—</strong></div><div><span>NLP RESIDUAL</span><strong id="result-residual">—</strong></div></div><details><summary>실행 검증 보고서</summary><pre id="report-json"></pre></details><p class="fine">통과 여부는 이 실행의 측정값입니다. 연속 충돌 안전성·하드웨어 성능 인증은 포함하지 않습니다.</p></div>
+      </section>
       <div class="experiment-grid">
         <section class="viewer-card">
           <div class="viewport" id="viewport" aria-label="로봇 3D 시뮬레이션 뷰어">

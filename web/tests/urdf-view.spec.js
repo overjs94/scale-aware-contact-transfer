@@ -129,3 +129,59 @@ test("three physical tools replay as three URDF instances with keyframe events",
   await expect(page.locator("#geometry-status")).toHaveAttribute("data-state", "ready");
   await expect(page.locator("#amplitude")).toBeDisabled();
 });
+
+test('three Panda arms use actual articulated URDF recordings', async ({page}) => {
+  await expect(page.locator('#model-title')).toContainText('Franka Panda × 3');
+  await expect(page.locator('#dof')).toHaveText('23');
+  await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+  await expect(page.locator('#result-tracking')).toContainText('PASS');
+  const errors=await page.evaluate(async()=>{
+    const data=await(await fetch('/data/three_franka.json')).json();
+    const {loadURDFModel,applyRecordedPose,disposeModel}=window.modelAPI;
+    const errors=[];
+    for(const mode of ['visual','collision']) for(const spec of data.instances){
+      const robot=await loadURDFModel(spec.manifest,mode);
+      const recording={...spec,q:data.q.map(row=>spec.q_indices.map(i=>row[i]))};let error=0;
+      for(const frame of [0,80,190]){
+        applyRecordedPose(robot,recording,frame);
+        for(const [name,link] of Object.entries(robot.links)){
+          const i=data.link_names.indexOf(spec.id+'_'+name);
+          link.matrixWorld.elements.slice(12,15).forEach((v,j)=>error=Math.max(error,Math.abs(v-data.positions[frame][i][j])));
+        }
+      }
+      disposeModel(robot);errors.push(error);
+    }
+    return errors;
+  });
+  errors.forEach(error=>expect(error).toBeLessThan(1e-7));
+});
+
+test('experiment form submits edits, polls and displays the completed recording',async({page})=>{
+  let submitted;
+  await page.route('**/api/health',route=>route.fulfill({json:{ready:true}}));
+  await page.route('**/api/experiments',async route=>{submitted=route.request().postDataJSON();await route.fulfill({status:202,json:{id:'fixture'}});});
+  await page.route('**/api/experiments/fixture',route=>route.fulfill({json:{state:'completed',stage:'complete',recording:'/data/three_franka.json'}}));
+  await page.reload();
+  await expect(page.locator('#experiment-run')).toBeEnabled();
+  await page.locator('#panel-mass').fill('1.2');
+  await page.getByLabel('lift z',{exact:true}).fill('0.65');
+  await page.locator('#experiment-run').click();
+  await expect(page.locator('#experiment-state')).toHaveText('계산 완료');
+  expect(submitted.mass).toBe(1.2);expect(submitted.keyframes[1].object_pose[2]).toBe(.65);
+  expect(submitted.contacts).toHaveLength(3);
+  await expect(page.locator('#result-residual')).toContainText('e-');
+});
+
+test('experiment failures and cancellation stay visible',async({page})=>{
+  await page.route('**/api/health',route=>route.fulfill({json:{ready:true}}));
+  await page.route('**/api/experiments',route=>route.fulfill({status:202,json:{id:'fixture'}}));
+  await page.route('**/api/experiments/fixture',route=>route.fulfill({json:{state:'running',stage:'optimization'}}));
+  await page.route('**/api/experiments/fixture/cancel',route=>route.fulfill({json:{state:'cancelled'}}));
+  await page.reload();await page.locator('#experiment-run').click();
+  await expect(page.locator('#experiment-state')).toContainText('IPOPT');
+  await page.locator('#experiment-cancel').click();
+  await expect(page.locator('#experiment-state')).toHaveText('취소됨');
+  await page.route('**/api/experiments',route=>route.fulfill({status:400,json:{error:'normal must point out of the panel surface'}}));
+  await page.locator('#experiment-run').click();
+  await expect(page.locator('#experiment-state')).toContainText('normal must point out');
+});

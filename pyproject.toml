@@ -22,7 +22,7 @@ contact-transfer = "contact_transfer.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-contact_transfer = ["models/**/*.urdf", "models/**/*.json", "models/**/LICENSE*", "scenarios/**/*.urdf", "scenarios/**/*.json"]
+contact_transfer = ["models/**/*.urdf", "models/**/*.json", "models/**/LICENSE*", "scenarios/**/*.urdf", "scenarios/**/*.json", "scenarios/**/*.srdf", "scenarios/**/LICENSE*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

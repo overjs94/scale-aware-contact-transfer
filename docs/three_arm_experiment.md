@@ -151,3 +151,51 @@ authored Cartesian/tool testbed. Rail visuals are schematic and their collision
 geometry is omitted; tool/panel/receiver contacts are simulated. No vendor-arm
 assembly result, full robot collision certificate, measured gripper wrench
 calibration, hardware result or learned network performance is claimed.
+
+## Three real Franka Panda arms and web controls
+
+The original `three_arm` experiment remains a synthetic Cartesian testbed. The
+new `three_franka` preset uses three upstream Panda arm chains, including their
+seven revolute joints, joint limits, inertias and collision meshes. The point
+and suction tools replace the hand at `panda_link8`; the gripper retains the
+native Panda hand and two independent finger motors. Upstream provenance and
+Apache license are bundled beside the modified URDFs. Standard upstream SRDF
+self-collision exclusions are retained; collisions between arms, other links,
+the panel and receiver remain enabled.
+
+```sh
+python tools/fetch_panda_meshes.py
+contact-transfer demo-three-arm --scenario franka --output outputs/three_franka --viewer web
+npm --prefix web ci
+npm --prefix web run build
+.venv/bin/python web/server.py
+```
+
+Open `http://localhost:8000`. The default recording shows three actual articulated
+Pandas. The experiment form accepts panel mass, three object positions/times, and
+contracted-contact JSON (SI, object frame). It submits an isolated Python worker,
+reports optimization/simulation/export stages, supports cancellation, and loads
+the resulting actual URDF joint and object trajectories. JSON can be imported
+from a file or edited directly. Tool assignment is fixed to sphere / Panda hand /
+suction for this first baseline. Invalid surface points, normals, time intervals
+and unreachable IK targets produce explicit errors. The server accepts same-origin
+browser requests; it is a local research server without robot hardware access.
+Static hosting supports recorded replay and input editing only; it disables new
+computation and gives the local-server command.
+
+The Panda planner is deliberately **fixed contact path**, not full CITO: full-pose
+IK prescribes a sampled rest-to-rest joint path; IPOPT optimizes reaction forces
+subject to object inertial balance, tool force envelopes, and derived inverse-
+dynamics joint torque limits. Clarabel computes a six-axis box wrench margin at
+each frozen keyframe. Joint velocity limits are checked. This baseline fixes
+object orientation and holds the last pose instead of releasing into the arms.
+Panda full CITO posture/mode search and collision-aware path optimization remain
+unimplemented. The Cartesian CITO implementation remains available separately.
+
+The default 1 kg panel execution uses 1 ms MuJoCo steps with a 0.5 s preparation,
+1.6 s lift, 1.6 s transfer and 0.3 s hold. Measured keyframe translation errors
+were 0.71, 0.80 and 0.86 mm; contact force envelopes and suction retention passed.
+The panel is a free body; there are no weld/equality constraints. Non-tool
+penetrations deeper than 0.2 mm are reported separately. Discrete simulation
+collision checks are not a continuous full-geometry certificate. Finite gripper
+moments are measured but are not certified by the force-only capability model.

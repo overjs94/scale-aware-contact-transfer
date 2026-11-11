@@ -69,8 +69,15 @@
       "engine": "mujoco_contact_recording",
       "dof": 11,
       "floating_base": false
+    },
+    {
+      "id": "three_franka",
+      "title": "Franka Panda \u00d7 3 \u00b7 contracted contacts",
+      "engine": "mujoco_contact_recording",
+      "dof": 23,
+      "floating_base": false
     }
   ],
-  "tests_passed": 58,
+  "tests_passed": 66,
   "draft_version": "12"
 }

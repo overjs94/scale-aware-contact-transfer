@@ -7,6 +7,7 @@ from pathlib import Path
 
 import numpy as np
 from scipy.spatial.transform import Rotation, Slerp
+from scipy.optimize import least_squares
 
 from .contacts import Capability, SurfacePatch, TaskWrench, gravity_wrench
 from .contacts import contact_basis
@@ -47,12 +48,26 @@ class ContractedCase:
             raise ValueError("unsupported contracted contact schema or coordinates")
         if len(d["arms"]) != 3 or len(d["keyframes"]) != 3 or len(d["contracted_contacts"]) != 3:
             raise ValueError("this experiment requires three arms, three keyframes and three groups")
+        family = d.get("model_family", "cartesian")
+        if family not in {"cartesian", "franka_panda"}:
+            raise ValueError("unsupported experiment model family")
+        if family == "franka_panda":
+            if d["optimization"].get("planner") != "fixed_contact_path":
+                raise ValueError("Panda baseline requires the fixed_contact_path planner; full Panda CITO is not implemented")
+            count = d["optimization"].get("path_samples_per_interval", 16)
+            if not isinstance(count, int) or not 4 <= count <= 128:
+                raise ValueError("fixed path needs 4 to 128 samples per interval")
         ids = [a["id"] for a in d["arms"]]
         groups = [c["group_id"] for c in d["contracted_contacts"]]
         assignments = [c["arm_id"] for c in d["contracted_contacts"]]
         if len(set(ids)) != 3 or len(set(groups)) != 3 or set(assignments) != set(ids):
             raise ValueError("contact groups must have unique IDs and an injective arm assignment")
         d["contracted_contacts"] = sorted(d["contracted_contacts"], key=lambda c: ids.index(c["arm_id"]))
+        if family == "franka_panda":
+            for arm, contact in zip(d["arms"], d["contracted_contacts"]):
+                axis = Rotation.from_quat(arm["tool_quaternion_xyzw"]).as_matrix()[:, 2]
+                if not np.isclose(axis@np.asarray(contact["normal_object"]), -1., atol=1e-6):
+                    raise ValueError("contact normal is incompatible with the preset tool orientation")
         times = np.array([k["time"] for k in d["keyframes"]], float)
         if not np.isfinite(times).all() or times[0] != 0 or np.any(np.diff(times) <= 0):
             raise ValueError("keyframe times must increase from zero")
@@ -77,7 +92,7 @@ class ContractedCase:
                 raise ValueError("scenario URDF must be inside the case directory")
             T = np.eye(4); T[:3, :3] = Rotation.from_euler("xyz", a["base_rpy"]).as_matrix(); T[:3, 3] = a["base_position"]
             robot = Robot(urdf, base_pose=T, locked_joints=a.get("locked_joints"))
-            if robot.n != 3 or any(j.kind not in {"fixed", "prismatic"} for j in robot.tree.joints):
+            if d.get("model_family", "cartesian") == "cartesian" and (robot.n != 3 or any(j.kind not in {"fixed", "prismatic"} for j in robot.tree.joints)):
                 raise ValueError("initial experiment uses three-axis URDF Cartesian arms")
             robots.append(robot)
             spec = a["capability"]
@@ -113,6 +128,9 @@ def plan_contracted(case: ContractedCase, *, settings=None):
     claimed. All three groups stay at fixed object-frame locations throughout.
     """
     d = case.data
+    if d.get("optimization", {}).get("planner") == "fixed_contact_path":
+        from .fixed_path import plan_fixed_contact_path
+        return plan_fixed_contact_path(case, settings=settings)
     models = [r.symbolic() for r in case.robots]
     obj = d["object"]
     system = MechanicalSystem(models, RigidObject(obj["mass"], np.array(obj["com"]), np.diag(obj["inertia_diagonal"])))
@@ -196,3 +214,14 @@ def _cartesian_initial(case, system, start, goal, contacts, steps, duration):
         U.append(np.concatenate(torque))
     return TrajectoryResult(Q, V, np.array(U), np.full(steps, h), {k: np.array(v) for k, v in impulses.items()},
                             0., 0., 0., 0., 0., False, ())
+
+def numerical_pose_ik(robot, frame, target, seed):
+    seed = np.asarray(seed, float)
+    def residual(q):
+        T = robot.fk(q, frame)
+        return np.r_[10*(T[:3, 3]-target[:3, 3]), Rotation.from_matrix(target[:3, :3].T@T[:3, :3]).as_rotvec(), 1e-5*(q-seed)]
+    fit = least_squares(residual, np.clip(seed, robot.lower+1e-5, robot.upper-1e-5),
+                        bounds=(robot.lower+1e-6, robot.upper-1e-6), max_nfev=160, ftol=1e-12, xtol=1e-12, gtol=1e-12)
+    if np.linalg.norm(residual(fit.x)[:6]) > 2e-5:
+        raise RuntimeError(f"IK failed at {frame}: position/orientation target is unreachable with this seed")
+    return fit.x

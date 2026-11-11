@@ -9,7 +9,7 @@ import xml.etree.ElementTree as ET
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from .contracted import ContractedCase, plan_contracted
+from .contracted import ContractedCase, plan_contracted, numerical_pose_ik
 from .contacts import contact_basis
 from .contact_simulation import MujocoContactScene, trajectory_reference
 from .robot import Robot
@@ -25,12 +25,30 @@ def build_three_arm_scene(plan, destination):
     ET.SubElement(root, "option", timestep=str(cfg["timestep"]), gravity="0 0 -9.81", integrator="implicitfast",
                   cone="elliptic", solver="Newton", iterations="100", tolerance="1e-10")
     world, actuators, contact = ET.SubElement(root, "worldbody"), ET.SubElement(root, "actuator"), ET.SubElement(root, "contact")
+    assets = ET.SubElement(root, "asset")
+    franka = d.get("model_family") == "franka_panda"
+    mesh_files = None
+    if franka:
+        mesh_cache = Path(d.get("mesh_cache", str(Path.cwd()/".cache/panda_meshes"))).resolve()
+        mesh_files = {p.name: p for p in mesh_cache.glob("*.stl")}
+        if len(mesh_files) < 8:
+            raise ValueError("Panda collision meshes are missing. Run python tools/fetch_panda_meshes.py first.")
     full = []
     for original, spec, cap in zip(plan.case.robots, d["arms"], plan.case.capabilities):
         robot = Robot(original.path, base_pose=original.base_pose)
         full.append(robot)
-        collisions = append_urdf_robot(world, actuators, robot, spec["id"]+"_")
+        prefix = spec["id"]+"_"
+        collisions = append_urdf_robot(world, actuators, robot, prefix, mesh_files=mesh_files, assets=assets, robot_collisions=franka)
+        if franka:
+            srdf = ET.parse(plan.case.path.parent/"panda.srdf")
+            for pair in srdf.findall("disable_collisions"):
+                a, b = pair.get("link1"), pair.get("link2")
+                if a in robot.tree.links and b in robot.tree.links:
+                    ET.SubElement(contact, "exclude", body1=prefix+("urdf_"+a if a == robot.tree.root else a),
+                                  body2=prefix+("urdf_"+b if b == robot.tree.root else b))
         for geom in collisions:
+            if franka and not any(geom.startswith(prefix+name+"_collision_") for name in spec["tool_collision_links"]):
+                continue
             mu = cap.mu if cap.kind != "G" else .9
             ET.SubElement(contact, "pair", geom1=geom, geom2="panel_collision", condim="3",
                           friction=_text([mu, mu, 0, 0, 0]), solref=".006 1", solimp=".95 .99 .001")
@@ -58,10 +76,19 @@ class ThreeArmController:
         self.node_time = np.r_[0., np.cumsum(plan.trajectory.dt)]
         self.prepare = self.cfg["preparation_seconds"]
         self.release = float(round(self.prepare+self.node_time[-1]+self.cfg["hold_seconds"], 12))
-        self.duration = float(round(self.release+self.cfg["release_seconds"], 12))
+        self.duration = float(round(self.release+(self.cfg["release_seconds"] if self.cfg.get("release_tools", True) else 0), 12))
+        if not self.cfg.get("release_tools", True):
+            self.release = self.duration+1.
         self.refs = [trajectory_reference(plan.trajectory, np.arange(s.start, s.stop), np.arange(v.start, v.stop))
                      for s, v in zip(plan.system.q_slices, plan.system.v_slices)]
         self.time = 0.
+        self.retracted = []
+        if plan.case.data.get("model_family") == "franka_panda" and self.cfg.get("release_tools", True):
+            for robot, spec, qs in zip(plan.case.robots, plan.case.data["arms"], plan.system.q_slices):
+                last = plan.trajectory.q[-1, qs]
+                target = robot.fk(last, spec["tool_frame"]).copy()
+                target[:3, 3] += spec["retract_world"]
+                self.retracted.append(numerical_pose_ik(robot, spec["tool_frame"], target, last))
 
     @staticmethod
     def blend(t):
@@ -77,9 +104,12 @@ class ThreeArmController:
             if time < self.prepare or time > self.prepare+self.node_time[-1]:
                 vp, ap = np.zeros_like(vp), np.zeros_like(ap)
             if time >= self.release:
-                direction = np.asarray(spec["retract_world"])
-                J = reduced.jacobian(qp, spec["tool_frame"])[3:]
-                qp = qp+np.linalg.solve(J, direction)*self.blend((time-self.release)/.35)
+                if self.retracted:
+                    qp = qp+(self.retracted[i]-qp)*self.blend((time-self.release)/.5)
+                else:
+                    direction = np.asarray(spec["retract_world"])
+                    J = reduced.jacobian(qp, spec["tool_frame"])[3:]
+                    qp = qp+np.linalg.solve(J, direction)*self.blend((time-self.release)/.35)
             q, v, a = np.zeros(robot.nq), np.zeros(robot.nv), np.zeros(robot.nv)
             for j, name in enumerate(robot.joint_names):
                 if name in reduced.joint_names:
@@ -96,6 +126,21 @@ class ThreeArmController:
         outputs, offset = [], 0
         for i, (robot, reduced) in enumerate(zip(self.robots, self.plan.case.robots)):
             sl = slice(offset, offset+robot.n); offset += robot.n
+            if self.cfg.get("controller_type") == "computed_torque":
+                feedback = self.cfg["arm_kp"]*(desired[sl]-q[sl])+self.cfg["arm_kd"]*(velocity[sl]-v[sl])
+                tau = robot.inverse_dynamics(q[sl], v[sl], acceleration[sl]+feedback)
+                if self.time < self.release:
+                    prediction = self.plan.case.data["contracted_contacts"][i]
+                    impulse = self.plan.trajectory.impulses[prediction["group_id"]][index]
+                    force = impulse[-3:]/self.plan.trajectory.dt[index]
+                    Robj = Rotation.from_quat(self.plan.trajectory.q[index, self.plan.system.object_q][3:]).as_matrix()
+                    Rwc = Robj@contact_basis(prediction["normal_object"])
+                    tau -= robot.jacobian(q[sl], self.plan.case.data["arms"][i]["tool_frame"])[3:].T@(Rwc@force)
+                for j, name in enumerate(robot.joint_names):
+                    if name not in reduced.joint_names:
+                        tau[j] = robot.gravity(q[sl])[j]+self.cfg["finger_kp"]*(desired[sl][j]-q[sl][j])+self.cfg["finger_kd"]*(velocity[sl][j]-v[sl][j])
+                outputs.append(np.clip(tau, -robot.effort, robot.effort))
+                continue
             tau = robot.inverse_dynamics(q[sl], v[sl], np.zeros(robot.n))
             for j, name in enumerate(robot.joint_names):
                 if name in reduced.joint_names:
@@ -109,9 +154,14 @@ class ThreeArmController:
         return np.concatenate(outputs)
 
 
-def run_three_arm(output="outputs/three_arm", *, case_path=None, contacts_path=None, settings=None, plan=None):
+def run_three_arm(output="outputs/three_arm", *, case_path=None, contacts_path=None, settings=None, plan=None, progress=None):
     output = Path(output); output.mkdir(parents=True, exist_ok=True)
-    plan = plan or plan_contracted(ContractedCase.load(case_path, contacts_path=contacts_path), settings=settings)
+    if plan is None:
+        case = ContractedCase.load(case_path, contacts_path=contacts_path)
+        if settings is None and case.data.get("model_family") == "franka_panda":
+            from .optimization import SolverSettings
+            settings = SolverSettings(max_iterations=600, options={"expand": False, "ipopt.hessian_approximation": "limited-memory"})
+        plan = plan_contracted(case, settings=settings)
     d = plan.case.data
     case_bytes = (json.dumps(d, indent=2, allow_nan=False)+"\n").encode()
     (output/"case.json").write_bytes(case_bytes)
@@ -121,7 +171,12 @@ def run_three_arm(output="outputs/three_arm", *, case_path=None, contacts_path=N
         if destination.resolve() != robot.path.resolve():
             shutil.copyfile(robot.path, destination)
         bundle.update(spec["urdf"].encode()); bundle.update(robot.path.read_bytes())
+    for name in ("panda.srdf", "provenance.json", "LICENSE.upstream"):
+        source = plan.case.path.parent/name
+        if source.exists() and source.resolve() != (output/name).resolve():
+            shutil.copyfile(source, output/name)
     full = build_three_arm_scene(plan, output/"scene.xml")
+    if progress: progress("simulation")
     controller = ThreeArmController(plan, full)
     joint_names = [spec["id"]+"_"+name for spec, robot in zip(d["arms"], full) for name in robot.joint_names]
     motor_names = [spec["id"]+"_motor_"+name for spec, robot in zip(d["arms"], full) for name in robot.joint_names]
@@ -136,7 +191,7 @@ def run_three_arm(output="outputs/three_arm", *, case_path=None, contacts_path=N
                       initial_q=controller.reference(0.)[0], external_forces=seal)
     trace.metadata.update(external_force_model="pressure_limited_compliant_adhesive_point", seal_events=seal.events,
                           prediction_source=d["prediction_source"], tool_types=[c.kind for c in plan.case.capabilities],
-                          release_time=float(controller.release), model_scope="synthetic_URDF_Cartesian_tool_testbed")
+                          release_time=float(controller.release), model_scope=d.get("model_family", "synthetic_URDF_Cartesian_tool_testbed"))
     trace.metadata.update(vacuum_parameters=dict(d["simulation"]["vacuum"]), vacuum_adhesion_limit_N=seal.adhesion)
     trace.save(output/"execution.npz"); seal.save(output/"vacuum.npz")
     np.savez_compressed(output/"plan.npz", q=plan.trajectory.q, v=plan.trajectory.v, tau=plan.trajectory.tau,
@@ -149,11 +204,22 @@ def run_three_arm(output="outputs/three_arm", *, case_path=None, contacts_path=N
                        "translation_m": float(np.linalg.norm(actual[:3]-desired[:3])),
                        "rotation_rad": float((Rotation.from_quat(desired[3:]).inv()*Rotation.from_quat(actual[3:])).magnitude())})
     before_release = np.asarray(seal.history)[:, 0] < controller.release
-    local_wrenches, force_checks = measured_tool_wrenches(plan, trace, seal, controller.prepare, controller.release)
+    local_wrenches, force_checks = measured_tool_wrenches(plan, trace, seal, controller.prepare, min(controller.release, controller.duration))
+    unexpected = {}
+    if d.get("model_family") == "franka_panda":
+        for pair, gap in zip(trace.contact_pair, trace.contact_gap):
+            other = next((g for g in pair if g != "panel_collision"), "")
+            expected = "panel_collision" in pair and any(other.startswith(a["id"]+"_"+link+"_collision_") for a in d["arms"] for link in a["tool_collision_links"])
+            if not expected and gap < -.0002:
+                key = " / ".join(pair)
+                unexpected[key] = min(unexpected.get(key, 0.), float(gap))
     np.savez_compressed(output/"tool_wrenches.npz", time=trace.time, local_reactions=local_wrenches,
                         group_ids=np.array([c["group_id"] for c in d["contracted_contacts"]]))
-    report = {"prediction_source": d["prediction_source"], "network_inference_executed": False, "arms": 3, "keyframes": 3,
+    report = {"model_family": d.get("model_family", "cartesian"), "planner": d["optimization"].get("planner", "cito"),
+              "prediction_source": d["prediction_source"], "network_inference_executed": False, "arms": 3, "keyframes": 3,
               "solver_backend": "ipopt" if settings is None else settings.backend,
+              "unexpected_penetrations_m": unexpected, "sampled_collision_check_passed": not unexpected,
+              "complementarity_applicable": d["optimization"].get("planner") != "fixed_contact_path",
               "mujoco_version": trace.metadata["engine_version"], "timestep": trace.metadata["timestep"],
               "tool_types": [c.kind for c in plan.case.capabilities], "keyframe_rho": [k.rho for k in plan.keyframes],
               "primal_residual": plan.trajectory.primal_residual, "complementarity_residual": plan.trajectory.complementarity_residual,
@@ -165,9 +231,10 @@ def run_three_arm(output="outputs/three_arm", *, case_path=None, contacts_path=N
               "force_envelopes_passed": all(c["maximum_violation_N"] < .05 for c in force_checks),
               "final_object_position": trace.object_pose[-1, 0, :3].tolist(), "full_geometry_certified": False,
               "equality_constraints_used": int(scene.model.neq),
-              "limitations": ["assumed network predictions; no learned model inference", "translation-only Cartesian arm prototype",
+              "limitations": ["assumed network predictions; no learned model inference",
+                              "IK-prescribed joint path with optimized forces/torques; not full CITO" if d.get("model_family") == "franka_panda" else "translation-only Cartesian arm prototype",
                               "assumed synthetic gripper capability; no hardware calibration", "force-only planning does not certify measured finite-gripper moments",
-                              "pressure-limited point seal, not cup/fluid FEM", "preparation and post-task release are scripted, not optimized placement"]}
+                              "pressure-limited point seal, not cup/fluid FEM", "preparation is scripted; final pose is held" if not d["simulation"].get("release_tools", True) else "preparation and post-task release are scripted, not optimized placement"]}
     (output/"report.json").write_text(json.dumps(report, indent=2, allow_nan=False)+"\n")
     return plan, trace, seal, report
 

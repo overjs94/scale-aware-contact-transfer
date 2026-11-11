@@ -108,3 +108,16 @@ navigation. Desktop and mobile software-WebGL QA checked actual tool geometry,
 contact/seal indicators and release navigation. The gripper's finite-pad moments
 are recorded but not certified by the force-only planning approximation. See
 [three_arm_experiment.md](three_arm_experiment.md) for scope and reproduction.
+
+Three-Panda extension (2026-11-11): 66 Python tests passed locally, including
+upstream inertia preservation, symbolic/Pinocchio mass and Jacobians, independent
+MuJoCo gravity, actual free-panel execution, invalid job requests and worker
+cancellation. A separately submitted web job completed optimization → simulation
+→ export and its recording is the default `three_franka` web dataset. Maximum
+keyframe translation error was 0.86 mm; measured force envelopes, suction retention
+and sampled non-tool collision checks passed. Wheel build with `--no-isolation`
+passed and includes scenario URDFs, SRDF, provenance and license. Managed browser
+preview was unavailable because the environment denied socket creation; visual
+browser QA and hosted publication were not completed in this session. Browser
+regressions for all three articulated instances and form/poll/error/cancel flows
+are included in CI with deterministic mesh fixtures.

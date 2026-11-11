@@ -1,3 +1,4 @@
+import { initializeExperiment } from "./experiment.js";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { applyRecordedPose, disposeModel, loadURDFModel } from "./urdf-view.js";
@@ -235,6 +236,8 @@ function showData(data) {
   $("toast").classList.remove("visible");
   if (dataset?.id === "dual_cito" && data.id !== "dual_cito") $("geometry-mode").value = "visual";
   dataset = data; frameFloat = 0;
+  document.querySelector(".run-panel").hidden = !!data.instances;
+  window.dispatchEvent(new CustomEvent("recording-selected", {detail:data}));
   $("geometry-mode").disabled = data.id === "dual_cito";
   if (data.id === "dual_cito") $("geometry-mode").value = "skeleton";
   $("model-title").textContent = data.title;
@@ -337,7 +340,7 @@ async function init() {
     button.append(icon, label, dot); button.onclick = () => selectModel(model.id); $("model-list").append(button);
   });
   const requestedModel = new URLSearchParams(location.search).get("model");
-  await selectModel(index.models.some(model => model.id === requestedModel) ? requestedModel : "franka_panda");
+  await selectModel(index.models.some(model => model.id === requestedModel) ? requestedModel : "three_franka");
   try {
     const health = await fetch("./api/health");
     if (health.ok) backend = (await health.json()).ready === true;
@@ -362,3 +365,6 @@ function animate(now) {
 }
 requestAnimationFrame(animate);
 init().catch(error => { toast(error.message); $("loading").classList.add("hidden"); });
+
+window.addEventListener("experiment-result", event => showData(event.detail));
+initializeExperiment().catch(error => { document.getElementById("experiment-state").textContent=error.message; });
