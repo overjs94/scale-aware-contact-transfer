@@ -3,6 +3,33 @@
 URDF 기반 동역학·기구학과 논문의 Sec. III-B–IV를 위한 연구용 Python 패키지입니다.
 로봇별 System_Param의 질량·관성·축·링크 길이를 재작성하지 않고 URDF에서 읽습니다.
 
+
+## 본 실험: 단일 패널 → 고정 지그
+
+[공개 URDF/mesh 뷰어](https://overjs94.github.io/Contact_contraction/?model=panel_fixture)
+의 기본 과제를 단일 패널의 lift → 12° 재배향 → 지그 안착 → 하중 전달 →
+전체 공구 릴리스로 구성했습니다. 기존 상판·다리 조립은 보조 데모입니다.
+
+기본 30초 / 8 keyframe / Panda G·P·P 실행은 작은 synthetic contracted 접촉점의
+위치 refinement를 실제 수행한 뒤, 위치만 4배 전달하고 2 kg target 패널의
+힘·토크를 다시 계산합니다. 네트워크 추론이나 손 시연 학습 결과는 아닙니다.
+[실험 비교 및 로봇별 저수준 제어 수식](docs/panel-experiments-and-control.md)에
+검증 범위와 G1/RBY1 이동형 듀얼암의 미구현 조건을 정리했습니다.
+
+~~~bash
+python tools/fetch_panda_meshes.py
+python examples/panel_fixture.py
+# 선택한 RB5-850E의 독립 위치제어 검증 (패널 운반 시험과 구별)
+python tools/fetch_rb5_meshes.py
+python examples/rb5_position_servo.py
+~~~
+
+Python 서버는 새 최적화·MuJoCo 실행을 수행하는 로컬 계산 백엔드입니다.
+GitHub Pages는 무료 정적 기록 재생이며 Python 서버를 실행하지 않습니다.
+`npm --prefix web run build` 후 `.venv/bin/python web/server.py --port 8010`으로
+로컬 UI에서 contracted source JSON을 입력·업로드하고 같은 과제를 재계산하며
+source refinement on/off를 비교할 수 있습니다.
+
 ## 설치
 
 검증은 Python 3.12, Linux에서 수행했습니다. Windows에서는 WSL2 사용을

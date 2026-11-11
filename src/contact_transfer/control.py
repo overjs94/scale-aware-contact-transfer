@@ -78,3 +78,17 @@ def position_servo_step(robot, q, frame, desired_twist, dt, *, damping=1e-3):
     if not solution.success:
         raise RuntimeError("bounded differential IK did not converge")
     return robot.integrate(q, dt*solution.x), solution.x
+
+
+def rb_position_command(joint_names, q_command, *, units='rad'):
+    """Pure command payload, no hardware connection or effort command.
+
+    ROS joint-position interfaces use rad. A raw vendor transport may require
+    degrees; conversion is explicit so it cannot happen twice silently.
+    """
+    q=np.asarray(q_command,float)
+    if q.shape!=(len(joint_names),) or not np.isfinite(q).all() or units not in {'rad','deg'}:
+        raise ValueError('invalid RB position command')
+    return {'mode':'joint_position','joint_names':list(joint_names),
+            'positions':(np.rad2deg(q) if units=='deg' else q).tolist(),'units':units,
+            'hardware_transmission_executed':False}

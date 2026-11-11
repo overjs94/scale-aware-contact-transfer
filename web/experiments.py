@@ -24,6 +24,8 @@ def vector(value, low, high):
 
 
 def prepare_request(request, destination):
+    if isinstance(request,dict) and request.get('preset')=='panel_fixture':
+        return prepare_panel_request(request,destination)
     if isinstance(request,dict) and request.get('preset')=='table_assembly':
         return prepare_assembly_request(request,destination)
     if not isinstance(request,dict) or set(request)-{'preset','mass','keyframes','contacts'}: raise ValueError('Unknown experiment fields')
@@ -75,6 +77,32 @@ def prepare_assembly_request(request,destination):
     (destination/'case.json').write_text(json.dumps(d,indent=2))
     from contact_transfer.table_assembly import AssemblyCase
     AssemblyCase.load(destination/'case.json')
+    return d
+
+
+def prepare_panel_request(request,destination):
+    if set(request)-{'preset','duration','refine_source','contracted_source'}:raise ValueError('Panel accepts preset, duration, refine_source and contracted_source only')
+    if not isinstance(request.get('refine_source',True),bool):raise ValueError('refine_source must be boolean')
+    source=PRESETS/'panel_fixture';d=json.loads((source/'case.json').read_text());duration=number(request.get('duration',30),24,60)
+    dt=d['simulation']['timestep']
+    if not math.isclose(round(duration/dt)*dt,duration,abs_tol=1e-9):raise ValueError('Duration must be a multiple of physics timestep')
+    scale=duration/d['simulation']['duration']
+    for k in d['keyframes']:k['time']*=scale
+    for name in ('duration','grasp_seconds','seat_time','load_transfer_end','release_time','release_seconds','retract_end'):d['simulation'][name]*=scale
+    d['optimization']['sample_dt']*=scale;d['source_refinement']=request.get('refine_source',True)
+    destination=Path(destination);destination.mkdir(parents=True)
+    for file in source.iterdir():
+        if file.is_file():shutil.copyfile(file,destination/file.name)
+    (destination/'case.json').write_text(json.dumps(d,indent=2))
+    from contact_transfer.source_transfer import load_source
+    if 'contracted_source' in request:
+        if not isinstance(request['contracted_source'],dict):raise ValueError('contracted_source must be an object')
+        (destination/d['source_file']).write_text(json.dumps(request['contracted_source'],allow_nan=False))
+    contacts=load_source(destination/d['source_file'])
+    if set(g['group_id'] for g in contacts['groups'])!=set(a['group_id'] for a in d['arms']):raise ValueError('Source groups must match assigned arms')
+    if contacts['source_to_target_scale']!=d['source_to_target_scale']:raise ValueError('Source and target scales must match')
+    from contact_transfer.panel_fixture import PanelCase
+    PanelCase.load(destination/'case.json')
     return d
 
 

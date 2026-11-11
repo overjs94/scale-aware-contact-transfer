@@ -1,6 +1,13 @@
 {
   "models": [
     {
+      "id": "panel_fixture",
+      "title": "\ud328\ub110 \u2192 \uc9c0\uadf8 \u00b7 Franka \u00d7 3 \u00b7 30 s",
+      "engine": "mujoco_contact_recording",
+      "dof": 23,
+      "floating_base": false
+    },
+    {
       "id": "franka_panda",
       "title": "Franka Panda",
       "engine": "mujoco_recording",
@@ -85,6 +92,6 @@
       "floating_base": false
     }
   ],
-  "tests_passed": 76,
+  "tests_passed": 88,
   "draft_version": "12"
 }

@@ -12,7 +12,14 @@ def status(stage, **extra):
     tmp.replace(root/'status.json')
 try:
     status('optimization')
-    if json.loads((root/'case.json').read_text()).get('id')=='table_assembly':
+    case_id=json.loads((root/'case.json').read_text()).get('id')
+    if case_id=='panel_fixture':
+        from contact_transfer.panel_fixture import run_panel
+        from contact_transfer.panel_view import export_panel_view
+        plan,trace,report,flags=run_panel(root/'result',case_path=root/'case.json',progress=status)
+        status('export')
+        data=export_panel_view(plan,trace,report,flags,root/'viewer')
+    elif case_id=='table_assembly':
         from contact_transfer.table_assembly import run_table_assembly
         from contact_transfer.assembly_view import export_assembly_view
         plan,trace,report,flags=run_table_assembly(root/'result',case_path=root/'case.json',progress=status)

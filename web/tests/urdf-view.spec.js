@@ -233,3 +233,44 @@ test('assembly duration submission uses the new Python scenario API',async({page
   expect(payload).toEqual({preset:'table_assembly',duration:36});
   await expect(page.locator('#result-seal')).toContainText('SEATED');
 });
+
+test('primary panel recording refines source anchors, seats on a URDF jig and releases all tools',async({page})=>{
+  await page.goto('/');
+  await expect(page.locator('#model-title')).toContainText('패널 → 지그');
+  await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+  await expect(page.locator('#scenario-preset')).toHaveValue('panel_fixture');
+  await expect(page.locator('#source-result')).toContainText('synthetic 입력');
+  await expect(page.locator('#source-result')).toContainText('1.053 → 1.116');
+  await expect(page.locator('#result-seal')).toContainText('SUPPORTED');
+  await page.getByRole('button',{name:'released · 30.0 s',exact:true}).click();
+  await expect(page.locator('#tool-state')).toContainText('edge_gripper_contact: 해제');
+  await expect(page.locator('#tool-state')).toContainText('support_right_contact: 해제');
+  await expect(page.locator('#chart-label')).toHaveText('MEASURED PANEL HEIGHT');
+  const errors=await page.evaluate(async()=>{
+    const {loadURDFModel,applyRecordedPose,disposeModel}=await import('/test-module.js');
+    const data=await(await fetch('/data/panel_fixture.json')).json();const rows=[];
+    for(const mode of ['visual','collision'])for(const spec of data.instances){
+      const robot=await loadURDFModel(spec.manifest,mode);let error=0;
+      for(const frame of [0,240,440,600]){
+        applyRecordedPose(robot,{...spec,q:data.q.map(q=>spec.q_indices.map(i=>q[i]))},frame);
+        for(const [name,link] of Object.entries(robot.links)){
+          const i=data.link_names.indexOf(spec.id+'_'+name);
+          if(i<0)throw Error('Missing recorded link '+spec.id+'_'+name);
+          link.matrixWorld.elements.slice(12,15).forEach((v,j)=>error=Math.max(error,Math.abs(v-data.positions[frame][i][j])));
+        }
+      }rows.push(error);disposeModel(robot);
+    }return rows;
+  });
+  expect(errors).toHaveLength(10);errors.forEach(e=>expect(e).toBeLessThan(1e-7));
+});
+
+test('panel API submits the source refinement ablation and duration',async({page})=>{
+  let payload;
+  await page.route('**/api/health',route=>route.fulfill({json:{ready:true}}));
+  await page.route('**/api/experiments',route=>{payload=route.request().postDataJSON();return route.fulfill({status:202,json:{id:'panel'}});});
+  await page.route('**/api/experiments/panel',route=>route.fulfill({json:{state:'completed',stage:'complete',recording:'/data/panel_fixture.json'}}));
+  await page.goto('/?model=panel_fixture');await expect(page.locator('#experiment-run')).toBeEnabled();
+  await page.locator('#source-refinement').uncheck();await page.locator('#assembly-duration').fill('36');
+  await page.locator('#experiment-run').click();await expect(page.locator('#experiment-state')).toHaveText('계산 완료');
+  expect(payload).toMatchObject({preset:'panel_fixture',duration:36,refine_source:false,contracted_source:{contact_frame:'object',origin:'synthetic_contracted_fixture'}});
+});

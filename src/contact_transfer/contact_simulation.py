@@ -34,18 +34,21 @@ def trajectory_reference(result, q_indices, v_indices):
 
 
 class MujocoContactScene:
-    """Named scalar joints, direct unit-gear torque motors, dynamic objects.
+    """Named scalar joints, direct unit-gear torque/position actuators, free objects.
 
     Load the calibrated robot/gripper/object/fixture scene from MJCF, including
     collision meshes and exclusions. The dynamics-only exporter is unchanged.
     """
-    def __init__(self, scene, joint_names, actuator_names, object_names):
+    def __init__(self, scene, joint_names, actuator_names, object_names, *, actuator_modes=None):
         import mujoco
         self.mj = mujoco
         self.scene = Path(scene).resolve()
         self.model = mujoco.MjModel.from_xml_path(str(self.scene))
         self.data = mujoco.MjData(self.model)
         self.joint_names, self.actuator_names, self.object_names = map(list, (joint_names, actuator_names, object_names))
+        self.actuator_modes = list(['torque']*len(self.joint_names) if actuator_modes is None else actuator_modes)
+        if len(self.actuator_modes)!=len(self.joint_names) or any(m not in {'torque','position'} for m in self.actuator_modes):
+            raise ValueError('one torque/position actuator mode per joint required')
         if len(self.joint_names) != len(self.actuator_names) or not self.object_names:
             raise ValueError("one actuator per joint and at least one dynamic object required")
         if any(len(names) != len(set(names)) for names in (self.joint_names, self.actuator_names, self.object_names)):
@@ -60,17 +63,22 @@ class MujocoContactScene:
         self.joints = ids(mujoco.mjtObj.mjOBJ_JOINT, self.joint_names)
         self.actuators = ids(mujoco.mjtObj.mjOBJ_ACTUATOR, self.actuator_names)
         self.objects = ids(mujoco.mjtObj.mjOBJ_BODY, self.object_names)
-        for joint, actuator in zip(self.joints, self.actuators):
+        for joint, actuator, mode in zip(self.joints, self.actuators, self.actuator_modes):
             if int(self.model.jnt_type[joint]) not in (int(mujoco.mjtJoint.mjJNT_HINGE), int(mujoco.mjtJoint.mjJNT_SLIDE)):
                 raise ValueError("controlled joints must be scalar")
             if (self.model.actuator_trntype[actuator] != mujoco.mjtTrn.mjTRN_JOINT
                     or self.model.actuator_trnid[actuator, 0] != joint
                     or self.model.actuator_dyntype[actuator] != mujoco.mjtDyn.mjDYN_NONE
                     or self.model.actuator_gaintype[actuator] != mujoco.mjtGain.mjGAIN_FIXED
-                    or self.model.actuator_biastype[actuator] != mujoco.mjtBias.mjBIAS_NONE
-                    or not np.allclose(self.model.actuator_gear[actuator], [1, 0, 0, 0, 0, 0])
-                    or not np.isclose(self.model.actuator_gainprm[actuator, 0], 1)):
-                raise ValueError("replay requires direct unit-gear torque motors")
+                    or not np.allclose(self.model.actuator_gear[actuator], [1, 0, 0, 0, 0, 0])):
+                raise ValueError("replay requires direct unit-gear joint actuators")
+            if mode=='torque':
+                if self.model.actuator_biastype[actuator]!=mujoco.mjtBias.mjBIAS_NONE or not np.isclose(self.model.actuator_gainprm[actuator,0],1):
+                    raise ValueError('torque mode requires unit fixed gain and no bias')
+            else:
+                kp=self.model.actuator_gainprm[actuator,0];bias=self.model.actuator_biasprm[actuator]
+                if not np.isfinite([kp,*bias[:3]]).all() or kp<=0 or self.model.actuator_biastype[actuator]!=mujoco.mjtBias.mjBIAS_AFFINE or not np.isclose(bias[0],0) or not np.isclose(bias[1],-kp) or bias[2]>0:
+                    raise ValueError('position mode requires a positive PD position actuator')
         if set(self.actuators) != set(range(self.model.nu)):
             raise ValueError("all scene actuators must be explicitly controlled")
         for body in self.objects:
@@ -96,7 +104,7 @@ class MujocoContactScene:
 
     def run(self, controller, reference, duration, *, case_id, plan_id, attachments=(),
             initial_q=None, external_forces=None, progress=None):
-        """reference(t)->(q_d,v_d,a_d); controller.command returns joint torques.
+        """reference(t)->(q_d,v_d,a_d); controller.command returns torque (Nm) or position (rad), per joint mode.
 
         attachments contains (time, equality_name, active). Named equality
         constraints are scene-defined grasp models. They model ideal holding,
@@ -162,15 +170,18 @@ class MujocoContactScene:
                 break
             tau = np.asarray(controller.command(q, v, *desired), float).reshape(len(self.joints))
             if not np.isfinite(tau).all():
-                raise RuntimeError("controller returned nonfinite torque")
-            for value, actuator in zip(tau, self.actuators):
+                raise RuntimeError("controller returned nonfinite command")
+            for value, actuator, mode in zip(tau, self.actuators, self.actuator_modes):
                 if model.actuator_ctrllimited[actuator] and not model.actuator_ctrlrange[actuator, 0] <= value <= model.actuator_ctrlrange[actuator, 1]:
                     raise RuntimeError("command exceeds scene actuator control range")
-                if model.actuator_forcelimited[actuator] and not model.actuator_forcerange[actuator, 0] <= value <= model.actuator_forcerange[actuator, 1]:
+                if mode=='torque' and model.actuator_forcelimited[actuator] and not model.actuator_forcerange[actuator, 0] <= value <= model.actuator_forcerange[actuator, 1]:
                     raise RuntimeError("command exceeds scene actuator force range")
-            torques.append(tau.copy())
             data.ctrl[self.actuators] = tau
             mj.mj_step(model, data)
+            applied=tau.copy()
+            for j,mode in enumerate(self.actuator_modes):
+                if mode=='position':applied[j]=data.actuator_force[self.actuators[j]]
+            torques.append(applied)
             if not np.isfinite(data.qpos).all() or not np.isfinite(data.qvel).all():
                 raise RuntimeError("nonfinite simulation state")
             if any(w.number for w in data.warning):
@@ -191,6 +202,7 @@ class MujocoContactScene:
                         "gravity": model.opt.gravity.tolist(), "geom_friction": model.geom_friction.tolist(),
                         "geom_solref": model.geom_solref.tolist(), "geom_solimp": model.geom_solimp.tolist()},
                     "attachments": [list(e) for e in attachments],
+                    "actuator_modes": self.actuator_modes,
                     "full_geometry_certified": False}
         log = ExecutionTrace(metadata, np.array(times), np.array(qs), np.array(refs),
                              np.array(torques).reshape(steps, len(self.joints)), np.array(poses))

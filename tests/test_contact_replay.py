@@ -97,3 +97,15 @@ def test_trace_rejects_nan_contact_data(scene):
     log.contact_gap[0] = np.nan
     with pytest.raises(ValueError, match="contact_gap"):
         log.validate()
+
+
+def test_position_actuator_logs_actual_torque_not_radian_command(scene):
+    scene.write_text(scene.read_text().replace('<motor name="motor" joint="slide" ctrllimited="true" ctrlrange="-10 10"/>','<position name="motor" joint="slide" kp="100" kv="20" ctrllimited="true" ctrlrange="-.1 .1" forcelimited="true" forcerange="-2 2"/>'))
+    with pytest.raises(ValueError,match='torque mode'):MujocoContactScene(scene,['slide'],['motor'],['panel'])
+    sim=MujocoContactScene(scene,['slide'],['motor'],['panel'],actuator_modes=['position'])
+    reference=lambda t:(np.array([.04]),np.zeros(1),np.zeros(1))
+    controller=SimpleNamespace(command=lambda q,v,qr,vr,ar:qr)
+    log=sim.run(controller,reference,1.,case_id='position',plan_id='step')
+    assert log.torque[0,0]==pytest.approx(2.)  # 4 Nm demanded, capped at 2
+    assert abs(log.torque[-1,0])<.01 and log.q[-1,0]==pytest.approx(.04,abs=.0001)
+    assert log.metadata['actuator_modes']==['position']

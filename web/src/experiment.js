@@ -1,27 +1,29 @@
 const $=id=>document.getElementById(id);
 let preset,job,timer,connected=false;
 const state=text=>{$('experiment-state').textContent=text;};
-const stages={queued:'대기',optimization:'SE(3) IK 경로 · IPOPT 접촉력/토크 최적화',simulation:'MuJoCo 동역학 실행',validation:'접촉 · 삽입 · 해제 검증',export:'기록 내보내기',complete:'계산 완료',failed:'실패',cancelled:'취소됨'};
+const stages={queued:'대기',source_refinement_and_optimization:'소형 접촉점 refinement · target 하중/토크 최적화',optimization:'SE(3) IK 경로 · IPOPT 접촉력/토크 최적화',simulation:'MuJoCo 동역학 실행',validation:'접촉 · 삽입 · 해제 검증',export:'기록 내보내기',complete:'계산 완료',failed:'실패',cancelled:'취소됨'};
 const assembly=()=>preset?.id==='table_assembly';
+const panel=()=>preset?.id==='panel_fixture';
 const names={grip_and_support:'상판 파지·구형 지지',grasp_settled:'파지 유지',lift_tabletop:'상판·다리 들어 올리기',reorient_tabletop:'상판 12° 재정렬',approach_socket:'다리 접근',align_leg:'peg / socket 정렬',insert_leg:'다리 삽입',assembled_and_released:'gripper 해제·조립 유지'};
 function fields(){
-  const isAssembly=assembly();$('keyframe-inputs').replaceChildren();
-  $('builder-title').textContent=isAssembly?'책상 상판·다리 조립':'Three Franka · 패널 운반';
-  $('builder-note').textContent=isAssembly?'실제 Panda × 3 · arm 21 + finger 4 DoF · 자유 물체 2개':'실제 Panda × 3 · arm 21 + finger 2 DoF · 자유 물체 1개';
-  $('tool-chips').replaceChildren();for(const title of isAssembly?['⋈ 상판 gripper','● Sphere support','⋈ 다리 gripper']:['● Sphere · point','⋈ Panda hand','⊙ Vacuum seal']){const chip=document.createElement('span');chip.textContent=title;$('tool-chips').append(chip);}
-  $('mass-control').hidden=isAssembly;$('panel-mass').disabled=isAssembly;
-  $('duration-control').hidden=!isAssembly;$('assembly-duration').disabled=!isAssembly;
-  $('planner-description').textContent=isAssembly?'2 kg 상판을 grip & support해 자세를 바꾸고 0.4 kg 다리를 삽입합니다. 28 s에 다리 gripper를 열어 자유 물체의 socket 접촉 유지를 검사합니다. 시간 변경 시 전체 경로와 제어 모드를 함께 재계산합니다.':'고정 자세의 IK 접촉 경로에서 접촉력·토크를 최적화합니다. 전체 CITO 탐색은 별도 Cartesian 예제입니다.';
-  $('keyframe-help').textContent=isAssembly?'기본 8개 keyframe · 상판의 z / pitch와 다리 z 표시 · 입력 시간에 비례해 재계산':'위치 m · 시간 s · 고정 자세 xyzw = [0, 0, 0, 1]';
-  if(isAssembly){
+  const isAssembly=assembly();const isPanel=panel();const detailed=isAssembly||isPanel;$('keyframe-inputs').replaceChildren();
+  $('builder-title').textContent=isPanel?'본 실험 · 패널 → 지그 → 릴리스':isAssembly?'책상 상판·다리 조립':'Three Franka · 패널 운반';
+  $('builder-note').textContent=isPanel?'Panda × 3 · G / P / P · 자유 패널 1개 · 고정 지그':isAssembly?'실제 Panda × 3 · arm 21 + finger 4 DoF · 자유 물체 2개':'실제 Panda × 3 · arm 21 + finger 2 DoF · 자유 물체 1개';
+  $('tool-chips').replaceChildren();for(const title of isPanel?['⋈ Edge gripper','● Left sphere support','● Right sphere support']:isAssembly?['⋈ 상판 gripper','● Sphere support','⋈ 다리 gripper']:['● Sphere · point','⋈ Panda hand','⊙ Vacuum seal']){const chip=document.createElement('span');chip.textContent=title;$('tool-chips').append(chip);}
+  $('mass-control').hidden=detailed;$('panel-mass').disabled=detailed;
+  $('source-refinement-control').hidden=!isPanel;
+  $('duration-control').hidden=!detailed;$('assembly-duration').disabled=!detailed;
+  $('planner-description').textContent=isPanel?'1/4 스케일의 synthetic contracted contact 위치를 먼저 최적화합니다. 위치만 4배 전달하고 2 kg 패널의 접촉력·토크를 다시 풉니다. 초기 파지와 SE(3) 경로는 주어집니다. 22 s 지그 안착 → 하중 전달 → 26 s 전체 공구 해제. 학습 추론·실제 로봇 실행은 포함하지 않습니다.':isAssembly?'2 kg 상판을 grip & support해 자세를 바꾸고 0.4 kg 다리를 삽입합니다. 28 s에 다리 gripper를 열어 자유 물체의 socket 접촉 유지를 검사합니다. 시간 변경 시 전체 경로와 제어 모드를 함께 재계산합니다.':'고정 자세의 IK 접촉 경로에서 접촉력·토크를 최적화합니다. 전체 CITO 탐색은 별도 Cartesian 예제입니다.';
+  $('keyframe-help').textContent=isPanel?'8개 keyframe · 소형 source refinement와 target 검증을 따로 기록':isAssembly?'기본 8개 keyframe · 상판의 z / pitch와 다리 z 표시 · 입력 시간에 비례해 재계산':'위치 m · 시간 s · 고정 자세 xyzw = [0, 0, 0, 1]';
+  if(detailed){
     const scale=Number($('assembly-duration').value)/preset.simulation.duration;
     for(const [i,k] of preset.keyframes.entries()){
       const row=document.createElement('div');row.className='assembly-key';
-      const pitch=2*Math.atan2(k.tabletop[4],k.tabletop[6])*180/Math.PI;
-      for(const text of [`0${i+1}`,`${(k.time*scale).toFixed(1)} s`,names[k.id]||k.id,`top ${k.tabletop[2].toFixed(2)} m / ${pitch.toFixed(0)}° · leg ${k.leg[2].toFixed(2)} m`]){const el=document.createElement('span');el.textContent=text;row.append(el);}
+      const pose=isPanel?k.object_pose:k.tabletop;const pitch=2*Math.atan2(pose[4],pose[6])*180/Math.PI;
+      for(const text of [`0${i+1}`,`${(k.time*scale).toFixed(1)} s`,names[k.id]||k.id,isPanel?`panel ${pose[2].toFixed(2)} m / ${pitch.toFixed(0)}°`:`top ${pose[2].toFixed(2)} m / ${pitch.toFixed(0)}° · leg ${k.leg[2].toFixed(2)} m`]){const el=document.createElement('span');el.textContent=text;row.append(el);}
       $('keyframe-inputs').append(row);
     }
-    $('contacts-json').value=JSON.stringify(preset.arms.map(a=>({arm_id:a.id,kind:a.kind,object:a.object,point_object:a.point_object,normal_object:a.normal_object})),null,2);
+    if(!isPanel)$('contacts-json').value=JSON.stringify(preset.arms.map(a=>({arm_id:a.id,kind:a.kind,object:a.object,point_object:a.point_object,normal_object:a.normal_object})),null,2);
   }else{
     for(const [i,k] of preset.keyframes.entries()){
       const row=document.createElement('div');row.className='keyframe-input';const name=document.createElement('span');name.textContent=`0${i+1} ${k.id}`;row.append(name);
@@ -35,11 +37,13 @@ function fields(){
 }
 function report(data){
   const r=data.report;if(!r)return;$('experiment-results').hidden=false;
-  const isAssembly=r.scenario==='table_assembly';const errors=isAssembly?r.keyframe_errors.flatMap(k=>[k.tabletop.translation_m,...(k.time<=(r.leg_release_time_s||28)?[k.leg.translation_m]:[])]):r.keyframe_errors.map(k=>k.translation_m);
+  const isAssembly=r.scenario==='table_assembly';const isPanel=r.scenario==='panel_fixture';const errors=isPanel?r.keyframe_errors.map(k=>k.panel.translation_m):isAssembly?r.keyframe_errors.flatMap(k=>[k.tabletop.translation_m,...(k.time<=(r.leg_release_time_s||28)?[k.leg.translation_m]:[])]):r.keyframe_errors.map(k=>k.translation_m);
   $('result-tracking').textContent=(r.tracking_passed?'PASS':'FAIL')+' · '+Math.max(...errors.map(v=>v*1000)).toFixed(2)+' mm';
   $('result-forces').textContent=r.force_envelopes_passed?'PASS':'FAIL';
-  $('result-seal-label').textContent=isAssembly?'ASSEMBLY / RELEASE':'SUCTION SEAL';
-  $('result-seal').textContent=isAssembly?(r.assembly_seated&&r.leg_released?`SEATED · ${(r.insertion_depth_m*1000).toFixed(1)} mm`:'FAIL / 미조립'):(r.seal_retained_before_vent?'유지':'이탈');
+  $('result-seal-label').textContent=isPanel?'JIG SUPPORT / RELEASE':isAssembly?'ASSEMBLY / RELEASE':'SUCTION SEAL';
+  $('result-seal').textContent=isPanel?(r.fixture_supported&&r.all_tools_released?`SUPPORTED · ${r.jig_support_final_N.toFixed(2)} N`:'FAIL'):isAssembly?(r.assembly_seated&&r.leg_released?`SEATED · ${(r.insertion_depth_m*1000).toFixed(1)} mm`:'FAIL / 미조립'):(r.seal_retained_before_vent?'유지':'이탈');
+  $('source-result').hidden=!isPanel;
+  if(isPanel)$('source-result').textContent=`SOURCE · ${r.source.synthetic_input?'synthetic 입력':'외부 contracted 입력'} · refinement ${r.source.source_refinement_enabled?'ON':'OFF'} · ρ ${r.source.source_rho_before.toFixed(3)} → ${r.source.source_rho_after.toFixed(3)} · target 최소 ρ ${Math.min(...r.target_validation.map(v=>v.rho)).toFixed(3)} · 학습 추론 미실행`;
   $('result-residual').textContent=r.primal_residual.toExponential(2);$('report-json').textContent=JSON.stringify(r,null,2);
 }
 async function request(path,options={}){const target=path.startsWith('/api/')?new URL('.'+path,document.baseURI):path;const response=await fetch(target,options);const body=await response.json();if(!response.ok)throw Error(body.error||'계산 서버 오류');return body;}
@@ -52,19 +56,20 @@ async function poll(){const active=job;if(!active)return;try{
 }catch(error){if(job===active){state(error.message);finish();}}}
 $('experiment-form').onsubmit=async event=>{event.preventDefault();try{
   let payload;
-  if(assembly())payload={preset:'table_assembly',duration:Number($('assembly-duration').value)};
+  if(panel())payload={preset:'panel_fixture',duration:Number($('assembly-duration').value),refine_source:$('source-refinement').checked,contracted_source:JSON.parse($('contacts-json').value)};
+  else if(assembly())payload={preset:'table_assembly',duration:Number($('assembly-duration').value)};
   else{const keyframes=structuredClone(preset.keyframes);document.querySelectorAll('#keyframe-inputs input').forEach(input=>{const k=keyframes[Number(input.dataset.key)],v=Number(input.value);if(input.dataset.field==='time')k.time=v;else k.object_pose[['x','y','z'].indexOf(input.dataset.field)]=v;});payload={preset:'three_franka',mass:Number($('panel-mass').value),keyframes,contacts:JSON.parse($('contacts-json').value)};}
   $('experiment-run').disabled=true;$('scenario-preset').disabled=true;state('작업 제출 중…');const result=await request('/api/experiments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});job=result.id;$('experiment-cancel').disabled=false;await poll();
 }catch(error){state(error.message);finish();}};
 $('experiment-cancel').onclick=async()=>{if(job){try{await request('/api/experiments/'+job+'/cancel',{method:'POST'});state('취소됨');finish();}catch(error){state(error.message);}}};
-$('experiment-reset').onclick=()=>{$('assembly-duration').value=30;fields();};
-$('assembly-duration').oninput=()=>{if(assembly()&&$('assembly-duration').checkValidity())fields();};
+$('experiment-reset').onclick=()=>{$('assembly-duration').value=30;if(panel())$('contacts-json').value=JSON.stringify(preset.contracted_source,null,2);fields();};
+$('assembly-duration').oninput=()=>{if((assembly()||panel())&&$('assembly-duration').checkValidity())fields();};
 $('contacts-file').onchange=async event=>{try{const file=event.target.files[0];if(!file)return;if(file.size>32768)throw Error('32 KB 이하 JSON을 사용하세요.');const body=JSON.parse(await file.text());$('contacts-json').value=JSON.stringify(body.contracted_contacts||body,null,2);state('접촉 JSON을 불러왔습니다. 실행 시 표면·법선을 검사합니다.');}catch(error){state(error.message);}};
 window.addEventListener('recording-selected',event=>report(event.detail));
-async function selectPreset(id){preset=await(await fetch(id==='table_assembly'?'./data/assembly-preset.json':'./data/franka-preset.json')).json();fields();}
+async function selectPreset(id){preset=await(await fetch(id==='panel_fixture'?'./data/panel-preset.json':id==='table_assembly'?'./data/assembly-preset.json':'./data/franka-preset.json')).json();if(id==='panel_fixture'){preset.contracted_source=await(await fetch('./data/panel-source.json')).json();$('contacts-json').value=JSON.stringify(preset.contracted_source,null,2);}fields();}
 $('scenario-preset').onchange=async()=>{try{await selectPreset($('scenario-preset').value);window.dispatchEvent(new CustomEvent('experiment-preview',{detail:$('scenario-preset').value}));}catch(error){state(error.message);}};
 export async function initializeExperiment(){
-  const id=new URLSearchParams(location.search).get('model')==='three_franka'?'three_franka':'table_assembly';$('scenario-preset').value=id;await selectPreset(id);
-  try{const health=await request('/api/health');if(health.ready){if(health.experiments_ready===false){state('Panda 충돌 mesh 준비 필요 · python tools/fetch_panda_meshes.py');return;}connected=true;$('experiment-run').disabled=false;state('Python 연결됨 · 실제 최적화와 두 물체 동역학 실행 가능');return;}}catch{}
+  const requested=new URLSearchParams(location.search).get('model');const id=['three_franka','table_assembly','panel_fixture'].includes(requested)?requested:'panel_fixture';$('scenario-preset').value=id;await selectPreset(id);
+  try{const health=await request('/api/health');if(health.ready){if(health.experiments_ready===false){state('Panda 충돌 mesh 준비 필요 · python tools/fetch_panda_meshes.py');return;}connected=true;$('experiment-run').disabled=false;state('Python 연결됨 · source/target 최적화와 접촉 동역학 실행 가능');return;}}catch{}
   state('GitHub Pages: 실제 실행 기록 재생 · 새 계산은 Python 백엔드에서 실행합니다. 서버: .venv/bin/python web/server.py');
 }

@@ -63,7 +63,7 @@ function buildGeometry(data) {
     disposeModel(robotGroup.children[0]);
   }
   geometry = []; objectMesh = undefined;
-  for (const item of data.environment || []) {
+  for (const item of (data.instances?.some(i=>i.role==="static_jig") ? [] : data.environment) || []) {
     if (item.type !== "box") continue;
     const mesh = new THREE.Mesh(new THREE.BoxGeometry(...item.size), new THREE.MeshStandardMaterial({color:item.color, transparent:true, opacity:.6}));
     mesh.position.fromArray(item.position); if(item.quaternion_xyzw) mesh.quaternion.fromArray(item.quaternion_xyzw); robotGroup.add(mesh);
@@ -136,7 +136,7 @@ async function loadGeometry() {
       : mode === "collision"
         ? "URDF collision 형상을 표시합니다. 형상 표시는 접촉 계산·충돌 검증 결과와 별개입니다."
         : data.engine === "mujoco_contact_recording"
-          ? data.scenario === "table_assembly" ? "Panda 3대와 두 자유 부품의 실제 접촉 실행입니다. 상판·다리의 visual/collision URDF에 빈 socket과 peg 형상을 포함합니다." : "3개 URDF 팔과 도구의 실제 접촉 실행입니다. Point는 구형 tool, gripper는 두 손가락 접촉, suction은 압력 제한 seal 모델입니다."
+          ? data.scenario === "panel_fixture" ? "원본 Panda URDF·mesh, 자유 패널 URDF와 고정 지그를 표시합니다. 소형 접촉 refinement 후 실행한 기록입니다." : data.scenario === "table_assembly" ? "Panda 3대와 두 자유 부품의 실제 접촉 실행입니다. 상판·다리의 visual/collision URDF에 빈 socket과 peg 형상을 포함합니다." : "3개 URDF 팔과 도구의 실제 접촉 실행입니다. Point는 구형 tool, gripper는 두 손가락 접촉, suction은 압력 제한 seal 모델입니다."
           : "URDF visual·mesh의 origin과 scale을 적용했습니다. 기록된 시뮬레이션은 관절 추종 검증입니다.";
     $("geometry-status").dataset.state = "ready";
     $("geometry-status").dataset.model = data.id;
@@ -252,7 +252,7 @@ function showData(data) {
   if (data.id === "dual_cito") $("geometry-mode").value = "skeleton";
   $("model-title").textContent = data.title;
   $("model-description").textContent = data.engine === "kinematic_preview" ? "29개 관절과 floating base를 가진 휴머노이드의 기구학을 확인합니다." : data.engine === "cito_trajectory" ? "접촉을 유지하며 물체를 들어 올리는 제한 모델의 최적화 결과입니다." : "URDF 관성으로 계산한 폐루프 토크 제어 결과를 재생합니다.";
-  if (data.instances) $("model-description").textContent = data.scenario === "table_assembly" ? "밑면이 위인 상판 grip & support → 12° reorientation → 다리 정렬·삽입 → gripper 해제 · 30초 실제 동역학 실행" : `주어진 contracted contact → ${data.keyframes.length}개 keyframe 최적화 → 3개 팔의 접촉 동역학 실행입니다.`;
+  if (data.instances) $("model-description").textContent = data.scenario === "panel_fixture" ? "본 실험: 소형 접촉 위치 refinement → 패널 운반·재배향 → 지그 안착·하중 전달 → 전체 릴리스 · 자유 강체 실행" : data.scenario === "table_assembly" ? "밑면이 위인 상판 grip & support → 12° reorientation → 다리 정렬·삽입 → gripper 해제 · 30초 실제 동역학 실행" : `주어진 contracted contact → ${data.keyframes.length}개 keyframe 최적화 → 3개 팔의 접촉 동역학 실행입니다.`;
   $("engine-badge").innerHTML = "<span></span>" + engineLabel(data);
   $("engine-badge").classList.toggle("kinematic", data.engine === "kinematic_preview");
   $("scene-label").textContent = data.engine === "cito_trajectory" ? "COUPLED ROBOT–OBJECT TRAJECTORY" : data.engine === "kinematic_preview" ? "FLOATING-BASE KINEMATIC PREVIEW" : "RECORDED CLOSED-LOOP SIMULATION";
@@ -297,7 +297,7 @@ function updateFrame() {
   $("timeline").value = frameFloat / (dataset.times.length - 1);
   $("time-now").textContent = time.toFixed(2) + " s";
   $("error-now").textContent = chartValues.length ? number(chartValues[index]) : "—";
-  $("tool-state").textContent = dataset.scenario === "table_assembly" ? `상판 gripper: ${dataset.tool_states.top_gripper_contact[index] ? "양쪽 pad 접촉" : "분리"} · 구형 support: ${dataset.tool_states.point_contact[index] ? "접촉" : "분리"} · 다리 gripper: ${dataset.tool_states.leg_gripper_contact[index] ? "양쪽 pad 접촉" : "해제"} · socket: ${dataset.tool_states.socket_contact[index] ? "접촉" : "비접촉"}` : dataset.tool_states
+  $("tool-state").textContent = dataset.scenario === "panel_fixture" ? Object.entries(dataset.tool_states).map(([name,values])=>`${name}: ${values[index]?"접촉":"해제"}`).join(" · ") : dataset.scenario === "table_assembly" ? `상판 gripper: ${dataset.tool_states.top_gripper_contact[index] ? "양쪽 pad 접촉" : "분리"} · 구형 support: ${dataset.tool_states.point_contact[index] ? "접촉" : "분리"} · 다리 gripper: ${dataset.tool_states.leg_gripper_contact[index] ? "양쪽 pad 접촉" : "해제"} · socket: ${dataset.tool_states.socket_contact[index] ? "접촉" : "비접촉"}` : dataset.tool_states
     ? `구형 tool: ${dataset.tool_states.point_contact[index] ? "접촉" : "분리"} · Gripper: ${dataset.tool_states.gripper_contact[index] ? "양쪽 pad 접촉" : "미파지"} · Suction: ${dataset.tool_states.suction_sealed[index] ? "seal 유지" : "해제"}` : "";
   const ratio = dataset.torque_ratio[index];
   $("torque-now").textContent = ratio === null || ratio === undefined ? "—" : (ratio * 100).toFixed(1) + "%";
@@ -336,7 +336,7 @@ async function init() {
   const response = await fetch("./data/index.json"), index = await response.json();
   $("model-count").textContent = String(index.models.length).padStart(2, "0");
   $("test-count").textContent = index.tests_passed;
-  const models = [...index.models].sort((a, b) => a.id === "dual_cito" ? -1 : b.id === "dual_cito" ? 1 : a.floating_base - b.floating_base || a.title.localeCompare(b.title));
+  const models = [...index.models].sort((a, b) => a.id === "panel_fixture" ? -1 : b.id === "panel_fixture" ? 1 : a.id === "dual_cito" ? -1 : b.id === "dual_cito" ? 1 : a.floating_base - b.floating_base || a.title.localeCompare(b.title));
   models.forEach(model => {
     const button = document.createElement("button");
     button.className = "model-choice"; button.dataset.id = model.id;
@@ -350,7 +350,7 @@ async function init() {
     button.append(icon, label, dot); button.onclick = () => selectModel(model.id); $("model-list").append(button);
   });
   const requestedModel = new URLSearchParams(location.search).get("model");
-  await selectModel(index.models.some(model => model.id === requestedModel) ? requestedModel : "table_assembly");
+  await selectModel(index.models.some(model => model.id === requestedModel) ? requestedModel : "panel_fixture");
   try {
     const health = await fetch("./api/health");
     if (health.ok) backend = (await health.json()).ready === true;
