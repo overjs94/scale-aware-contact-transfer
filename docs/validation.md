@@ -1,11 +1,11 @@
 # Validation record
 
-Date: 2026-11-10. Runtime: CPython 3.12.14, Linux x86_64.
+Updated: 2026-11-11. Runtime: CPython 3.12.14, Linux x86_64.
 Exact selected package versions are recorded in requirements-validated.txt.
 
 ## Automated tests
 
-30 pytest tests passed in 7.20 seconds on the implementation workspace.
+40 pytest tests passed on the implementation workspace.
 One warning originates from an inherited anyio pytest plugin's deprecated
 pytest internal import; it is not a package test failure.
 
@@ -30,6 +30,9 @@ pytest internal import; it is not a package test failure.
 | Source prior | Feasible zero margin distinguished from failed solve; geometry fallback and explicit group IDs |
 | Contact phases | Required point maintenance/sticking and release-phase validation |
 | URDF validation | Incomplete inertia tensors rejected before backend parsing |
+| Clarabel SOCP | Analytic support and circular friction margins, IPOPT agreement, fixed-posture torque bound, rotated gripper map, zero/infeasible margin |
+| MuJoCo contact scene | Dynamic object fall, upward 9.81 N support, ideal hold/release, closed-loop reference and rejected invalid scenes/commands |
+| Execution trace | NPZ roundtrip without pickle, matching-plan comparison and nonfinite contact rejection |
 
 Mechanics comparison tolerances are 2e-8. Physical velocity finite-difference
 tolerance is 2e-7 and Jdot tolerance is 3e-7. These are test thresholds, not
@@ -69,3 +72,16 @@ Docker/Codespaces service. GitHub Actions successfully ran the initial
 22-test implementation; each updated commit has a separate Actions check.
 Hardware communication, full-mesh collision certification, general regrasping
 and the complete shared-variable III-D NLP remain outside this validation.
+
+## Independent wrench and solver checks
+
+`examples/fixed_wrench_margin.py` returned IPOPT rho 9.809999997530284 and
+Clarabel rho 9.810000000036933, with conic primal residual 3.69e-11.
+The same eight-node stationary-support CITO passed two fresh IPOPT trials
+(primal residual 2.54e-9, unrelaxed complementarity 1.94e-9). These are smoke
+checks, not assembly performance results. SNOPT was reported unavailable by
+the installed CasADi; no SNOPT timing or success comparison is claimed.
+
+CRISP execution, an external C++ trace adapter, real furniture collision scenes,
+precision insertion/jam/retention classification and timestep-sensitivity
+experiments remain pending. See [contact_execution.md](contact_execution.md).

@@ -12,7 +12,7 @@ URDF 기반 동역학·기구학과 논문의 Sec. III-B–IV를 위한 연구�
 ~~~bash
 python -m venv .venv
 source .venv/bin/activate
-python -m pip install -e ".[dev,simulation]"
+python -m pip install -e ".[dev,simulation,conic]"
 python -m pytest -q
 contact-transfer models
 contact-transfer demo-refinement
@@ -178,3 +178,29 @@ WebGL이 제공되지 않는 브라우저에서는 같은 좌표를 CPU로 3D �
 특히 draft의 선택 솔버는 SNOPT/SQP이며 검증된 기본 구현은 IPOPT입니다.
 SolverSettings.backend="snopt" 선택 경로를 제공하지만 SNOPT plugin/설치/라이선스가
 있는 환경에서의 실행 검증은 아직 수행하지 않았습니다.
+
+## 계획과 접촉 실행 검증
+
+기본 계획기는 CasADi + IPOPT로 유지합니다. 같은 CITO 문제를 SNOPT와 비교하는
+도구는 동일한 초기화·접촉 후보·continuation·residual 기준을 사용하며,
+통과한 실행의 시간만 집계합니다. SNOPT가 없으면 `unavailable`로 기록합니다.
+
+~~~bash
+python examples/fixed_wrench_margin.py
+python tools/benchmark_cito_solvers.py --backends ipopt snopt --repeats 3
+~~~
+
+`conic.fixed_wrench_margin`은 고정 접촉 위치·법선의 wrench margin을 Clarabel의
+SOCP로 독립 계산합니다. 고정 arm 자세와 assignment를 함께 주면 III-C의
+중력·관절 토크 제한도 검사합니다. 접촉 형상·자세·모드 탐색은 기존 NLP에 둡니다.
+
+`contact_simulation.MujocoContactScene`은 별도 MJCF scene의 충돌 형상과 자유 물체를
+사용합니다. CITO 관절 궤적은 `trajectory_reference`로 제어기 reference에 연결하고,
+물체 자세는 MuJoCo 동역학으로 계산합니다. 접촉 위치·법선·signed gap·wrench와
+엔진 버전·시간 간격·접촉 설정을 `execution.ExecutionTrace`에 기록합니다.
+`simulation.MujocoRobot`의 기존 marker 모델은 관절 추종 검증용으로 유지합니다.
+
+CRISP C++ 실행기는 아직 연결하지 않았습니다. 같은 부품·fixture·제어 reference의
+실행 결과를 공통 trace 형식으로 옮겨 비교하는 경계와, 실제 dual-arm 패널 운반 및
+정밀 삽입 실험의 완료 조건은 [docs/contact_execution.md](docs/contact_execution.md)에
+정리했습니다. 현재의 합성 접촉 테스트가 실제 가구 조립 성공을 의미하지는 않습니다.

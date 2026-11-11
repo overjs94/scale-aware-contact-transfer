@@ -16,6 +16,10 @@ paper component is not complete.
 | Collision | Differentiable margins and trajectory validator callbacks | Bundled dynamics-only models do not provide full mesh clearances |
 | Control | Computed torque, Cartesian admittance, position servo | Simulation level; no hard real-time guarantee |
 | MuJoCo | URDF inertia export, state mapping, headless tracking | Markers are not collision geometry |
+| Fixed-geometry SOCP | Clarabel box margin, exact friction cones, fixed-posture torque bounds | Geometry/closure/collision remain NLP or scene checks |
+| Contact scene replay | Supplied MJCF, scalar-joint torque control, free objects, contact traces, equality hold/release | Real furniture collision assets and gripper calibration external |
+| Engine comparison | Validated portable trace and matched endpoint comparisons | CRISP C++ runner/adapter and insertion/jam classifier not implemented |
+| Solver comparison | Fresh stationary CITO trials and residual-qualified timing tool | SNOPT unavailable in validated runtime; no assembly benchmark |
 | Hardware | Position/velocity/effort separation | No physical communication or validation |
 
 Restricted CITO tests cover stationary impulse balance and a 3 cm object lift
@@ -27,3 +31,7 @@ redundant velocity conditions use an explicit tolerance and are checked again.
 The III-A learned contact prior is an input; this package does not train the
 networks. Use multi-start budgets for nonconvex experiments. Vendor model
 inertias/effort values are not independent calibration or payload identification.
+
+The planning/execution workflow and CRISP integration boundary are specified in
+[contact_execution.md](contact_execution.md). Synthetic contact replay tests do
+not provide real dual-arm furniture transport or precision insertion evidence.

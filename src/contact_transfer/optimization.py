@@ -48,8 +48,17 @@ def solve(opti, settings=None):
         "ipopt.bound_relax_factor": 0,
     } if settings.backend == "ipopt" else {
         "expand": True, "print_time": settings.verbose,
+        "snopt": {"Major_iterations_limit": settings.max_iterations,
+                  "Major_feasibility_tolerance": settings.tolerance,
+                  "Major_optimality_tolerance": settings.tolerance},
     }
-    options.update(settings.options)
+    # Merge backend dictionaries so a print option does not erase the shared
+    # feasibility/optimality budget. Do not mutate caller-owned settings.
+    for key, value in settings.options.items():
+        if key in options and isinstance(options[key], dict) and isinstance(value, dict):
+            options[key] = {**options[key], **value}
+        else:
+            options[key] = value
     opti.solver(settings.backend, options)
     try:
         solution = opti.solve()
