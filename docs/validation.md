@@ -133,3 +133,13 @@ permissive CORS. The live URL is https://overjs94.github.io/Contact_contraction/
 Cloud-browser visual inspection remains blocked by ERR_TUNNEL_CONNECTION_FAILED.
 The private workflow now packages export artifacts without requesting Pages or
 OIDC write permissions.
+
+Table assembly extension (2026-11-11): 76 Python tests passed locally, including
+an independently submitted 30-second assembly worker, both free bodies'
+Pinocchio/MuJoCo mass and gravity agreement, real empty-socket geometry, duration
+retiming and invalid API input rejection. The actual HTTP server accepted the new
+scenario and canceled a worker through its API. The execution passed tracking,
+force/moment envelope, grip retention, sampled collision, insertion and leg
+release checks. Final measured depth was 25.00 mm and lateral error 0.134 mm.
+URDFs, SRDFs and licenses are included in the wheel. No hardware, continuous
+collision or structural fastening certificate is claimed.

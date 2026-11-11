@@ -76,8 +76,15 @@
       "engine": "mujoco_contact_recording",
       "dof": 23,
       "floating_base": false
+    },
+    {
+      "id": "table_assembly",
+      "title": "\ucc45\uc0c1 \uc870\ub9bd \u00b7 Franka \u00d7 3 \u00b7 30 s",
+      "engine": "mujoco_contact_recording",
+      "dof": 25,
+      "floating_base": false
     }
   ],
-  "tests_passed": 66,
+  "tests_passed": 76,
   "draft_version": "12"
 }

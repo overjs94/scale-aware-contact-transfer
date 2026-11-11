@@ -23,6 +23,10 @@ class SolverSettings:
 def equality(opti, expression):
     """Add nonconstant equality rows and reject inconsistent constant rows."""
     expression = ca.vec(expression)
+    if isinstance(expression, ca.DM):
+        if not np.isfinite(np.asarray(expression)).all() or np.any(abs(np.asarray(expression)) > 1e-10):
+            raise ValueError("inconsistent constant equality")
+        return
     # MX function calls and dense zero blocks can hide identically zero rows.
     # SX expansion discovers them without a tolerance-based numerical rank test.
     symbols = ca.symvar(expression)

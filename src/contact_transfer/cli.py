@@ -39,6 +39,10 @@ def main(argv=None):
     three.add_argument("--contacts", help="External contracted-contact predictions JSON")
     three.add_argument("--output", default="outputs/three_arm")
     three.add_argument("--viewer", help="Export actual multi-robot recording to a web source directory")
+    assembly = sub.add_parser("demo-table-assembly", help="30 s two-gripper/point Panda tabletop and leg assembly")
+    assembly.add_argument("--case")
+    assembly.add_argument("--output", default="outputs/table_assembly")
+    assembly.add_argument("--viewer")
     args = parser.parse_args(argv)
     if args.command == "models":
         print(json.dumps(catalog(), indent=2))
@@ -72,6 +76,13 @@ def main(argv=None):
         print(json.dumps({"output": str(path.resolve()),
                           "final_position_error": float(np.linalg.norm(sim.state()[0]-target)),
                           "steps": len(log["time"])}, indent=2))
+    elif args.command == "demo-table-assembly":
+        from .table_assembly import run_table_assembly
+        from .assembly_view import export_assembly_view
+        plan, trace, report, flags = run_table_assembly(args.output, case_path=args.case)
+        if args.viewer: export_assembly_view(plan, trace, report, flags, args.viewer)
+        print(json.dumps(report, indent=2))
+        if not report["execution_passed"]: raise SystemExit("Table assembly execution rejected; inspect report.")
     elif args.command == "demo-three-arm":
         from .three_arm import run_three_arm
         from .three_arm_view import export_three_arm_view

@@ -24,6 +24,8 @@ def vector(value, low, high):
 
 
 def prepare_request(request, destination):
+    if isinstance(request,dict) and request.get('preset')=='table_assembly':
+        return prepare_assembly_request(request,destination)
     if not isinstance(request,dict) or set(request)-{'preset','mass','keyframes','contacts'}: raise ValueError('Unknown experiment fields')
     preset=request.get('preset','three_franka')
     if preset not in {'three_franka','three_arm'}:raise ValueError('Unknown preset')
@@ -53,6 +55,26 @@ def prepare_request(request, destination):
     (destination/'case.json').write_text(json.dumps(d,indent=2))
     from contact_transfer.contracted import ContractedCase
     ContractedCase.load(destination/'case.json')
+    return d
+
+
+def prepare_assembly_request(request,destination):
+    if set(request)-{'preset','duration'}:raise ValueError('Assembly accepts preset and duration only')
+    source=PRESETS/'table_assembly'
+    d=json.loads((source/'case.json').read_text())
+    duration=number(request.get('duration',30),24,60)
+    dt=d['simulation']['timestep']
+    if not math.isclose(round(duration/dt)*dt,duration,abs_tol=1e-9):raise ValueError('Duration must be a multiple of the physics timestep')
+    scale=duration/d['simulation']['duration']
+    for key in d['keyframes']:key['time']*=scale
+    for name in ('duration','grasp_seconds','release_time','release_seconds','seat_time'):d['simulation'][name]*=scale
+    d['optimization']['sample_dt']*=scale
+    destination=Path(destination);destination.mkdir(parents=True)
+    for file in source.iterdir():
+        if file.is_file():shutil.copyfile(file,destination/file.name)
+    (destination/'case.json').write_text(json.dumps(d,indent=2))
+    from contact_transfer.table_assembly import AssemblyCase
+    AssemblyCase.load(destination/'case.json')
     return d
 
 

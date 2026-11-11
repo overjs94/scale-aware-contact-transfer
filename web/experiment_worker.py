@@ -12,9 +12,16 @@ def status(stage, **extra):
     tmp.replace(root/'status.json')
 try:
     status('optimization')
-    plan, trace, seal, report = run_three_arm(root/'result', case_path=root/'case.json', progress=status)
-    status('export')
-    data = export_three_arm_view(plan, trace, report, root/'viewer')
+    if json.loads((root/'case.json').read_text()).get('id')=='table_assembly':
+        from contact_transfer.table_assembly import run_table_assembly
+        from contact_transfer.assembly_view import export_assembly_view
+        plan,trace,report,flags=run_table_assembly(root/'result',case_path=root/'case.json',progress=status)
+        status('export')
+        data=export_assembly_view(plan,trace,report,flags,root/'viewer')
+    else:
+        plan, trace, seal, report = run_three_arm(root/'result', case_path=root/'case.json', progress=status)
+        status('export')
+        data = export_three_arm_view(plan, trace, report, root/'viewer')
     for spec in data['instances']:
         spec['manifest'] = '/api/experiments/'+root.name+'/assets/'+spec['manifest'].removeprefix('./')
     (root/'viewer/result.json').write_text(json.dumps(data, separators=(',',':'),allow_nan=False))

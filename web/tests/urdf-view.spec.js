@@ -22,7 +22,7 @@ test.beforeEach(async ({ page }) => {
     body: route.request().url().toLowerCase().endsWith(".dae") ? dae : stl,
     headers: { "Access-Control-Allow-Origin": "*" },
   }));
-  await page.goto("/");
+  await page.goto("/?model=three_franka");
   await page.evaluate(async () => { window.modelAPI = await import("/test-module.js"); });
 });
 
@@ -184,4 +184,52 @@ test('experiment failures and cancellation stay visible',async({page})=>{
   await page.route('**/api/experiments',route=>route.fulfill({status:400,json:{error:'normal must point out of the panel surface'}}));
   await page.locator('#experiment-run').click();
   await expect(page.locator('#experiment-state')).toContainText('normal must point out');
+});
+
+test('table assembly renders three arms and two free URDF parts through all eight keyframes',async({page})=>{
+  await page.goto('/?model=table_assembly');
+  await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+  await expect(page.locator('#model-title')).toContainText('책상 조립');
+  await expect(page.locator('#dof')).toHaveText('25');
+  await expect(page.locator('.keyframe-choice')).toHaveCount(9);
+  await expect(page.locator('#result-seal')).toContainText('SEATED');
+  await page.getByRole('button',{name:'reorient_tabletop · 12.0 s',exact:true}).click();
+  await expect(page.locator('#time-now')).toHaveText('12.00 s');
+  await expect(page.locator('#tool-state')).toContainText('상판 gripper: 양쪽 pad 접촉');
+  await page.getByRole('button',{name:'assembled_and_released · 30.0 s',exact:true}).click();
+  await expect(page.locator('#tool-state')).toContainText('다리 gripper: 해제');
+  await expect(page.locator('#tool-state')).toContainText('socket: 접촉');
+  await expect(page.locator('#chart-label')).toHaveText('MEASURED INSERTION DEPTH');
+  await expect(page.locator('#error-unit')).toHaveText('mm');
+  await page.evaluate(async()=>{window.modelAPI=await import('/test-module.js');});
+  const errors=await page.evaluate(async()=>{
+    const data=await(await fetch('/data/table_assembly.json')).json();
+    const {loadURDFModel,applyRecordedPose,disposeModel}=window.modelAPI;const rows=[];
+    for(const mode of ['visual','collision'])for(const spec of data.instances){
+      const robot=await loadURDFModel(spec.manifest,mode);let error=0;
+      const recording={...spec,q:data.q.map(q=>spec.q_indices.map(i=>q[i]))};
+      for(const frame of [0,240,540,600]){
+        applyRecordedPose(robot,recording,frame);
+        for(const [name,link] of Object.entries(robot.links)){
+          const i=data.link_names.indexOf(spec.id+'_'+name);
+          link.matrixWorld.elements.slice(12,15).forEach((v,j)=>error=Math.max(error,Math.abs(v-data.positions[frame][i][j])));
+        }
+      }rows.push(error);disposeModel(robot);
+    }return rows;
+  });
+  expect(errors).toHaveLength(10);errors.forEach(error=>expect(error).toBeLessThan(1e-7));
+});
+
+test('assembly duration submission uses the new Python scenario API',async({page})=>{
+  let payload;
+  await page.route('**/api/health',route=>route.fulfill({json:{ready:true}}));
+  await page.route('**/api/experiments',route=>{payload=route.request().postDataJSON();return route.fulfill({status:202,json:{id:'assembly'}});});
+  await page.route('**/api/experiments/assembly',route=>route.fulfill({json:{state:'completed',stage:'complete',recording:'/data/table_assembly.json'}}));
+  await page.goto('/?model=table_assembly');
+  await expect(page.locator('#experiment-run')).toBeEnabled();
+  await page.locator('#assembly-duration').fill('36');
+  await page.locator('#experiment-run').click();
+  await expect(page.locator('#experiment-state')).toHaveText('계산 완료');
+  expect(payload).toEqual({preset:'table_assembly',duration:36});
+  await expect(page.locator('#result-seal')).toContainText('SEATED');
 });

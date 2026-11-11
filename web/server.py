@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import threading
 import mimetypes
-from urllib.parse import urlsplit, unquote
+from urllib.parse import urlsplit, unquote, parse_qs
 from experiments import Jobs, PRESETS
 
 from simulate import generate
@@ -40,7 +40,9 @@ class Handler(SimpleHTTPRequestHandler):
     def do_GET(self):
         path = urlsplit(self.path).path
         if path == "/api/experiments/preset":
-            return self.respond(200,json.loads((PRESETS/"three_franka/case.json").read_text()))
+            preset=parse_qs(urlsplit(self.path).query).get('preset',['three_franka'])[0]
+            if preset not in {'three_franka','table_assembly'}:return self.respond(400,{'error':'Unknown preset'})
+            return self.respond(200,json.loads((PRESETS/preset/"case.json").read_text()))
         if path.startswith("/api/experiments/"):
             try:
                 parts = path.split("/")

@@ -261,3 +261,18 @@ permissions here. The public repository verifies file hashes and deploys its
 select **Settings → Pages → Source → GitHub Actions** in the public repository;
 the integration token cannot create a Pages site. Static hosting replays recorded
 runs; new CasADi/IPOPT and MuJoCo computations require the Python backend.
+
+The default public experiment is now [30-second tabletop/leg assembly](docs/table_assembly.md):
+three real Panda arms, two native grippers and one spherical support tool, eight
+keyframes, tabletop reorientation, peg/socket insertion, and leg-hand release.
+
+```sh
+contact-transfer demo-table-assembly --output outputs/table_assembly --viewer web
+npm --prefix web run build
+.venv/bin/python web/server.py --port 8010
+```
+
+For new computations, open the Python-served UI and choose **책상 조립 · G / P / G**.
+The existing backend now implements this scenario, duration retiming, isolated
+jobs, progress and cancellation. See [what the Python server does](docs/python_server.md).
+GitHub Pages continues to serve the measured recording without a compute backend.

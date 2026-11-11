@@ -95,7 +95,7 @@ class MujocoContactScene:
         self.vadr = self.model.jnt_dofadr[self.joints]
 
     def run(self, controller, reference, duration, *, case_id, plan_id, attachments=(),
-            initial_q=None, external_forces=None):
+            initial_q=None, external_forces=None, progress=None):
         """reference(t)->(q_d,v_d,a_d); controller.command returns joint torques.
 
         attachments contains (time, equality_name, active). Named equality
@@ -137,6 +137,8 @@ class MujocoContactScene:
                     data.eq_active[eid] = active
             mj.mj_forward(model, data)
             t = k*dt
+            if progress is not None and (k % max(1, round(1/dt)) == 0 or k == steps):
+                progress(t, duration)
             data.qfrc_applied[:] = 0
             data.xfrc_applied[:] = 0
             if external_forces is not None:

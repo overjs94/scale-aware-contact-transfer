@@ -66,7 +66,7 @@ function buildGeometry(data) {
   for (const item of data.environment || []) {
     if (item.type !== "box") continue;
     const mesh = new THREE.Mesh(new THREE.BoxGeometry(...item.size), new THREE.MeshStandardMaterial({color:item.color, transparent:true, opacity:.6}));
-    mesh.position.fromArray(item.position); robotGroup.add(mesh);
+    mesh.position.fromArray(item.position); if(item.quaternion_xyzw) mesh.quaternion.fromArray(item.quaternion_xyzw); robotGroup.add(mesh);
   }
   const points = data.positions[0].map(p => new THREE.Vector3(...p));
   const box = new THREE.Box3().setFromPoints(points);
@@ -136,7 +136,7 @@ async function loadGeometry() {
       : mode === "collision"
         ? "URDF collision 형상을 표시합니다. 형상 표시는 접촉 계산·충돌 검증 결과와 별개입니다."
         : data.engine === "mujoco_contact_recording"
-          ? "3개 URDF 팔과 도구의 실제 접촉 실행입니다. Point는 구형 tool, gripper는 두 손가락 접촉, suction은 압력 제한 seal 모델입니다."
+          ? data.scenario === "table_assembly" ? "Panda 3대와 두 자유 부품의 실제 접촉 실행입니다. 상판·다리의 visual/collision URDF에 빈 socket과 peg 형상을 포함합니다." : "3개 URDF 팔과 도구의 실제 접촉 실행입니다. Point는 구형 tool, gripper는 두 손가락 접촉, suction은 압력 제한 seal 모델입니다."
           : "URDF visual·mesh의 origin과 scale을 적용했습니다. 기록된 시뮬레이션은 관절 추종 검증입니다.";
     $("geometry-status").dataset.state = "ready";
     $("geometry-status").dataset.model = data.id;
@@ -194,7 +194,7 @@ function drawCanvasScene() {
   }
   for (const item of dataset.environment || []) {
     if (item.type !== "box") continue;
-    const corners = Array.from({length:8}, (_, i) => new THREE.Vector3(...item.position).add(new THREE.Vector3(...item.size.map((s,j) => ((i >> j) & 1 ? .5 : -.5)*s))));
+    const corners = Array.from({length:8}, (_, i) => new THREE.Vector3(...item.size.map((s,j) => ((i >> j) & 1 ? .5 : -.5)*s)).applyQuaternion(new THREE.Quaternion().fromArray(item.quaternion_xyzw || [0,0,0,1])).add(new THREE.Vector3(...item.position)));
     corners.forEach((p,i) => { for (let j=0;j<3;j++) if (!(i & (1<<j))) line(p,corners[i | (1<<j)],"#64768b",1); });
   }
   const edges = [...dataset.edges].sort((a, b) =>
@@ -217,15 +217,25 @@ function drawCanvasScene() {
       .applyQuaternion(objectMesh.quaternion).add(origin));
     corners.forEach((p,i) => { for(let j=0;j<3;j++) if (!(i & (1<<j))) line(p,corners[i | (1<<j)],"#f1ba79",2); });
   }
+  for(const part of dataset.objects || []) {
+    const lo=Math.floor(frameFloat), hi=Math.min(lo+1,dataset.times.length-1), f=frameFloat-lo;
+    const position=new THREE.Vector3().fromArray(part.poses[lo]).lerp(new THREE.Vector3().fromArray(part.poses[hi]),f);
+    const rotation=new THREE.Quaternion().fromArray(part.poses[lo],3).slerp(new THREE.Quaternion().fromArray(part.poses[hi],3),f);
+    for(const box of part.boxes){
+      const localRotation=new THREE.Quaternion().fromArray(box.quaternion_xyzw);
+      const corners=Array.from({length:8},(_,i)=>new THREE.Vector3(...box.size.map((s,j)=>((i>>j)&1?.5:-.5)*s)).applyQuaternion(localRotation).add(new THREE.Vector3(...box.position)).applyQuaternion(rotation).add(position));
+      corners.forEach((p,i)=>{for(let j=0;j<3;j++)if(!(i&(1<<j)))line(p,corners[i|(1<<j)],part.id==='tabletop'?"#f1ba79":"#d49965",2);});
+    }
+  }
   ctx.fillStyle = "#8fa6c3"; ctx.font = `${9 * scale}px sans-serif`;
   ctx.fillText("CPU 3D PROJECTION · WebGL unavailable", 18 * scale, h - 40 * scale);
 }
 function drawChart() {
-  chartValues = dataset.errors?.some(x => x !== null) ? dataset.errors :
-    dataset.object ? dataset.positions.map(p => p[dataset.object.index][2] - dataset.positions[0][dataset.object.index][2]) : [];
-  $("chart-label").textContent = dataset.object ? "OBJECT LIFT" : "JOINT TRACKING ERROR";
-  $("error-unit").textContent = dataset.object ? "m" : "rad";
-  $("chart-note").textContent = dataset.engine === "kinematic_preview" ? "기구학 재생: 동역학 추종 오차 없음" : dataset.instances ? "3개 팔 · lift와 transfer 후 3.0 s에 도구 해제" : dataset.object ? "1 kg 물체 · 두 Cartesian arm · 3 cm 이동" : "관절 위치 오차의 2-norm";
+  chartValues = dataset.chart_values || (dataset.errors?.some(x => x !== null) ? dataset.errors :
+    dataset.object ? dataset.positions.map(p => p[dataset.object.index][2] - dataset.positions[0][dataset.object.index][2]) : []);
+  $("chart-label").textContent = dataset.chart_label || (dataset.object ? "OBJECT LIFT" : "JOINT TRACKING ERROR");
+  $("error-unit").textContent = dataset.chart_unit || (dataset.object ? "m" : "rad");
+  $("chart-note").textContent = dataset.engine === "kinematic_preview" ? "기구학 재생: 동역학 추종 오차 없음" : dataset.scenario === "table_assembly" ? "실제 peg tip / socket 위치에서 계산 · 28 s에 다리 gripper 해제" : dataset.instances ? "실제 접촉 동역학 실행 기록 · keyframe별 추종·접촉 상태 확인" : dataset.object ? "1 kg 물체 · 두 Cartesian arm · 3 cm 이동" : "관절 위치 오차의 2-norm";
   if (!chartValues.length) { $("chart-line").setAttribute("points", ""); $("chart-area").setAttribute("d", ""); return; }
   const min = Math.min(0, ...chartValues), max = Math.max(1e-8, ...chartValues);
   const points = chartValues.map((y, i) => [i / (chartValues.length - 1) * 260, 80 - (y-min) / (max-min) * 66]);
@@ -242,11 +252,11 @@ function showData(data) {
   if (data.id === "dual_cito") $("geometry-mode").value = "skeleton";
   $("model-title").textContent = data.title;
   $("model-description").textContent = data.engine === "kinematic_preview" ? "29개 관절과 floating base를 가진 휴머노이드의 기구학을 확인합니다." : data.engine === "cito_trajectory" ? "접촉을 유지하며 물체를 들어 올리는 제한 모델의 최적화 결과입니다." : "URDF 관성으로 계산한 폐루프 토크 제어 결과를 재생합니다.";
-  if (data.instances) $("model-description").textContent = "주어진 contracted contact → 3개 keyframe 최적화 → 3개 팔의 접촉 동역학 실행입니다.";
+  if (data.instances) $("model-description").textContent = data.scenario === "table_assembly" ? "밑면이 위인 상판 grip & support → 12° reorientation → 다리 정렬·삽입 → gripper 해제 · 30초 실제 동역학 실행" : `주어진 contracted contact → ${data.keyframes.length}개 keyframe 최적화 → 3개 팔의 접촉 동역학 실행입니다.`;
   $("engine-badge").innerHTML = "<span></span>" + engineLabel(data);
   $("engine-badge").classList.toggle("kinematic", data.engine === "kinematic_preview");
   $("scene-label").textContent = data.engine === "cito_trajectory" ? "COUPLED ROBOT–OBJECT TRAJECTORY" : data.engine === "kinematic_preview" ? "FLOATING-BASE KINEMATIC PREVIEW" : "RECORDED CLOSED-LOOP SIMULATION";
-  if (data.instances) $("scene-label").textContent = "THREE-ARM CONTACT DYNAMICS · 3 KEYFRAMES";
+  if (data.instances) $("scene-label").textContent = `THREE-ARM CONTACT DYNAMICS · ${data.keyframes.length} KEYFRAMES`;
   $("dof").textContent = data.dof; $("base").textContent = data.floating_base ? "Floating +6" : "Fixed";
   $("physics-step").textContent = data.summary.physics_dt ? (data.summary.physics_dt * 1000).toFixed(0) + " ms" : data.engine === "cito_trajectory" ? "100 ms" : "—";
   const end = data.times.at(-1);
@@ -255,7 +265,7 @@ function showData(data) {
   $("tool-frame").textContent = data.frame;
   $("scope-description").textContent = data.description;
   $("keyframe-list").replaceChildren();
-  for (const keyframe of [...(data.keyframes || []), ...(data.events || [])]) {
+  for (const keyframe of [...(data.keyframes || []), ...(data.events || [])].sort((a,b)=>a.time-b.time)) {
     const button = document.createElement("button"); button.className = "keyframe-choice";
     button.textContent = keyframe.id + " · " + keyframe.time.toFixed(1) + " s";
     button.onclick = () => {
@@ -287,7 +297,7 @@ function updateFrame() {
   $("timeline").value = frameFloat / (dataset.times.length - 1);
   $("time-now").textContent = time.toFixed(2) + " s";
   $("error-now").textContent = chartValues.length ? number(chartValues[index]) : "—";
-  $("tool-state").textContent = dataset.tool_states
+  $("tool-state").textContent = dataset.scenario === "table_assembly" ? `상판 gripper: ${dataset.tool_states.top_gripper_contact[index] ? "양쪽 pad 접촉" : "분리"} · 구형 support: ${dataset.tool_states.point_contact[index] ? "접촉" : "분리"} · 다리 gripper: ${dataset.tool_states.leg_gripper_contact[index] ? "양쪽 pad 접촉" : "해제"} · socket: ${dataset.tool_states.socket_contact[index] ? "접촉" : "비접촉"}` : dataset.tool_states
     ? `구형 tool: ${dataset.tool_states.point_contact[index] ? "접촉" : "분리"} · Gripper: ${dataset.tool_states.gripper_contact[index] ? "양쪽 pad 접촉" : "미파지"} · Suction: ${dataset.tool_states.suction_sealed[index] ? "seal 유지" : "해제"}` : "";
   const ratio = dataset.torque_ratio[index];
   $("torque-now").textContent = ratio === null || ratio === undefined ? "—" : (ratio * 100).toFixed(1) + "%";
@@ -340,7 +350,7 @@ async function init() {
     button.append(icon, label, dot); button.onclick = () => selectModel(model.id); $("model-list").append(button);
   });
   const requestedModel = new URLSearchParams(location.search).get("model");
-  await selectModel(index.models.some(model => model.id === requestedModel) ? requestedModel : "three_franka");
+  await selectModel(index.models.some(model => model.id === requestedModel) ? requestedModel : "table_assembly");
   try {
     const health = await fetch("./api/health");
     if (health.ok) backend = (await health.json()).ready === true;
@@ -368,3 +378,5 @@ init().catch(error => { toast(error.message); $("loading").classList.add("hidden
 
 window.addEventListener("experiment-result", event => showData(event.detail));
 initializeExperiment().catch(error => { document.getElementById("experiment-state").textContent=error.message; });
+
+window.addEventListener("experiment-preview", event => selectModel(event.detail));
