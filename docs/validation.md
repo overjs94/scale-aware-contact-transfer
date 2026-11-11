@@ -121,3 +121,13 @@ preview was unavailable because the environment denied socket creation; visual
 browser QA and hosted publication were not completed in this session. Browser
 regressions for all three articulated instances and form/poll/error/cancel flows
 are included in CI with deterministic mesh fixtures.
+
+Free public viewer export (2026-11-11): `Contact_contraction` now contains only
+the built static UI, 11 recorded examples, model URDF/manifests and licenses.
+The public repository's `verify_site.py` passed checksum/reference checks for 62
+static files and validates the recorded Panda report. The private source history,
+optimizer and Python simulation backend were not copied. Public Pages deployment
+is prepared but initial site creation was rejected with `Resource not accessible
+by integration`; an owner must enable GitHub Actions as the Pages source once.
+The private workflow now packages export artifacts without requesting Pages or
+OIDC write permissions.

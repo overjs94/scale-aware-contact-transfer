@@ -244,12 +244,19 @@ results using actual URDF/mesh playback. The Panda baseline optimizes forces and
 torques on an IK-prescribed path; the original Cartesian example uses CITO.
 See [experiment scope and validation](docs/three_arm_experiment.md).
 
-GitHub Pages deployment is defined in `.github/workflows/pages.yml`. It builds
-`web/dist` and publishes the recorded URDF/mesh viewer using the official Pages
-Actions. The workflow runs on web changes to `main` or the current feature branch.
-It attempts to enable Pages without changing repository visibility. GitHub must
-permit Pages for the repository/account plan. Pages serves static recordings;
-new CasADi/IPOPT and MuJoCo calculations require the Python server. If automatic
-enablement is denied, an administrator must select **Settings → Pages → Source →
-GitHub Actions**, then rerun the Pages workflow. Private repositories may require
-GitHub Pro or an eligible organization plan; the repository is kept private.
+The free public viewer is published from
+[overjs94/Contact_contraction](https://github.com/overjs94/Contact_contraction).
+This source repository stays private. Only the built web UI, recorded examples,
+URDF manifests and required licenses are exported:
+
+```sh
+npm --prefix web run build
+python tools/export_public_viewer.py /path/to/Contact_contraction
+```
+
+The source workflow packages a `public-viewer` artifact without requiring Pages
+permissions here. The public repository verifies file hashes and deploys its
+`site/` directory using GitHub Pages. Initial activation may require an owner to
+select **Settings → Pages → Source → GitHub Actions** in the public repository;
+the integration token cannot create a Pages site. Static hosting replays recorded
+runs; new CasADi/IPOPT and MuJoCo computations require the Python backend.
