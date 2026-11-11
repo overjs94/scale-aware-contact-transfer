@@ -28,7 +28,8 @@ function report(data) {
   $('report-json').textContent=JSON.stringify(r,null,2);
 }
 async function request(path,options={}) {
-  const response=await fetch(path,options);const body=await response.json();
+  const target=path.startsWith('/api/') ? new URL('.'+path,document.baseURI) : path;
+  const response=await fetch(target,options);const body=await response.json();
   if(!response.ok)throw Error(body.error||'계산 서버 오류');return body;
 }
 function finish(){clearTimeout(timer);job=null;$('experiment-run').disabled=false;$('experiment-cancel').disabled=true;}
@@ -75,5 +76,5 @@ export async function initializeExperiment(){
     if(health.experiments_ready===false){state('Panda 충돌 mesh 준비 필요 · python tools/fetch_panda_meshes.py');return;}
     $('experiment-run').disabled=false;state('Python 연결됨 · 실제 최적화와 동역학 실행 가능');return;
   }}catch{}
-  state('기록 재생 모드 · 새 계산: 저장소에서 .venv/bin/python web/server.py 실행 후 localhost:8000 접속');
+  state('기록 재생 모드 · GitHub Pages 등 정적 호스팅에서는 저장된 실행을 확인할 수 있습니다. 새 최적화·MuJoCo 계산에는 Python 서버가 필요합니다.');
 }

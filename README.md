@@ -243,3 +243,13 @@ contact JSON, run optimization and MuJoCo, cancel a job, and inspect measured
 results using actual URDF/mesh playback. The Panda baseline optimizes forces and
 torques on an IK-prescribed path; the original Cartesian example uses CITO.
 See [experiment scope and validation](docs/three_arm_experiment.md).
+
+GitHub Pages deployment is defined in `.github/workflows/pages.yml`. It builds
+`web/dist` and publishes the recorded URDF/mesh viewer using the official Pages
+Actions. The workflow runs on web changes to `main` or the current feature branch.
+It attempts to enable Pages without changing repository visibility. GitHub must
+permit Pages for the repository/account plan. Pages serves static recordings;
+new CasADi/IPOPT and MuJoCo calculations require the Python server. If automatic
+enablement is denied, an administrator must select **Settings → Pages → Source →
+GitHub Actions**, then rerun the Pages workflow. Private repositories may require
+GitHub Pro or an eligible organization plan; the repository is kept private.
