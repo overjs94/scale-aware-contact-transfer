@@ -13,7 +13,13 @@ def status(stage, **extra):
 try:
     status('optimization')
     case_id=json.loads((root/'case.json').read_text()).get('id')
-    if case_id=='panel_fixture':
+    if case_id=='mobile_panel':
+        from contact_transfer.mobile_panel import run_mobile
+        from contact_transfer.mobile_view import export_mobile_view
+        plan,trace,report,flags=run_mobile(root/'result',case_path=root/'case.json',progress=status)
+        status('export')
+        data=export_mobile_view(plan,trace,report,flags,root/'viewer')
+    elif case_id=='panel_fixture':
         from contact_transfer.panel_fixture import run_panel
         from contact_transfer.panel_view import export_panel_view
         plan,trace,report,flags=run_panel(root/'result',case_path=root/'case.json',progress=status)

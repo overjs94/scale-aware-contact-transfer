@@ -173,22 +173,85 @@ an SE(2) command interface does not justify assuming independent sideways
 motion. This wheeled-base model differs from G1's floating-base foot-contact
 and balance problem.
 
-The RBY1 SDK documents joint-position and SE(2)-velocity command builders. The
-intended low-level split is joint-position references for torso/arms and a
-feasible base-velocity reference for the mobile base, with measured base pose
-feeding back into tool/world-frame tracking. Import the official URDF/MJCF,
-wheel mechanics and licenses, then validate combined base/arm execution before
-reporting a mobile transfer result. This repository does not yet implement or
-claim that mobile controller or an RBY1 execution result.
+The executable `contact_transfer.mobile_panel.run_mobile` now implements a
+restricted RBY1-A mobile baseline together with one fixed Panda. The official
+SDK/model is pinned to `300a585c297d1bdf8554312c3a1659610a9823f5` and retains its
+Apache-2.0 license and NOTICE. Original link mass, COM, inertia, joint origins,
+axes and arm effort limits are preserved and independently checked. The vendor
+custom capsule proxies are replaced by convex hulls of official per-link OBJ
+geometry; original DAE visual meshes remain available in the web viewer.
+Parent/grandparent mechanical neighbours are excluded from self-collision.
+Native hand visual geometry has no full collision model; the contact tools are
+explicitly authored parallel-jaw pads and a spherical support.
 
-https://rainbowrobotics.github.io/rby1-dev/software/architecture.html
+The 36-second, nine-keyframe task is: shared lift with the Panda → handover at
+6 s → Panda retreats clear → drive from 8 to 24 s → seat on the destination
+cantilever jig at 28 s → transfer load → release RBY tools at 32 s. The RBY base
+travels 1.4 m along a supplied straight corridor. The torso holds a supplied
+ready posture; this is not joint optimization of arbitrary torso/base paths.
+The mobile source fixture has its own synthetic anchor placement so G/P
+support remains feasible after removing the Panda contact. Source refinement
+runs before geometry-only transfer; target forces are recomputed.
+
+At the destination, each RBY contact target is farther from its initial fixed
+shoulder than the sum of all intervening URDF joint/tool translation lengths.
+This RBY comparison holds the torso at the same ready posture in both
+conditions. A separate counterfactual checks the full fixed Panda chain while
+keeping its original panel anchor. The report stores the comparison scope,
+**geometric reach upper bound**, target distance and
+`provably_outside_fixed_base` flag for each arm. This is stronger than a failed
+IK seed: an unreachable upper bound rejects the stationary-base alternative.
+The moving-base realization also checks the supplied full-pose arm IK path,
+velocity/torque bounds and sampled geometry.
+
+The official URDF `<mobile>` element specifies a differential base with wheel
+separation b=0.53 m, radius r=0.1 m and wheel axes along local −y. Consequently,
+for this sign convention and axle-frame forward/yaw commands,
+
+\[
+\dot x=v\cos\psi,\quad\dot y=v\sin\psi,\qquad
+\dot\theta_r=-\frac{v+b\omega/2}{r},\quad
+\dot\theta_l=-\frac{v-b\omega/2}{r}.
+\]
+
+There is no lateral velocity command. The nominal straight path has ψ=0;
+its quintic distance profile provides continuous velocity and acceleration.
+The simulated controller converts base tracking error to bounded (v,ω), then
+uses limited wheel velocity feedback torques. These are the only mobility
+actuators. The RBY base is a free body with wheel/floor contacts: neither base
+nor panel poses are reset, teleported or prescribed during stepping. Official
+chassis support meshes provide low-friction skid contact in place of resolved
+passive caster rolling. This assumption is explicit in every report.
+
+Torso/arm position actuators use the declared inner PD model and inverse-PD
+feedforward described in the RB section; both hand reactions act on the **same**
+RBY joint vector, so their Jacobian-transpose contributions are summed before
+imposing the joint torque limits. The Panda uses the torque/Cartesian controller
+above. The wheel 40 Nm bound is an authored simulation setting: the upstream
+URDF does not specify a wheel effort rating. It is not a manufacturer limit.
+Servo gains and grasp wrench bounds are also simulation assumptions. The
+planner allocates nominal object/robot inertial wrenches on the supplied path;
+it does not optimize floor contact modes or provide a whole-body robustness
+certificate. Ground support, roll/pitch, wheel contact, wheel odometry, tool
+wrench envelopes, actual base travel and final jig support are measured in
+execution. Source margin is not a mobile-base stability certificate.
+
+The SDK exposes joint-position and SE(2)-velocity commands, but this executable
+runs simulation only and never connects to hardware. Turning corridors,
+obstacle avoidance, optimized torso motion, rolling caster modelling and
+hardware validation remain further work. G1 still needs its separate
+floating-base foot-contact/balance controller.
+
+https://github.com/RainbowRobotics/rby1-sdk/blob/300a585c297d1bdf8554312c3a1659610a9823f5/models/rby1a/urdf/model.urdf
+
+https://github.com/RainbowRobotics/rby1-sdk/blob/300a585c297d1bdf8554312c3a1659610a9823f5/examples/python/37_mobile_test.py
 
 ## Paper experiment matrix and readiness
 
 | Experiment | Controlled comparison | Data/result status |
 |---|---|---|
 | 1: contraction/refinement | Functional vs geometric groups with identical keyframes/contact count; refinement on/off with the same anchors | Synthetic source refinement executable; hand-twin capture and network output still required |
-| 2: scale/embodiment | Geometry+IK vs target load/torque realization; common frozen-geometry checker | Panel target allocation/validation executable; physical loads and RB servo calibration pending |
+| 2: scale/embodiment | Geometry+IK vs target load/torque realization; common frozen-geometry checker | Panel target allocation/validation and RBY1/Panda workspace-extension baseline executable; physical loads and hardware servo calibration pending |
 | 3a: assignment | Keyframe-only P/G selection vs transition-aware selection, same transition validator | G/P/P baseline supplied; selection comparison pending |
 | 3b: trajectory | Fixed-mode vs restricted CITO, same assignment/endpoints | Supplied-path articulated baseline; existing Cartesian CITO is not this comparison |
 | 4: physical dual-arm | Edge G + underside P, jig load handover/release, predefined initial-pose perturbations | Hardware collection pending; no fabricated trials |

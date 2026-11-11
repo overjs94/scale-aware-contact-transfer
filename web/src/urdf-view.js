@@ -80,6 +80,8 @@ export function applyRecordedPose(robot, data, value) {
   for (let i = 0; i < data.joint_names.length; i++) {
     const name = data.joint_names[i];
     if (!robot.joints[name]) throw Error("URDF에 기록된 관절이 없습니다: " + name);
+    // Replay measured soft-limit overshoot faithfully; validation owns limits.
+    robot.joints[name].ignoreLimits = true;
     joints[name] = THREE.MathUtils.lerp(data.q[lo][offset+i], data.q[hi][offset+i], f);
   }
   robot.setJointValues(joints);

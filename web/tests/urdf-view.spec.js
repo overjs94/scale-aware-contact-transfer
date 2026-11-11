@@ -19,7 +19,7 @@ const dae = `<?xml version="1.0"?><COLLADA xmlns="http://www.collada.org/2005/11
 test.beforeEach(async ({ page }) => {
   await page.route("https://raw.githubusercontent.com/**", route => route.fulfill({
     contentType: route.request().url().toLowerCase().endsWith(".dae") ? "application/xml" : "application/octet-stream",
-    body: route.request().url().toLowerCase().endsWith(".dae") ? dae : stl,
+    body: route.request().url().toLowerCase().endsWith(".obj") ? "v 0 0 0\nv 1 0 0\nv 0 1 0\nf 1 2 3\n" : route.request().url().toLowerCase().endsWith(".dae") ? dae : stl,
     headers: { "Access-Control-Allow-Origin": "*" },
   }));
   await page.goto("/?model=three_franka");
@@ -235,7 +235,7 @@ test('assembly duration submission uses the new Python scenario API',async({page
 });
 
 test('primary panel recording refines source anchors, seats on a URDF jig and releases all tools',async({page})=>{
-  await page.goto('/');
+  await page.goto('/?model=panel_fixture');
   await expect(page.locator('#model-title')).toContainText('패널 → 지그');
   await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
   await expect(page.locator('#scenario-preset')).toHaveValue('panel_fixture');
@@ -273,4 +273,47 @@ test('panel API submits the source refinement ablation and duration',async({page
   await page.locator('#source-refinement').uncheck();await page.locator('#assembly-duration').fill('36');
   await page.locator('#experiment-run').click();await expect(page.locator('#experiment-state')).toHaveText('계산 완료');
   expect(payload).toMatchObject({preset:'panel_fixture',duration:36,refine_source:false,contracted_source:{contact_frame:'object',origin:'synthetic_contracted_fixture'}});
+});
+
+test('mobile RBY1 and fixed Panda replay wheel-driven workspace extension',async({page})=>{
+  await page.goto('/');
+  await expect(page.locator('#model-title')).toContainText('RBY1 + Panda');
+  await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+  await expect(page.locator('#base')).toHaveText('Mobile SE(2)');
+  await expect(page.locator('#scenario-preset')).toHaveValue('mobile_panel');
+  await expect(page.locator('#preset-tag')).toHaveText('RBY1 + PANDA');
+  await expect(page.locator('#workspace-result')).toContainText('고정 Panda');
+  await expect(page.locator('#workspace-result')).toContainText('1.399 m');
+  await expect(page.locator('#result-seal')).toContainText('SUPPORTED');
+  await page.getByRole('button',{name:'outside_fixed_workspace · 18.0 s',exact:true}).click();
+  await expect(page.locator('#tool-state')).toContainText('fixed_arm_support: 해제');
+  await expect(page.locator('#tool-state')).toContainText('rby_gripper: 접촉');
+  await expect(page.locator('#chart-label')).toHaveText('MEASURED MOBILE BASE TRAVEL');
+  await page.getByRole('button',{name:'released · 36.0 s',exact:true}).click();
+  await expect(page.locator('#tool-state')).toContainText('rby_gripper: 해제');
+  const errors=await page.evaluate(async()=>{
+    const {loadURDFModel,applyRecordedPose,disposeModel}=await import('/test-module.js');
+    const data=await(await fetch('/data/mobile_panel.json')).json();const errors=[];
+    for(const mode of ['visual','collision'])for(const spec of data.instances){
+      const robot=await loadURDFModel(spec.manifest,mode);let error=0;
+      for(const frame of [0,120,360,480,720]){
+        applyRecordedPose(robot,{...spec,q:data.q.map(q=>spec.q_indices.map(i=>q[i]))},frame);
+        for(const [name,link] of Object.entries(robot.links)){
+          const i=data.link_names.indexOf(spec.id+'_'+name);if(i<0)throw Error('Missing '+spec.id+'_'+name);
+          link.matrixWorld.elements.slice(12,15).forEach((v,j)=>error=Math.max(error,Math.abs(v-data.positions[frame][i][j])));
+        }
+      }errors.push(error);disposeModel(robot);
+    }return errors;
+  });
+  expect(errors).toHaveLength(8);errors.forEach(e=>expect(e).toBeLessThan(1e-7));
+});
+
+test('mobile form submits the mixed embodiment and source JSON to Python',async({page})=>{
+  let payload;
+  await page.route('**/api/health',route=>route.fulfill({json:{ready:true}}));
+  await page.route('**/api/experiments',route=>{payload=route.request().postDataJSON();return route.fulfill({status:202,json:{id:'mobile'}});});
+  await page.route('**/api/experiments/mobile',route=>route.fulfill({json:{state:'completed',stage:'complete',recording:'/data/mobile_panel.json'}}));
+  await page.goto('/?model=mobile_panel');await expect(page.locator('#experiment-run')).toBeEnabled();await page.locator('#assembly-duration').fill('45');
+  await page.locator('#experiment-run').click();await expect(page.locator('#experiment-state')).toHaveText('계산 완료');
+  expect(payload).toMatchObject({preset:'mobile_panel',duration:45,contracted_source:{origin:'synthetic_mobile_handover_fixture'}});
 });

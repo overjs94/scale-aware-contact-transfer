@@ -41,7 +41,7 @@ class Handler(SimpleHTTPRequestHandler):
         path = urlsplit(self.path).path
         if path == "/api/experiments/preset":
             preset=parse_qs(urlsplit(self.path).query).get('preset',['three_franka'])[0]
-            if preset not in {'three_franka','table_assembly','panel_fixture'}:return self.respond(400,{'error':'Unknown preset'})
+            if preset not in {'three_franka','table_assembly','panel_fixture','mobile_panel'}:return self.respond(400,{'error':'Unknown preset'})
             return self.respond(200,json.loads((PRESETS/preset/"case.json").read_text()))
         if path.startswith("/api/experiments/"):
             try:

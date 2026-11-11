@@ -7,20 +7,27 @@ URDF 기반 동역학·기구학과 논문의 Sec. III-B–IV를 위한 연구�
 ## 본 실험: 단일 패널 → 고정 지그
 
 [공개 URDF/mesh 뷰어](https://overjs94.github.io/Contact_contraction/?model=panel_fixture)
-의 기본 과제를 단일 패널의 lift → 12° 재배향 → 지그 안착 → 하중 전달 →
-전체 공구 릴리스로 구성했습니다. 기존 상판·다리 조립은 보조 데모입니다.
+에는 단일 패널의 lift → 12° 재배향 → 지그 안착 → 하중 전달 →
+전체 공구 릴리스 과제를 구성했습니다. 기존 상판·다리 조립은 보조 데모입니다.
 
 기본 30초 / 8 keyframe / Panda G·P·P 실행은 작은 synthetic contracted 접촉점의
 위치 refinement를 실제 수행한 뒤, 위치만 4배 전달하고 2 kg target 패널의
 힘·토크를 다시 계산합니다. 네트워크 추론이나 손 시연 학습 결과는 아닙니다.
 [실험 비교 및 로봇별 저수준 제어 수식](docs/panel-experiments-and-control.md)에
-검증 범위와 G1/RBY1 이동형 듀얼암의 미구현 조건을 정리했습니다.
-RBY1은 이동 가능한 바퀴형 모바일 베이스와 torso·듀얼암을 함께 계획하는
-대상입니다. 베이스 위치·방향·속도와 팔의 접촉을 함께 검증하는 구현은 아직입니다.
+검증 범위와 G1 이동형 듀얼암의 미구현 조건을 정리했습니다.
+
+추가한 [RBY1 + Panda 작업영역 확장 시나리오](https://overjs94.github.io/Contact_contraction/?model=mobile_panel)는
+36초·9 keyframe입니다. 고정 Panda가 지지를 넘기고 물러난 뒤, RBY1-A의 바퀴를
+구동해 1.4 m 이동하고 고정 베이스로는 닿지 않는 지그에 패널을 안착·해제합니다.
+베이스와 패널은 모두 자유 강체이며 실행 중 위치를 강제하지 않습니다. 공식
+URDF·mesh·라이선스를 보존하고, 바퀴 토크 한계와 수동 caster의 skid 근사는
+시뮬레이션 가정으로 구분합니다. 직선 경로·초기 파지·모드와 torso 자세는 주어집니다.
 
 ~~~bash
 python tools/fetch_panda_meshes.py
 python examples/panel_fixture.py
+python tools/fetch_rby1_assets.py
+python examples/mobile_panel.py
 # 선택한 RB5-850E의 독립 위치제어 검증 (패널 운반 시험과 구별)
 python tools/fetch_rb5_meshes.py
 python examples/rb5_position_servo.py

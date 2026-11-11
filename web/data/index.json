@@ -1,6 +1,13 @@
 {
   "models": [
     {
+      "id": "mobile_panel",
+      "title": "\uc791\uc5c5\uc601\uc5ed \ud655\uc7a5 \u00b7 RBY1 + Panda \u00b7 36 s",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
       "id": "panel_fixture",
       "title": "\ud328\ub110 \u2192 \uc9c0\uadf8 \u00b7 Franka \u00d7 3 \u00b7 30 s",
       "engine": "mujoco_contact_recording",
@@ -92,6 +99,6 @@
       "floating_base": false
     }
   ],
-  "tests_passed": 88,
+  "tests_passed": 93,
   "draft_version": "12"
 }
