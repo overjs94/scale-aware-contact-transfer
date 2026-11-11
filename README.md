@@ -15,6 +15,8 @@ URDF 기반 동역학·기구학과 논문의 Sec. III-B–IV를 위한 연구�
 힘·토크를 다시 계산합니다. 네트워크 추론이나 손 시연 학습 결과는 아닙니다.
 [실험 비교 및 로봇별 저수준 제어 수식](docs/panel-experiments-and-control.md)에
 검증 범위와 G1/RBY1 이동형 듀얼암의 미구현 조건을 정리했습니다.
+RBY1은 이동 가능한 바퀴형 모바일 베이스와 torso·듀얼암을 함께 계획하는
+대상입니다. 베이스 위치·방향·속도와 팔의 접촉을 함께 검증하는 구현은 아직입니다.
 
 ~~~bash
 python tools/fetch_panda_meshes.py

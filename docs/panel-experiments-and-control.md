@@ -153,11 +153,33 @@ or balanced mobile execution is claimed here.
 
 https://github.com/unitreerobotics/unitree_sdk2_python/blob/master/example/g1/low_level/g1_low_level_example.py
 
-RBY1 is a useful wheeled dual-arm alternative: its SDK documents joint position
-and SE(2) velocity command builders. Import its official URDF/MJCF and licenses,
-then add base motion, collision and stability constraints before reporting a
-mobile transfer experiment. This repository does not yet claim an RBY1
-controller or execution result.
+RBY1 is a **mobile dual-arm manipulator with an actuated wheeled base**. Its
+base motion belongs in the task plan and low-level interface. A fixed-base
+dual-arm approximation is only a separately labelled baseline. The planned
+configuration is
+
+\[
+q=(x_b,y_b,\psi_b,q_{\mathrm{torso}},q_L,q_R),\qquad
+T_{W,\mathrm{tool},i}=T_{W,B}(x_b,y_b,\psi_b)
+T_{B,\mathrm{tool},i}(q_{\mathrm{torso}},q_i).
+\]
+
+Thus the same object-frame contracted anchors are realized jointly by base,
+torso and arm motion. Base position, heading and motion limits must participate
+in reachability and collision checks; the base footprint and load-dependent
+stability must also be checked throughout transport and jig seating. Wheel
+kinematics and admissible base velocities must come from the official model;
+an SE(2) command interface does not justify assuming independent sideways
+motion. This wheeled-base model differs from G1's floating-base foot-contact
+and balance problem.
+
+The RBY1 SDK documents joint-position and SE(2)-velocity command builders. The
+intended low-level split is joint-position references for torso/arms and a
+feasible base-velocity reference for the mobile base, with measured base pose
+feeding back into tool/world-frame tracking. Import the official URDF/MJCF,
+wheel mechanics and licenses, then validate combined base/arm execution before
+reporting a mobile transfer result. This repository does not yet implement or
+claim that mobile controller or an RBY1 execution result.
 
 https://rainbowrobotics.github.io/rby1-dev/software/architecture.html
 
