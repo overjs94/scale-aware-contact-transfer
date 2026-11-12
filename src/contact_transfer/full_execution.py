@@ -18,8 +18,18 @@ class FullEpisode(CoupledEpisode):
     def __init__(self,problem,keyframes,trajectories,contacts_by_interval,*,reference_dt=.02,force_feedforward=True):
         super().__init__(problem,tuple(keyframes),tuple(trajectories),contacts_by_interval=tuple(contacts_by_interval),control_mode='impedance_feedforward',jaw_force_fraction=.7)
         self.force_feedforward=force_feedforward;self.nodal_spline=self.spline;self.reference_dt=reference_dt
-        times=np.unique(np.r_[self.time,np.arange(0,self.time[-1],reference_dt),self.time[-1]]);Q=[];objects=[];largest=0.
-        for t in times:
+        # Only interpolation is cached. Model/plan/code identity must match;
+        # velocity bounds and native geometry remain fresh execution gates.
+        cache=problem.directory/'dense-reference.npz';digest=hashlib.sha256()
+        for name in ['full_execution.py','full_trajectory.py','contracted.py']:digest.update(Path(__file__).with_name(name).read_bytes())
+        for part in self.identity():digest.update(part.encode())
+        digest.update(str(reference_dt).encode());identity=digest.hexdigest();loaded=False
+        if cache.exists():
+            with np.load(cache,allow_pickle=False) as a:
+                if str(a['identity'])==identity:
+                    times=a['times'].copy();Q=a['q'].copy();objects=a['object_q'].copy();largest=float(a['projection_max_rad']);loaded=True
+        if not loaded:times=np.unique(np.r_[self.time,np.arange(0,self.time[-1],reference_dt),self.time[-1]]);Q=[];objects=[];largest=0.
+        for t in (() if loaded else times):
             i,k,_=self.phase(t+self.preparation);qo=self.object_reference_local(t);seed=self.nodal_spline(t);q=seed.copy()
             for j,(f,r,frame,c,qs) in enumerate(zip(problem.task_definition.features,problem.robots,problem.frames,contacts_by_interval[i],problem.system.q_slices)):
                 if not self.attached(j,t+self.preparation):continue
@@ -35,6 +45,8 @@ class FullEpisode(CoupledEpisode):
         for r,qs in zip(problem.robots,problem.system.q_slices):
             if np.max(abs(velocity[:,qs])-r.velocity)>1e-4:raise RuntimeError('Projected reference exceeds robot velocity limits')
         self.spline=CubicHermiteSpline(times,self.reference_q,velocity)
+        if not loaded:np.savez_compressed(cache,identity=identity,times=times,q=self.reference_q,object_q=self.reference_objects,projection_max_rad=largest)
+        self.reference_cache_hit=loaded
     def object_reference_local(self,t):
         i,k,local=self.phase(t+self.preparation);r=self.trajectories[i];offset=self.offsets[i]+np.r_[0,np.cumsum(r.dt)][k];s=np.clip((local-offset)/r.dt[k],0,1);sys=self.problem.system
         return object_interpolate(self.problem.task_definition.object,r.q[k,sys.object_q],r.q[k+1,sys.object_q],r.v[k,sys.object_v],r.v[k+1,sys.object_v],r.dt[k],s)
@@ -43,7 +55,7 @@ class FullEpisode(CoupledEpisode):
     def reactions(self,t):
         return super().reactions(t) if self.force_feedforward else np.zeros((len(self.problem.robots),6))
     def identity(self):
-        p=self.problem;data=dict(task=p.task_definition.id,types=p.types,assignment=p.assignment,specs=p.specs,source_refinement=p.refine_enabled);h=hashlib.sha256(json.dumps(data,sort_keys=True).encode())
+        p=self.problem;data=dict(task=p.task_definition.id,types=p.types,assignment=p.assignment,specs=[{k:v for k,v in spec.items() if k!='allowed_object_geoms'} for spec in p.specs],source_refinement=p.refine_enabled);h=hashlib.sha256(json.dumps(data,sort_keys=True).encode())
         objects=p.task_definition.object.bodies.values() if isinstance(p.task_definition.object,RigidCollection) else [p.task_definition.object]
         for r in [*p.full_robots,*objects]:h.update(r.path.read_bytes());h.update(np.asarray(r.base_pose,dtype='<f8').tobytes())
         from .full_recording import jsonable
@@ -52,6 +64,8 @@ class FullEpisode(CoupledEpisode):
         for r in self.trajectories:
             for a in [r.q,r.v,r.tau,r.dt]:plan.update(np.asarray(a,dtype='<f8').tobytes())
             for n in sorted(r.impulses):plan.update(n.encode());plan.update(r.impulses[n].tobytes())
+        for key in self.keyframes:
+            for a in [key.positions,key.rotations]:plan.update(np.asarray(a,dtype='<f8').tobytes())
         return h.hexdigest(),plan.hexdigest()
 
 
@@ -71,8 +85,8 @@ class FullContactController(CoupledContactController):
 
 
 def reference_geometry(episode,scene):
-    p=episode.problem;geometry=Geometry(p,scene);states=np.c_[episode.reference_q,episode.reference_objects];failures=geometry.discover(states)
-    return dict(passed=not failures,samples=len(states),continuous_certificate=False,reference_interpolation='object_SE3_and_joint_Hermite_with_dense_robot_IK',projection_limit_rad=.02,projection_max_rad=episode.reference_projection_max_rad,compliant_pad_allowance_m=geometry.pad_compliance_allowance,unintended_clearance_m=geometry.clearance,violations=failures)
+    p=episode.problem;geometry=Geometry(p,scene);states=np.c_[episode.reference_q,episode.reference_objects];opened=[tuple(f.id for i,(f,c) in enumerate(zip(p.task_definition.features,p.capabilities)) if c.kind=='G' and not episode.attached(i,t+episode.preparation)) for t in episode.reference_times];failures=geometry.discover(states,open_grippers=opened)
+    return dict(passed=not failures,samples=len(states),continuous_certificate=False,reference_interpolation='object_SE3_and_joint_Hermite_with_dense_robot_IK',released_gripper_reference='native URDF open configuration after stationary opening dwell',projection_limit_rad=.02,projection_max_rad=episode.reference_projection_max_rad,compliant_pad_allowance_m=geometry.pad_compliance_allowance,unintended_clearance_m=geometry.clearance,violations=failures)
 
 
 def run_full_episode(episode,output,*,contacts_enabled=True,disturbances=(),progress=None,allow_reduced_baseline=False):

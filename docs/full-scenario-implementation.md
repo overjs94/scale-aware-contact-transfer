@@ -132,3 +132,64 @@ The source diagram is [full-scenario-flow.dot](diagrams/full-scenario-flow.dot).
 All P tools use five-dimensional pose IK (position plus tool axis); axial roll is free. This avoids prescribing an extra contact moment or unnecessary wrist rotation. Native geometry still checks the stem and arm meshes.
 
 Moving-interval grids adapt uniformly from 16 to 32 to 64 nodes. The default per-NLP CPU budget is 180 seconds for every variant; failed and budget-exhausted attempts remain in `interval*-mesh-attempts.json`. Finite failed iterates may seed a fresh successful solve, never certify a plan. Cached solves and fresh solves are reported separately.
+
+## Fixed-geometry target decomposition and numerical boundary checks
+
+Held material points are fixed after their first realization. At such a keyframe,
+contact geometry and capability maps no longer depend on robot posture. The
+implementation first minimizes the posture term with the same contact closure
+and axis constraints, then computes a torque-free SOCP upper bound on rho.
+If a separate fixed-rho SOCP realizes that **same** upper bound at that posture
+with every joint torque limit, both separable objective bounds are attained.
+The target certificate records these two successful solves. If the bound is
+not torque-realizable, the coupled target NLP remains the fallback. No global
+optimality is asserted for the nonconvex posture IK.
+
+After native endpoint IK polish, a successful fixed-rho witness QP may replace
+static force distributions without changing pose, rho or the target objective.
+If this auxiliary solve is rejected, its iterate is discarded and the original
+successful target solution must pass the fresh independent gates instead.
+
+`FingerGrasp.check` first tests exact wrench equality. At a numerically rounded
+cone boundary, it can instead find an actual cone/capacity witness within half
+of its existing 1e-7 wrench test tolerance. The returned residual is still
+checked against that same tolerance; a 1e-3 overload is rejected by a dedicated
+regression test. Failed conic iterates never serve as witnesses.
+
+Assembly shoulder candidates use the exact parameterization
+`P=[mu*n*t_x,mu*n*t_y,n]`, `n>=0`, `||t||<=1`, with a recorded 1e-6 ratio
+regularizer. This removes the quadratic cone's zero-gradient vertex when an
+insertion candidate has zero load. Original unsmoothed Coulomb and momentum
+checks remain independent final gates. This change enabled the complete
+16-node insertion interval to terminate successfully; its native execution
+still has a separate acceptance requirement.
+
+## Reference geometry and layout
+
+A released gripper is checked in its native URDF open configuration after its
+stationary opening dwell. The previous closed-jaw geometry is retained for
+holding. The recording always exports measured native gripper joints,
+including passive links; it does not animate a scripted opening over the trace.
+Objects remain free during both planning-reference checks and native execution.
+
+The full panel task has a separate authored layout in
+`src/contact_transfer/scenarios/full_layouts.json`. Robot 0 is placed at
+x=-0.75 m to accommodate the actual Robotiq tool through placement. A sequential
+IK diagnostic increased the smallest joint-limit margin from 0.00034 rad at
+the legacy placement to 0.164 rad. All contact types and ablations use the same
+new layout. Canonical spherical tip geometry and its EE bias are unchanged.
+
+Dense reference interpolation can be cached only with matching model, plan,
+reference spacing and interpolation-code identities. Robot velocity bounds and
+native geometry are checked again before execution. This cache contains no
+physical execution or success certificate.
+
+The panel layout also declares `posture_reference_rule=previous_keyframe`.
+Every method uses that same rule. Independent keyframe posture minimization
+against the original hardware seed had selected a different wrist branch
+between two neighboring poses (a 4.49 rad joint change); its transition
+initializer was infeasible. Using the preceding realized posture as the
+regularization reference retains the contact geometry and torque/force
+constraints while favoring a continuous branch. Box and assembly retain the
+hardware-seed reference. The rule and reference vector are stage metadata;
+old target solutions with a different rule are not reused for later keys.

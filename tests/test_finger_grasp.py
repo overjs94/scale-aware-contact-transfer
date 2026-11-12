@@ -15,6 +15,13 @@ def test_finger_aperture_is_explicit_in_symbolic_resultant_map():
  cap=FingerGrasp(.04,.008,.012,.8,20.);a=ca.SX.sym('a');B=ca.horzcat(*cap.maps(a));fn=ca.Function('finger_map',[a],[B]);assert np.linalg.norm(np.array(fn(.04))-np.array(fn(.06)))>.01
 
 
+def test_rounded_boundary_wrench_uses_existing_tolerance_without_accepting_overload():
+ cap=FingerGrasp(.04,.008,.012,.6,40.);rounded=np.array([0.,0.,0.,0.,0.,-48.-2e-8]);check=cap.check(rounded,tolerance=1e-7)
+ assert check['feasible'] and check['primal_residual']<1e-7
+ assert check['status'] in {'Solved','AlmostSolved'}
+ assert not cap.check(np.array([0.,0.,0.,0.,0.,-48.-1e-3]),tolerance=1e-7)['feasible']
+
+
 def test_external_force_bound_is_in_grasp_frame_and_scales_with_impulse():
  from scipy.spatial.transform import Rotation
  from contact_transfer.optimization import solve

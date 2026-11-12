@@ -64,3 +64,13 @@ def test_floating_robot_environment_contact_velocity():
     plus, minus = system.integrate(q, h*v), system.integrate(q, -h*v)
     finite_difference = (float(fn(plus)[0])-float(fn(minus)[0]))/(2*h)
     np.testing.assert_allclose(np.array(fn(q)[1])[2]@v, finite_difference, atol=1e-7)
+
+
+def test_per_contact_coordinates_handle_a_separated_zero_force_candidate(slider_urdf):
+    robot=Robot(slider_urdf).symbolic();system=MechanicalSystem([robot,robot],RigidObject(1.,np.zeros(3),np.eye(3)*.02));q=np.r_[-.25,0,.5,.25,0,.5,0,0,.5,0,0,0,1];goal=q.copy();goal[[2,5,8]]+=.03;N=8
+    cap=Capability.force_gripper([50.,50.,50.]);contacts=[Contact('left',[-.25,0,0],[0,0,-1],cap,robot_index=0,frame='link2',attached_steps=tuple(range(N))),Contact('right',[.25,0,0],[0,0,-1],cap,robot_index=1,frame='link2',attached_steps=tuple(range(N))),Contact('separated',[0,0,.2],[0,0,1],Capability(mu=.5,normal_max=30.),plane_offset=.5,force_coordinates='scaled_tangent',tangent_ratio_regularization=1e-6)]
+    result=solve_cito(system,q,goal,contacts,steps=N,duration=.8,friction_speed_model='huber_norm',friction_relaxations=(1e-8,),relaxations=(1e-8,),eliminate_endpoint_redundancy=True)
+    assert result.complementarity_residual<2e-5 and result.friction_residual<2e-5
+    assert np.max(abs(result.impulses['separated']))<1e-6
+    np.testing.assert_allclose(result.q[-1],goal,atol=1e-6)
+    assert result.continuation['per_contact_force_coordinates']['separated']['coordinates']=='scaled_tangent'

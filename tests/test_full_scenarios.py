@@ -26,6 +26,14 @@ def test_complete_scenes_preserve_unactuated_objects_and_native_mechanics(task_i
     np.testing.assert_allclose(B.T@M@B,obj.mass(qo),atol=1e-9);np.testing.assert_allclose(B.T@d.qfrc_bias,obj.gravity(qo),atol=1e-8)
     assert all(cap.closing_force_per_finger==40 for cap in p.capabilities if cap.kind=='G')
     for c in support_contacts(p,task.keyframes[-1]['phase'],8):assert abs(numeric_contact(p,c,q)[0])<1e-10 and support_patch_contains(p,c,q)
+    # Released-tool reference geometry must use the native open mechanism,
+    # without changing any arm or free-object coordinates.
+    old=d.qpos.copy();opened=[s['group_id'] for s in p.specs if s['kind']=='G'];g.set_state(q,open_grippers=opened)
+    for spec,locked in zip(p.specs,g.locked):
+        if spec['kind']=='G':
+            indices=list(locked);np.testing.assert_allclose(d.qpos[indices],m.qpos0[indices],atol=1e-12)
+            assert np.linalg.norm(old[indices]-d.qpos[indices])>.1
+    for adr in g.addresses:np.testing.assert_allclose(d.qpos[adr],old[adr],atol=1e-12)
 
 
 def test_complete_interval_cache_preserves_formulation_and_rejects_other_model(tmp_path):

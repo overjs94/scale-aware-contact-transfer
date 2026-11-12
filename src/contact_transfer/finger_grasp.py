@@ -99,4 +99,11 @@ class FingerGrasp:
   import clarabel
   import scipy.sparse as sp
   B,L,b,C=self.conic_matrices();A=sp.csc_matrix(np.vstack([B,L,*[-c for c in C]]));rhs=np.r_[wrench,b,np.zeros(24)];settings=clarabel.DefaultSettings();settings.verbose=False;settings.tol_feas=1e-10;settings.tol_gap_abs=1e-10;settings.tol_gap_rel=1e-10
-  solver=clarabel.DefaultSolver(sp.eye(24,format='csc')*1e-6,np.zeros(24),A,rhs,[clarabel.ZeroConeT(6),clarabel.NonnegativeConeT(len(b)),*[clarabel.SecondOrderConeT(3) for _ in C]],settings);s=solver.solve();u=np.asarray(s.x);res=max(float(np.max(abs(B@u-wrench))),float(np.max(L@u-b)),max(float(np.linalg.norm((c@u)[1:])-(c@u)[0]) for c in C));return dict(feasible=str(s.status) in {'Solved','AlmostSolved'} and res<tolerance,primal_residual=res,finger_forces=u.reshape(8,3),status=str(s.status))
+  solver=clarabel.DefaultSolver(sp.eye(24,format='csc')*1e-6,np.zeros(24),A,rhs,[clarabel.ZeroConeT(6),clarabel.NonnegativeConeT(len(b)),*[clarabel.SecondOrderConeT(3) for _ in C]],settings);s=solver.solve();u=np.asarray(s.x);res=max(float(np.max(abs(B@u-wrench))),float(np.max(L@u-b)),max(float(np.linalg.norm((c@u)[1:])-(c@u)[0]) for c in C));exact_status=str(s.status);mode='exact_wrench'
+  if exact_status not in {'Solved','AlmostSolved'} or res>=tolerance:
+   # Exact equality can be infeasible for a numerically rounded boundary
+   # wrench even when its distance to the cone is below the requested test
+   # tolerance. Find an actual cone/capacity witness in that same tolerance
+   # box. Still require successful termination and the original residual.
+   width=.5*tolerance;A=sp.csc_matrix(np.vstack([B,-B,L,*[-c for c in C]]));rhs=np.r_[wrench+width,-np.asarray(wrench)+width,b,np.zeros(24)];solver=clarabel.DefaultSolver(sp.eye(24,format='csc')*1e-6,np.zeros(24),A,rhs,[clarabel.NonnegativeConeT(12+len(b)),*[clarabel.SecondOrderConeT(3) for _ in C]],settings);s=solver.solve();u=np.asarray(s.x);res=max(float(np.max(abs(B@u-wrench))),float(np.max(L@u-b)),max(float(np.linalg.norm((c@u)[1:])-(c@u)[0]) for c in C));mode='same_tolerance_wrench_box'
+  return dict(feasible=str(s.status) in {'Solved','AlmostSolved'} and res<tolerance,primal_residual=res,finger_forces=u.reshape(8,3),status=str(s.status),exact_equality_status=exact_status,mode=mode,tolerance=tolerance)

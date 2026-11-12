@@ -39,8 +39,11 @@ class Contact:
     aperture_rate_max: float = .12
     rotation_object: object = None
     plane_bounds: object = None
+    force_coordinates: str | None = None
+    tangent_ratio_regularization: float = 0.
 
     def __post_init__(self):
+        if self.force_coordinates not in {None,'cartesian','scaled_tangent'} or not np.isfinite(self.tangent_ratio_regularization) or self.tangent_ratio_regularization<0:raise ValueError('Invalid contact force coordinates or ratio regularization')
         self.point_object = np.asarray(self.point_object, float).reshape(3)
         self.normal = np.asarray(self.normal, float).reshape(3)
         if not np.isclose(np.linalg.norm(self.normal), 1):
@@ -335,13 +338,14 @@ def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
                         if l<steps-1:equality(opti,vel[:2])
                     else:opti.subject_to(opti.bounded(-kinematic_tolerance,vel[:2],kinematic_tolerance))
                     grasp_velocities.append(vel[:2])
-                normal=ratio=None
-                if active and contact_force_coordinates=='scaled_tangent':
+                normal=ratio=None;coordinates=contact.force_coordinates or contact_force_coordinates
+                if active and coordinates=='scaled_tangent':
                     normal=opti.variable();ratio=opti.variable(2);opti.subject_to(ca.sumsqr(ratio)<=1);P=ca.vertcat(cap.mu*normal*ratio,normal)
+                    objective+=h*contact.tangent_ratio_regularization*ca.sumsqr(ratio)
                 else:P = opti.variable(3) if active else ca.DM.zeros(3)
                 if active:
                     opti.subject_to(opti.bounded(0, P[2], h*cap.normal_max))
-                    if contact_force_coordinates=='cartesian':opti.subject_to(ca.sumsqr(P[:2]) <= (cap.mu*P[2])**2)
+                    if coordinates=='cartesian':opti.subject_to(ca.sumsqr(P[:2]) <= (cap.mu*P[2])**2)
                     # An explicitly maintained zero gap already satisfies
                     # complementarity. Avoid a redundant near-active product
                     # row parallel to its exact gap equality.
@@ -522,7 +526,7 @@ def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
          for name, ps in impulses.items()}, float(sol.value(objective)), residual,
         comp_res, fric_res, min_gap, False, tuple(relaxations), gripper_res)
     result.apertures={name:np.asarray(sol.value(a)).reshape(-1) for name,a in apertures.items()}
-    result.continuation=dict(normal_gap_Ns_m=tuple(relaxations),friction_work_Nm=friction_relaxations,velocity_m_s_or_rad_s=velocity_relaxations)
+    result.continuation=dict(normal_gap_Ns_m=tuple(relaxations),friction_work_Nm=friction_relaxations,velocity_m_s_or_rad_s=velocity_relaxations,per_contact_force_coordinates={c.name:dict(coordinates=c.force_coordinates or contact_force_coordinates,tangent_ratio_regularization=c.tangent_ratio_regularization) for c in contacts})
     result.grasp_velocity_model=grasp_velocity_model
     result.objective_mode=objective_mode
     result.configuration_update=configuration_update

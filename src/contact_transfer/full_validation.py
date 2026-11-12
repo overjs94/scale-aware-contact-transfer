@@ -137,11 +137,11 @@ class Geometry:
         self.mj=mj;self.problem=problem;self.scene=scene;self.model=mj.MjModel.from_xml_path(str(scene.path));self.data=mj.MjData(self.model);self.clearance=clearance;self.tolerance=tolerance;self.pad_compliance_allowance=pad_compliance_allowance;self.model.geom_margin[:]=clearance;self.model.pair_margin[:]=clearance;self.last_violations=[];self.addresses=[];self.locked=[]
         for reduced,full,spec in zip(problem.robots,problem.full_robots,problem.specs):
             adr=[self.model.jnt_qposadr[mj.mj_name2id(self.model,mj.mjtObj.mjOBJ_JOINT,spec['id']+'_'+n)] for n in reduced.joint_names];locks={self.model.jnt_qposadr[mj.mj_name2id(self.model,mj.mjtObj.mjOBJ_JOINT,spec['id']+'_'+n)]:v for n,v in reduced.tree.locked.items()};self.addresses.append(adr);self.locked.append(locks)
-    def set_state(self,q):
+    def set_state(self,q,*,open_grippers=()):
         m,d,mj=self.model,self.data,self.mj;d.qpos[:]=m.qpos0;sys=self.problem.system
-        for qs,adr,locked in zip(sys.q_slices,self.addresses,self.locked):
+        for spec,qs,adr,locked in zip(self.problem.specs,sys.q_slices,self.addresses,self.locked):
             d.qpos[adr]=q[qs]
-            for i,v in locked.items():d.qpos[i]=v
+            for i,v in locked.items():d.qpos[i]=m.qpos0[i] if spec['group_id'] in open_grippers else v
         obj=self.problem.task_definition.object;qo=q[sys.object_q]
         for name,body in self.scene.object_roots.items():
             pose=qo[obj.q_slices[name]][:7] if isinstance(obj,RigidCollection) else qo[:7];bid=mj.mj_name2id(m,mj.mjtObj.mjOBJ_BODY,body);j=m.body_jntadr[bid];adr=m.jnt_qposadr[j];d.qpos[adr:adr+7]=pose[[0,1,2,6,3,4,5]]
@@ -156,10 +156,10 @@ class Geometry:
         if any(n in object_geom for n in pair) and any(n.startswith('jig_') or n.startswith('top_cradle_') or n=='leg_cradle' or n=='floor' for n in pair):return True
         if self.problem.task_definition.id=='assembly' and all(n in object_geom for n in pair):return True
         return False
-    def discover(self,states):
+    def discover(self,states,*,open_grippers=None):
         failures=[]
         for k,q in enumerate(states):
-            self.set_state(q)
+            self.set_state(q,open_grippers=() if open_grippers is None else open_grippers[k])
             for c in self.data.contact:
                 pair=tuple(self.mj.mj_id2name(self.model,self.mj.mjtObj.mjOBJ_GEOM,int(g)) for g in c.geom);allowed=self.intended(pair);pad=any('_left_pad_collision_' in n or '_right_pad_collision_' in n for n in pair);margin=-self.pad_compliance_allowance if allowed and pad else 0. if allowed else self.clearance
                 if c.dist<margin-self.tolerance:failures.append(dict(node=k,pair=pair,gap_m=float(c.dist),required_m=margin))

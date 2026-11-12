@@ -64,7 +64,7 @@ class FullPlanner:
             self.progress(f'{self.task.id} {types}/{assignment}: key {k} {self.task.keyframes[k]["id"]}',flush=True);self.settings.diagnostics_path=str(p.directory/f'key{k}-failure.json');key=self.archived_key(p,k,env,previous)
             if key is None:key=p.keyframe(k,previous,environment=env,settings=self.settings)
             else:cached='independently_revalidated_archive'
-        key=polish_keyframe(p,key);check=validate_keyframe(p,key,env);geometry=Geometry(p,self.scenes[(tuple(types),tuple(assignment))]);violations=geometry.discover([key.q]);write_json(p.directory/f'key{k}-validation.json',dict(independent=check,geometry_violations=violations,source=key.source,endpoint_polish_max_rad=key.endpoint_polish_max_rad))
+        key=polish_keyframe(p,key,env);check=validate_keyframe(p,key,env);geometry=Geometry(p,self.scenes[(tuple(types),tuple(assignment))]);violations=geometry.discover([key.q]);write_json(p.directory/f'key{k}-validation.json',dict(independent=check,geometry_violations=violations,source=key.source,target_provenance=key.target_provenance,endpoint_polish_max_rad=key.endpoint_polish_max_rad))
         if not check['passed'] or violations:
             np.savez_compressed(p.directory/f'key{k}-unaccepted.npz',q=key.q,positions=key.positions,rotations=key.rotations,reactions=key.reactions,torques=key.torques,rho=key.rho,accepted=False);raise RuntimeError(f'Key {k} independent/geometry rejected; see {p.directory}')
         if cached is not True:save_key(path,key,identity)
@@ -81,6 +81,7 @@ class FullPlanner:
         import json,hashlib
         folder=self.keyframe_archive/p.directory.name;path=folder/f'key{k}.npz'
         goal=self.task.keyframes[k]
+        if k>0 and self.task.posture_reference_rule=='previous_keyframe':return None
         if goal.get('freeze_posture') or goal.get('freeze_holding_posture'):return None
         if not path.exists():return None
         for robot in p.full_robots:
@@ -142,13 +143,16 @@ class FullPlanner:
         if not path.exists():return None
         with np.load(path,allow_pickle=False) as a:old_identity=json.loads(str(a['metadata_json']))['identity']
         r=load_interval(path,old_identity);contacts=interval_contacts(p,k,left,len(r.dt))
+        for c in contacts:
+            previous_coordinates=r.continuation.get('per_contact_force_coordinates',{}).get(c.name,dict(coordinates=r.contact_force_coordinates,tangent_ratio_regularization=0.))
+            if previous_coordinates!=dict(coordinates=c.force_coordinates or r.contact_force_coordinates,tangent_ratio_regularization=c.tangent_ratio_regularization):return None
         same_friction_model=r.friction_speed_model=='huber_norm' and r.friction_speed_smoothing==1e-6
         sticking_only=all(c.robot_index is not None and (c.capability.kind!='P' or len(c.sticking_steps)==len(r.dt)) for c in contacts)
         if r.configuration_update!='independent_midpoint' or not r.full_geometry_checked or not (same_friction_model or sticking_only):return None
         for robot in p.full_robots:
             other=folder/robot.path.name
             if not other.exists() or other.read_bytes()!=robot.path.read_bytes():raise RuntimeError('Interval archive mechanical URDF mismatch')
-        if r.q.shape[1]!=p.system.nq or np.max(abs(r.q[[0,-1]]-np.array([left.q,right.q])))>2e-5:raise RuntimeError('Interval archive endpoint mismatch')
+        if r.q.shape[1]!=p.system.nq or np.max(abs(r.q[[0,-1]]-np.array([left.q,right.q])))>2e-5:return None
         check=validate_interval(p,r,contacts)
         if not check['passed']:raise RuntimeError('Interval archive rejected by current independent mechanics')
         write_json(p.directory/f'interval{k}-archive.json',dict(path=str(path),sha256=hashlib.sha256(path.read_bytes()).hexdigest(),original_formulation_identity=old_identity,sliding_norm_branch_absent=sticking_only,identical_friction_regularization=same_friction_model,mechanical_URDFs_byte_identical=True,current_independent=check));return r
@@ -164,7 +168,7 @@ class FullPlanner:
                 self.ledger.append(dict(types=types,assignment=assignments[0],interval=k,accepted=False,reason=str(error)));write_json(self.directory/'candidate-ledger.json',self.ledger);raise RuntimeError(str(error)) from error
         try:result=choose_sequence(allowed,sequences,key,transition)
         finally:write_json(self.directory/'stage-timings.json',self.timings)
-        p=self.problem(result.best.types,result.best.assignments[0]);contacts=tuple(interval_contacts(p,k,left,len(r.dt)) for k,(left,r) in enumerate(zip(result.best.keyframes,result.best.transitions)));episode=FullEpisode(p,result.best.keyframes,result.best.transitions,contacts);report=dict(selection_executed=not fixed,selection_method='exhaustive configured hardware-compatible P/G and fixed-through-sequence injective assignment candidates',candidate_count=int(np.prod([len(a) for a in allowed]))*len(sequences),accepted_candidates=[dict(types=c.types,assignment=c.assignments[0],objective=c.objective) for c in result.candidates],rejections=result.failures,selected_types=result.best.types,selected_assignment=result.best.assignments[0],objective=result.best.objective,objective_definition='sum keyframe geometry/posture minus robustness plus sum interval motion costs; no type penalty',planning_wall_time_s=perf_counter()-start,source_refinement_enabled=self.refine_source,source_certificates=[k.source for k in result.best.keyframes],all_keyframes_optimized=True,all_intervals_cito_optimized=all(r.objective_mode=='motion_cost' for r in episode.trajectories),all_moving_object_intervals_cito_optimized=True,interval_methods=[r.objective_mode for r in episode.trajectories],keyframes=len(episode.keyframes),intervals=len(episode.trajectories),restricted_contact_candidates=True,sampled_geometry=True,continuous_certificate=False,configuration_update=[r.configuration_update for r in episode.trajectories],manuscript_literal_equations_passed=False,extension='free articulated object' if self.task.id=='box' else 'two independent floating bodies and equal/opposite inter-object contacts' if self.task.id=='assembly' else None,full_paper_pipeline_executed=False);write_json(self.directory/'selection.json',report);return episode,report
+        p=self.problem(result.best.types,result.best.assignments[0]);contacts=tuple(interval_contacts(p,k,left,len(r.dt)) for k,(left,r) in enumerate(zip(result.best.keyframes,result.best.transitions)));episode=FullEpisode(p,result.best.keyframes,result.best.transitions,contacts);report=dict(selection_executed=not fixed,selection_method='exhaustive configured hardware-compatible P/G and fixed-through-sequence injective assignment candidates',candidate_count=int(np.prod([len(a) for a in allowed]))*len(sequences),accepted_candidates=[dict(types=c.types,assignment=c.assignments[0],objective=c.objective) for c in result.candidates],rejections=result.failures,selected_types=result.best.types,selected_assignment=result.best.assignments[0],objective=result.best.objective,objective_definition='sum keyframe geometry/posture minus robustness plus sum interval motion costs; no type penalty',planning_wall_time_s=perf_counter()-start,source_refinement_enabled=self.refine_source,source_certificates=[k.source for k in result.best.keyframes],target_keyframe_margins=[key.rho for key in episode.keyframes],target_methods=[getattr(key,'target_provenance',{}) for key in episode.keyframes],actual_interval_nodes=[len(r.dt) for r in episode.trajectories],solver_configuration={k:v for k,v in vars(self.settings).items() if k not in {'diagnostics_path','verbose'}},stage_cache_counts=dict(cached=sum(bool(t['cache_hit']) for t in self.timings),fresh=sum(not t['cache_hit'] for t in self.timings)),all_keyframes_optimized=True,all_intervals_cito_optimized=all(r.objective_mode=='motion_cost' for r in episode.trajectories),all_moving_object_intervals_cito_optimized=True,interval_methods=[r.objective_mode for r in episode.trajectories],keyframes=len(episode.keyframes),intervals=len(episode.trajectories),restricted_contact_candidates=True,sampled_geometry=True,continuous_certificate=False,configuration_update=[r.configuration_update for r in episode.trajectories],manuscript_literal_equations_passed=False,extension='free articulated object' if self.task.id=='box' else 'two independent floating bodies and equal/opposite inter-object contacts' if self.task.id=='assembly' else None,full_paper_pipeline_executed=False);write_json(self.directory/'selection.json',report);return episode,report
 
 
 def run_task(task_id,directory,*,variants=ABLATIONS,steps=16,max_steps=64,settings=None,progress=print,web_directory=None,keyframe_archive=None,interval_archive=None):

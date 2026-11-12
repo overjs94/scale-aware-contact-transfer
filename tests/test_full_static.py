@@ -41,3 +41,31 @@ def test_released_arm_nlp_keeps_free_object_balanced_without_object_actuation(sl
     np.testing.assert_allclose(r.q[:,p.system.object_q],np.tile(q[p.system.object_q],(N+1,1)),atol=1e-12)
     assert not np.any(r.impulses['tool'])
     assert r.objective_mode=='stationary_objects_release_NLP'
+
+
+def test_fixed_material_target_attains_posture_and_torque_free_margin_bounds(slider_urdf,tmp_path):
+    from contact_transfer.full_static import fixed_geometry_keyframe
+    from contact_transfer.paper_keyframe import Interface
+    from contact_transfer.contacts import SurfacePatch,contact_basis
+    from contact_transfer.full_validation import validate_keyframe
+    p,_,_=problem(slider_urdf,tmp_path);arm=p.robots[0];obj=p.task_definition.object;points=np.array([[-.2,-.15,0.],[.2,-.15,0.],[0.,.2,0.]]);normal=np.array([0.,0.,-1.]);qo=np.r_[0.,0.,.5,0.,0.,0.,1.];seeds=[a+qo[:3] for a in points];caps=[Capability(mu=.8,normal_max=30.) for _ in points]
+    p.system=MechanicalSystem([arm.symbolic() for _ in points],obj.symbolic());p.robots=[arm]*3;p.frames=['link2']*3;p.specs=[dict(q_initial=q) for q in seeds];p.capabilities=caps;p.task_definition.features=[SimpleNamespace(id='tool'+str(i),frame='body') for i in range(3)]
+    interfaces=[Interface(f.id,i,'link2','body',SurfacePatch.fixed(a,normal),c,a,contact_basis(normal)) for i,(f,a,c) in enumerate(zip(p.task_definition.features,points,caps))]
+    key=fixed_geometry_keyframe(p,np.r_[*seeds,qo],interfaces,dict(positions=points,normals=np.tile(normal,(3,1))),(),SolverSettings(max_iterations=300));assert key is not None;key.interfaces=interfaces
+    assert key.separable_target_certificate['same_rho_torque_feasibility']
+    assert key.rho==key.separable_target_certificate['torque_free_rho_upper_bound']
+    assert validate_keyframe(p,key)['passed']
+    # The torque-free bound must never be used as a certificate when robot
+    # actuation cannot realize its force distribution.
+    p.system.effort=np.full(9,.1)
+    assert fixed_geometry_keyframe(p,np.r_[*seeds,qo],interfaces,dict(positions=points,normals=np.tile(normal,(3,1))),(),SolverSettings(max_iterations=300)) is None
+
+
+def test_full_execution_identity_tracks_physics_and_material_points_not_observer_state(slider_urdf,tmp_path):
+    from contact_transfer.full_execution import FullEpisode
+    from contact_transfer.trajectory import TrajectoryResult
+    p,q,_=problem(slider_urdf,tmp_path);p.full_robots=p.robots;p.specs=[dict(id='arm',q_initial=q[:3].tolist())];p.types=('P',);p.assignment=(0,);p.refine_enabled=True;p.task_definition.keyframes=[];p.task_definition.fixtures=()
+    r=TrajectoryResult(np.tile(q,(2,1)),np.zeros((2,p.system.nv)),np.zeros((1,3)),np.array([.1]),{'tool':np.zeros((1,3))},0.,0.,0.,0.,0.,False,());episode=SimpleNamespace(problem=p,trajectories=[r],keyframes=[SimpleNamespace(positions=np.zeros((1,3)),rotations=np.eye(3)[None])]);before=FullEpisode.identity(episode)
+    p.specs[0]['allowed_object_geoms']=['body_collision_0'];assert FullEpisode.identity(episode)==before
+    episode.keyframes[0].positions[0,0]=.001;changed=FullEpisode.identity(episode);assert changed[0]==before[0] and changed[1]!=before[1]
+    p.robots[0].base_pose[0,3]+=.01;assert FullEpisode.identity(episode)[0]!=changed[0]
