@@ -96,6 +96,18 @@
         <box size="0.04 0.04 0.06" />
       </geometry>
     </collision>
+    <!-- The handle is part of the declared aggregate 2 kg base body.
+         Include its rigid attachment in BOTH render and collision geometry;
+         a shared URDF link alone must not bridge an unexplained air gap. -->
+    <visual name="base_handle_connector">
+      <origin xyz="-0.271 0 0" />
+      <geometry><box size="0.062 0.016 0.018" /></geometry>
+      <material name="base_handle_metal" />
+    </visual>
+    <collision name="base_handle_connector">
+      <origin xyz="-0.271 0 0" />
+      <geometry><box size="0.062 0.016 0.018" /></geometry>
+    </collision>
   </link>
   <link name="moving">
     <inertial>

@@ -10,6 +10,12 @@
 [과거 첫 lift 보고서](archive/first-lift-system-report-5ad6015.md)를 함께 제공합니다.
 공개 재생 주소는 https://overjs94.github.io/Contact_contraction/ 입니다.
 
+**접촉 형상 재점검:** 구형 박스 본체 손잡이와 목재 벽 사이 50 mm의 연결 형상이
+누락된 결함을 발견해 visual/collision 연결부를 추가했습니다. 수정된 모델에서 박스의
+새 native 실행과 비교 시험을 기록합니다. [형상·실패·조합 선택 점검](contact-geometry-and-comparison-audit.md)에
+기존 검증의 한계, 장착 길이와 후보 탐색 결과를 정리했습니다. 웹의 ablation 표에는
+실패 기준과 수치를, 접촉 확대에는 실제 native pad/tool 접촉 중심을 표시합니다.
+
 ## 전체 구조와 데이터 흐름
 
 ![전체 시나리오 코드 구조](images/full-scenario-flow.svg)

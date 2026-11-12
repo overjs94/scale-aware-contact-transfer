@@ -38,8 +38,9 @@ sun.position.set(3, -2, 5); scene.add(sun);
 const rim = new THREE.DirectionalLight(0x4ac7ba, 1.8);
 rim.position.set(-2, 3, 2); scene.add(rim);
 const forceArrow=new THREE.ArrowHelper(new THREE.Vector3(0,1,0),new THREE.Vector3(),.5,0xef683c,.08,.04);forceArrow.visible=false;for(const mesh of [forceArrow.line,forceArrow.cone]){mesh.material.depthTest=false;mesh.renderOrder=1100;}scene.add(forceArrow);
-let grid;let contactOverlay;
+let grid;let contactOverlay;let nativeContactOverlay;
 const contactColors=[0x25bfa3,0xf4a340,0xa788f5];
+const contactNames={base_grasp:'본체 파지',base_support:'본체 지지',moving_manipulation:'뚜껑 파지',edge_grip:'패널 edge 파지',under_left:'패널 왼쪽 지지',under_right:'패널 오른쪽 지지',top_gripper:'상판 파지',point_support:'상판 지지',leg_gripper:'다리 파지'};
 
 const studio=createStudio(scene,renderer,sun,rim,canvasFallback);
 studio.set("studio");
@@ -75,11 +76,19 @@ function buildGeometry(data) {
     disposeModel(robotGroup.children[0]);
   }
   geometry = []; objectMesh = undefined;
+  nativeContactOverlay=new THREE.Group();robotGroup.add(nativeContactOverlay);
+  for(let i=0;i<6;i++){const marker=new THREE.Mesh(new THREE.SphereGeometry(.004,12,8),new THREE.MeshBasicMaterial({color:0xffffff,depthTest:false}));marker.renderOrder=1003;marker.visible=false;nativeContactOverlay.add(marker);}
+  $('native-contact-controls').hidden=!data.native_contact_samples;
+  $('full-result-links').hidden=!data.full_task_recording;
+  $('contact-focus').replaceChildren(new Option('선택',''));
+  for(const g of data.contact_contraction?.groups||[])$('contact-focus').append(new Option(contactNames[g.group_id]||g.group_id,g.group_id));
+  const tool=data.provenance?.canonical_point_tool;$('native-contact-note').hidden=!data.native_contact_samples;
+  $('native-contact-note').textContent=data.native_contact_samples?'색 점: 계획된 contracted anchor. '+(tool?`P 장착 길이 EE → 접촉점 ${(1000*Math.hypot(...tool.ee_to_tip.slice(0,3).map(row=>row[3]))).toFixed(0)} mm / 구 반경 ${1000*tool.radius_m} mm. `:'')+(data.scenario==='full_box'?'G는 본체·뚜껑의 돌출 손잡이를 파지합니다. 본체 손잡이는 금속 연결부로 벽에 연결됩니다.':''):'';
   contactOverlay=new THREE.Group();robotGroup.add(contactOverlay);
   for(const [i,g] of (data.contact_contraction?.groups||[]).entries()){
     const group=new THREE.Group();group.userData.contactGroup=g;const color=contactColors[i%contactColors.length];
     const points=new THREE.Points(new THREE.BufferGeometry().setFromPoints(g.target_points_m.map(p=>new THREE.Vector3(...p))),new THREE.PointsMaterial({color,size:.007,depthTest:false}));points.userData.dense=true;points.renderOrder=1001;group.add(points);
-    const anchor=new THREE.Mesh(new THREE.SphereGeometry(.012,14,10),new THREE.MeshBasicMaterial({color,depthTest:false}));anchor.position.fromArray(g.target_anchor_m);anchor.userData.anchor=true;anchor.renderOrder=1002;group.add(anchor);contactOverlay.add(group);
+    const anchor=new THREE.Mesh(new THREE.SphereGeometry(.006,14,10),new THREE.MeshBasicMaterial({color,depthTest:false}));anchor.position.fromArray(g.target_anchor_m);anchor.userData.anchor=true;anchor.renderOrder=1002;group.add(anchor);contactOverlay.add(group);
   }
   $('contraction-state').replaceChildren();if(data.contact_contraction){const c=data.contact_contraction;$('contraction-state').append(c.input_type==='supplied_contracted_contacts'?` · 주어진 ${c.contracted_contact_count} contracted contacts → 3 arms · `:` · ${c.dense_sample_count} samples → ${c.contracted_contact_count} anchors → 3 arms · `);for(const [i,g] of c.groups.entries()){const label=document.createElement('span');label.style.color='#'+contactColors[i%contactColors.length].toString(16).padStart(6,'0');label.textContent=` ${g.group_id}@${g.link_id} → ${c.assignment.find(a=>a.group_id===g.group_id).arm_id} `;$('contraction-state').append(label);}}
   for (const item of (data.instances?.some(i=>["static_jig","articulated_object"].includes(i.role)) ? [] : data.environment) || []) {
@@ -192,6 +201,10 @@ function updateGeometry(value) {
   }
   urdfModels.forEach(item => applyRecordedPose(item.robot, item.recording, value));
   for(const group of contactOverlay?.children||[]){const contact=group.userData.contactGroup,object=dataset.objects?.find(o=>o.id===contact.link_id);if(!object)continue;const pose=object.poses[lo],next=object.poses[hi];group.position.fromArray(pose).lerp(new THREE.Vector3().fromArray(next),f);group.quaternion.fromArray(pose,3).slerp(new THREE.Quaternion().fromArray(next,3),f);const mode=$('contact-display').value;for(const item of group.children)item.visible=mode==='both'||(item.userData.dense&&mode==='dense')||(item.userData.anchor&&mode==='contracted');}
+  const sample=Math.round(value),patches=dataset.native_contact_samples?.frames[sample]||[];
+  nativeContactOverlay?.children.forEach((marker,i)=>{marker.visible=!!patches[i]&&$('native-contact-visible').checked;if(patches[i])marker.position.fromArray(patches[i].position_world_m);});
+  $('native-contact-state').dataset.count=String(patches.length);
+  $('native-contact-state').textContent=dataset.native_contact_samples?`native ${dataset.times[sample].toFixed(3)} s · ${patches.length} 접촉면 · 보간 없음${patches.length?' · 최소 gap '+(1000*Math.min(...patches.map(p=>p.minimum_gap_m))).toFixed(3)+' mm':''}`:'';
   const time=dataset.times[lo]*(1-f)+dataset.times[hi]*f;const pulses=dataset.external_disturbances||[];const pulse=pulses.find(p=>time>=p.start&&time<=p.start+p.duration);forceArrow.visible=false;
   if(pulse&&dataset.objects?.[0]?.poses){const object=dataset.objects.find(o=>o.native_body===pulse.body)||dataset.objects[0],pose=object.poses[lo],next=object.poses[hi],quat=new THREE.Quaternion().fromArray(pose,3).slerp(new THREE.Quaternion().fromArray(next,3),f);const origin=new THREE.Vector3(...pose.slice(0,3)).lerp(new THREE.Vector3(...next.slice(0,3)),f).add(new THREE.Vector3(...pulse.point_body_m).applyQuaternion(quat));const magnitude=Math.sin(Math.PI*(time-pulse.start)/pulse.duration)**2;const force=new THREE.Vector3(...pulse.force_world_N).multiplyScalar(magnitude);if(force.length()>.01){forceArrow.position.copy(origin);forceArrow.setDirection(force.clone().normalize());forceArrow.setLength(.12+force.length()*.015,.08,.04);forceArrow.visible=true;}}
   $('disturbance-state').hidden=!pulses.length;$('disturbance-state').dataset.active=String(forceArrow.visible);
@@ -256,6 +269,7 @@ function drawCanvasScene() {
     }
   }
   for(const group of contactOverlay?.children||[]){group.updateMatrixWorld(true);const g=group.userData.contactGroup,mode=$('contact-display').value;if(mode==='off')continue;ctx.fillStyle='#'+contactColors[contactOverlay.children.indexOf(group)%contactColors.length].toString(16).padStart(6,'0');for(const point of (mode==='dense'||mode==='both'?g.target_points_m:[])){const p=project(group.localToWorld(new THREE.Vector3(...point)));ctx.beginPath();ctx.arc(p[0],p[1],2*scale,0,Math.PI*2);ctx.fill();}if(mode==='contracted'||mode==='both'){const p=project(group.localToWorld(new THREE.Vector3(...g.target_anchor_m)));ctx.beginPath();ctx.arc(p[0],p[1],6*scale,0,Math.PI*2);ctx.fill();}}
+  for(const marker of nativeContactOverlay?.children||[])if(marker.visible){const p=project(marker.position);ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p[0],p[1],3*scale,0,Math.PI*2);ctx.fill();}
   if(forceArrow.visible){const a=forceArrow.position,b=new THREE.Vector3(0,1,0).applyQuaternion(forceArrow.quaternion).multiplyScalar(forceArrow.line.scale.y+.08).add(a);line(a,b,"#ff482f",4);const tip=project(b),tail=project(a),angle=Math.atan2(tip[1]-tail[1],tip[0]-tail[0]);ctx.fillStyle="#ff482f";ctx.beginPath();ctx.moveTo(tip[0],tip[1]);for(const sign of [-1,1])ctx.lineTo(tip[0]-15*scale*Math.cos(angle+sign*.4),tip[1]-15*scale*Math.sin(angle+sign*.4));ctx.closePath();ctx.fill();}
   ctx.fillStyle = "#8fa6c3"; ctx.font = `${9 * scale}px sans-serif`;
   ctx.fillText("CPU 3D PROJECTION · WebGL unavailable", 18 * scale, h - 40 * scale);
@@ -417,6 +431,17 @@ $("loop").onclick = () => { loop = !loop; $("loop").classList.toggle("active", l
 $("reset-camera").onclick = resetCamera;
 $("geometry-mode").onchange = loadGeometry;
 $("contact-display").onchange=()=>updateFrame();
+$("native-contact-visible").onchange=()=>updateFrame();
+$("contact-focus").onchange=()=>{
+  const id=$('contact-focus').value,g=dataset?.contact_contraction?.groups.find(g=>g.group_id===id),object=dataset?.objects?.find(o=>o.id===g?.link_id);if(!g||!object)return;
+  playing=false;$('play').textContent='▶';$('play').setAttribute('aria-label','재생');frameFloat=Math.round(frameFloat);updateFrame();
+  const patches=dataset.native_contact_samples?.frames[frameFloat]?.filter(p=>p.group_id===id)||[],pose=object.poses[frameFloat];
+  const point=patches.length?patches.reduce((a,p)=>a.add(new THREE.Vector3(...p.position_world_m)),new THREE.Vector3()).divideScalar(patches.length):new THREE.Vector3(...g.target_anchor_m).applyQuaternion(new THREE.Quaternion().fromArray(pose,3)).add(new THREE.Vector3(...pose.slice(0,3)));
+  // Inspect the outside of the rotating lid, rather than looking through its
+  // underside and hiding the raised handle behind the wood.
+  const offset=new THREE.Vector3(id==='base_grasp'?-.35:.25,-.45,.35).applyQuaternion(new THREE.Quaternion().fromArray(pose,3));
+  controls.target.copy(point);camera.position.copy(point).add(offset);controls.update();
+};
 $("run").onclick = async () => {
   $("run").disabled = true; $("run").textContent = "계산 중…";
   try {

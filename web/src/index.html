@@ -48,6 +48,9 @@
           <div class="geometry-note"><span>◈</span><p id="geometry-status" role="status">URDF visual과 mesh를 준비하고 있습니다.</p><label class="geometry-control">조명 <select id="scene-style" aria-label="렌더링 스타일"><option value="studio">Studio · PBR</option><option value="analysis">Analysis · grid</option></select></label><label class="geometry-control">표시 형상 <select id="geometry-mode" aria-label="표시 형상"><option value="visual">URDF visual</option><option value="collision">URDF collision</option><option value="skeleton">링크 좌표</option></select></label></div>
           <div id="keyframe-list" class="keyframe-list" aria-label="Keyframe와 도구 이벤트"></div>
           <div class="tool-state"><label>접촉 표시 <select id="contact-display"><option value="both">Dense → contracted</option><option value="dense">Dense patches</option><option value="contracted">Contracted anchors</option><option value="off">Off</option></select></label><span id="contraction-state"></span></div><p id="disturbance-state" class="tool-state" hidden></p><div id="tool-state" class="tool-state" aria-label="실제 도구 접촉 상태"></div>
+          <div id="native-contact-controls" class="tool-state" hidden><label><input id="native-contact-visible" type="checkbox" checked> 흰 점: 측정된 패드·구형 팁 접촉 중심</label><label>접촉 확대 <select id="contact-focus" aria-label="접촉 확대"><option value="">선택</option></select></label><span id="native-contact-state"></span></div>
+          <p id="native-contact-note" class="tool-state" hidden></p>
+          <nav id="full-result-links" class="result-links" hidden aria-label="검증 결과 바로가기"><a href="#ablation-results">Ablation 7조건 · 실패 이유 ↓</a><a href="#selection-results">접촉 조합 · 후보 비용 ↓</a></nav>
         </section>
         <aside class="details">
           <section class="panel"><div class="section-label">MODEL SNAPSHOT</div><div class="stat-grid">

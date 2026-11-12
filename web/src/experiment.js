@@ -1,4 +1,5 @@
 import { categories, experimentPresets, libraryEntry } from './library.js';
+import { renderFullResults } from './full-results.js';
 const $=id=>document.getElementById(id);
 let preset,job,timer,connected=false,presetId,presetToken=0;
 const state=text=>{$('experiment-state').textContent=text;};
@@ -65,9 +66,7 @@ function report(data){
     $('result-forces').textContent=r.sampled_interface_wrench_capability.passed&&Object.values(r.jaw_force).every(j=>j.passed)&&r.minimum_actuator_margin_Nm>=-1e-8?'PASS':'FAIL';$('result-seal-label').textContent='TASK / LOADED CONTACT';$('result-seal').textContent=`${r.task_passed&&r.contact_retention_passed?'PASS':'FAIL'} · ${(100*Math.min(...Object.values(r.maintained_contact_fraction).filter(v=>v!==null))).toFixed(1)}% contact`;
     $('result-residual').textContent=r.selection.selected_types.join(' / ');$('source-result').hidden=false;$('source-result').textContent=`SELECTION · ${r.selection.accepted_candidates.length} accepted / ${r.selection.candidate_count} 후보 · ${(r.selection.pruned_candidates||[]).length} 비용 가지치기 · physical arms ${r.selection.selected_assignment.join(', ')} · ${r.selection.keyframes} keyframes / ${r.selection.intervals} 전이 / ${(r.selection.interval_methods||[]).filter(m=>m==='motion_cost').length} 이동 CITO · source certificates ${r.selection.source_certificates.filter(s=>s.source_certificate??s.source_refinement_passed??false).length}/${r.selection.keyframes}`;
     for(const id of ['workspace-result','robustness-result'])$(id).hidden=true;
-    const table=document.createElement('table'),head=document.createElement('tr');for(const title of ['Ablation','실행','최대 위치 오차','계획 하중 접촉 유지']){const th=document.createElement('th');th.textContent=title;head.append(th);}table.append(head);
-    for(const [name,result] of Object.entries(r.ablation_results||{})){const row=document.createElement('tr'),e=Object.values(result.object_tracking||{}),f=Object.values(result.maintained_contact_fraction||{}).filter(v=>v!==null);for(const text of [name,result.execution_passed?'PASS':result.failure?'계획/실행 실패':'FAIL',e.length?(1000*Math.max(...e.map(v=>v.maximum_position_error_m))).toFixed(2)+' mm':'—',f.length?(100*Math.min(...f)).toFixed(1)+'%':'—']){const cell=document.createElement('td');cell.textContent=text;row.append(cell);}table.append(row);}comparison.append(table);
-    const note=document.createElement('p');note.className='fine';note.textContent='P 접촉 유지율은 계획 법선 하중이 0.1 N을 넘는 구간에서 평가합니다. 하중 전달 후 0 N 구간을 포함한 원래 접촉 비율과 전체 시간의 jaw force 최대값은 보고서에 보존합니다. 각 비교는 한 번의 실행입니다.';comparison.append(note);
+    renderFullResults(data,comparison);
     $('report-json').textContent=JSON.stringify(r,null,2);return;
   }
   if(['robotiq_clamp','coupled_panel_lift'].includes(data.scenario)){

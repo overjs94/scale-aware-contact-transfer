@@ -96,6 +96,19 @@
         <box size="0.01 0.01 0.015" />
       </geometry>
     </collision>
+    <visual name="base_handle_connector">
+      <origin xyz="-0.06775 0.0 0.0" />
+      <geometry>
+        <box size="0.0155 0.004 0.0045" />
+      </geometry>
+      <material name="base_handle_metal" />
+    </visual>
+    <collision name="base_handle_connector">
+      <origin xyz="-0.06775 0.0 0.0" />
+      <geometry>
+        <box size="0.0155 0.004 0.0045" />
+      </geometry>
+    </collision>
   </link>
   <link name="moving">
     <inertial>

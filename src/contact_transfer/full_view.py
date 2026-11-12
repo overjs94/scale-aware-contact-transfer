@@ -13,6 +13,32 @@ from .full_recording import write_json
 TITLES={'panel':'패널 · 운반·재배향·안착·릴리스','box':'자유 박스 · 본체 지지·뚜껑 열기','assembly':'가구 조립 · 상판 지지·다리 삽입·릴리스'}
 
 
+def native_contact_samples(episode,trace,scene,indices,threshold=1e-3):
+    """Per-pad force-weighted centers at exact native steps; no interpolation.
+
+    Positions are centers of the recorded contact patch, not planned anchors.
+    Preserve world force-on-robot signs and native signed minimum gaps.
+    """
+    step=np.rint(trace.contact_time/trace.metadata['timestep']).astype(int)
+    starts=np.searchsorted(step,indices,side='left');ends=np.searchsorted(step,indices,side='right');frames=[]
+    for start,end in zip(starts,ends):
+        patches={}
+        for k in range(start,end):
+            pair=trace.contact_pair[k];weight=float(np.linalg.norm(trace.contact_wrench[k,3:]))
+            if weight<=threshold:continue
+            for feature,spec in zip(episode.problem.task_definition.features,episode.problem.specs):
+                side=next((j for j,n in enumerate(pair) if n.startswith(spec['id']+'_')),None)
+                if side is None or pair[1-side] not in scene.allowed_by_group[feature.id]:continue
+                part=next((name for name in ('left_pad','right_pad','tool') if pair[side].startswith(spec['id']+'_'+name+'_')),None)
+                if part is None:continue
+                key=(feature.id,part);patch=patches.setdefault(key,dict(group_id=feature.id,part=part,position_world_m=np.zeros(3),force_on_robot_world_N=np.zeros(3),minimum_gap_m=np.inf,weight=0.,native_pairs=set()))
+                patch['position_world_m']+=weight*trace.contact_position[k];patch['weight']+=weight;patch['force_on_robot_world_N']+=(1 if side==1 else -1)*trace.contact_wrench[k,3:];patch['minimum_gap_m']=min(patch['minimum_gap_m'],float(trace.contact_gap[k]));patch['native_pairs'].add(tuple(pair))
+        for patch in patches.values():
+            patch['position_world_m']=(patch['position_world_m']/patch.pop('weight')).tolist();patch['force_on_robot_world_N']=patch['force_on_robot_world_N'].tolist();patch['native_pairs']=[list(pair) for pair in sorted(patch['native_pairs'])]
+        frames.append(list(patches.values()))
+    return dict(source='raw_native_contacts',position_definition='force-norm-weighted patch center per native pad/tool',frame='world',force_convention='force_on_robot',interpolated=False,minimum_force_N=threshold,sample_times_s=trace.time[indices].tolist(),frames=frames)
+
+
 def update_catalog(web,data):
     import fcntl,tempfile
     lock=Path(tempfile.gettempdir())/('contact-transfer-catalog-'+hashlib.sha256(str(web.resolve()).encode()).hexdigest()[:16]+'.lock')
@@ -53,4 +79,5 @@ def export_full(episode,trace,report,scene,web_directory,*,variant='full',frames
         # samples are absent in this supplied-contracted-contact experiment.
         contraction['groups'].append(dict(group_id=f.id,link_id=f.frame,target_points_m=[],target_anchor_m=episode.keyframes[0].positions[i].tolist()));contraction['assignment'].append(dict(group_id=f.id,arm_id='physical_arm_'+str(p.assignment[i]),kind=p.types[i]))
     chart=np.rad2deg(np.array(trace.metadata['articulated_state']['q'])[idx,0]) if task.id=='box' else trace.object_pose[idx,0,2]*1000;environment=[dict(type='box',**f,color='#596d7d') for f in scene.fixtures];environment.extend(dict(type='box',position=[*r.base_pose[:2,3],r.base_pose[2,3]/2],size=[.3,.3,r.base_pose[2,3]],quaternion_xyzw=[0,0,0,1],color='#687888') for r in p.full_robots if r.base_pose[2,3]>0);enriched={**report,'ablation_results':ablation_results};flags=measured_contact_flags(episode,trace,scene);events=[dict(id=label,time=pulse['start']+fraction*pulse['duration']) for pulse in trace.metadata.get('external_disturbances',[]) for label,fraction in [('외력 시작',0.),('외력 최대 · 화살표',.5),('외력 종료',1.)]];data=dict(id=dataset,title=TITLES[task.id]+(' · '+variant if variant!='full' else ''),scenario='full_'+task.id,full_task_recording=True,multi_arm=True,free_articulated_object=task.id=='box',articulated_object=task.id=='box',engine='mujoco_contact_recording',dof=sum(r.n for r in p.full_robots),nq=q.shape[1],nv=sum(r.nv for r in p.full_robots)+obj.nv,floating_base=False,frame='supplied contracted groups -> source/target -> type/assignment search -> all intervals -> native control',joint_names=trace.metadata['joint_names'],instances=instances,objects=objects,times=trace.time[idx].tolist(),q=q.tolist(),positions=positions,link_names=names,edges=edges,torques=torque.tolist(),torque_ratio=ratio.tolist(),errors=[None]*len(idx),chart_values=chart.tolist(),chart_label='MEASURED HINGE ANGLE' if task.id=='box' else 'MEASURED OBJECT HEIGHT',chart_unit='deg' if task.id=='box' else 'mm',keyframes=[dict(id=k['id'],time=episode.preparation+episode.offsets[i]) for i,k in enumerate(task.keyframes)],events=events,tool_states={f.id:flags[idx,i].tolist() for i,f in enumerate(task.features)},planned_tool_states={f.id:[episode.attached(i,t) for t in trace.time[idx]] for i,f in enumerate(task.features)},environment=environment,contact_contraction=contraction,external_disturbances=trace.metadata.get('external_disturbances',[]),summary=dict(duration=float(trace.time[-1]),physics_dt=trace.metadata['timestep'],full_geometry_checked=True),report=enriched,description='All task keyframes and transitions with supplied contracted groups. See selection ledger, source fallback flags, independent mechanics, midpoint variant and raw native-contact assessment. Authored simulation parameters; hardware calibration not claimed.',display=dict(description=TITLES[task.id],scene_label='THREE-ARM FULL TASK · '+' / '.join(p.types),geometry='Panda·Robotiq 원본 mesh + 동일 spherical tip URDF · 측정된 native 관절과 자유 물체',chart_note='유형·팔 배정 후보 탐색 및 전체 구간 최적화 결과 · midpoint 구성 업데이트 변형'),provenance=dict(case_id=trace.metadata['case_id'],plan_id=trace.metadata['plan_id'],scene_sha256=trace.metadata['scene_sha256'],selected_types=p.types,selected_assignment=p.assignment,canonical_point_tool=next((s['point_tool_profile'] for s in p.specs if s['kind']=='P'),None)))
+    data['native_contact_samples']=native_contact_samples(episode,trace,scene,idx)
     write_json(web/'data'/f'{dataset}.json',data,compact=True);update_catalog(web,data);return data

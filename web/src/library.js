@@ -62,7 +62,10 @@ export function recordingScope(data) {
   const full = report.full_paper_pipeline_executed === true &&
     ["III-B", "III-C", "III-D", "IV"].every(section => sections[section] === true);
   let status, detail;
-  if (data.full_task_recording) {
+  if (data.known_modeling_issues?.length) {
+    status = '구형 형상 · 재검증 필요';
+    detail = data.known_modeling_issues.join(' ')+' 수정된 모델과 7조건 비교는 「자유 박스 · 전체 구간 최적화」(full_box)에서 확인하세요.';
+  } else if (data.full_task_recording) {
     status = "전체 구간 · " + (report.execution_passed ? "검증 통과" : "검사 실패 포함");
     detail = "접촉 유형·팔 배정 후보, 이동 CITO·하중 전달 QP·릴리스 동역학과 native 접촉 실행을 기록합니다. Midpoint 구성 업데이트 변형이며 source 실패 시 기하 prior 사용 여부와 ablation 결과를 보고서에 표시합니다.";
     if(report.variant==="fixed_path") detail="고정된 보간 경로에서 힘·토크만 계산하는 비교 실행입니다. 전체 계획과 endpoint·구간 시간을 맞추며, CITO의 동역학 적분 잔차와 실제 접촉 실행 결과를 구분하여 표시합니다.";

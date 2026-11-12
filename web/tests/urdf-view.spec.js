@@ -138,7 +138,8 @@ test("library separates paper tasks, single embodiments and diagnostics with mat
   const counts=category=>catalog.models.filter(model=>libraryEntry(model).category===category).length;
   await expect(page.locator('.category-choice[data-category="paper"]')).toHaveAttribute('aria-pressed','true');
   await expect(page.locator('.model-choice:visible')).toHaveCount(counts('paper'));
-  await expect(page.locator('#scenario-status')).toContainText('전체 최적화 미검증');
+  await expect(page.locator('#scenario-status')).toContainText('구형 형상 · 재검증 필요');
+  await expect(page.locator('#scenario-scope')).toContainText('50 mm');
   await expect(page.locator('#scenario-status')).toHaveAttribute('data-full-pipeline','false');
   await page.locator('.category-choice[data-category="embodiment"]').click();
   await expect(page.locator('.model-choice:visible')).toHaveCount(8);
@@ -503,7 +504,7 @@ test('full assembly external push replays applied force and all controlled ablat
  await page.getByRole('button',{name:`외력 최대 · 화살표 · ${peak.time.toFixed(1)} s`,exact:true}).click();
  await expect(page.locator('#disturbance-state')).toHaveAttribute('data-active','true');
  await expect(page.locator('#disturbance-state')).toContainText('5.00 N');
- await expect(page.locator('#ablation-results')).toContainText('contact_disabled');
+ await expect(page.locator('#ablation-results tr[data-variant="contact_disabled"]')).toContainText('음성 대조군');
 });
 
 test('free-object form preserves edited dense groups while retiming',async({page})=>{
@@ -524,7 +525,9 @@ for (const task of ['assembly','box','panel']) {
     await expect(page.locator('#scenario-status')).toContainText('전체 구간 · 검증 통과');
     await expect(page.locator('#result-tracking')).toContainText('PASS');
     await expect(page.locator('#result-forces')).toContainText('PASS');
-    await expect(page.locator('#ablation-results')).toContainText('full');
+    await expect(page.locator('#ablation-results tr[data-variant="full"]')).toContainText('PASS');
+    await expect(page.locator('#full-result-links')).toContainText('실패 이유');
+    await expect(page.locator('#ablation-results')).toContainText('성능 향상을 입증하지 못합니다');
     await expect(page.locator('#experiment-form')).toBeHidden();
     const result=await page.evaluate(async task=>{
       const data=await(await fetch(`/data/full_${task}.json`)).json(),{loadURDFModel,applyRecordedPose,disposeModel}=window.modelAPI;let maximum=0;
@@ -542,6 +545,13 @@ for (const task of ['assembly','box','panel']) {
     },task);
     expect(result.maximum).toBeLessThan(1e-6);
     const d=result.data,r=d.report;
+    expect(d.native_contact_samples.source).toBe('raw_native_contacts');expect(d.native_contact_samples.interpolated).toBe(false);
+    expect(d.native_contact_samples.sample_times_s).toEqual(d.times);expect(d.native_contact_samples.frames).toHaveLength(d.times.length);
+    await page.locator('#timeline').evaluate(el=>{el.value='.8';el.dispatchEvent(new Event('input'));});
+    await page.locator('#contact-focus').selectOption(d.contact_contraction.groups[0].group_id);
+    await expect(page.locator('#play')).toHaveAttribute('aria-label','재생');
+    await expect(page.locator('#native-contact-state')).toContainText('보간 없음');
+    expect(Number(await page.locator('#native-contact-state').getAttribute('data-count'))).toBeGreaterThan(0);
     expect(d.full_task_recording).toBe(true);expect(d.multi_arm).toBe(true);expect(r.execution_passed).toBe(true);
     expect(r.full_variant_pipeline_executed).toBe(true);expect(r.full_paper_pipeline_executed).toBe(false);
     expect(r.selection.selection_executed).toBe(true);expect(r.selection.candidate_count).toBeGreaterThanOrEqual(12);
@@ -550,6 +560,14 @@ for (const task of ['assembly','box','panel']) {
     expect(d.provenance.canonical_point_tool.radius_m).toBe(.025);
     expect(d.provenance.canonical_point_tool.ee_to_tip.slice(0,3).map(row=>row[3])).toEqual([0,0,.165]);
     expect(r.object_equality_constraints_used).toBe(0);expect(r.sampled_interface_wrench_capability.passed).toBe(true);
+    const negative=page.locator('#ablation-results tr[data-variant="contact_disabled"]');await expect(negative).toContainText('FAIL');await expect(negative).toContainText('목표');
+    if(task==='box'){
+      const fixed=r.ablation_results.fixed_path,peak=Math.max(...Object.values(fixed.jaw_force).flatMap(j=>j.all_time_maximum_per_jaw_N||j.maximum_per_jaw_N));
+      await expect(page.locator('#ablation-results tr[data-variant="fixed_path"]')).toContainText(peak.toFixed(2)+' N / 40 N');
+      const object=d.instances.find(i=>i.id==='object');const xml=await page.evaluate(async manifest=>{const m=await(await fetch(manifest)).json();return await(await fetch(new URL(m.urdf,new URL(manifest,location.href)))).text();},object.manifest);
+      expect(xml).toContain('base_handle_connector');
+      const final=d.native_contact_samples.frames.at(-1);expect(final.filter(p=>p.group_id==='moving_manipulation')).toHaveLength(2);
+    }
     if(task==='assembly'){expect(r.task_metrics.leg_released).toBe(true);expect(r.task_metrics.lateral_error_m).toBeLessThan(.002);}
   });
 }

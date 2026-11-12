@@ -10,6 +10,41 @@ from contact_transfer.trajectory import TrajectoryResult
 from contact_transfer.multi_object import RigidCollection
 
 
+def test_box_handle_has_connected_visual_and_collision_attachment():
+    """A shared rigid link cannot substitute for missing physical material."""
+    import xml.etree.ElementTree as ET
+    tree=ET.parse('src/contact_transfer/scenarios/free_articulated/box_lid.urdf')
+    for name in ('base','moving'):
+        link=tree.find(f"link[@name='{name}']");geometries=[]
+        for kind in ('visual','collision'):
+            bounds=[]
+            for geom in link.findall(kind):
+                center=np.fromstring(geom.find('origin').get('xyz'),sep=' ');half=np.fromstring(geom.find('geometry/box').get('size'),sep=' ')/2
+                bounds.append((center-half,center+half))
+            # Every primitive must be connected, including the handle.
+            visited={0}
+            while True:
+                connected={j for i in visited for j in range(len(bounds)) if np.all(np.maximum(bounds[i][0],bounds[j][0])<=np.minimum(bounds[i][1],bounds[j][1])+1e-12)}
+                if connected<=visited:break
+                visited|=connected
+            assert len(visited)==len(bounds),f'{name}/{kind}: disconnected primitive'
+            geometries.append(np.array(bounds))
+        np.testing.assert_array_equal(*geometries)
+    # Mass/COM/inertia are declared for the aggregate body including hardware.
+    assert tree.find("link[@name='base']/inertial/mass").get('value')=='2.0'
+
+
+def test_native_contact_export_preserves_measured_time_sign_and_patch_centers():
+    from types import SimpleNamespace as NS
+    from contact_transfer.full_view import native_contact_samples
+    p=NS(task_definition=NS(features=[NS(id='grasp')]),specs=[{'id':'arm0'}]);e=NS(problem=p)
+    trace=NS(metadata={'timestep':.001},time=np.array([0.,.001,.002]),contact_time=np.array([0.,0.,.001,.002]),contact_pair=np.array([['arm0_left_pad_collision_0','wood'],['wood','arm0_left_pad_collision_1'],['arm0_left_pad_collision_0','wood'],['arm0_left_pad_collision_0','fixture']]),contact_wrench=np.array([[0,0,0,2,0,0],[0,0,0,-1,0,0],[0,0,0,0,0,0],[0,0,0,100,0,0]],float),contact_position=np.array([[0,0,0],[3,0,0],[4,0,0],[9,0,0]],float),contact_gap=np.array([-.001,-.002,0,-.003]))
+    result=native_contact_samples(e,trace,NS(allowed_by_group={'grasp':['wood']}),np.array([0,1,2]))
+    assert result['interpolated'] is False and result['sample_times_s']==[0.,.001,.002]
+    assert result['frames'][1:]==[[],[]]  # no invented contact after loss
+    patch=result['frames'][0][0];np.testing.assert_allclose(patch['position_world_m'],[1,0,0]);np.testing.assert_allclose(patch['force_on_robot_world_N'],[-3,0,0]);assert patch['minimum_gap_m']==-.002
+
+
 @pytest.mark.parametrize('task_id,types',[('panel','GPP'),('box','GPG'),('assembly','GPG')])
 def test_complete_scenes_preserve_unactuated_objects_and_native_mechanics(task_id,types,tmp_path):
     mj=pytest.importorskip('mujoco')

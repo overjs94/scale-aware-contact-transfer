@@ -30,6 +30,17 @@
     "base_support": 0.9994972347913524,
     "moving_manipulation": 0.9999441371990392
   },
+  "geometric_holding_contact_fraction": {
+    "base_grasp": 0.9999441371990392,
+    "base_support": 0.9994972347913524,
+    "moving_manipulation": 0.9999441371990392
+  },
+  "required_loaded_contact_samples": {
+    "base_grasp": 17901,
+    "base_support": 17901,
+    "moving_manipulation": 17901
+  },
+  "contact_retention_definition": "P: stored planned normal reaction >0.1 N; G: attached holding gripper. Zero-force handoff remains in geometric_holding_contact_fraction.",
   "contact_retention_passed": true,
   "jaw_force": {
     "base_grasp": {
@@ -1602,23 +1613,11 @@
   ],
   "fixed_path_integration_residuals": null,
   "new_physical_trial_executed": true,
-  "trial_wall_time_s": 266.3580520280011,
+  "trial_wall_time_s": 287.5975271549978,
   "control_replay": {
-    "previous_trial": "outputs/full_scenarios_v22/box/diagnostics/full-before-control-replay-20261112T203943Z",
-    "previous_result_sha256": "6b402aa3cfe60dcfd47daba9cf6b24c6de8a42a7ef60b4476af91134ac363394",
+    "previous_trial": "outputs/box_connected_v1/box/diagnostics/full-before-control-replay-20261112T220948Z",
+    "previous_result_sha256": "23afe1bada323f471fe5cc96c40b7dfc0e2f19fb8f0c1f52d57ea243b838d962",
     "new_target_solver_executed": false,
     "model_force_limits_changed": false
-  },
-  "geometric_holding_contact_fraction": {
-    "base_grasp": 0.9999441371990392,
-    "base_support": 0.9994972347913524,
-    "moving_manipulation": 0.9999441371990392
-  },
-  "required_loaded_contact_samples": {
-    "base_grasp": 17901,
-    "base_support": 17901,
-    "moving_manipulation": 17901
-  },
-  "contact_retention_definition": "P: stored planned normal reaction >0.1 N; G: attached holding gripper. Zero-force handoff remains in geometric_holding_contact_fraction.",
-  "assessment_replayed_from_saved_trace": true
+  }
 }

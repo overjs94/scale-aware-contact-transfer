@@ -2,9 +2,10 @@
 
 Requested scope: furniture/table assembly, free box/lid opening, and panel
 reorientation/placement/release. This file tracks implementation rather than
-asserting an unexecuted full-pipeline result. The consolidated historical
-[architecture report](system-architecture-and-progress.md) describes baseline
-`5ad6015`, whose 131 Python and 33 browser checks passed before this work.
+asserting literal execution of every manuscript equation. The consolidated
+[architecture report](system-architecture-and-progress.md) describes the accepted
+implementation variant; the [contact geometry audit](contact-geometry-and-comparison-audit.md)
+records the later box-handle repair and limitations of the type-selection comparison.
 
 ## Required common behavior
 
@@ -51,11 +52,11 @@ External-force trials use actual native force injection and replay arrows.
 | Canonical P tool compiler / cross-scenario EE-bias check | implemented; focused check passed |
 | Independent two-free-body mechanics / both quaternion integrations | implemented; focused check passed |
 | Internal-contact equal/opposite impulse and power/gap checks | implemented; focused check passed |
-| Target keyframe unload force flag and source-refinement switch | implemented; focused validation in progress |
+| Target keyframe unload force flag and source-refinement switch | implemented; accepted target keys independently checked; source panel certified, box/assembly fallback explicit |
 | All three task adapters / scenes / independent native mechanics | implemented; three-scene mass/gravity checks passed |
-| Robust target keyframes | panel 9, box 8 and assembly 10 declared keyframes; individual/sequence acceptance is recorded separately |
-| Type/assignment optimization connected to complete scenarios | implemented; exhaustive configured candidates, rejections and common sequence objective retained; assembly: 24 configured candidates, one accepted G/P/G sequence; panel/box complete acceptance remains pending |
-| Full native executions / ablation matrix / web records | assembly full native execution and all six controlled ablations executed; panel/box full native acceptance in progress |
+| Robust target keyframes | panel 9, box 8 and assembly 10 independently accepted target keyframes |
+| Type/assignment optimization connected to complete scenarios | configured candidates enumerated: panel 12, box/assembly 24 each; selected G/P/P, G/P/G, G/P/G match supplied fixed-type baselines, so no selection benefit demonstrated |
+| Full native executions / ablation matrix / web records | three accepted full executions; seven conditions per task with failed comparisons preserved; box geometry repair uses independently revalidated plans and fresh physical trials |
 
 The ledger is updated from executed results. Pending cells must not produce
 `full_paper_pipeline_executed=true` in public recordings.
