@@ -4,19 +4,24 @@ import pytest
 
 from contact_transfer.contacts import Capability
 from contact_transfer.system import MechanicalSystem, RigidObject
-from contact_transfer.trajectory import Contact, solve_cito
+from contact_transfer.trajectory import Contact, TrajectoryResult, solve_cito
 from contact_transfer import Robot
 from contact_transfer.embodiments import load, catalog
 
 
-@pytest.mark.parametrize('friction_speed_model',['auxiliary_cone','direct_norm'])
+@pytest.mark.parametrize('friction_speed_model',['auxiliary_cone','direct_norm','huber_norm'])
 def test_cito_support_impulse_and_unrelaxed_residuals(friction_speed_model):
     body = RigidObject(1., np.zeros(3), np.eye(3)*.02)
     system = MechanicalSystem([], body)
     q = np.array([0., 0, .5, 0, 0, 0, 1])
     contact = Contact("ground", np.zeros(3), [0, 0, 1],
                       Capability(mu=.5, normal_max=30), plane_offset=.5)
-    result = solve_cito(system, q, q, [contact], steps=8, duration=.4,friction_speed_model=friction_speed_model)
+    initial=None
+    if friction_speed_model=='huber_norm':
+        # The smooth zero-speed representation is exercised with the same
+        # positive, independently balanced force seed as the full task runner.
+        initial=TrajectoryResult(np.tile(q,(9,1)),np.zeros((9,6)),np.zeros((8,0)),np.full(8,.05),{'ground':np.tile([0.,0.,9.81*.05],(8,1))},0.,0.,0.,0.,0.,False,())
+    result = solve_cito(system, q, q, [contact], steps=8, duration=.4,friction_speed_model=friction_speed_model,friction_relaxations=(1e-8,)*3,initial=initial,eliminate_endpoint_redundancy=friction_speed_model=='huber_norm')
     assert result.complementarity_residual < 2e-5
     assert result.friction_residual < 2e-5
     assert result.minimum_gap >= -2e-6

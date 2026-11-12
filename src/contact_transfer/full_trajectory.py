@@ -9,6 +9,7 @@ from .generalized_load import GeneralizedTaskLoad
 from .generalized_conic import fixed_generalized_margin
 from .multi_object import RigidCollection
 from .contracted import numerical_pose_ik
+from .full_scenario import point_pose_ik
 from .full_scene import support_contacts
 from .full_validation import numeric_contact,numeric_object_point,bias_object,support_patch_contains,validate_interval
 
@@ -142,10 +143,13 @@ def initial_interval(problem,k,left,right,steps,duration,contacts):
             seed=(1-s)*left.q[sys.q_slices[i]]+s*right.q[sys.q_slices[i]]
             if phase_mode(problem.task_definition.keyframes[k]['phase'],f)=='holding':
                 T=obj.fk(qo,f.frame);goal=np.eye(4);goal[:3,3]=T[:3,3]+T[:3,:3]@left.positions[i]
-                local=left.rotations[i]@np.diag([1.,-1.,-1.]) if c.capability.kind=='G' else Rotation.align_vectors(np.array([-c.normal]),np.array([f.tool_rotation[:,2]]))[0].as_matrix()@f.tool_rotation;goal[:3,:3]=T[:3,:3]@local;seed=numerical_pose_ik(r,frame,goal,seed)
+                local=left.rotations[i]@np.diag([1.,-1.,-1.]) if c.capability.kind=='G' else Rotation.align_vectors(np.array([-c.normal]),np.array([f.tool_rotation[:,2]]))[0].as_matrix()@f.tool_rotation;goal[:3,:3]=T[:3,:3]@local;seed=point_pose_ik(r,frame,goal[:3,3],T[:3,:3]@c.normal,seed) if c.capability.kind=='P' else numerical_pose_ik(r,frame,goal,seed)
             nominal=beta[j]*(right.q[sys.q_slices[i]]-left.q[sys.q_slices[i]])
             if phase_mode(problem.task_definition.keyframes[k]['phase'],f)=='holding':
-                _,Jo=numeric_object_point(obj,qo,f.frame,left.positions[i]);Jr=r.jacobian(seed,frame,'world_aligned');velocity=nominal+np.linalg.lstsq(Jr,Jo@vo-Jr@nominal,rcond=1e-9)[0]
+                _,Jo=numeric_object_point(obj,qo,f.frame,left.positions[i]);Jr=r.jacobian(seed,frame,'world_aligned')
+                if c.capability.kind=='P':
+                    Rc=obj.fk(qo,f.frame)[:3,:3]@c.basis();project=np.zeros((5,6));project[:2,:3]=Rc[:,:2].T;project[2:,3:]=np.eye(3);Jr=project@Jr;Jo=project@Jo
+                velocity=nominal+np.linalg.lstsq(Jr,Jo@vo-Jr@nominal,rcond=1e-9)[0]
             else:velocity=nominal
             row.extend(seed);velocities.extend(velocity)
         Q.append(np.r_[row,qo]);V.append(np.r_[velocities,vo])
@@ -157,25 +161,13 @@ def initial_interval(problem,k,left,right,steps,duration,contacts):
 
 
 def solve_interval(problem,k,left,right,settings,*,steps=16,configuration_update='independent_midpoint',configuration_defect_bounds=(2e-5,5e-5),collision_margins=None,initial_guess=None,force_coordinates='cartesian'):
-    sys=problem.system;duration=problem.task_definition.keyframes[k+1]['time']-problem.task_definition.keyframes[k]['time'];contacts=interval_contacts(problem,k,left,steps);initial=initial_interval(problem,k,left,right,steps,duration,contacts)
-    if np.max(abs(left.q-right.q))<1e-8 and left.phase==right.phase:
-        # A declared stationary dwell has constant states. Condense those known
-        # states out of the *same* momentum/contact equations and minimize its
-        # torque plus finger-witness cost as a convex conic QP. Moving intervals
-        # still use the complete CITO NLP below.
-        maps=[];tmaps=[];caps=[]
-        for c in contacts:
-            gap,J,_,_=numeric_contact(problem,c,left.q)
-            if c.robot_index is None and (gap>2e-5 or not support_patch_contains(problem,c,left.q)):continue
-            X=np.c_[np.zeros((sys.nv,3)),J.T] if c.capability.kind=='P' else J.T;maps.append(-X[sys.object_v]);tmaps.append(np.array(sys.B).T@X);caps.append(c.capability)
-        gravity=np.concatenate([r.gravity(left.q[qs]) for r,qs in zip(problem.robots,sys.q_slices)]);load=problem.task_load(left.q[sys.object_q]);Qt=np.diag(.01/sys.effort**2);check=fixed_generalized_margin(maps,load,caps,torque_gravity=gravity,torque_maps=tmaps,effort=sys.effort,fixed_rho=0.,torque_weight=Qt,witness_weight=1e-6)
-        if not check['certificate']:raise RuntimeError('Stationary dwell conic allocation rejected: '+check['status'])
-        forces=check['reactions'].mean(axis=0);tau=gravity-sum(T@f for T,f in zip(tmaps,forces));h=duration/steps;active_names=[c.name for c in contacts if c.robot_index is not None or numeric_contact(problem,c,left.q)[0]<=2e-5 and support_patch_contains(problem,c,left.q)];by_name={n:w for n,w in zip(active_names,forces)};initial.q[:]=left.q;initial.q[-1]=right.q;initial.v[:]=0.;initial.tau[:]=tau
-        for c in contacts:
-            w=by_name.get(c.name,np.zeros(6));initial.impulses[c.name][:]=h*(w[3:] if c.capability.kind=='P' else w)
-        witness_cost=sum(np.sum(np.mean([row[i] for row in check['coordinates']],axis=0)**2) for i,c in enumerate(caps) if c.kind=='G');initial.objective=duration*(tau@Qt@tau+.1+1e-6*witness_cost);initial.objective_mode='stationary_dwell_conic_QP';initial.configuration_update=configuration_update;initial.configuration_defect_bounds=configuration_defect_bounds if configuration_update=='grasp_consistent_midpoint' else ();initial.contact_force_coordinates='cartesian';initial.continuation={'stationary_condensation':True,'solver':check['status']};validation=validate_interval(problem,initial,contacts)
-        if not validation['passed']:raise RuntimeError('Stationary dwell native validation rejected: '+str(validation))
-        return initial,contacts,validation
+    from .full_static import stationary_interval,released_arm_interval
+    sys=problem.system;duration=problem.task_definition.keyframes[k+1]['time']-problem.task_definition.keyframes[k]['time'];contacts=interval_contacts(problem,k,left,steps)
+    if np.max(abs(left.q-right.q))<1e-8:
+        return stationary_interval(problem,left,right,contacts,duration,steps)
+    if left.phase in {'released','release_leg'} and np.max(abs(left.q[sys.object_q]-right.q[sys.object_q]))<1e-8:
+        return released_arm_interval(problem,left,right,contacts,duration,steps,settings)
+    initial=initial_interval(problem,k,left,right,steps,duration,contacts)
     obj=problem.task_definition.object;frames=list(obj.names) if isinstance(obj,RigidCollection) else list(obj.tree.links) if problem.task_definition.id=='box' else [obj.tree.root];desired={f:[] for f in frames}
     # Failed iterates are optional numerical seeds, never accepted plans. A
     # fresh successful NLP and all independent gates below remain mandatory.
@@ -197,7 +189,7 @@ def solve_interval(problem,k,left,right,settings,*,steps=16,configuration_update
         s=j/steps;qo=object_interpolate(obj,left.q[sys.object_q],right.q[sys.object_q],np.zeros(obj.nv),np.zeros(obj.nv),duration,s)
         for f in frames:desired[f].append(obj.fk(qo,f))
     initial.configuration_update=configuration_update;initial.configuration_defect_bounds=configuration_defect_bounds if configuration_update=='grasp_consistent_midpoint' else ();feasible_initial=validate_interval(problem,initial,contacts)['passed'];gap_schedule=(1e-8,) if feasible_initial else (1e-3,1e-5,1e-8);friction_schedule=gap_schedule;velocity_schedule=(0.,) if feasible_initial else (1e-3,1e-5,0.)
-    result=solve_cito(sys,left.q,right.q,contacts,steps=steps,duration=duration,dt_bounds=(duration/steps*.9,duration/steps*1.1),fixed_dt=False,initial=initial,desired_object_poses=desired,characteristic_length=.6,Kp=np.eye(3)*500,kR=50.,configuration_update=configuration_update,configuration_defect_bounds=configuration_defect_bounds,contact_force_coordinates=force_coordinates,friction_speed_model='direct_norm',eliminate_endpoint_redundancy=True,exact_gripper_velocity=configuration_update=='grasp_consistent_midpoint',exact_sticking_velocity=True,kinematic_tolerance=1e-5,Q_tau=np.diag(.01/sys.effort**2),Q_v=np.diag(np.r_[np.concatenate([.1/r.velocity**2 for r in problem.robots]),np.full(sys.object_v.stop-sys.object_v.start,.1)]),duration_weight=.1,witness_regularization=1e-6,relaxations=gap_schedule,friction_relaxations=friction_schedule,velocity_relaxations=velocity_schedule,collision_margins=collision_margins,failure_recording_path=problem.directory/f'interval{k}-unaccepted.npz',settings=settings)
+    result=solve_cito(sys,left.q,right.q,contacts,steps=steps,duration=duration,dt_bounds=(duration/steps*.9,duration/steps*1.1),fixed_dt=False,initial=initial,desired_object_poses=desired,characteristic_length=.6,Kp=np.eye(3)*500,kR=50.,configuration_update=configuration_update,configuration_defect_bounds=configuration_defect_bounds,contact_force_coordinates=force_coordinates,friction_speed_model='huber_norm',friction_speed_smoothing=1e-6,eliminate_endpoint_redundancy=True,exact_gripper_velocity=configuration_update=='grasp_consistent_midpoint',exact_sticking_velocity=True,kinematic_tolerance=1e-5,Q_tau=np.diag(.01/sys.effort**2),Q_v=np.diag(np.r_[np.concatenate([.1/r.velocity**2 for r in problem.robots]),np.full(sys.object_v.stop-sys.object_v.start,.1)]),duration_weight=.1,witness_regularization=1e-6,relaxations=gap_schedule,friction_relaxations=friction_schedule,velocity_relaxations=velocity_schedule,collision_margins=collision_margins,failure_recording_path=problem.directory/f'interval{k}-unaccepted.npz',settings=settings)
     check=validate_interval(problem,result,contacts)
     if not check['passed']:raise RuntimeError('Independent interval validation rejected: '+str(check))
     if kinematic_report is not None:result.continuation['kinematic_initialization']=kinematic_report

@@ -64,7 +64,7 @@ export function recordingScope(data) {
   let status, detail;
   if (data.full_task_recording) {
     status = "전체 구간 · " + (report.execution_passed ? "검증 통과" : "검사 실패 포함");
-    detail = "접촉 유형·팔 배정 후보, 모든 keyframe과 CITO 전이, native 접촉 실행을 기록합니다. Midpoint 구성 업데이트 변형이며 source 실패 시 기하 prior 사용 여부와 ablation 결과를 보고서에 표시합니다.";
+    detail = "접촉 유형·팔 배정 후보, 이동 CITO·하중 전달 QP·릴리스 동역학과 native 접촉 실행을 기록합니다. Midpoint 구성 업데이트 변형이며 source 실패 시 기하 prior 사용 여부와 ablation 결과를 보고서에 표시합니다.";
   } else if (full) {
     status = "Sec. III-B–IV 실행 기록";
     detail = "전체 단계의 실행 provenance가 포함된 기록입니다. 개별 검사 결과는 실행 보고서에서 확인하세요.";

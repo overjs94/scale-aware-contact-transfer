@@ -14,8 +14,11 @@ def jsonable(value):
     raise TypeError(type(value).__name__)
 
 
-def write_json(path,value):
-    path=Path(path);path.parent.mkdir(parents=True,exist_ok=True);path.write_text(json.dumps(value,default=jsonable,allow_nan=False,indent=2)+'\n')
+def write_json(path,value,*,compact=False):
+    import os,tempfile
+    path=Path(path);path.parent.mkdir(parents=True,exist_ok=True);contents=json.dumps(value,default=jsonable,allow_nan=False,**({'separators':(',',':')} if compact else {'indent':2}))+'\n'
+    with tempfile.NamedTemporaryFile(mode='w',encoding='utf-8',dir=path.parent,prefix='.'+path.name,suffix='.tmp',delete=False) as handle:handle.write(contents);temporary=handle.name
+    os.replace(temporary,path)
 
 
 def fingerprint(problem,settings,steps):
@@ -26,13 +29,13 @@ def fingerprint(problem,settings,steps):
     for r in [*problem.full_robots,*objects]:h.update(r.path.read_bytes())
     # Execution/controller and validators are rerun on every load; changing an
     # assessment or controller must not pretend the optimization was rerun.
-    for name in ['full_scenario','full_scene','full_trajectory','paper_keyframe','trajectory','finger_grasp','generalized_conic','source_transfer','multi_object','spherical_tool','system']:
+    for name in ['full_scenario','full_static','full_scene','full_trajectory','paper_keyframe','trajectory','finger_grasp','generalized_conic','source_transfer','multi_object','spherical_tool','system']:
         h.update(Path(__file__).with_name(name+'.py').read_bytes())
     return h.hexdigest()
 
 
 def save_key(path,key,identity):
-    names=['q','positions','rotations','reactions','torques'];meta={f.name:getattr(key,f.name) for f in fields(key) if f.name not in names+['environment_reactions']};meta.update(identity=identity,phase=key.phase,source=key.source,environment=list(key.environment_reactions),interfaces=[dict(group_id=s.group_id,force_enabled=s.force_enabled) for s in key.interfaces]);a={n:getattr(key,n) for n in names};a.update({'env_'+n:v for n,v in key.environment_reactions.items()});np.savez_compressed(path,metadata_json=json.dumps(meta,default=jsonable,allow_nan=False),**a)
+    names=['q','positions','rotations','reactions','torques'];meta={f.name:getattr(key,f.name) for f in fields(key) if f.name not in names+['environment_reactions']};meta.update(identity=identity,phase=key.phase,retreat_m=getattr(key,'retreat_m',.06 if key.phase in {'released','release_leg'} else 0.),source=key.source,environment=list(key.environment_reactions),interfaces=[dict(group_id=s.group_id,force_enabled=s.force_enabled) for s in key.interfaces]);a={n:getattr(key,n) for n in names};a.update({'env_'+n:v for n,v in key.environment_reactions.items()});np.savez_compressed(path,metadata_json=json.dumps(meta,default=jsonable,allow_nan=False),**a)
 
 
 def load_key(path,identity):
@@ -40,7 +43,7 @@ def load_key(path,identity):
     with np.load(path,allow_pickle=False) as a:
         meta=json.loads(str(a['metadata_json']))
         if meta.pop('identity')!=identity:raise ValueError('Keyframe cache formulation/model mismatch')
-        phase,source,interfaces=[meta.pop(n) for n in ['phase','source','interfaces']];env={n:a['env_'+n].copy() for n in meta.pop('environment')};key=KeyframeCertificate(**{n:a[n].copy() for n in ['q','positions','rotations','reactions','torques']},environment_reactions=env,**meta);key.phase=phase;key.source=source;key.interfaces=[SimpleNamespace(**s) for s in interfaces];return key
+        phase,source,interfaces=[meta.pop(n) for n in ['phase','source','interfaces']];retreat=meta.pop('retreat_m',.06 if phase in {'released','release_leg'} else 0.);env={n:a['env_'+n].copy() for n in meta.pop('environment')};key=KeyframeCertificate(**{n:a[n].copy() for n in ['q','positions','rotations','reactions','torques']},environment_reactions=env,**meta);key.phase=phase;key.retreat_m=retreat;key.source=source;key.interfaces=[SimpleNamespace(**s) for s in interfaces];return key
 
 
 def save_interval(path,result,identity):

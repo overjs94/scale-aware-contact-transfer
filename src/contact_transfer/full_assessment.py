@@ -9,6 +9,21 @@ def frame_index(episode,trace,scene,frame):
     return trace.metadata['object_names'].index(scene.object_frames[frame])
 
 
+def measured_contact_flags(episode,trace,scene,threshold=1e-3):
+    flags=np.zeros((len(trace.time),len(episode.problem.robots)),bool);steps=np.rint(trace.contact_time/trace.metadata['timestep']).astype(int);loaded=np.linalg.norm(trace.contact_wrench[:,3:],axis=1)>threshold
+    for i,(feature,spec) in enumerate(zip(episode.problem.task_definition.features,episode.problem.specs)):
+        selected=loaded&np.any(np.char.startswith(trace.contact_pair,spec['id']+'_'),axis=1)&np.any(np.isin(trace.contact_pair,scene.allowed_by_group[feature.id]),axis=1);flags[np.clip(steps[selected],0,len(flags)-1),i]=True
+    return flags
+
+
+def final_support_force(trace,object_geometries,counterpart,window=.25):
+    """Mean world force on the named object from specified native counterparts."""
+    h=trace.metadata['timestep'];steps=np.rint(trace.contact_time/h).astype(int);selected=trace.contact_time>=trace.time[-1]-window;total=np.zeros((len(trace.time),3))
+    for side in [0,1]:
+        mask=selected&np.isin(trace.contact_pair[:,side],object_geometries)&np.isin(trace.contact_pair[:,1-side],counterpart);np.add.at(total,steps[mask],(1 if side==1 else -1)*trace.contact_wrench[mask,3:])
+    return total[trace.time>=trace.time[-1]-window].mean(axis=0)
+
+
 def capability_samples(episode,trace,scene,sample_dt=.05):
     p=episode.problem;h=trace.metadata['timestep'];stride=max(1,round(sample_dt/h));step=np.rint(trace.contact_time/h).astype(int);starts=np.searchsorted(step,np.arange(len(trace.time)),side='left');ends=np.searchsorted(step,np.arange(len(trace.time)),side='right');records={}
     for arm,(f,spec,cap) in enumerate(zip(p.task_definition.features,p.specs,p.capabilities)):
@@ -40,13 +55,13 @@ def assess(episode,trace,controller,scene,*,geometry):
         needed=np.array([t>=episode.preparation+.1 and episode.attached(arm,t) and phase_mode(episode.keyframes[episode.phase(t)[0]].phase,f)=='holding' for t in trace.time[:-1]]);present=np.zeros(len(trace.time),bool);pair=trace.contact_pair;selected=(np.linalg.norm(trace.contact_wrench[:,3:],axis=1)>1e-3)&np.any(np.char.startswith(pair,spec['id']+'_'),axis=1)&np.any(np.isin(pair,scene.allowed_by_group[f.id]),axis=1);steps=np.rint(trace.contact_time[selected]/dt).astype(int);present[np.clip(steps,0,len(present)-1)]=True;contact_fractions[f.id]=float(present[:-1][needed].mean()) if needed.any() else None
         if cap.kind=='G':
             samples=np.array([entry['jaw_force'][arm] for entry in controller.logs]);values=samples[:len(needed)][needed];jaws[f.id]=dict(maximum_per_jaw_N=values.max(axis=0).tolist(),minimum_per_jaw_N=values.min(axis=0).tolist(),positive_reaction_fraction=(values>1e-3).mean(axis=0).tolist(),limit_N=cap.closing_force_per_finger,limit_margin_N=float(cap.closing_force_per_finger-values.max()),passed=bool(values.max()<=cap.closing_force_per_finger+1e-6 and min((values>1e-3).mean(axis=0))>=.99))
-    task_metrics={};task_pass=True
+    measured=measured_contact_flags(episode,trace,scene);final_window=trace.time>=trace.time[-1]-.25;task_metrics={};task_pass=True
     if task.id=='box':
         theta=np.array(trace.metadata['articulated_state']['q'])[:,0];target=float(task.keyframes[-1]['object_q'][-1]);task_metrics=dict(final_hinge_angle_rad=float(theta[-1]),target_hinge_angle_rad=target,hinge_error_rad=float(abs(theta[-1]-target)),floating_box=True,passive_hinge=True);task_pass=abs(theta[-1]-target)<=.06
     elif task.id=='assembly':
-        a=trace.object_pose[-1,frame_index(episode,trace,scene,'tabletop')];b=trace.object_pose[-1,frame_index(episode,trace,scene,'leg')];Ra=Rotation.from_quat(a[3:]).as_matrix();Rb=Rotation.from_quat(b[3:]).as_matrix();cfg=task.original.data['socket'];tip=b[:3]+Rb@np.array(cfg.get('peg_tip_object',[0,0,-.165]));socket=a[:3]+Ra@np.array(cfg['center_object']);delta=Ra.T@(tip-socket);task_metrics=dict(insertion_depth_m=float(-delta[2]),lateral_error_m=float(np.linalg.norm(delta[:2])),two_independent_free_bodies=True,leg_released=episode.keyframes[-1].phase=='release_leg');task_pass=task_metrics['lateral_error_m']<=.002 and abs(task_metrics['insertion_depth_m']-cfg.get('target_depth_m',.025))<=.003
+        a=trace.object_pose[-1,frame_index(episode,trace,scene,'tabletop')];b=trace.object_pose[-1,frame_index(episode,trace,scene,'leg')];Ra=Rotation.from_quat(a[3:]).as_matrix();Rb=Rotation.from_quat(b[3:]).as_matrix();cfg=task.original.data['socket'];tip=b[:3]+Rb@np.array(cfg.get('peg_tip_object',[0,0,-.165]));socket=a[:3]+Ra@np.array(cfg['center_object']);delta=Ra.T@(tip-socket);leg_index=next(i for i,f in enumerate(task.features) if f.id=='leg_gripper');support=final_support_force(trace,scene.object_geometries['leg'],scene.object_geometries['tabletop']);weight=9.81*sum(link.mass for link in obj.bodies['leg'].tree.links.values());released=not measured[final_window,leg_index].any();task_metrics=dict(insertion_depth_m=float(-delta[2]),lateral_error_m=float(np.linalg.norm(delta[:2])),two_independent_free_bodies=True,leg_release_planned=episode.keyframes[-1].phase=='release_leg',leg_released=bool(released),leg_support_from_tabletop_N=support.tolist(),leg_weight_N=weight);task_pass=task_metrics['lateral_error_m']<=.002 and abs(task_metrics['insertion_depth_m']-cfg.get('target_depth_m',.025))<=.003 and released and support[2]>=.9*weight
     else:
-        final=errors[obj.tree.root];task_metrics=dict(placed_on_jig=True,robot_release_planned=episode.keyframes[-1].phase=='released',final_position_error_m=final['final_position_error_m'],final_rotation_error_rad=final['final_rotation_error_rad']);task_pass=final['final_position_error_m']<=.008 and final['final_rotation_error_rad']<=.06
+        final=errors[obj.tree.root];jig=sorted({str(n) for pair in trace.contact_pair for n in pair if n.startswith('jig_')});support=final_support_force(trace,scene.object_geometries[obj.tree.root],jig);weight=9.81*sum(link.mass for link in obj.tree.links.values());released=not measured[final_window].any();supported=support[2]>=.95*weight;task_metrics=dict(placed_on_jig=bool(supported),jig_support_final_N=support.tolist(),object_weight_N=weight,all_tools_released=bool(released),robot_release_planned=episode.keyframes[-1].phase=='released',final_position_error_m=final['final_position_error_m'],final_rotation_error_rad=final['final_rotation_error_rad']);task_pass=final['final_position_error_m']<=.008 and final['final_rotation_error_rad']<=.06 and released and supported
     from .full_validation import Geometry
     oracle=Geometry(p,scene);unexpected={}
     for pair,gap,wrench in zip(trace.contact_pair,trace.contact_gap,trace.contact_wrench):

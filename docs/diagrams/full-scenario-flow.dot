@@ -1,0 +1,36 @@
+digraph FullScenario {
+  graph [rankdir=TB, bgcolor="white", pad="0.3", nodesep="0.35", ranksep="0.4", splines=polyline, fontname="Noto Sans CJK KR", fontsize=17, labelloc=t, label="Contact transfer — complete-task implementation\nPanel / free box + lid / two-body furniture assembly"];
+  node [shape=box,style="rounded,filled",fillcolor="#edf4fc",color="#6e8aa8",fontname="Noto Sans CJK KR",fontsize=11,margin="0.15,0.12"];
+  edge [color="#506783",arrowsize=.7,fontname="Noto Sans CJK KR",fontsize=9];
+  task [label="Task input · full_scenario.FullTask\nSupplied contracted groups + link IDs + keyframes\nGeometry, gravity, disturbance E/D and fixture data"];
+  tool [label="One P tool · spherical_tool.py\nmodels/tools/spherical_tip.urdf\nIdentical sphere + EE transform in all three tasks"];
+  models [label="Authoritative mechanics\nurdf.py / robot.py / symbolic.py / system.py\nmulti_object.py: two independent SE(3) roots"];
+  grip [label="Finite G model\nrobotiq.py / robotiq_panel.py / finger_grasp.py\nNative loops, jaw friction, aperture and motor/stop cut"];
+  source [label="III-B · source_transfer.py / refinement.py / pipeline.py\nCommon point model · geometry-only scale transfer\nExplicit geometric-prior fallback if source is infeasible"];
+  subgraph cluster_search {
+    label="III-D · full_pipeline.FullPlanner → sequence.choose_sequence\nEvaluate every configured P/G and injective fixed-through-sequence assignment";color="#a9bfd4";
+    target [label="III-C · paper_keyframe.realize_system_keyframe\nPosture + local geometry + margin rho\nSeparate force/torque distribution at every vertex"];
+    polish [label="Endpoint polish + independent target checks\nNative IK / RNEA / Jacobians · Clarabel\nExact contact closure before fixing CITO endpoints",fillcolor="#e7f5ed",color="#4e9470"];
+    kin [label="Numerical initialization · full_trajectory.py\nCommon grid · midpoint collocation / no-slip seed\nInitializer status cannot certify an execution"];
+    cito [label="Moving intervals · trajectory.solve_cito\nOptimize q / v / torque / impulse / duration\nPre-state momentum, contact complementarity / friction\nEliminate equivalent redundant equality/inequality rows"];
+    dwell [label="Stationary phases · full_static.py / generalized_conic.py\nCondense constant states from the same equations\nLoad-transfer QP / released-arm dynamics NLP\nFull native momentum/contact equations rechecked"];
+    validation [label="Independent interval + reference checks\nfull_validation.py / full_execution.reference_geometry\nPinocchio / NumPy / native geometry · sampled clearance",fillcolor="#e7f5ed",color="#4e9470"];
+    rank [label="Complete-candidate ranking\nSum keyframe and interval objectives\nRetain numerical / structural / geometry rejections"];
+    target -> polish -> kin -> cito -> validation -> rank;
+    polish -> dwell -> validation;
+  }
+  cache [label="Pickle-free stage records · full_recording.py\nModel / formulation / settings identity\nFresh independent gates on every cache load"];
+  reference [label="FullEpisode · full_execution.py\nSE(3) object reference + joint Hermite + dense robot IK\nOnly robot joints receive references"];
+  control [label="Low-level control\npaper_execution.py / hybrid_control.py\nArm impedance + planned contact feedforward\nNative measured-jaw admittance · virtual PMI in pmi.py"];
+  physics [label="Native MuJoCo · full_scene.py / urdf_scene.py\ncontact_simulation.MujocoContactScene\nURDF mass / mesh / collision · passive internal joints\nFree objects · no object actuator / weld / pose forcing"];
+  assessment [label="Measured acceptance · full_assessment.py\nTask completion / contact retention / jaw and effort bounds\nRaw native P/G wrench checks / unexpected loaded contacts",fillcolor="#e7f5ed",color="#4e9470"];
+  ablation [label="Controlled ablations · full_pipeline.py\nSource refinement / fixed types / fixed path / no arm FF\nContact-disabled negative control / native external-force pulse"];
+  view [label="Measured replay · full_view.py\nActual native joints / free-root poses / hinge state\nURDF + pinned meshes + selected contacts + force arrows"];
+  web [label="web/src/library.js / experiment.js / app.js\nPaper tasks, embodiments, diagnostics · ablation table\nGitHub Pages static playback; Python CLI for recomputation"];
+  boundary [label="Separate legacy / optional paths\nRB5 position admittance / RBY1 mobile baseline\nCRISP CANAL/SubADMM: existing free-panel path\nThese are not new three-task validation claims",style="rounded,dashed,filled",fillcolor="#fff5e6",color="#bc8c39"];
+  {rank=same; tool; models; grip;}
+  {rank=same; control; physics;}
+  task -> models; tool -> models; grip -> models; models -> source -> target;
+  rank -> cache -> reference -> control -> physics -> assessment;
+  ablation -> control; assessment -> view -> web; models -> boundary [style=dashed];
+}

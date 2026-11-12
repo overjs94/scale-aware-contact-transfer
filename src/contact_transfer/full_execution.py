@@ -44,7 +44,10 @@ class FullEpisode(CoupledEpisode):
         return super().reactions(t) if self.force_feedforward else np.zeros((len(self.problem.robots),6))
     def identity(self):
         p=self.problem;data=dict(task=p.task_definition.id,types=p.types,assignment=p.assignment,specs=p.specs,source_refinement=p.refine_enabled);h=hashlib.sha256(json.dumps(data,sort_keys=True).encode())
-        for r in p.full_robots:h.update(r.path.read_bytes())
+        objects=p.task_definition.object.bodies.values() if isinstance(p.task_definition.object,RigidCollection) else [p.task_definition.object]
+        for r in [*p.full_robots,*objects]:h.update(r.path.read_bytes());h.update(np.asarray(r.base_pose,dtype='<f8').tobytes())
+        from .full_recording import jsonable
+        h.update(json.dumps(p.task_definition.keyframes,sort_keys=True,default=jsonable).encode());h.update(json.dumps(p.task_definition.fixtures,sort_keys=True,default=jsonable).encode())
         plan=hashlib.sha256()
         for r in self.trajectories:
             for a in [r.q,r.v,r.tau,r.dt]:plan.update(np.asarray(a,dtype='<f8').tobytes())

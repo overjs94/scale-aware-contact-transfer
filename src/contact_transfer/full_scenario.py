@@ -44,6 +44,17 @@ def release_ik(robot,frame,target,seed):
     return fit.x
 
 
+def point_pose_ik(robot,frame,position,normal,seed):
+    """A spherical P tool constrains position and axis, leaving axial roll free."""
+    from scipy.optimize import least_squares
+    seed=np.asarray(seed);position=np.asarray(position);normal=np.asarray(normal)
+    def residual(q):
+        T=robot.fk(q,frame);return np.r_[10*(T[:3,3]-position),T[:3,2]+normal,1e-7*(q-seed)]
+    fit=least_squares(residual,np.clip(seed,robot.lower+1e-5,robot.upper-1e-5),bounds=(robot.lower+1e-6,robot.upper-1e-6),max_nfev=240,ftol=1e-12,xtol=1e-12,gtol=1e-12)
+    if np.linalg.norm(residual(fit.x)[:6])>2e-5:raise RuntimeError(f'Point position/axis IK failed at {frame}')
+    return fit.x
+
+
 def polish_keyframe(problem,key):
     """Remove numerical endpoint closure error before fixed-endpoint CITO.
 
@@ -57,7 +68,7 @@ def polish_keyframe(problem,key):
         if problem.types[i]=='G':goal[:3,:3]=Rc@np.diag([1.,-1.,-1.])
         else:
             current=r.fk(old,frame)[:3,:3];goal[:3,:3]=Rotation.align_vectors(np.array([-Rc[:,2]]),np.array([current[:,2]]))[0].as_matrix()@current
-        new=numerical_pose_ik(r,frame,goal,old);largest=max(largest,float(np.max(abs(new-old))));key.q[qs]=new;span=np.maximum(r.upper-r.lower,1e-3);reference=np.array(spec['q_initial']);key.objective+=.01*(np.sum(((new-reference)/span)**2)-np.sum(((old-reference)/span)**2));J=r.jacobian(new,frame,'world_aligned');rotation=np.zeros((6,6));rotation[:3,:3]=rotation[3:,3:]=Rc;key.torques[:,u_offsets[i]:u_offsets[i+1]]=np.array([r.gravity(new)-J.T@rotation@w for w in key.reactions[:,i]])
+        new=point_pose_ik(r,frame,goal[:3,3],Rc[:,2],old) if problem.types[i]=='P' else numerical_pose_ik(r,frame,goal,old);largest=max(largest,float(np.max(abs(new-old))));key.q[qs]=new;span=np.maximum(r.upper-r.lower,1e-3);reference=np.array(spec['q_initial']);key.objective+=.01*(np.sum(((new-reference)/span)**2)-np.sum(((old-reference)/span)**2));J=r.jacobian(new,frame,'world_aligned');rotation=np.zeros((6,6));rotation[:3,:3]=rotation[3:,3:]=Rc;key.torques[:,u_offsets[i]:u_offsets[i+1]]=np.array([r.gravity(new)-J.T@rotation@w for w in key.reactions[:,i]])
     if largest>1e-3:raise RuntimeError(f'Endpoint polish {largest:.3g} rad exceeds 1e-3; resolve the target keyframe')
     key.endpoint_polish_max_rad=largest;return key
 
@@ -106,6 +117,7 @@ class FullTask:
             for s,g in zip(c.data['arms'],raw['groups']):
                 p=np.array(g['position'])*raw['source_to_target_scale'];n=np.array(g['normal']);Rt=Rotation.from_quat(s['tool_quaternion_xyzw']).as_matrix();features.append(Feature(g['group_id'],'panel',p,n,p,Rt,nearest_box(c.panel,'panel',p),('P','G') if s['kind']=='G' else ('P',),s['kind']=='G'))
             keys=[dict(id=k['id'],time=k['time'],object_q=np.array(k['object_pose']),phase='released' if k['id']=='released' else 'unload' if k['id']=='load_transfer' else 'hold') for k in c.data['keyframes']]
+            keys[-1]['freeze_holding_posture']=True;keys[-2]['freeze_posture']=True;keys.insert(-1,dict(id='open_gripper',time=keys[-2]['time']+.8,object_q=keys[-1]['object_q'].copy(),phase='released',retreat_m=0.,freeze_posture=True))
             return cls(id,c,c.panel,tuple(features),tuple(keys),c.full_robots,tuple(np.array(s['q_initial']) for s in c.data['arms']),c.path.parent/'gripper_arm.urdf',4.)
         if id=='box':
             c=FreeCase.load('free_box_lid');features=[]
@@ -113,8 +125,8 @@ class FullTask:
                 p=np.array(s['point_link']);n=-np.array(s['inward_link']);size=nearest_box(c.object,s['link_id'],p);surface=p.copy()
                 if s['kind']=='G':n=np.array([0.,-1. if i==0 else 1.,0.]);surface=p+n*(abs(n)@size/2)
                 features.append(Feature(s['group_id'],s['link_id'],surface,n,p,Rotation.from_quat(s['tool_rotation_link_xyzw']).as_matrix(),size,('P','G') if s['kind']=='G' else ('P',)))
-            times=sorted(set([0.,c.data['lift_start'],c.data['lift_end'],c.data['motion_start'],(c.data['motion_start']+c.data['motion_end'])/2,c.data['motion_end'],c.data['duration']]))
-            keys=tuple(dict(id=['initial','lift_start','lift_done','open_start','opening','open_done','hold_final'][i],time=t,object_q=box_reference(c,t)[0],phase='hold') for i,t in enumerate(times))
+            times=sorted(set([0.,c.data['lift_start'],c.data['lift_end'],c.data['motion_start'],(c.data['motion_start']+c.data['motion_end'])/2,(c.data['motion_start']+3*c.data['motion_end'])/4,c.data['motion_end'],c.data['duration']]))
+            keys=tuple(dict(id=['initial','lift_start','lift_done','open_start','opening','opening_late','open_done','hold_final'][i],time=t,object_q=box_reference(c,t)[0],phase='hold') for i,t in enumerate(times))
             return cls(id,c,c.object,tuple(features),keys,c.full,tuple(np.array(s['q_seed']) for s in c.data['arms']),c.path.parent/'gripper_arm.urdf',c.data['source_to_target_scale'])
         if id=='assembly':
             c=AssemblyCase.load();obj=RigidCollection({s['id']:r for s,r in zip(c.data['objects'],c.parts)});features=[]
@@ -123,7 +135,7 @@ class FullTask:
                 if s['id']=='leg_gripper':surface+=n*(abs(n)@size/2)
                 features.append(Feature(s['id'],s['object'],surface,n,p,Rotation.from_quat(s['tool_quaternion_xyzw']).as_matrix(),size,('P','G') if s['kind']=='G' else ('P',),s['id']=='top_gripper'))
             keys=[dict(id=k['id'],time=k['time'],object_q=np.concatenate([k[n] for n in obj.names]),phase='release_leg' if i==len(c.data['keyframes'])-1 else 'hold') for i,k in enumerate(c.data['keyframes'])]
-            before=dict(id='unload_leg',time=c.data['simulation']['release_time'],object_q=keys[-1]['object_q'].copy(),phase='unload_leg');keys.insert(-1,before)
+            before=dict(id='unload_leg',time=c.data['simulation']['release_time'],object_q=keys[-1]['object_q'].copy(),phase='unload_leg',freeze_posture=True);keys.insert(-1,before);keys.insert(-1,dict(id='open_leg_gripper',time=before['time']+.8,object_q=keys[-1]['object_q'].copy(),phase='release_leg',retreat_m=0.,freeze_posture=True));keys[-1]['freeze_holding_posture']=True
             fixtures=tuple(build_assembly_scene(c,out/'legacy-fixture-source.xml'))
             return cls(id,c,obj,tuple(features),tuple(keys),c.full_robots,tuple(np.array(s['q_initial']) for s in c.data['arms']),c.path.parent/'gripper_arm.urdf',4.,fixtures)
         raise ValueError('Full tasks are panel, box and assembly')
@@ -238,7 +250,11 @@ class FullProblem:
 
     def keyframe(self,k,previous=None,*,environment=(),settings=None):
         key=self.task_definition.keyframes[k];qo=key['object_q']
-        if previous is not None and key['phase']==previous.phase and np.array_equal(qo,previous.q[self.system.object_q]) and set(c.name for c in environment)==set(previous.environment_reactions):
+        retreat=float(key.get('retreat_m',.06 if key['phase'] in {'released','release_leg'} else 0.))
+        if previous is not None and (key.get('freeze_posture') or key.get('freeze_holding_posture')):
+            from .full_static import fixed_posture_keyframe
+            return fixed_posture_keyframe(self,k,previous,environment,retreat)
+        if previous is not None and key['phase']==previous.phase and retreat==getattr(previous,'retreat_m',.06 if previous.phase in {'released','release_leg'} else 0.) and np.array_equal(qo,previous.q[self.system.object_q]) and set(c.name for c in environment)==set(previous.environment_reactions):
             # Identical task pose, transferred prior, force mode and environment
             # define the same robust realization problem. Preserve its solution
             # through a dwell instead of creating an arbitrary nullspace sweep
@@ -253,8 +269,8 @@ class FullProblem:
             else:local_rotation=Rotation.align_vectors(np.array([-n]),np.array([f.tool_rotation[:,2]]))[0].as_matrix()@f.tool_rotation
             goal[:3,:3]=T[:3,:3]@local_rotation
             released=key['phase']=='released' or key['phase']=='release_leg' and f.id=='leg_gripper';unload=key['phase']=='unload' or key['phase']=='unload_leg' and f.id=='leg_gripper'
-            if released:goal[:3,3]+=T[:3,:3]@n*.06
-            seed=previous.q[self.system.q_slices[i]] if previous is not None else spec['q_initial'];initial.extend(release_ik(r,frame,goal,seed) if released else numerical_pose_ik(r,frame,goal,seed));interface.force_enabled=not unload
+            if released:goal[:3,3]+=T[:3,:3]@n*retreat
+            seed=previous.q[self.system.q_slices[i]] if previous is not None else spec['q_initial'];initial.extend(release_ik(r,frame,goal,seed) if released else point_pose_ik(r,frame,goal[:3,3],T[:3,:3]@n,seed) if cap.kind=='P' else numerical_pose_ik(r,frame,goal,seed));interface.force_enabled=not unload
             if released:interfaces.pop()
         seed=np.r_[initial,qo];reference=seed.copy()
         for i,(f,spec,qs) in enumerate(zip(self.task_definition.features,self.specs,self.system.q_slices)):
@@ -263,4 +279,4 @@ class FullProblem:
         # Keep a stable group order, including unloaded/released zero reactions.
         M=len(self.task_definition.features);old=certificate.reactions;reactions=np.zeros((len(old),M,6));positions=np.array([f.surface for f in self.task_definition.features]);rotations=np.array([contact_basis(f.normal) for f in self.task_definition.features]);apertures=[getattr(c,'aperture_required',None) for c in self.capabilities]
         for i,s in enumerate(interfaces):j=next(j for j,f in enumerate(self.task_definition.features) if f.id==s.group_id);reactions[:,j]=old[:,i];positions[j]=certificate.positions[i];rotations[j]=certificate.rotations[i]
-        certificate.positions=positions;certificate.rotations=rotations;certificate.reactions=reactions;certificate.apertures=tuple(apertures);certificate.source=prior['record'];certificate.interfaces=interfaces;certificate.phase=key['phase'];return certificate
+        certificate.positions=positions;certificate.rotations=rotations;certificate.reactions=reactions;certificate.apertures=tuple(apertures);certificate.source=prior['record'];certificate.interfaces=interfaces;certificate.phase=key['phase'];certificate.retreat_m=retreat;return certificate

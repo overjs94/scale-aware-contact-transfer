@@ -53,7 +53,7 @@ External-force trials use actual native force injection and replay arrows.
 | Internal-contact equal/opposite impulse and power/gap checks | implemented; focused check passed |
 | Target keyframe unload force flag and source-refinement switch | implemented; focused validation in progress |
 | All three task adapters / scenes / independent native mechanics | implemented; three-scene mass/gravity checks passed |
-| Robust target keyframes | panel 8, box 7 and assembly 9 keyframes have accepted individual solutions; full-sequence acceptance remains separate |
+| Robust target keyframes | panel 9, box 8 and assembly 10 declared keyframes; individual/sequence acceptance is recorded separately |
 | Type/assignment optimization connected to complete scenarios | implemented; exhaustive configured candidates, rejections and common sequence objective retained; no accepted complete search result yet |
 | Full native executions / ablation matrix / web records | runner/exporter implemented; acceptance runs in progress |
 
@@ -87,11 +87,9 @@ Numerical changes preserve the physical gates:
 - P and finger Coulomb forces can use `f=[mu*n*t_x,mu*n*t_y,n]`,
   `n>=0`, `||t||<=1`: the same circular cone with a nonsingular normal bound.
 - Moving intervals use independent midpoint configuration updates, pre-state
-  momentum, exact unrelaxed contact checks, and the direct tangential-speed
-  norm (a 1e-15 m/s numerical floor is recorded in the implementation).
-- A declared stationary dwell condenses its constant states from those same
-  equations and solves the torque/finger-witness objective as a conic QP.
-  It is recorded as `stationary_dwell_conic_QP`, not a moving-interval NLP.
+  momentum, exact unrelaxed contact checks, and a Huber tangential-speed norm with a recorded 1e-6 m/s smoothing speed. The final acceptance gate separately checks the original unsmoothed maximum-dissipation work.
+- Declared stationary phases condense their constant states from those same
+  equations and solve the torque/finger-witness objective as a conic QP, including the last zero robot load at handoff. Open the gripper during a stationary 0.8 s dwell, then optimize the released arm trajectory with full joint dynamics while the supported object/holding-arm coordinates are fixed in the planner. These coordinates remain free in MuJoCo. Methods are recorded as `stationary_contact_conic_QP` and `stationary_objects_release_NLP`, separately from moving-object CITO.
 - IPOPT primal acceptance remains 2e-6; acceptable termination additionally
   requires unscaled constraint violation <=1e-6. Objective/KKT acceptance is
   configured separately (1e-4), and final independent unrelaxed gates remain
@@ -125,3 +123,12 @@ mechanical URDF bytes, task/mode and source prior, and rerunning native
 equilibrium, capability, frozen-conic and geometry checks. Archive reuse and
 fresh solve wall times are distinguished. Failed `*-unaccepted.npz` files
 can initialize a new solve but cannot pass any stage by themselves.
+
+## Current code structure
+
+![Complete scenario pipeline](images/full-scenario-flow.svg)
+
+The source diagram is [full-scenario-flow.dot](diagrams/full-scenario-flow.dot).
+All P tools use five-dimensional pose IK (position plus tool axis); axial roll is free. This avoids prescribing an extra contact moment or unnecessary wrist rotation. Native geometry still checks the stem and arm meshes.
+
+Moving-interval grids adapt uniformly from 16 to 32 to 64 nodes. The default per-NLP CPU budget is 180 seconds for every variant; failed and budget-exhausted attempts remain in `interval*-mesh-attempts.json`. Finite failed iterates may seed a fresh successful solve, never certify a plan. Cached solves and fresh solves are reported separately.

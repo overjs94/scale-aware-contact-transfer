@@ -130,6 +130,7 @@ class TrajectoryResult:
     contact_force_coordinates: str = 'cartesian'
     friction_speed_model: str = 'auxiliary_cone'
     endpoint_redundancy_eliminated: bool = False
+    friction_speed_smoothing: float = 0.
 
 
 def constrained_object_roots(system,contacts,step):
@@ -158,6 +159,7 @@ def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
                exact_sticking_velocity=False,
                contact_force_coordinates='cartesian',
                friction_speed_model='auxiliary_cone',
+               friction_speed_smoothing=1e-6,
                eliminate_endpoint_redundancy=False,
                exact_gripper_velocity=False,
                kinematic_tolerance=1e-7,
@@ -177,7 +179,7 @@ def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
     if objective_mode not in {'motion_cost','feasibility'}:raise ValueError('Unknown trajectory objective mode')
     if configuration_update not in {'independent_se3','independent_midpoint','grasp_consistent','grasp_consistent_midpoint'}:raise ValueError('Unknown configuration update')
     if contact_force_coordinates not in {'cartesian','scaled_tangent'}:raise ValueError('Unknown contact-force coordinates')
-    if friction_speed_model not in {'auxiliary_cone','direct_norm'}:raise ValueError('Unknown friction speed representation')
+    if friction_speed_model not in {'auxiliary_cone','direct_norm','huber_norm'} or friction_speed_smoothing<=0:raise ValueError('Unknown friction speed representation or nonpositive smoothing')
     if configuration_update=='grasp_consistent' and grasp_velocity_model!='instantaneous':raise ValueError('Grasp-consistent update retains instantaneous no-slip')
     if len(configuration_defect_bounds)!=2 or min(configuration_defect_bounds)<=0:raise ValueError('Positive translational/rotational integration defect bounds required')
     if witness_regularization<0:raise ValueError('Nonnegative witness tie-break regularization required')
@@ -185,6 +187,7 @@ def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
     velocity_relaxations=tuple(0. for _ in relaxations) if velocity_relaxations is None else tuple(velocity_relaxations)
     if len(friction_relaxations)!=len(relaxations) or len(velocity_relaxations)!=len(relaxations) or min(*friction_relaxations,*velocity_relaxations)<0 or velocity_relaxations[-1]!=0:
         raise ValueError('Continuation schedules must match; final velocity relaxation is zero')
+    if friction_speed_model=='huber_norm' and friction_relaxations[-1]<=0:raise ValueError('Huber speed requires a positive work tolerance and an unrelaxed physical residual check')
     def weight(value, size, default):
         value = np.eye(size)*default if value is None else np.asarray(value, float)
         if np.ndim(value) == 0:
@@ -362,6 +365,7 @@ def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
                         friction.append(ca.dot(P[:2],vel[:2])+cap.mu*P[2]*ca.sqrt(ca.sumsqr(vel[:2])+1e-30))
                     else:
                         if friction_speed_model=='direct_norm':speed=ca.sqrt(ca.sumsqr(vel[:2])+1e-30)
+                        elif friction_speed_model=='huber_norm':speed=ca.sqrt(ca.sumsqr(vel[:2])+friction_speed_smoothing**2)-friction_speed_smoothing
                         else:
                             speed = opti.variable()
                             opti.subject_to(speed >= 0)
@@ -369,7 +373,7 @@ def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
                         dissipation = ca.dot(P[:2], vel[:2])+cap.mu*P[2]*speed
                         if not any(friction_relaxations):equality(opti,dissipation)
                         else:opti.subject_to(opti.bounded(-eps_friction,dissipation,eps_friction))
-                        friction.append(dissipation)
+                        friction.append(ca.dot(P[:2],vel[:2])+cap.mu*P[2]*ca.sqrt(ca.sumsqr(vel[:2])+1e-30) if friction_speed_model=='huber_norm' else dissipation)
                     if initial is not None and contact.name in initial.impulses:
                         seed=initial.impulses[contact.name][l]
                         if normal is not None:opti.set_initial(normal,seed[2]);opti.set_initial(ratio,seed[:2]/(cap.mu*seed[2]) if seed[2]>1e-12 else np.zeros(2))
@@ -524,6 +528,7 @@ def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
     result.configuration_update=configuration_update
     result.friction_speed_model=friction_speed_model
     result.endpoint_redundancy_eliminated=eliminate_endpoint_redundancy
+    result.friction_speed_smoothing=friction_speed_smoothing if friction_speed_model=='huber_norm' else 0.
     result.configuration_defect_bounds=tuple(configuration_defect_bounds) if configuration_update in {'grasp_consistent','grasp_consistent_midpoint'} else ()
     result.exact_sticking_velocity=bool(exact_sticking_velocity)
     result.contact_force_coordinates=contact_force_coordinates

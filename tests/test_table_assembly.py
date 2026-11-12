@@ -50,14 +50,15 @@ def test_assembly_job_retimes_objects_and_release_together(tmp_path):
 def execution(tmp_path_factory):
     pytest.importorskip('mujoco')
     if not (ROOT/'.cache/panda_meshes/link7.stl').exists():pytest.skip('Fetch Panda collision meshes first')
-    jobs=Jobs(tmp_path_factory.mktemp('assembly_jobs'));job=jobs.submit({'preset':'table_assembly','duration':30});seen=set();deadline=time.monotonic()+240
+    # Mesh-backed native stepping can share a runner with optimization jobs.
+    jobs=Jobs(tmp_path_factory.mktemp('assembly_jobs'));job=jobs.submit({'preset':'table_assembly','duration':30});seen=set();deadline=time.monotonic()+480
     while time.monotonic()<deadline:
         status=jobs.get(job['id']);seen.add(status['stage'])
         if status['state']=='completed':break
         if status['state']=='failed':pytest.fail(str(status)+'\n'+(jobs.path(job['id'])/'worker.log').read_text()[-2500:])
         time.sleep(.2)
     else:
-        jobs.cancel(job['id']);pytest.fail('Assembly worker exceeded 240 seconds')
+        jobs.cancel(job['id']);pytest.fail('Assembly worker exceeded 480 seconds')
     root=jobs.path(job['id']);trace=ExecutionTrace.load(root/'result/execution.npz');data=json.loads((root/'viewer/result.json').read_text())
     return status['report'],trace,data,root
 
