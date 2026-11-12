@@ -2,24 +2,24 @@ const $=id=>document.getElementById(id);
 let preset,job,timer,connected=false;
 const state=text=>{$('experiment-state').textContent=text;};
 const stages={queued:'대기',source_refinement_and_optimization:'소형 접촉점 refinement · target 하중/토크 최적화',optimization:'SE(3) IK 경로 · IPOPT 접촉력/토크 최적화',simulation:'MuJoCo 동역학 실행',validation:'접촉 · 삽입 · 해제 검증',export:'기록 내보내기',complete:'계산 완료',failed:'실패',cancelled:'취소됨'};
-const articulated=()=>['hinged_door','folding_panel','drawer'].includes(preset?.id);
+const articulated=()=>['hinged_door','folding_panel','drawer','free_box_lid','free_folding_object','free_portable_drawer'].includes(preset?.id);
 const assembly=()=>preset?.id==='table_assembly';
 const panel=()=>['panel_fixture','mobile_panel'].includes(preset?.id);
 const mobile=()=>preset?.id==='mobile_panel';
 const names={grip_and_support:'상판 파지·구형 지지',grasp_settled:'파지 유지',lift_tabletop:'상판·다리 들어 올리기',reorient_tabletop:'상판 12° 재정렬',approach_socket:'다리 접근',align_leg:'peg / socket 정렬',insert_leg:'다리 삽입',assembled_and_released:'gripper 해제·조립 유지'};
 function articulatedFields(){
-  const angular=preset.id!=='drawer';$('keyframe-inputs').replaceChildren();
-  $('preset-tag').textContent='PANDA · PASSIVE OBJECT';$('builder-title').textContent={hinged_door:'문 열기',folding_panel:'접이식 상판 펼치기',drawer:'서랍 당기기'}[preset.id];
-  $('builder-note').textContent=`수동 ${angular?'hinge':'rail'} · 물체 actuator 0 · ${preset.tool==='G'?'native gripper':'spherical point tool'}`;
-  $('tool-chips').replaceChildren();const chip=document.createElement('span');chip.textContent=preset.tool==='G'?'⋈ Gripper handle grasp':'● Spherical point contact';$('tool-chips').append(chip);
+  const free=preset.id.startsWith('free_');const angular=!preset.id.includes('drawer');$('keyframe-inputs').replaceChildren();
+  $('preset-tag').textContent=free?'PANDA × 3 · FREE ARTICULATED':'COMPONENT · SINGLE ARM';$('builder-title').textContent={hinged_door:'문 열기',folding_panel:'접이식 상판 펼치기',drawer:'서랍 당기기',free_box_lid:'자유 박스 · grip/support + 뚜껑 열기',free_folding_object:'자유 접이식 패널 · 지지 + 날개 펼치기',free_portable_drawer:'자유 수납함 · 지지 + 서랍 당기기'}[preset.id];
+  $('builder-note').textContent=free?'세계에 고정되지 않은 본체 + 내부 관절 · G / P / G · dense contact → contraction → 3-arm realization':`수동 ${angular?'hinge':'rail'} · 물체 actuator 0 · ${preset.tool==='G'?'native gripper':'spherical point tool'}`;
+  $('tool-chips').replaceChildren();const chip=document.createElement('span');chip.textContent=free?'⋈ 본체 파지 · ● 본체 지지 · ⋈ 내부 링크 조작':preset.tool==='G'?'⋈ Gripper handle grasp':'● Spherical point contact';$('tool-chips').append(chip);
   $('mass-control').hidden=true;$('panel-mass').disabled=true;$('source-refinement-control').hidden=true;$('duration-control').hidden=false;$('assembly-duration').disabled=false;$('assembly-duration').min=12;
-  $('planner-description').textContent='물체의 수동 관절 관성·중력·스프링·마찰과 접촉력·팔 토크를 최적화합니다. 물체 pose를 강제하거나 actuator로 움직이지 않습니다. 접촉점·초기 파지·관절 경로는 주어진 조건이며, articulated contraction 학습은 아직 포함하지 않습니다.';
+  $('planner-description').textContent=free?'소형 입력의 링크·기능별 dense contact를 대표 접촉으로 contraction합니다. 위치만 4배 전달하고 세 팔의 자세·접촉력·토크와 자유 본체+내부 관절의 동역학을 공동으로 맞춥니다. 본체는 공중에서 로봇 접촉으로 지지하며 world 고정 관절·물체 actuator·weld가 없습니다. Group ID와 assignment/path는 supplied synthetic 입력입니다.':'물체의 수동 관절 관성·중력·스프링·마찰과 접촉력·팔 토크를 최적화합니다. 물체 pose를 강제하거나 actuator로 움직이지 않습니다. 접촉점·초기 파지·관절 경로는 주어진 조건이며, articulated contraction 학습은 아직 포함하지 않습니다.';
   const scale=Number($('assembly-duration').value)/preset.duration;
-  for(const [label,time,q] of [['접촉',0,preset.initial_coordinate],['시작',preset.motion_start,preset.initial_coordinate],['중간',(preset.motion_start+preset.motion_end)/2,(preset.initial_coordinate+preset.target_coordinate)/2],['목표',preset.motion_end,preset.target_coordinate],['유지',preset.duration,preset.target_coordinate]]){
+  for(const [label,time,q] of [['접촉',0,preset.initial_coordinate],...(free?[['본체 lift',preset.lift_end,preset.initial_coordinate]]:[]),['시작',preset.motion_start,preset.initial_coordinate],['중간',(preset.motion_start+preset.motion_end)/2,(preset.initial_coordinate+preset.target_coordinate)/2],['목표',preset.motion_end,preset.target_coordinate],['유지',preset.duration,preset.target_coordinate]]){
     const row=document.createElement('div');row.className='assembly-key';for(const text of [label,`${(time*scale).toFixed(1)} s`,`${(q*(angular?180/Math.PI:1000)).toFixed(1)} ${angular?'deg':'mm'}`]){const el=document.createElement('span');el.textContent=text;row.append(el);}$('keyframe-inputs').append(row);
   }
   $('keyframe-help').textContent='초기 접촉 → 이동 → 유지 · 물체 관절의 측정값을 재생합니다.';
-  $('contacts-json').value=JSON.stringify({kind:preset.tool,link:'moving',point_link:preset.contact_object,inward_link:preset.inward_object},null,2);$('contacts-json').readOnly=true;$('contacts-file').disabled=true;
+  if(!free||$('contacts-json').dataset.preset!==preset.id){$('contacts-json').dataset.preset=preset.id;$('contacts-json').value=JSON.stringify(free?preset.dense_source_groups:{kind:preset.tool,link:'moving',point_link:preset.contact_object,inward_link:preset.inward_object},null,2);}$('contacts-json').readOnly=!free;$('contacts-file').disabled=!free;
 }
 function fields(){
   if(articulated())return articulatedFields();
@@ -56,13 +56,13 @@ function fields(){
 }
 function report(data){
   const r=data.report;if(!r)return;$('experiment-results').hidden=false;
-  if(r.articulated_object){
+  if(r.articulated_object||r.free_articulated_object){
     const angular=r.coordinate_units==='rad',factor=angular?180/Math.PI:1000,unit=angular?'deg':'mm';
     $('result-tracking').textContent=`${r.execution_passed?'PASS':'FAIL'} · ${(r.final_error*factor).toFixed(3)} ${unit}`;
-    $('result-forces').textContent=`${r.peak_contact_force_N.toFixed(2)} N · peak`;
-    $('result-seal-label').textContent='PASSIVE JOINT / CONTACT';$('result-seal').textContent=`0 actuators · ${(100*r.contact_fraction).toFixed(1)}% contact`;
+    $('result-forces').textContent=`${(r.peak_contact_force_N||Math.max(...r.peak_contact_force_per_arm_N)).toFixed(2)} N · peak`;
+    $('result-seal-label').textContent=r.free_articulated_object?'FREE BODY / 3-ARM CONTACT':'PASSIVE JOINT / CONTACT';$('result-seal').textContent=`0 actuators · ${(100*(Array.isArray(r.contact_fraction)?Math.min(...r.contact_fraction):r.contact_fraction)).toFixed(1)}% contact`;
     for(const id of ['source-result','workspace-result','robustness-result'])$(id).hidden=true;
-    $('result-residual').textContent=r.primal_residual.toExponential(2);$('report-json').textContent=JSON.stringify(r,null,2);return;
+    if(r.contraction){$('source-result').hidden=false;$('source-result').textContent=(r.full_paper_pipeline_executed?'FULL PIPELINE · ':'NOMINAL BASELINE · Sec. III-B–IV full pipeline 미실행 · ')+`CONTRACTION · ${r.contraction.dense_sample_count} dense samples → ${r.contraction.contracted_contact_count} link-aware anchors → ${r.arm_count} arms · ×${r.contraction.source_to_target_scale} geometry transfer · synthetic group IDs`;}$('result-residual').textContent=r.primal_residual.toExponential(2);$('report-json').textContent=JSON.stringify(r,null,2);return;
   }
   const isAssembly=r.scenario==='table_assembly';const isPanel=r.scenario==='panel_fixture';const isMobile=r.scenario==='mobile_panel';const errors=isPanel?r.keyframe_errors.map(k=>k.panel.translation_m):isAssembly?r.keyframe_errors.flatMap(k=>[k.tabletop.translation_m,...(k.time<=(r.leg_release_time_s||28)?[k.leg.translation_m]:[])]):r.keyframe_errors.map(k=>k.translation_m);
   $('result-tracking').textContent=(r.tracking_passed?'PASS':'FAIL')+' · '+Math.max(...errors.map(v=>v*1000)).toFixed(2)+' mm';
@@ -87,22 +87,22 @@ async function poll(){const active=job;if(!active)return;try{
 }catch(error){if(job===active){state(error.message);finish();}}}
 $('experiment-form').onsubmit=async event=>{event.preventDefault();try{
   let payload;
-  if(articulated())payload={preset:preset.id,duration:Number($('assembly-duration').value)};
+  if(articulated())payload={preset:preset.id,duration:Number($('assembly-duration').value),...(preset.id.startsWith('free_')?{dense_source_groups:JSON.parse($('contacts-json').value)}:{})};
   else if(panel())payload={preset:mobile()?'mobile_panel':'panel_fixture',duration:Number($('assembly-duration').value),refine_source:$('source-refinement').checked,contracted_source:JSON.parse($('contacts-json').value)};
   else if(assembly())payload={preset:'table_assembly',duration:Number($('assembly-duration').value)};
   else{const keyframes=structuredClone(preset.keyframes);document.querySelectorAll('#keyframe-inputs input').forEach(input=>{const k=keyframes[Number(input.dataset.key)],v=Number(input.value);if(input.dataset.field==='time')k.time=v;else k.object_pose[['x','y','z'].indexOf(input.dataset.field)]=v;});payload={preset:'three_franka',mass:Number($('panel-mass').value),keyframes,contacts:JSON.parse($('contacts-json').value)};}
   $('experiment-run').disabled=true;$('scenario-preset').disabled=true;state('작업 제출 중…');const result=await request('/api/experiments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});job=result.id;$('experiment-cancel').disabled=false;await poll();
 }catch(error){state(error.message);finish();}};
 $('experiment-cancel').onclick=async()=>{if(job){try{await request('/api/experiments/'+job+'/cancel',{method:'POST'});state('취소됨');finish();}catch(error){state(error.message);}}};
-$('experiment-reset').onclick=()=>{$('assembly-duration').value=articulated()?14:mobile()?36:30;if(panel())$('contacts-json').value=JSON.stringify(preset.contracted_source,null,2);fields();};
+$('experiment-reset').onclick=()=>{$('contacts-json').dataset.preset='';$('assembly-duration').value=articulated()?preset.duration:mobile()?36:30;if(panel())$('contacts-json').value=JSON.stringify(preset.contracted_source,null,2);fields();};
 $('assembly-duration').oninput=()=>{if((articulated()||assembly()||panel())&&$('assembly-duration').checkValidity())fields();};
-$('contacts-file').onchange=async event=>{try{const file=event.target.files[0];if(!file)return;if(file.size>32768)throw Error('32 KB 이하 JSON을 사용하세요.');const body=JSON.parse(await file.text());$('contacts-json').value=JSON.stringify(body.contracted_contacts||body,null,2);state('접촉 JSON을 불러왔습니다. 실행 시 표면·법선을 검사합니다.');}catch(error){state(error.message);}};
+$('contacts-file').onchange=async event=>{try{const file=event.target.files[0];if(!file)return;if(file.size>32768)throw Error('32 KB 이하 JSON을 사용하세요.');const body=JSON.parse(await file.text());$('contacts-json').value=JSON.stringify(body.dense_source_groups||body.contracted_contacts||body,null,2);state('접촉 JSON을 불러왔습니다. 실행 시 표면·법선을 검사합니다.');}catch(error){state(error.message);}};
 window.addEventListener('recording-selected',event=>report(event.detail));
 async function selectPreset(id){
-  const isArticulated=['hinged_door','folding_panel','drawer'].includes(id);
+  const isArticulated=['hinged_door','folding_panel','drawer','free_box_lid','free_folding_object','free_portable_drawer'].includes(id);
   const url=isArticulated?`./data/${id}-preset.json`:id==='mobile_panel'?'./data/mobile-preset.json':id==='panel_fixture'?'./data/panel-preset.json':id==='table_assembly'?'./data/assembly-preset.json':'./data/franka-preset.json';
   preset=await(await fetch(url)).json();
-  $('assembly-duration').value=isArticulated?14:id==='mobile_panel'?36:30;
+  $('assembly-duration').value=isArticulated?preset.duration:id==='mobile_panel'?36:30;
   if(['panel_fixture','mobile_panel'].includes(id)){
     preset.contracted_source=await(await fetch(id==='mobile_panel'?'./data/mobile-source.json':'./data/panel-source.json')).json();
     $('contacts-json').value=JSON.stringify(preset.contracted_source,null,2);
@@ -111,7 +111,7 @@ async function selectPreset(id){
 }
 $('scenario-preset').onchange=async()=>{try{await selectPreset($('scenario-preset').value);window.dispatchEvent(new CustomEvent('experiment-preview',{detail:$('scenario-preset').value}));}catch(error){state(error.message);}};
 export async function initializeExperiment(){
-  const requested=new URLSearchParams(location.search).get('model');const id=['hinged_door','folding_panel','drawer','three_franka','table_assembly','panel_fixture','mobile_panel'].includes(requested)?requested:'mobile_panel';$('scenario-preset').value=id;await selectPreset(id);
+  const model=new URLSearchParams(location.search).get('model');const requested=model?.startsWith('mobile_push_')?'mobile_panel':model==='free_box_push'?'free_box_lid':model;const id=['free_box_lid','free_folding_object','free_portable_drawer','hinged_door','folding_panel','drawer','three_franka','table_assembly','panel_fixture','mobile_panel'].includes(requested)?requested:'free_box_lid';$('scenario-preset').value=id;await selectPreset(id);
   try{const health=await request('/api/health');if(health.ready){if(health.experiments_ready===false){state('Panda 충돌 mesh 준비 필요 · python tools/fetch_panda_meshes.py');return;}connected=true;$('experiment-run').disabled=false;state('Python 연결됨 · source/target 최적화와 접촉 동역학 실행 가능');return;}}catch{}
   state('GitHub Pages: 실제 실행 기록 재생 · 새 계산은 Python 백엔드에서 실행합니다. 서버: .venv/bin/python web/server.py');
 }

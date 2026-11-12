@@ -13,7 +13,14 @@ def status(stage, **extra):
 try:
     status('optimization')
     case_id=json.loads((root/'case.json').read_text()).get('id')
-    if case_id in {'hinged_door','folding_panel','drawer'}:
+    if case_id in {'free_box_lid','free_folding_object','free_portable_drawer'}:
+        from contact_transfer.free_articulated import run_free
+        from contact_transfer.free_articulated_view import export_free
+        duration=json.loads((root/'case.json').read_text())['duration']
+        plan,trace,report,flags=run_free(case_id,root/'result',case_path=root/'case.json',progress=lambda t,d:status('simulation',time_s=t,duration_s=duration))
+        status('export')
+        data=export_free(plan,trace,report,flags,root/'viewer')
+    elif case_id in {'hinged_door','folding_panel','drawer'}:
         from contact_transfer.articulated import run_articulated
         from contact_transfer.articulated_view import export_articulated_view
         duration=json.loads((root/'case.json').read_text())['duration']

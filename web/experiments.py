@@ -11,6 +11,7 @@ import uuid
 ROOT = Path(__file__).resolve().parents[1]
 PRESETS = ROOT/'src/contact_transfer/scenarios'
 ARTICULATED = {'hinged_door','folding_panel','drawer'}
+MULTI_ARTICULATED = {'free_box_lid','free_folding_object','free_portable_drawer'}
 
 
 def number(value, low, high):
@@ -25,7 +26,7 @@ def vector(value, low, high):
 
 
 def prepare_request(request, destination):
-    if isinstance(request,dict) and request.get('preset') in ARTICULATED:
+    if isinstance(request,dict) and request.get('preset') in ARTICULATED|MULTI_ARTICULATED:
         return prepare_articulated_request(request,destination)
     if isinstance(request,dict) and request.get('preset')=='mobile_panel':
         return prepare_mobile_request(request,destination)
@@ -66,14 +67,23 @@ def prepare_request(request, destination):
 
 
 def prepare_articulated_request(request,destination):
-    if set(request)-{'preset','duration'}:raise ValueError('Articulated accepts preset and duration only')
-    source=PRESETS/'articulated';d=json.loads((source/(request['preset']+'.json')).read_text())
-    duration=number(request.get('duration',14),12,60)
+    if set(request)-{'preset','duration','dense_source_groups'}:raise ValueError('Unknown articulated request fields')
+    multi=request['preset'] in MULTI_ARTICULATED
+    source=PRESETS/('free_articulated' if multi else 'articulated');d=json.loads((source/(request['preset']+'.json')).read_text())
+    duration=number(request.get('duration',d['duration']),12,60)
     if not math.isclose(round(duration/d['timestep'])*d['timestep'],duration,abs_tol=1e-9):raise ValueError('Duration must match timestep')
     scale=duration/d['duration']
-    for name in ['duration','motion_start','motion_end','sample_dt']:d[name]*=scale
+    for name in ['duration','motion_start','motion_end','sample_dt','lift_start','lift_end']:
+        if name in d:d[name]*=scale
+    if multi and 'dense_source_groups' in request:
+        d['dense_source_groups']=request['dense_source_groups']
+        from contact_transfer.functional_contraction import contract_dense_contacts
+        contract_dense_contacts(d)
     destination=Path(destination);destination.mkdir(parents=True)
-    for name in {d['robot_urdf'],d['object_urdf'],'panda.srdf','LICENSE.panda','LICENSE.authored','franka_panda_provenance.json'}:shutil.copyfile(source/name,destination/name)
+    names={d['object_urdf'],'panda.srdf','LICENSE.panda','LICENSE.authored','franka_panda_provenance.json'}|({a['robot_urdf'] for a in d['arms']} if multi else {d['robot_urdf']})
+    # Both tool URDFs are saved with native execution bundles.
+    if multi:names|={'point_arm.urdf','gripper_arm.urdf','provenance.json'}
+    for name in names:shutil.copyfile(source/name,destination/name)
     (destination/'case.json').write_text(json.dumps(d,indent=2))
     return d
 

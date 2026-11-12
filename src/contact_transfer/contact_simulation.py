@@ -185,6 +185,10 @@ class MujocoContactScene:
                                  np.r_[frame.T@local[3:], frame.T@local[:3]]))
             if k == steps:
                 break
+            if hasattr(controller, 'observe'):
+                # Read-only force/state observation precedes the next command.
+                # No reference or observer is allowed to prescribe object poses.
+                controller.observe(mj, model, data, t)
             tau = np.asarray(controller.command(q, v, *desired), float).reshape(len(self.joints))
             if not np.isfinite(tau).all():
                 raise RuntimeError("controller returned nonfinite command")

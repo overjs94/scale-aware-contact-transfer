@@ -4,6 +4,23 @@ URDF 기반 동역학·기구학과 논문의 Sec. III-B–IV를 위한 연구�
 로봇별 System_Param의 질량·관성·축·링크 길이를 재작성하지 않고 URDF에서 읽습니다.
 
 
+## 자유 articulated object · 3-arm 명목 진단 baseline
+
+**새 기록은 시나리오·동역학 검증용 baseline이며 Sec. III-B–IV 전체 계획 및 hybrid 제어의 완료 결과가 아닙니다.**
+
+[자유 박스 + 뚜껑](https://overjs94.github.io/Contact_contraction/?model=free_box_lid),
+[자유 접이식 패널](https://overjs94.github.io/Contact_contraction/?model=free_folding_object),
+[자유 수납함 + 서랍](https://overjs94.github.io/Contact_contraction/?model=free_portable_drawer)는
+Panda G/P/G 세 팔이 본체 파지·본체 지지·내부 링크 조작을 담당합니다. 물체 본체는 자유 6 DoF,
+힌지/레일은 물체 내부 관절이며 world에 고정하지 않습니다. 125개 소형 dense contact를
+링크/기능별 대표 접촉 3개로 contraction하고 위치만 4배 전달한 뒤, 실제 target 동역학으로
+세 팔의 IK·접촉력/토크 realization을 계산합니다. Group ID와 assignment/path는 synthetic 입력이며
+학습 inference는 실행하지 않습니다. 기존 단일 팔 고정 힌지 과제는 component test로 구분합니다.
+
+[5 N 외력 + 화살표](https://overjs94.github.io/Contact_contraction/?model=free_box_push)의
+**외력 최대 · 화살표 · 8.5 s**를 누르면 실제 작용점의 화살표와 크기를 확인할 수 있습니다.
+[수식·실행 검증·한계](docs/free-articulated-realization.md)에 세 과제와 contact-disabled 대조를 정리했습니다.
+
 ## 본 실험: 단일 패널 → 고정 지그
 
 [공개 URDF/mesh 뷰어](https://overjs94.github.io/Contact_contraction/?model=panel_fixture)

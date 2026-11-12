@@ -92,7 +92,7 @@ class Capability:
     def has_moment(self):
         return self.kind == "G" and np.linalg.norm(np.asarray(self.H)[:3]) > 1e-12
 
-    def reaction(self, opti, scale=1., initial=None):
+    def reaction(self, opti, scale=1., initial=None, aperture=None):
         """Return a wrench, or an impulse when scale is the interval duration."""
         if self.kind in {"P", "S"}:
             f = opti.variable(3)

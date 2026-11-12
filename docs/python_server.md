@@ -35,6 +35,10 @@ npm --prefix web run build
 전체 동작 시간을 변경할 수 있습니다. 모델 형상·접촉·solver 설정은
 `src/contact_transfer/scenarios/table_assembly/`에 있습니다.
 
+자유 articulated 과제는 `free_box_lid`, `free_folding_object`, `free_portable_drawer`입니다.
+기본 18초이며 `dense_source_groups` 입력을 받아 link-aware contraction과 3-arm realization을
+계산합니다. [과제와 제어/동역학 범위](free-articulated-realization.md)를 확인하세요.
+
 ## API
 
 - `GET /api/health`: 계산 서버와 Panda mesh 준비 상태.

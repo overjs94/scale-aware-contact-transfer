@@ -1,22 +1,43 @@
 {
   "models": [
     {
+      "id": "free_portable_drawer",
+      "title": "\uc790\uc720 \uc218\ub0a9\ud568 \u00b7 \ubcf8\uccb4 \uc9c0\uc9c0 + \uc11c\ub78d \ub2f9\uae30\uae30",
+      "engine": "mujoco_contact_recording",
+      "dof": 25,
+      "floating_base": false
+    },
+    {
+      "id": "free_folding_object",
+      "title": "\uc790\uc720 \uc811\uc774\uc2dd \ud328\ub110 \u00b7 \ubcf8\uccb4 \uc9c0\uc9c0 + \ub0a0\uac1c \ud3bc\uce58\uae30",
+      "engine": "mujoco_contact_recording",
+      "dof": 25,
+      "floating_base": false
+    },
+    {
+      "id": "free_box_lid",
+      "title": "\uc790\uc720 \ubc15\uc2a4 \u00b7 \ubcf8\uccb4 grip/support + \ub69c\uaed1 \uc5f4\uae30",
+      "engine": "mujoco_contact_recording",
+      "dof": 25,
+      "floating_base": false
+    },
+    {
       "id": "drawer",
-      "title": "\uc11c\ub78d \ub2f9\uae30\uae30 \u00b7 14 s",
+      "title": "Component \u00b7 \ub2e8\uc77c \ud314 \u00b7 \uc11c\ub78d \ub2f9\uae30\uae30 \u00b7 14 s",
       "engine": "mujoco_contact_recording",
       "dof": 9,
       "floating_base": false
     },
     {
       "id": "folding_panel",
-      "title": "\uc811\uc774\uc2dd \uc0c1\ud310 \ud3bc\uce58\uae30 \u00b7 14 s",
+      "title": "Component \u00b7 \ub2e8\uc77c \ud314 \u00b7 \uc811\uc774\uc2dd \uc0c1\ud310 \ud3bc\uce58\uae30 \u00b7 14 s",
       "engine": "mujoco_contact_recording",
       "dof": 7,
       "floating_base": false
     },
     {
       "id": "hinged_door",
-      "title": "\uc218\ub3d9 \ud78c\uc9c0 \u00b7 \ubb38 \uc5f4\uae30 \u00b7 14 s",
+      "title": "Component \u00b7 \ub2e8\uc77c \ud314 \u00b7 \uc218\ub3d9 \ud78c\uc9c0 \u00b7 \ubb38 \uc5f4\uae30 \u00b7 14 s",
       "engine": "mujoco_contact_recording",
       "dof": 7,
       "floating_base": false
@@ -138,6 +159,13 @@
       "title": "\uc678\ub825 25 N \u00b7 RBY1 + Panda",
       "engine": "mujoco_contact_recording",
       "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "free_box_push",
+      "title": "\uc678\ub825 5 N \u00b7 \uc790\uc720 articulated \ubc15\uc2a4 \u00b7 G/P/G",
+      "engine": "mujoco_contact_recording",
+      "dof": 25,
       "floating_base": false
     }
   ],

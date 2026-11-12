@@ -1,5 +1,12 @@
 # Implementation scope
 
+The free articulated-object tasks now execute link-aware geometric contraction of
+125 supplied synthetic contact samples into three anchors, geometry-only scale
+transfer, and three-arm G/P/G IK plus coupled 7D object-force/robot-torque
+realization. The complete object has a free root and passive internal joint.
+See [the main articulated-object validation](free-articulated-realization.md).
+The fixed-fixture single-arm tasks below are component tests.
+
 Three passive one-joint articulated extensions (hinged door, folding panel,
 drawer) optimize generalized contact force/arm torque along supplied joint
 paths and execute using native MuJoCo contact, with no object actuator or pose

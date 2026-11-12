@@ -1,0 +1,25 @@
+import casadi as ca
+import numpy as np
+from contact_transfer.finger_grasp import FingerGrasp
+
+
+def test_finger_resultants_shift_origin_and_coupled_normal_force_bounds():
+ cap=FingerGrasp(.04,.008,.012,.8,20.);maps=cap.maps();B=np.hstack([np.array(x) for x in maps]);assert np.linalg.matrix_rank(B)==6
+ zero=cap.check(np.zeros(6));assert zero['feasible']
+ support=cap.check(np.array([0,0,0,0,0,-10.]));assert support['feasible'];f=support['finger_forces'];assert np.max(np.linalg.norm(f[:,:2],axis=1)-.8*f[:,2])<1e-7 and all(f[k:k+4,2].sum()<=20+1e-7 for k in [0,4])
+ assert not cap.check(np.array([0,0,0,0,0,50.]))['feasible']
+ T=np.eye(4);T[:3,3]=[.02,0,0];shifted=FingerGrasp(.04,.008,.012,.8,20.,interface_from_grasp=T);w=np.array([0,.2,0,0,0,-10.]);assert shifted.check(w)['feasible']
+
+
+def test_finger_aperture_is_explicit_in_symbolic_resultant_map():
+ cap=FingerGrasp(.04,.008,.012,.8,20.);a=ca.SX.sym('a');B=ca.horzcat(*cap.maps(a));fn=ca.Function('finger_map',[a],[B]);assert np.linalg.norm(np.array(fn(.04))-np.array(fn(.06)))>.01
+
+
+def test_cito_uses_finger_resultants_and_explicit_holding_aperture(slider_urdf):
+ from contact_transfer import Robot
+ from contact_transfer.system import MechanicalSystem,RigidObject
+ from contact_transfer.trajectory import Contact,solve_cito
+ r=Robot(slider_urdf).symbolic();sys=MechanicalSystem([r],RigidObject(1.,np.zeros(3),np.eye(3)*.02));q=np.r_[0,0,.5,0,0,.5,0,0,0,1];R=np.diag([1.,-1.,-1.]);T=np.eye(4);T[:3,:3]=R;cap=FingerGrasp(.04,.008,.012,.8,20.,interface_from_grasp=T);contact=Contact('holding',np.zeros(3),[0,0,-1],cap,robot_index=0,frame='link2',attached_steps=tuple(range(4)),rotation_object=R)
+ result=solve_cito(sys,q,q,[contact],steps=4,duration=.4);np.testing.assert_allclose(result.apertures['holding'],.04,atol=1e-8)
+ for P,h in zip(result.impulses['holding'],result.dt):assert cap.check(P/h)['feasible']
+ assert result.gripper_velocity_residual<1e-6 and result.primal_residual<1e-6

@@ -1,5 +1,7 @@
 # Rendering, contact validation, articulated objects and datasets
 
+현재 multi-arm articulated 검증은 [자유 본체+내부 관절의 contraction/realization](free-articulated-realization.md)을 기준으로 합니다. 아래의 고정 fixture·단일 팔 과제는 component test이며, 논문의 contact contraction → multi-arm realization을 검증하는 본 과제가 아닙니다.
+
 실행 수치는 [기계 판독 결과](contact-validation-results.json)에 보관합니다. 세 articulated task는
 본 논문의 단일 강체 패널 실험을 보완하는 확장입니다. Articulated contraction 학습이나
 임의 다관절 물체에 대한 CITO를 구현·검증한 것으로 해석하지 않습니다.

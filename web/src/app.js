@@ -36,8 +36,10 @@ const sun = new THREE.DirectionalLight(0xddeaff, 3.5);
 sun.position.set(3, -2, 5); scene.add(sun);
 const rim = new THREE.DirectionalLight(0x4ac7ba, 1.8);
 rim.position.set(-2, 3, 2); scene.add(rim);
-const forceArrow=new THREE.ArrowHelper(new THREE.Vector3(0,1,0),new THREE.Vector3(),.5,0xef683c,.08,.04);forceArrow.visible=false;scene.add(forceArrow);
-let grid;
+const forceArrow=new THREE.ArrowHelper(new THREE.Vector3(0,1,0),new THREE.Vector3(),.5,0xef683c,.08,.04);forceArrow.visible=false;for(const mesh of [forceArrow.line,forceArrow.cone]){mesh.material.depthTest=false;mesh.renderOrder=1100;}scene.add(forceArrow);
+let grid;let contactOverlay;
+const contactColors=[0x25bfa3,0xf4a340,0xa788f5];
+
 const studio=createStudio(scene,renderer,sun,rim,canvasFallback);
 studio.set("studio");
 const robotGroup = new THREE.Group(); scene.add(robotGroup);
@@ -69,6 +71,13 @@ function buildGeometry(data) {
     disposeModel(robotGroup.children[0]);
   }
   geometry = []; objectMesh = undefined;
+  contactOverlay=new THREE.Group();robotGroup.add(contactOverlay);
+  for(const [i,g] of (data.contact_contraction?.groups||[]).entries()){
+    const group=new THREE.Group();group.userData.contactGroup=g;const color=contactColors[i%contactColors.length];
+    const points=new THREE.Points(new THREE.BufferGeometry().setFromPoints(g.target_points_m.map(p=>new THREE.Vector3(...p))),new THREE.PointsMaterial({color,size:.007,depthTest:false}));points.userData.dense=true;points.renderOrder=1001;group.add(points);
+    const anchor=new THREE.Mesh(new THREE.SphereGeometry(.012,14,10),new THREE.MeshBasicMaterial({color,depthTest:false}));anchor.position.fromArray(g.target_anchor_m);anchor.userData.anchor=true;anchor.renderOrder=1002;group.add(anchor);contactOverlay.add(group);
+  }
+  $('contraction-state').replaceChildren();if(data.contact_contraction){const c=data.contact_contraction;$('contraction-state').append(` · ${c.dense_sample_count} samples → ${c.contracted_contact_count} anchors → 3 arms · `);for(const [i,g] of c.groups.entries()){const label=document.createElement('span');label.style.color='#'+contactColors[i%contactColors.length].toString(16).padStart(6,'0');label.textContent=` ${g.group_id}@${g.link_id} → ${c.assignment.find(a=>a.group_id===g.group_id).arm_id} `;$('contraction-state').append(label);}}
   for (const item of (data.instances?.some(i=>["static_jig","articulated_object"].includes(i.role)) ? [] : data.environment) || []) {
     if (item.type !== "box") continue;
     const mesh = new THREE.Mesh(new THREE.BoxGeometry(...item.size), new THREE.MeshStandardMaterial({color:item.color, transparent:true, opacity:.6}));
@@ -144,7 +153,7 @@ async function loadGeometry() {
       : mode === "collision"
         ? "URDF collision 형상을 표시합니다. 형상 표시는 접촉 계산·충돌 검증 결과와 별개입니다."
         : data.engine === "mujoco_contact_recording"
-          ? data.scenario === "mobile_panel" ? "공식 RBY1 URDF·mesh, 차동구동 모바일 베이스와 고정 Panda의 실제 접촉 실행입니다." : data.articulated_object ? "수동 관절의 URDF와 측정된 움직임을 표시합니다. 물체 actuator 없이 로봇 접촉으로 구동했습니다." : data.scenario === "panel_fixture" ? "원본 Panda URDF·mesh, 자유 패널 URDF와 고정 지그를 표시합니다. 소형 접촉 refinement 후 실행한 기록입니다." : data.scenario === "table_assembly" ? "Panda 3대와 두 자유 부품의 실제 접촉 실행입니다. 상판·다리의 visual/collision URDF에 빈 socket과 peg 형상을 포함합니다." : "3개 URDF 팔과 도구의 실제 접촉 실행입니다. Point는 구형 tool, gripper는 두 손가락 접촉, suction은 압력 제한 seal 모델입니다."
+          ? data.scenario === "mobile_panel" ? "공식 RBY1 URDF·mesh, 차동구동 모바일 베이스와 고정 Panda의 실제 접촉 실행입니다." : data.free_articulated_object ? "자유 본체+내부 관절의 실제 동역학, 세 팔의 링크별 contracted contact realization입니다." : data.articulated_object ? "수동 관절의 URDF와 측정된 움직임을 표시합니다. 물체 actuator 없이 로봇 접촉으로 구동했습니다." : data.scenario === "panel_fixture" ? "원본 Panda URDF·mesh, 자유 패널 URDF와 고정 지그를 표시합니다. 소형 접촉 refinement 후 실행한 기록입니다." : data.scenario === "table_assembly" ? "Panda 3대와 두 자유 부품의 실제 접촉 실행입니다. 상판·다리의 visual/collision URDF에 빈 socket과 peg 형상을 포함합니다." : "3개 URDF 팔과 도구의 실제 접촉 실행입니다. Point는 구형 tool, gripper는 두 손가락 접촉, suction은 압력 제한 seal 모델입니다."
           : "URDF visual·mesh의 origin과 scale을 적용했습니다. 기록된 시뮬레이션은 관절 추종 검증입니다.";
     $("geometry-status").dataset.state = "ready";
     $("geometry-status").dataset.model = data.id;
@@ -177,9 +186,10 @@ function updateGeometry(value) {
       .slerp(new THREE.Quaternion().fromArray(dataset.object.poses[hi], 3), f);
   }
   urdfModels.forEach(item => applyRecordedPose(item.robot, item.recording, value));
+  for(const group of contactOverlay?.children||[]){const contact=group.userData.contactGroup,object=dataset.objects?.find(o=>o.id===contact.link_id);if(!object)continue;const pose=object.poses[lo],next=object.poses[hi];group.position.fromArray(pose).lerp(new THREE.Vector3().fromArray(next),f);group.quaternion.fromArray(pose,3).slerp(new THREE.Quaternion().fromArray(next,3),f);const mode=$('contact-display').value;for(const item of group.children)item.visible=mode==='both'||(item.userData.dense&&mode==='dense')||(item.userData.anchor&&mode==='contracted');}
   const time=dataset.times[lo]*(1-f)+dataset.times[hi]*f;const pulses=dataset.external_disturbances||[];const pulse=pulses.find(p=>time>=p.start&&time<=p.start+p.duration);forceArrow.visible=false;
   if(pulse&&dataset.objects?.[0]?.poses){const object=dataset.objects[0],pose=object.poses[lo],next=object.poses[hi],quat=new THREE.Quaternion().fromArray(pose,3).slerp(new THREE.Quaternion().fromArray(next,3),f);const origin=new THREE.Vector3(...pose.slice(0,3)).lerp(new THREE.Vector3(...next.slice(0,3)),f).add(new THREE.Vector3(...pulse.point_body_m).applyQuaternion(quat));const magnitude=Math.sin(Math.PI*(time-pulse.start)/pulse.duration)**2;const force=new THREE.Vector3(...pulse.force_world_N).multiplyScalar(magnitude);if(force.length()>.01){forceArrow.position.copy(origin);forceArrow.setDirection(force.clone().normalize());forceArrow.setLength(.12+force.length()*.015,.08,.04);forceArrow.visible=true;}}
-  $('disturbance-state').hidden=!pulses.length;
+  $('disturbance-state').hidden=!pulses.length;$('disturbance-state').dataset.active=String(forceArrow.visible);
   $('disturbance-state').textContent=pulse?`외력 적용 중 · ${(Math.sin(Math.PI*(time-pulse.start)/pulse.duration)**2*Math.hypot(...pulse.force_world_N)).toFixed(2)} N · world frame` : pulses.length?`외력: ${pulses.map(p=>`${p.start}–${p.start+p.duration} s / 최대 ${Math.hypot(...p.force_world_N)} N`).join(', ')}`:'';
   displayedPositions = positions;
 }
@@ -240,6 +250,8 @@ function drawCanvasScene() {
       corners.forEach((p,i)=>{for(let j=0;j<3;j++)if(!(i&(1<<j)))line(p,corners[i|(1<<j)],part.id==='tabletop'?"#f1ba79":"#d49965",2);});
     }
   }
+  for(const group of contactOverlay?.children||[]){group.updateMatrixWorld(true);const g=group.userData.contactGroup,mode=$('contact-display').value;if(mode==='off')continue;ctx.fillStyle='#'+contactColors[contactOverlay.children.indexOf(group)%contactColors.length].toString(16).padStart(6,'0');for(const point of (mode==='dense'||mode==='both'?g.target_points_m:[])){const p=project(group.localToWorld(new THREE.Vector3(...point)));ctx.beginPath();ctx.arc(p[0],p[1],2*scale,0,Math.PI*2);ctx.fill();}if(mode==='contracted'||mode==='both'){const p=project(group.localToWorld(new THREE.Vector3(...g.target_anchor_m)));ctx.beginPath();ctx.arc(p[0],p[1],6*scale,0,Math.PI*2);ctx.fill();}}
+  if(forceArrow.visible){const a=forceArrow.position,b=new THREE.Vector3(0,1,0).applyQuaternion(forceArrow.quaternion).multiplyScalar(forceArrow.line.scale.y+.08).add(a);line(a,b,"#ff482f",4);const tip=project(b),tail=project(a),angle=Math.atan2(tip[1]-tail[1],tip[0]-tail[0]);ctx.fillStyle="#ff482f";ctx.beginPath();ctx.moveTo(tip[0],tip[1]);for(const sign of [-1,1])ctx.lineTo(tip[0]-15*scale*Math.cos(angle+sign*.4),tip[1]-15*scale*Math.sin(angle+sign*.4));ctx.closePath();ctx.fill();}
   ctx.fillStyle = "#8fa6c3"; ctx.font = `${9 * scale}px sans-serif`;
   ctx.fillText("CPU 3D PROJECTION · WebGL unavailable", 18 * scale, h - 40 * scale);
 }
@@ -265,12 +277,12 @@ function showData(data) {
   if (data.id === "dual_cito") $("geometry-mode").value = "skeleton";
   $("model-title").textContent = data.title;
   $("model-description").textContent = data.engine === "kinematic_preview" ? "29개 관절과 floating base를 가진 휴머노이드의 기구학을 확인합니다." : data.engine === "cito_trajectory" ? "접촉을 유지하며 물체를 들어 올리는 제한 모델의 최적화 결과입니다." : "URDF 관성으로 계산한 폐루프 토크 제어 결과를 재생합니다.";
-  if (data.instances) $("model-description").textContent = data.articulated_object ? "수동 물체 관절 · 로봇 접촉으로 구동 · 주어진 접촉점과 관절 경로의 힘·토크 최적화" : data.scenario === "mobile_panel" ? "RBY1 모바일 듀얼암 + 고정 Panda · 초기 지지 전달 → 고정 작업영역 밖으로 이동 → 지그 안착·릴리스" : data.scenario === "panel_fixture" ? "본 실험: 소형 접촉 위치 refinement → 패널 운반·재배향 → 지그 안착·하중 전달 → 전체 릴리스 · 자유 강체 실행" : data.scenario === "table_assembly" ? "밑면이 위인 상판 grip & support → 12° reorientation → 다리 정렬·삽입 → gripper 해제 · 30초 실제 동역학 실행" : `주어진 contracted contact → ${data.keyframes.length}개 keyframe 최적화 → 3개 팔의 접촉 동역학 실행입니다.`;
+  if (data.instances) $("model-description").textContent = data.free_articulated_object ? "자유 본체+내부 관절의 실제 동역학, 세 팔의 링크별 contracted contact realization입니다." : data.articulated_object ? "수동 물체 관절 · 로봇 접촉으로 구동 · 주어진 접촉점과 관절 경로의 힘·토크 최적화" : data.scenario === "mobile_panel" ? "RBY1 모바일 듀얼암 + 고정 Panda · 초기 지지 전달 → 고정 작업영역 밖으로 이동 → 지그 안착·릴리스" : data.scenario === "panel_fixture" ? "본 실험: 소형 접촉 위치 refinement → 패널 운반·재배향 → 지그 안착·하중 전달 → 전체 릴리스 · 자유 강체 실행" : data.scenario === "table_assembly" ? "밑면이 위인 상판 grip & support → 12° reorientation → 다리 정렬·삽입 → gripper 해제 · 30초 실제 동역학 실행" : `주어진 contracted contact → ${data.keyframes.length}개 keyframe 최적화 → 3개 팔의 접촉 동역학 실행입니다.`;
   $("engine-badge").innerHTML = "<span></span>" + engineLabel(data);
   $("engine-badge").classList.toggle("kinematic", data.engine === "kinematic_preview");
   $("scene-label").textContent = data.engine === "cito_trajectory" ? "COUPLED ROBOT–OBJECT TRAJECTORY" : data.engine === "kinematic_preview" ? "FLOATING-BASE KINEMATIC PREVIEW" : "RECORDED CLOSED-LOOP SIMULATION";
-  if (data.instances) $("scene-label").textContent = data.articulated_object ? "PASSIVE ARTICULATED OBJECT · MEASURED CONTACT DYNAMICS" : `COOPERATIVE CONTACT DYNAMICS · ${data.keyframes.length} KEYFRAMES`;
-  $("dof").textContent = data.dof; $("base").textContent = data.scenario === "mobile_panel" ? "Mobile SE(2)" : data.floating_base ? "Floating +6" : "Fixed";
+  if (data.instances) $("scene-label").textContent = data.free_articulated_object ? "LINK-AWARE CONTRACTION → THREE-ARM REALIZATION · FREE ARTICULATED BODY" : data.articulated_object ? "PASSIVE ARTICULATED OBJECT · MEASURED CONTACT DYNAMICS" : `COOPERATIVE CONTACT DYNAMICS · ${data.keyframes.length} KEYFRAMES`;
+  $("dof").textContent = data.dof; $("base").textContent = data.free_articulated_object ? "Free object + joint" : data.scenario === "mobile_panel" ? "Mobile SE(2)" : data.floating_base ? "Floating +6" : "Fixed";
   $("physics-step").textContent = data.summary.physics_dt ? (data.summary.physics_dt * 1000).toFixed(0) + " ms" : data.engine === "cito_trajectory" ? "100 ms" : "—";
   const end = data.times.at(-1);
   $("duration").textContent = end.toFixed(1) + " s";
@@ -334,6 +346,7 @@ $("speed").onchange = event => speed = Number(event.target.value);
 $("loop").onclick = () => { loop = !loop; $("loop").classList.toggle("active", loop); $("loop").setAttribute("aria-pressed", loop); };
 $("reset-camera").onclick = resetCamera;
 $("geometry-mode").onchange = loadGeometry;
+$("contact-display").onchange=()=>updateFrame();
 $("run").onclick = async () => {
   $("run").disabled = true; $("run").textContent = "계산 중…";
   try {
@@ -349,7 +362,7 @@ async function init() {
   const response = await fetch("./data/index.json"), index = await response.json();
   $("model-count").textContent = String(index.models.length).padStart(2, "0");
   $("test-count").textContent = index.tests_passed;
-  const models = [...index.models].sort((a, b) => a.id === "mobile_panel" ? -1 : b.id === "mobile_panel" ? 1 : a.id === "panel_fixture" ? -1 : b.id === "panel_fixture" ? 1 : a.id === "dual_cito" ? -1 : b.id === "dual_cito" ? 1 : a.floating_base - b.floating_base || a.title.localeCompare(b.title));
+  const models = [...index.models].sort((a, b) => a.id === "free_box_lid" ? -1 : b.id === "free_box_lid" ? 1 : a.id.startsWith("free_") ? -1 : b.id.startsWith("free_") ? 1 : a.id === "mobile_panel" ? -1 : b.id === "mobile_panel" ? 1 : a.id === "panel_fixture" ? -1 : b.id === "panel_fixture" ? 1 : a.id === "dual_cito" ? -1 : b.id === "dual_cito" ? 1 : a.floating_base - b.floating_base || a.title.localeCompare(b.title));
   models.forEach(model => {
     const button = document.createElement("button");
     button.className = "model-choice"; button.dataset.id = model.id;
@@ -363,7 +376,7 @@ async function init() {
     button.append(icon, label, dot); button.onclick = () => selectModel(model.id); $("model-list").append(button);
   });
   const requestedModel = new URLSearchParams(location.search).get("model");
-  await selectModel(index.models.some(model => model.id === requestedModel) ? requestedModel : "mobile_panel");
+  await selectModel(index.models.some(model => model.id === requestedModel) ? requestedModel : "free_box_lid");
   try {
     const health = await fetch("./api/health");
     if (health.ok) backend = (await health.json()).ready === true;

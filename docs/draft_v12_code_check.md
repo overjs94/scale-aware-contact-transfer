@@ -1,5 +1,7 @@
 # Draft v12 ↔ implementation check
 
+Historical audit. The newly uploaded 11-page manuscript changes the numerical procedure; see [the current equation audit](manuscript-equation-audit.md). In particular, it specifies IPOPT and marks shared-endpoint joint refinement as an extension.
+
 Reviewed the latest paired TeX/PDF snapshot, both version 12 and modified on
 2026-11-10 at 22:28 KST. The manuscript is not edited by this code branch.
 Line references below address Contact_contraction_MS_TRO.tex v12.

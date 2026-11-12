@@ -276,7 +276,7 @@ test('panel API submits the source refinement ablation and duration',async({page
 });
 
 test('mobile RBY1 and fixed Panda replay wheel-driven workspace extension',async({page})=>{
-  await page.goto('/');
+  await page.goto('/?model=mobile_panel');
   await expect(page.locator('#model-title')).toContainText('RBY1 + Panda');
   await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
   await expect(page.locator('#base')).toHaveText('Mobile SE(2)');
@@ -354,4 +354,45 @@ test('external pulse shows measured recovery and preserves capability failure',a
   await expect(page.locator('#disturbance-state')).toContainText(expectedForce+' N');
   await page.locator('#timeline').evaluate(el=>{el.value=String(18/36);el.dispatchEvent(new Event('input'));});
   await expect(page.locator('#disturbance-state')).not.toContainText('적용 중');
+});
+
+for(const id of ['free_box_lid','free_folding_object','free_portable_drawer']){
+ test(`${id}: contracted link-aware contacts realize on three arms and a free articulated body`,async({page})=>{
+  await page.goto(`/?model=${id}`);
+  await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+  await expect(page.locator('#dof')).toHaveText('25');
+  await expect(page.locator('#base')).toHaveText('Free object + joint');
+  await expect(page.locator('#source-result')).toContainText('125 dense samples → 3 link-aware anchors → 3 arms');
+  await expect(page.locator('#result-tracking')).toContainText('PASS');
+  await expect(page.locator('#contraction-state')).toContainText('base_grasp@base');
+  await expect(page.locator('#contraction-state')).toContainText('moving_manipulation@moving');
+  await page.getByRole('button',{name:'mid_internal_motion · 9.0 s',exact:true}).click();
+  await page.locator('#contact-display').selectOption('contracted');
+  await page.locator('#contact-display').selectOption('dense');
+  await expect(page.locator('#time-now')).toHaveText('9.00 s');
+  const errors=await page.evaluate(async id=>{
+   const data=await(await fetch(`/data/${id}.json`)).json(),{loadURDFModel,applyRecordedPose,disposeModel}=await import('/test-module.js');let error=0;
+   for(const mode of ['visual','collision'])for(const spec of data.instances){const model=await loadURDFModel(spec.manifest,mode);for(const frame of [0,270,data.times.length-1]){applyRecordedPose(model,{...spec,q:data.q.map(row=>spec.q_indices.map(i=>row[i]))},frame);for(const [name,link] of Object.entries(model.links)){const i=data.link_names.indexOf(spec.id+'_'+name);link.matrixWorld.elements.slice(12,15).forEach((v,j)=>error=Math.max(error,Math.abs(v-data.positions[frame][i][j])));}}disposeModel(model);}return error;
+  },id);expect(errors).toBeLessThan(1e-7);
+ });
+}
+test('force peak event pauses with an explicitly visible force arrow',async({page})=>{
+ await page.goto('/?model=free_box_push');
+ await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+ await page.getByRole('button',{name:'외력 최대 · 화살표 · 8.5 s',exact:true}).click();
+ await expect(page.locator('#time-now')).toHaveText('8.50 s');
+ await expect(page.locator('#disturbance-state')).toHaveAttribute('data-active','true');
+ await expect(page.locator('#disturbance-state')).toContainText('5.00 N');
+ await page.getByRole('button',{name:'target · 13.0 s',exact:true}).click();
+ await expect(page.locator('#disturbance-state')).toHaveAttribute('data-active','false');
+});
+
+test('free-object form preserves edited dense groups while retiming',async({page})=>{
+ await page.route('**/api/health',r=>r.fulfill({json:{ready:true,experiments_ready:true}}));let submitted;
+ await page.route('**/api/experiments',async r=>{submitted=r.request().postDataJSON();await r.fulfill({status:202,json:{id:'dense'}});});
+ await page.route('**/api/experiments/dense',r=>r.fulfill({json:{state:'completed',stage:'complete',recording:'/data/free_box_lid.json'}}));
+ await page.goto('/');await expect(page.locator('#scenario-preset')).toHaveValue('free_box_lid');await expect(page.locator('#experiment-run')).toBeEnabled();
+ await page.locator('#contacts-json').evaluate(el=>{const d=JSON.parse(el.value);d[1].weights[0]=2;el.value=JSON.stringify(d);});
+ await page.locator('#assembly-duration').fill('22');await page.locator('#experiment-run').click();
+ await expect.poll(()=>submitted?.duration).toBe(22);expect(submitted.preset).toBe('free_box_lid');expect(submitted.dense_source_groups[1].weights[0]).toBe(2);
 });

@@ -21,11 +21,13 @@ class RefinementResult:
 
 def refine_contacts(patches, task: TaskWrench, capabilities=None, *,
                     position_radius=.03, normal_radius=.1, rho_min=0.,
-                    geometry_weight=0., settings=None):
+                    geometry_weight=0., reaction_maps=None, settings=None):
     m = len(patches)
     caps = capabilities or [Capability() for _ in patches]
     if not m or len(caps) != m:
         raise ValueError("supply one capability per nonempty contact set")
+    if reaction_maps is not None and len(reaction_maps) != m:
+        raise ValueError('One object/link reaction map per contact required')
     if position_radius < 0 or normal_radius < 0 or rho_min < 0 or geometry_weight < 0:
         raise ValueError("radii, margin and weights must be nonnegative")
     opti = ca.Opti()
@@ -44,7 +46,8 @@ def refine_contacts(patches, task: TaskWrench, capabilities=None, *,
     reactions = []
     for vertex in task.vertices:
         lam = [cap.reaction(opti) for cap in caps]
-        total = sum(map_reaction(g[1], g[2], f) for g, f in zip(geometry, lam))
+        total = sum((reaction_maps[i](g[1], g[2], f) if reaction_maps is not None
+                     else map_reaction(g[1], g[2], f)) for i, (g, f) in enumerate(zip(geometry, lam)))
         equality(opti, total-task.required(rho, vertex))
         reactions.append(lam)
     objective = -rho + geometry_weight*geometry_cost

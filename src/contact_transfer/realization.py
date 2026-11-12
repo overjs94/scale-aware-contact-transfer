@@ -39,6 +39,7 @@ class RealizationResult:
     types: tuple
     objective: float
     primal_residual: float
+    apertures: object = None
 
 
 def realize_keyframe(arms, patches, capabilities, assignment, object_pose,
@@ -46,6 +47,8 @@ def realize_keyframe(arms, patches, capabilities, assignment, object_pose,
                      position_radius=.05, normal_radius=.2, geometry_weight=1.,
                      normal_weight=1.,
                      posture_weight=.01, robustness_weight=1., collision_margins=None,
+                     contact_transforms=None, reaction_maps=None, geometry_priors=None,
+                     grasp_constraints=None,
                      settings=None):
     m = len(patches)
     if len(capabilities) != m or len(assignment) != m or len(set(assignment)) != m:
@@ -55,6 +58,9 @@ def realize_keyframe(arms, patches, capabilities, assignment, object_pose,
     if characteristic_length <= 0:
         raise ValueError("characteristic length must be positive")
     Tobj = ca.DM(object_pose)
+    transforms = [Tobj]*m if contact_transforms is None else [ca.DM(T) for T in contact_transforms]
+    if len(transforms)!=m or (reaction_maps is not None and len(reaction_maps)!=m):
+        raise ValueError('One transform/reaction map per object-link contact required')
     opti = ca.Opti()
     qs = []
     objective = 0
@@ -70,13 +76,15 @@ def realize_keyframe(arms, patches, capabilities, assignment, object_pose,
     for i, (patch, (_, p, R)) in enumerate(zip(patches, geometry)):
         arm = arms[assignment[i]]
         Tee = arm.model.fk(qs[assignment[i]], arm.frame)
-        world_position = Tobj[:3, 3]+Tobj[:3, :3]@p
+        Tw = transforms[i]
+        world_position = Tw[:3, 3]+Tw[:3, :3]@p
         opti.subject_to(Tee[:3, 3] == world_position)
         tool_n = Tee[:3, :3]@ca.DM(arm.tool_outward_axis)
-        object_n = Tobj[:3, :3]@R[:, 2]
+        object_n = Tw[:3, :3]@R[:, 2]
         # Toleranced normal alignment avoids a redundant 3-equality SO(3) constraint.
-        opti.subject_to(1+ca.dot(tool_n, object_n) <= 1e-6)
-        p0, R0 = patch.position(patch.initial), patch.rotation(patch.initial)
+        if capabilities[i].kind == 'P':
+            opti.subject_to(1+ca.dot(tool_n, object_n) <= 1e-6)
+        p0, R0 = (patch.position(patch.initial), patch.rotation(patch.initial)) if geometry_priors is None else geometry_priors[i]
         if len(patch.initial):
             opti.subject_to(ca.sumsqr(p-p0) <= position_radius**2)
             opti.subject_to(1-ca.dot(R[:, 2], R0[:, 2]) <= normal_radius)
@@ -85,18 +93,21 @@ def realize_keyframe(arms, patches, capabilities, assignment, object_pose,
         # Moment capability must be accompanied by matching orientation closure.
         cap = capabilities[i]
         if cap.has_moment:
-            desired = Tobj[:3, :3]@R@ca.diag(ca.DM([1, -1, -1]))
+            desired = Tw[:3, :3]@R@ca.diag(ca.DM([1, -1, -1]))
             opti.subject_to(rotation_cost(Tee[:3, :3], desired) <= 1e-7)
     if collision_margins is not None:
         opti.subject_to(collision_margins(ca.vertcat(*qs)) >= 0)
+    apertures = [None]*m if grasp_constraints is None else grasp_constraints(opti, qs, geometry, transforms)
+    if len(apertures)!=m:raise ValueError('One optional aperture per contact required')
     rho = opti.variable()
     opti.subject_to(rho >= rho_min)
     opti.set_initial(rho, rho_min)
     objective -= robustness_weight*rho
     all_lam, all_tau = [], []
     for vertex in task.vertices:
-        lam = [cap.reaction(opti) for cap in capabilities]
-        total = sum(map_reaction(g[1], g[2], f) for g, f in zip(geometry, lam))
+        lam = [cap.reaction(opti, aperture=a) for cap, a in zip(capabilities, apertures)]
+        total = sum((reaction_maps[i](g[1], g[2], f) if reaction_maps is not None
+                     else map_reaction(g[1], g[2], f)) for i, (g, f) in enumerate(zip(geometry, lam)))
         equality(opti, total-task.required(rho, vertex))
         torques = []
         for j, arm in enumerate(arms):
@@ -105,7 +116,7 @@ def realize_keyframe(arms, patches, capabilities, assignment, object_pose,
                 if assignment[i] != j:
                     continue
                 Tee = arm.model.fk(qs[j], arm.frame)
-                Rwc = Tobj[:3, :3]@geometry[i][2]
+                Rwc = transforms[i][:3, :3]@geometry[i][2]
                 dual = ca.vertcat(Tee[:3, :3].T@Rwc@lam[i][:3], Rwc@lam[i][3:])
                 tau -= arm.model.jacobian(qs[j], arm.frame).T@dual
             opti.subject_to(opti.bounded(-arm.model.effort, tau, arm.model.effort))
@@ -122,4 +133,5 @@ def realize_keyframe(arms, patches, capabilities, assignment, object_pose,
         np.array([[np.asarray(sol.value(f)).reshape(6) for f in v] for v in all_lam]),
         np.array([np.asarray(sol.value(t)).reshape(-1) for t in all_tau]),
         tuple(assignment), tuple(c.kind for c in capabilities),
-        float(sol.value(objective)), residual)
+        float(sol.value(objective)), residual,
+        tuple(None if a is None else float(sol.value(a)) for a in apertures))
