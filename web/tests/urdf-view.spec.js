@@ -91,6 +91,7 @@ test("missing mesh rejects the model and mode switching preserves playback", asy
 });
 
 test("three physical tools replay as three URDF instances with keyframe events", async ({ page }) => {
+  await page.locator('.category-choice[data-category="diagnostic"]').click();
   await page.locator('.model-choice[data-id="three_arm"]').click();
   await expect(page.locator("#geometry-status")).toHaveAttribute("data-state", "ready");
   await expect(page.locator("#geometry-status")).toHaveAttribute("data-model", "three_arm");
@@ -128,6 +129,49 @@ test("three physical tools replay as three URDF instances with keyframe events",
   await expect(page.locator("#geometry-status")).toHaveAttribute("data-model", "three_arm");
   await expect(page.locator("#geometry-status")).toHaveAttribute("data-state", "ready");
   await expect(page.locator("#amplitude")).toBeDisabled();
+});
+
+test("library separates paper tasks, single embodiments and diagnostics with matching editors", async ({page})=>{
+  await page.goto('/');
+  await expect(page.locator('.category-choice[data-category="paper"]')).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('.model-choice:visible')).toHaveCount(6);
+  await expect(page.locator('#scenario-status')).toContainText('전체 최적화 미검증');
+  await expect(page.locator('#scenario-status')).toHaveAttribute('data-full-pipeline','false');
+  await page.locator('.category-choice[data-category="embodiment"]').click();
+  await expect(page.locator('.model-choice:visible')).toHaveCount(8);
+  await page.locator('.model-choice[data-id="rb5"]').click();
+  await expect(page.locator('#scenario-category')).toContainText('단일 embodiment');
+  await expect(page.locator('#scenario-status')).toHaveText('관절 추종 검증');
+  await expect(page.locator('.experiment-builder')).toBeHidden();
+  await expect(page).toHaveURL(/model=rb5/);
+  await page.locator('.category-choice[data-category="paper"]').click();
+  await page.locator('.model-choice[data-id="panel_fixture"]').click();
+  await expect(page.locator('.experiment-builder')).toBeVisible();
+  await expect(page.locator('#scenario-preset')).toHaveValue('panel_fixture');
+  await expect(page.locator('#builder-title')).toContainText('패널');
+  await page.locator('.category-choice[data-category="diagnostic"]').click();
+  await expect(page.locator('.model-choice:visible')).toHaveCount(10);
+  await page.locator('.model-choice[data-id="hinged_door"]').click();
+  await expect(page.locator('#scenario-preset')).toHaveValue('hinged_door');
+  await expect(page.locator('#scenario-scope')).toContainText('세계에 고정된 수동 관절');
+  await expect(page.locator('#scenario-preset optgroup[label="논문 목표"] option')).toHaveCount(6);
+  await expect(page.locator('#scenario-preset optgroup[label="요소·강건성"] option')).toHaveCount(4);
+});
+
+test("library deep links retain failed force tests and distinguish G1 preview on mobile", async ({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/?model=mobile_push_25');
+  await expect(page.locator('.category-choice[data-category="diagnostic"]')).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('#scenario-status')).toContainText('검사 실패 포함');
+  await expect(page.locator('#scenario-preset')).toHaveValue('mobile_panel');
+  await expect(page.locator('#robustness-result')).toContainText('전체 검사 FAIL');
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.goto('/?model=unitree_g1');
+  await expect(page.locator('.category-choice[data-category="embodiment"]')).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('#scenario-status')).toHaveText('기구학 미리보기');
+  await expect(page.locator('.experiment-builder')).toBeHidden();
+  await expect(page.locator('.model-choice[data-id="unitree_g1"]')).toBeInViewport();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
 
 test('three Panda arms use actual articulated URDF recordings', async ({page}) => {

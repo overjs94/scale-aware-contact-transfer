@@ -1,5 +1,6 @@
+import { categories, experimentPresets, libraryEntry } from './library.js';
 const $=id=>document.getElementById(id);
-let preset,job,timer,connected=false;
+let preset,job,timer,connected=false,presetId,presetToken=0;
 const state=text=>{$('experiment-state').textContent=text;};
 const stages={queued:'대기',source_refinement_and_optimization:'소형 접촉점 refinement · target 하중/토크 최적화',optimization:'SE(3) IK 경로 · IPOPT 접촉력/토크 최적화',simulation:'MuJoCo 동역학 실행',validation:'접촉 · 삽입 · 해제 검증',export:'기록 내보내기',complete:'계산 완료',failed:'실패',cancelled:'취소됨'};
 const articulated=()=>['hinged_door','folding_panel','drawer','free_box_lid','free_folding_object','free_portable_drawer'].includes(preset?.id);
@@ -97,21 +98,38 @@ $('experiment-cancel').onclick=async()=>{if(job){try{await request('/api/experim
 $('experiment-reset').onclick=()=>{$('contacts-json').dataset.preset='';$('assembly-duration').value=articulated()?preset.duration:mobile()?36:30;if(panel())$('contacts-json').value=JSON.stringify(preset.contracted_source,null,2);fields();};
 $('assembly-duration').oninput=()=>{if((articulated()||assembly()||panel())&&$('assembly-duration').checkValidity())fields();};
 $('contacts-file').onchange=async event=>{try{const file=event.target.files[0];if(!file)return;if(file.size>32768)throw Error('32 KB 이하 JSON을 사용하세요.');const body=JSON.parse(await file.text());$('contacts-json').value=JSON.stringify(body.dense_source_groups||body.contracted_contacts||body,null,2);state('접촉 JSON을 불러왔습니다. 실행 시 표면·법선을 검사합니다.');}catch(error){state(error.message);}};
-window.addEventListener('recording-selected',event=>report(event.detail));
+function showRecordingExperiment(data){
+  const id=libraryEntry(data).preset;
+  document.querySelector('.experiment-builder').hidden=!id;
+  $('experiment-results').hidden=!data.report;
+  if(id){$('scenario-preset').value=id;if(presetId!==id)selectPreset(id).catch(error=>state(error.message));}
+  report(data);
+}
+window.addEventListener('recording-selected',event=>showRecordingExperiment(event.detail));
 async function selectPreset(id){
+  const token=++presetToken;presetId=id;
   const isArticulated=['hinged_door','folding_panel','drawer','free_box_lid','free_folding_object','free_portable_drawer'].includes(id);
   const url=isArticulated?`./data/${id}-preset.json`:id==='mobile_panel'?'./data/mobile-preset.json':id==='panel_fixture'?'./data/panel-preset.json':id==='table_assembly'?'./data/assembly-preset.json':'./data/franka-preset.json';
-  preset=await(await fetch(url)).json();
-  $('assembly-duration').value=isArticulated?preset.duration:id==='mobile_panel'?36:30;
+  const next=await(await fetch(url)).json();
   if(['panel_fixture','mobile_panel'].includes(id)){
-    preset.contracted_source=await(await fetch(id==='mobile_panel'?'./data/mobile-source.json':'./data/panel-source.json')).json();
-    $('contacts-json').value=JSON.stringify(preset.contracted_source,null,2);
+    next.contracted_source=await(await fetch(id==='mobile_panel'?'./data/mobile-source.json':'./data/panel-source.json')).json();
   }
+  if(token!==presetToken)return;
+  preset=next;$('assembly-duration').value=isArticulated?preset.duration:id==='mobile_panel'?36:30;
+  if(next.contracted_source)$('contacts-json').value=JSON.stringify(next.contracted_source,null,2);
   fields();
 }
 $('scenario-preset').onchange=async()=>{try{await selectPreset($('scenario-preset').value);window.dispatchEvent(new CustomEvent('experiment-preview',{detail:$('scenario-preset').value}));}catch(error){state(error.message);}};
 export async function initializeExperiment(){
-  const model=new URLSearchParams(location.search).get('model');const requested=model?.startsWith('mobile_push_')?'mobile_panel':model==='free_box_push'?'free_box_lid':model;const id=['free_box_lid','free_folding_object','free_portable_drawer','hinged_door','folding_panel','drawer','three_franka','table_assembly','panel_fixture','mobile_panel'].includes(requested)?requested:'free_box_lid';$('scenario-preset').value=id;await selectPreset(id);
+  for(const category of categories){
+    const entries=experimentPresets().filter(entry=>entry.category===category.id);if(!entries.length)continue;
+    const group=document.createElement('optgroup');group.label=category.title;
+    for(const entry of entries){const option=document.createElement('option');option.value=entry.id;option.textContent=entry.title;group.append(option);}
+    $('scenario-preset').append(group);
+  }
+  const model=new URLSearchParams(location.search).get('model')||'free_box_lid';const id=libraryEntry({id:model}).preset;
+  document.querySelector('.experiment-builder').hidden=!id;
+  if(id){$('scenario-preset').value=id;await selectPreset(id);}
   try{const health=await request('/api/health');if(health.ready){if(health.experiments_ready===false){state('Panda 충돌 mesh 준비 필요 · python tools/fetch_panda_meshes.py');return;}connected=true;$('experiment-run').disabled=false;state('Python 연결됨 · source/target 최적화와 접촉 동역학 실행 가능');return;}}catch{}
   state('GitHub Pages: 실제 실행 기록 재생 · 새 계산은 Python 백엔드에서 실행합니다. 서버: .venv/bin/python web/server.py');
 }

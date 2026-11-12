@@ -217,8 +217,20 @@ GitHub의 Code → Codespaces에서 컨테이너를 생성해 같은 환경을 �
 
 ## 브라우저에서 보기
 
-[웹 시뮬레이션 뷰어 열기](https://overjs94-contact-transfer-lab.engagingchina4.chatgpt.site)
-(계산 결과 재생용, 본인 계정 접근).
+[무료 공개 웹 뷰어 열기](https://overjs94.github.io/Contact_contraction/)
+(계산 결과 재생용, GitHub Pages).
+
+실험 라이브러리는 목적에 따라 나눕니다.
+
+- **논문 목표:** 단일 패널 → 지그를 핵심으로, 모바일 협력·자유 articulated
+  물체를 확장 과제, 두 부품 조립을 보조 과제로 표시합니다. 현재 기록은
+  기준 동작이며 Sec. III-B–IV 전체 최적화 완료를 뜻하지 않습니다.
+- **단일 embodiment:** 7종 로봇팔의 관절 추종과 G1 기구학 미리보기입니다.
+- **요소·강건성:** 외력 시험, 접촉 도구·제한 CITO, 고정 힌지/레일 단일 팔
+  시험입니다. 외란 시험에서 발생한 허용영역 위반도 그대로 표시합니다.
+
+각 화면은 목적·검증 범위를 표시하며, 실험 설정은 선택한 시나리오와 함께
+전환됩니다. 단일 로봇 화면에는 협력 조작 설정을 표시하지 않습니다.
 
 web/에는 3D 결과 뷰어와 Python 계산 서버가 있습니다.
 
@@ -249,10 +261,10 @@ URDF origin·mesh scale·material과 floating-base pose를 적용하며, mesh �
 
 ## 최신 draft 대조
 
-2026-11-10 갱신된 TeX/PDF v12과 대조한 결과는
-[docs/draft_v12_code_check.md](docs/draft_v12_code_check.md)에 있습니다.
-특히 draft의 선택 솔버는 SNOPT/SQP이며 검증된 기본 구현은 IPOPT입니다.
-SolverSettings.backend="snopt" 선택 경로를 제공하지만 SNOPT plugin/설치/라이선스가
+첨부된 `Contact_contraction_MS_TRO (2).pdf`의 Sec. III-B–IV 대조와 현재 실행
+경계는 [docs/manuscript-equation-audit.md](docs/manuscript-equation-audit.md)에
+있습니다. 이 원고의 수치 절차는 CasADi + IPOPT입니다. 이전 v12 대조 문서는
+과거 기록으로 유지합니다. SNOPT 비교 경로는 제공하지만 plugin/설치/라이선스가
 있는 환경에서의 실행 검증은 아직 수행하지 않았습니다.
 
 ## 계획과 접촉 실행 검증
@@ -332,9 +344,11 @@ select **Settings → Pages → Source → GitHub Actions** in the public reposi
 the integration token cannot create a Pages site. Static hosting replays recorded
 runs; new CasADi/IPOPT and MuJoCo computations require the Python backend.
 
-The default public experiment is now [30-second tabletop/leg assembly](docs/table_assembly.md):
-three real Panda arms, two native grippers and one spherical support tool, eight
-keyframes, tabletop reorientation, peg/socket insertion, and leg-hand release.
+The viewer opens the free box/lid three-arm baseline. The
+[30-second tabletop/leg assembly](docs/table_assembly.md) is an auxiliary
+multi-body demonstration under the paper-task category: three real Panda arms,
+two native grippers and one spherical support, tabletop reorientation,
+peg/socket insertion, and leg-hand release.
 
 ```sh
 contact-transfer demo-table-assembly --output outputs/table_assembly --viewer web

@@ -11,13 +11,15 @@
     <a class="brand" href="./"><span class="brand-icon">⌘</span><span>Contact Transfer <b>Lab</b></span></a>
     <span class="workspace"><i></i> RESEARCH WORKSPACE</span>
     <nav><a href="https://github.com/overjs94/scale-aware-contact-transfer" target="_blank" rel="noreferrer">GitHub ↗</a>
-      <a href="https://github.com/overjs94/scale-aware-contact-transfer/blob/main/docs/draft_v12_code_check.md" target="_blank" rel="noreferrer">논문·코드 대조 ↗</a></nav>
+      <a href="https://github.com/overjs94/scale-aware-contact-transfer/blob/main/docs/manuscript-equation-audit.md" target="_blank" rel="noreferrer">논문·코드 대조 ↗</a></nav>
   </header>
   <div class="layout">
     <aside class="sidebar">
       <div class="section-label">EXPERIMENT LIBRARY <span id="model-count">10</span></div>
-      <h1>Embodiments</h1><p class="subtle">같은 모델 규약, 다른 로봇 구조.</p>
-      <div id="model-list" class="model-list" aria-label="로봇 모델 선택"></div>
+      <h1>실험 라이브러리</h1><p class="subtle">목표 과제와 개별 검증을 구분합니다.</p>
+      <nav id="library-categories" class="library-categories" aria-label="실험 분류"></nav>
+      <p id="library-description" class="library-description"></p>
+      <div id="model-list" class="model-list" aria-label="시나리오·로봇 선택"></div>
       <div class="side-note"><span class="tiny-icon">◇</span><div><b>URDF에서 직접 계산</b><p>링크 기하·질량·관성으로<br>동역학과 기구학을 생성합니다.</p></div></div>
       <a class="source-link" href="https://github.com/overjs94/scale-aware-contact-transfer/blob/main/docs/models.md" target="_blank" rel="noreferrer">모델 출처와 라이선스 ↗</a>
     </aside>
@@ -25,6 +27,10 @@
       <section class="heading-row">
         <div><div class="eyebrow">MODEL-BASED MANIPULATION</div><h2 id="model-title">Loading simulation…</h2><p id="model-description" class="subtle">검증된 모델의 계산 결과를 불러오고 있습니다.</p></div>
         <div id="engine-badge" class="engine-badge"><span></span>Loading</div>
+      </section>
+      <section class="scenario-context" aria-label="시나리오 목적과 검증 범위">
+        <div><span id="scenario-category"></span><strong id="scenario-status"></strong></div>
+        <p id="scenario-scope"></p>
       </section>
       <div class="experiment-grid">
         <section class="viewer-card">
@@ -58,7 +64,7 @@
       </div>
       <section class="experiment-builder" aria-label="협력 접촉 실험 설정">
         <div class="builder-heading"><div><div class="eyebrow">CONTRACTED CONTACT → OPTIMIZATION → DYNAMICS</div><h3 id="builder-title">책상 상판·다리 조립</h3><p id="builder-note">Panda × 3 · gripper × 2 + point × 1 · 8 keyframes · 30 s</p></div><span id="preset-tag" class="preset-tag">RBY1 + PANDA</span></div>
-        <form id="experiment-form"><label class="scenario-control">시나리오 <select id="scenario-preset" aria-label="실험 시나리오"><option value="free_box_lid">3-arm · 자유 박스 + 뚜껑</option><option value="free_folding_object">3-arm · 자유 접이식 패널</option><option value="free_portable_drawer">3-arm · 자유 수납함 + 서랍</option><option value="hinged_door">Component · Articulated · 문 열기</option><option value="folding_panel">Component · 단일 팔 상판</option><option value="drawer">Component · 단일 팔 서랍</option><option value="mobile_panel">작업영역 확장 · RBY1 + Panda</option><option value="panel_fixture">본 실험 · 패널 → 지그 · G / P / P</option><option value="table_assembly">책상 조립 · G / P / G · 30 s</option><option value="three_franka">패널 운반 · P / G / suction</option></select></label>
+        <form id="experiment-form"><label class="scenario-control">시나리오 <select id="scenario-preset" aria-label="실험 시나리오"></select></label>
           <div class="builder-columns"><div><div class="section-label">01 / TOOLS & OBJECT</div><div class="tool-chips" id="tool-chips"><span>● Sphere · point</span><span>⋈ Panda hand</span><span>⊙ Vacuum seal</span></div><label class="mass-label" id="mass-control">패널 질량 <input id="panel-mass" type="number" min=".1" max="2" step=".1" value="1" required> kg</label><label class="mass-label" id="duration-control" hidden>전체 동작 시간 <input id="assembly-duration" type="number" min="24" max="60" step="1" value="30"> s</label><p class="fine" id="planner-description">SE(3) 경로와 접촉 모드를 정하고 관성·접촉력·관절 토크를 최적화합니다.</p><details><summary>Contracted contact JSON 편집 / 가져오기</summary><label class="file-label">JSON 파일 <input id="contacts-file" type="file" accept=".json,application/json"></label><textarea id="contacts-json" aria-label="Contracted contact JSON" spellcheck="false"></textarea><p class="fine">SI · object frame · group ID로 배정합니다. 기본값은 synthetic 입력이며 네트워크 추론은 실행하지 않습니다.</p></details></div><div><div class="section-label">02 / OBJECT KEYFRAMES</div><div id="keyframe-inputs"></div><p class="fine" id="keyframe-help">위치 m · 시간 s · 자세는 각 부품의 URDF 좌표 기준입니다.</p></div></div>
           <div class="experiment-actions"><p id="experiment-state" role="status" aria-live="polite">계산 서버 확인 중…</p><button id="experiment-reset" type="button" class="small-button">기본값</button><button id="experiment-cancel" type="button" class="small-button" disabled>취소</button><button id="experiment-run" type="submit" disabled>Optimize & simulate ↗</button></div>
         </form>
@@ -72,7 +78,7 @@
         <button id="run" disabled>Run simulation <span>↗</span></button>
       </section>
       <section class="scope"><div><span class="section-label">WHAT YOU ARE VIEWING</span><p id="scope-description"></p></div><a id="download-data" href="#" download>결과 데이터 다운로드 ↓</a></section>
-      <footer><span>ANGULAR-FIRST · POWER-CONSISTENT · URDF-DRIVEN</span><span id="draft-note">Draft v12 alignment checked · prototype solver: IPOPT</span></footer>
+      <footer><span>ANGULAR-FIRST · POWER-CONSISTENT · URDF-DRIVEN</span><span id="draft-note">실험 목적·검증 범위를 기록별로 표시 · CasADi / IPOPT</span></footer>
     </main>
   </div>
   <div id="toast" role="status"></div>

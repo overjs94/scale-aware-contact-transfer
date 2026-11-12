@@ -18,7 +18,8 @@ def export(destination):
     target.mkdir(parents=True,exist_ok=True)
     shutil.copytree(source,target,dirs_exist_ok=True)
     html=(target/'index.html').read_text()
-    html=html.replace('https://github.com/overjs94/scale-aware-contact-transfer/blob/main/docs/draft_v12_code_check.md',PUBLIC_REPO+'#scope')
+    for audit in ['draft_v12_code_check.md','manuscript-equation-audit.md']:
+        html=html.replace('https://github.com/overjs94/scale-aware-contact-transfer/blob/main/docs/'+audit,PUBLIC_REPO+'#scope')
     html=html.replace('https://github.com/overjs94/scale-aware-contact-transfer/blob/main/docs/models.md',PUBLIC_REPO+'#models-and-licenses')
     html=html.replace('https://github.com/overjs94/scale-aware-contact-transfer',PUBLIC_REPO)
     html=html.replace('논문·코드 대조 ↗','사용 안내 ↗')

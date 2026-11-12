@@ -1,5 +1,6 @@
 import { createStudio } from "./studio.js";
 import { initializeExperiment } from "./experiment.js";
+import { categories, libraryEntry, recordingScope } from "./library.js";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { applyRecordedPose, disposeModel, loadURDFModel } from "./urdf-view.js";
@@ -267,6 +268,58 @@ function drawChart() {
   $("chart-line").setAttribute("points", points.map(p => p.join(",")).join(" "));
   $("chart-area").setAttribute("d", "M0,85 L" + points.map(p => p.join(",")).join(" L") + " L260,85 Z");
 }
+function selectLibraryCategory(id) {
+  for (const button of document.querySelectorAll(".category-choice")) {
+    button.setAttribute("aria-pressed", String(button.dataset.category === id));
+  }
+  for (const panel of document.querySelectorAll(".library-category")) panel.hidden = panel.dataset.category !== id;
+  $("library-description").textContent = categories.find(category => category.id === id).description;
+  revealLibraryChoice();
+}
+function revealLibraryChoice() {
+  if (!matchMedia("(max-width:680px)").matches) return;
+  const panel = document.querySelector('.library-category:not([hidden])');
+  const choice = panel?.querySelector('.model-choice.selected');
+  if (choice) panel.scrollLeft += choice.getBoundingClientRect().left-panel.getBoundingClientRect().left-(panel.clientWidth-choice.clientWidth)/2;
+}
+function buildLibrary(models) {
+  for (const category of categories) {
+    const members = models.map(model => ({ model, entry: libraryEntry(model) }))
+      .filter(item => item.entry.category === category.id).sort((a,b) => a.entry.order-b.entry.order);
+    if (!members.length) continue;
+    const choice = document.createElement("button");
+    choice.className = "category-choice"; choice.dataset.category = category.id;
+    choice.setAttribute("aria-controls", "library-" + category.id);
+    choice.setAttribute("aria-pressed", "false");
+    const label = document.createElement("span"), count = document.createElement("span");
+    label.textContent = category.title; count.textContent = members.length;
+    choice.append(label, count); choice.onclick = () => selectLibraryCategory(category.id);
+    $("library-categories").append(choice);
+    const panel = document.createElement("div");
+    panel.id = "library-" + category.id; panel.className = "library-category";
+    panel.dataset.category = category.id;
+    for (const [index, title] of category.groups.entries()) {
+      const items = members.filter(item => item.entry.group === index);
+      if (!items.length) continue;
+      const group = document.createElement("section"); group.className = "library-group";
+      const heading = document.createElement("h3"); heading.textContent = title;
+      group.append(heading);
+      for (const { model, entry } of items) {
+        const button = document.createElement("button");
+        button.className = "model-choice"; button.dataset.id = model.id;
+        button.setAttribute("aria-pressed", "false");
+        const label = document.createElement("span"), name = document.createElement("span"), meta = document.createElement("span");
+        name.className = "model-name"; name.textContent = entry.title;
+        meta.className = "model-meta"; meta.textContent = entry.detail;
+        label.append(name, meta);
+        const dot = document.createElement("span"); dot.className = "choice-dot"; dot.textContent = "●";
+        button.append(label, dot); button.onclick = () => selectModel(model.id); group.append(button);
+      }
+      panel.append(group);
+    }
+    $("model-list").append(panel);
+  }
+}
 function showData(data) {
   $("toast").classList.remove("visible");
   if (dataset?.id === "dual_cito" && data.id !== "dual_cito") $("geometry-mode").value = "visual";
@@ -276,6 +329,15 @@ function showData(data) {
   $("geometry-mode").disabled = data.id === "dual_cito";
   if (data.id === "dual_cito") $("geometry-mode").value = "skeleton";
   $("model-title").textContent = data.title;
+  const scope = recordingScope(data);
+  selectLibraryCategory(scope.entry.category);
+  $("scenario-category").textContent = scope.category.title + " / " + scope.category.groups[scope.entry.group];
+  $("scenario-status").textContent = scope.status;
+  $("scenario-status").dataset.fullPipeline = String(scope.full);
+  $("scenario-scope").textContent = scope.detail;
+  if (document.querySelector(`.model-choice[data-id="${CSS.escape(data.id)}"]`)) {
+    const url = new URL(location.href); url.searchParams.set("model", data.id); history.replaceState(null, "", url);
+  }
   $("model-description").textContent = data.engine === "kinematic_preview" ? "29개 관절과 floating base를 가진 휴머노이드의 기구학을 확인합니다." : data.engine === "cito_trajectory" ? "접촉을 유지하며 물체를 들어 올리는 제한 모델의 최적화 결과입니다." : "URDF 관성으로 계산한 폐루프 토크 제어 결과를 재생합니다.";
   if (data.instances) $("model-description").textContent = data.free_articulated_object ? "자유 본체+내부 관절의 실제 동역학, 세 팔의 링크별 contracted contact realization입니다." : data.articulated_object ? "수동 물체 관절 · 로봇 접촉으로 구동 · 주어진 접촉점과 관절 경로의 힘·토크 최적화" : data.scenario === "mobile_panel" ? "RBY1 모바일 듀얼암 + 고정 Panda · 초기 지지 전달 → 고정 작업영역 밖으로 이동 → 지그 안착·릴리스" : data.scenario === "panel_fixture" ? "본 실험: 소형 접촉 위치 refinement → 패널 운반·재배향 → 지그 안착·하중 전달 → 전체 릴리스 · 자유 강체 실행" : data.scenario === "table_assembly" ? "밑면이 위인 상판 grip & support → 12° reorientation → 다리 정렬·삽입 → gripper 해제 · 30초 실제 동역학 실행" : `주어진 contracted contact → ${data.keyframes.length}개 keyframe 최적화 → 3개 팔의 접촉 동역학 실행입니다.`;
   $("engine-badge").innerHTML = "<span></span>" + engineLabel(data);
@@ -305,6 +367,7 @@ function showData(data) {
     button.classList.toggle("selected", button.dataset.id === data.id);
     button.setAttribute("aria-pressed", button.dataset.id === data.id);
   });
+  revealLibraryChoice();
   if (downloadUrl) URL.revokeObjectURL(downloadUrl);
   downloadUrl = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: "application/json" }));
   $("download-data").href = downloadUrl; $("download-data").download = data.id + "-simulation.json";
@@ -362,19 +425,7 @@ async function init() {
   const response = await fetch("./data/index.json"), index = await response.json();
   $("model-count").textContent = String(index.models.length).padStart(2, "0");
   $("test-count").textContent = index.tests_passed;
-  const models = [...index.models].sort((a, b) => a.id === "free_box_lid" ? -1 : b.id === "free_box_lid" ? 1 : a.id.startsWith("free_") ? -1 : b.id.startsWith("free_") ? 1 : a.id === "mobile_panel" ? -1 : b.id === "mobile_panel" ? 1 : a.id === "panel_fixture" ? -1 : b.id === "panel_fixture" ? 1 : a.id === "dual_cito" ? -1 : b.id === "dual_cito" ? 1 : a.floating_base - b.floating_base || a.title.localeCompare(b.title));
-  models.forEach(model => {
-    const button = document.createElement("button");
-    button.className = "model-choice"; button.dataset.id = model.id;
-    button.setAttribute("aria-pressed", "false");
-    const icon = document.createElement("span"); icon.className = "model-icon"; icon.textContent = model.id === "dual_cito" ? "⋈" : model.floating_base ? "♧" : "⌁";
-    const label = document.createElement("span"), title = document.createElement("span"), meta = document.createElement("span");
-    title.className = "model-name"; title.textContent = model.title;
-    meta.className = "model-meta"; meta.textContent = model.id === "three_arm" ? "P · G · SUCTION / 3 KEYFRAMES" : model.id === "dual_cito" ? "CONTACT-IMPLICIT · 6 DoF" : model.dof + " DoF · " + (model.floating_base ? "KINEMATIC PREVIEW" : "MUJOCO");
-    label.append(title, meta);
-    const dot = document.createElement("span"); dot.className = "choice-dot"; dot.textContent = "●";
-    button.append(icon, label, dot); button.onclick = () => selectModel(model.id); $("model-list").append(button);
-  });
+  buildLibrary(index.models);
   const requestedModel = new URLSearchParams(location.search).get("model");
   await selectModel(index.models.some(model => model.id === requestedModel) ? requestedModel : "free_box_lid");
   try {
