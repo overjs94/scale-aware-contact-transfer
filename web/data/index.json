@@ -1,6 +1,118 @@
 {
   "models": [
     {
+      "id": "robust_refinement_nominal_12N",
+      "title": "Source polytope OFF \u00b7 \uc678\ub825 12 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_nominal_-12N",
+      "title": "Source polytope OFF \u00b7 \uc678\ub825 -12 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_polytope_12N",
+      "title": "Source polytope ON \u00b7 \uc678\ub825 12 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "counterfactual_box_PPG",
+      "title": "box \u00b7 \uac15\uc81c \uc720\ud615 P / P / G",
+      "engine": "mujoco_contact_recording",
+      "dof": 29,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_nominal_8N",
+      "title": "Source polytope OFF \u00b7 \uc678\ub825 8 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_polytope_-12N",
+      "title": "Source polytope ON \u00b7 \uc678\ub825 -12 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "counterfactual_panel_PPP",
+      "title": "panel \u00b7 \uac15\uc81c \uc720\ud615 P / P / P",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_nominal_-8N",
+      "title": "Source polytope OFF \u00b7 \uc678\ub825 -8 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_polytope_8N",
+      "title": "Source polytope ON \u00b7 \uc678\ub825 8 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_polytope_-8N",
+      "title": "Source polytope ON \u00b7 \uc678\ub825 -8 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_nominal_4N",
+      "title": "Source polytope OFF \u00b7 \uc678\ub825 4 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_polytope_4N",
+      "title": "Source polytope ON \u00b7 \uc678\ub825 4 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_nominal_-4N",
+      "title": "Source polytope OFF \u00b7 \uc678\ub825 -4 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_polytope_-4N",
+      "title": "Source polytope ON \u00b7 \uc678\ub825 -4 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_nominal_0N",
+      "title": "Source polytope OFF \u00b7 \uc678\ub825 0 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_polytope_0N",
+      "title": "Source polytope ON \u00b7 \uc678\ub825 0 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
       "id": "full_box_fixed_contact_types",
       "title": "\uc790\uc720 \ubc15\uc2a4 \u00b7 \ubcf8\uccb4 \uc9c0\uc9c0\u00b7\ub69c\uaed1 \uc5f4\uae30 \u00b7 fixed_contact_types",
       "engine": "mujoco_contact_recording",

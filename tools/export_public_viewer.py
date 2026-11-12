@@ -25,7 +25,7 @@ def export(destination):
     html=html.replace('논문·코드 대조 ↗','사용 안내 ↗')
     (target/'index.html').write_text(html)
     reports=target/'reports';reports.mkdir(exist_ok=True)
-    for source,name in [(ROOT/'docs/images/full-scenario-flow.svg','full-scenario-flow.svg'),(ROOT/'docs/full-scenario-results.json','full-scenario-results.json')]:
+    for source,name in [(ROOT/'docs/images/full-scenario-flow.svg','full-scenario-flow.svg'),(ROOT/'docs/full-scenario-results.json','full-scenario-results.json'),(ROOT/'docs/algorithm-comparison-results.json','algorithm-comparison-results.json'),(ROOT/'docs/images/source-robustness-comparison.svg','source-robustness-comparison.svg'),(ROOT/'docs/images/type-counterfactual-comparison.svg','type-counterfactual-comparison.svg')]:
         if source.is_file():shutil.copyfile(source,reports/name)
     (target/'.nojekyll').touch()
     shutil.copyfile(ROOT/'LICENSE',target/'CONTACT-TRANSFER-LICENSE.txt')

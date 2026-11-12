@@ -40,7 +40,7 @@ rim.position.set(-2, 3, 2); scene.add(rim);
 const forceArrow=new THREE.ArrowHelper(new THREE.Vector3(0,1,0),new THREE.Vector3(),.5,0xef683c,.08,.04);forceArrow.visible=false;for(const mesh of [forceArrow.line,forceArrow.cone]){mesh.material.depthTest=false;mesh.renderOrder=1100;}scene.add(forceArrow);
 let grid;let contactOverlay;let nativeContactOverlay;
 const contactColors=[0x25bfa3,0xf4a340,0xa788f5];
-const contactNames={base_grasp:'본체 파지',base_support:'본체 지지',moving_manipulation:'뚜껑 파지',edge_grip:'패널 edge 파지',under_left:'패널 왼쪽 지지',under_right:'패널 오른쪽 지지',top_gripper:'상판 파지',point_support:'상판 지지',leg_gripper:'다리 파지'};
+const contactNames={base_grasp:'본체 파지',base_support:'본체 지지',moving_manipulation:'뚜껑 파지',edge_grip:'패널 edge 파지',under_left:'패널 왼쪽 지지',under_right:'패널 오른쪽 지지',top_gripper:'상판 파지',point_support:'상판 지지',leg_gripper:'다리 파지',support_0:'왼쪽 지지',support_1:'중앙 지지',support_2:'오른쪽 지지'};
 
 const studio=createStudio(scene,renderer,sun,rim,canvasFallback);
 studio.set("studio");
@@ -79,7 +79,8 @@ function buildGeometry(data) {
   nativeContactOverlay=new THREE.Group();robotGroup.add(nativeContactOverlay);
   for(let i=0;i<6;i++){const marker=new THREE.Mesh(new THREE.SphereGeometry(.004,12,8),new THREE.MeshBasicMaterial({color:0xffffff,depthTest:false}));marker.renderOrder=1003;marker.visible=false;nativeContactOverlay.add(marker);}
   $('native-contact-controls').hidden=!data.native_contact_samples;
-  $('full-result-links').hidden=!data.full_task_recording;
+  $('full-result-links').hidden=!data.full_task_recording&&!data.comparison_recording;
+  document.querySelectorAll('[data-baseline-link]').forEach(link=>link.hidden=!data.full_task_recording);
   $('contact-focus').replaceChildren(new Option('선택',''));
   for(const g of data.contact_contraction?.groups||[])$('contact-focus').append(new Option(contactNames[g.group_id]||g.group_id,g.group_id));
   const tool=data.provenance?.canonical_point_tool;$('native-contact-note').hidden=!data.native_contact_samples;

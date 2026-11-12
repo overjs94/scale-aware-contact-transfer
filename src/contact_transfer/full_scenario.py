@@ -126,6 +126,7 @@ class FullTask:
     posture_reference_rule: str='hardware_seed'
     posture_trust_radius_rad: float | None=None
     gripper_force_coordinates: str='cartesian'
+    include_fixtures: bool=True
     @classmethod
     def load(cls,id,directory):
         out=Path(directory);out.mkdir(parents=True,exist_ok=True)

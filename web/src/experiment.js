@@ -1,5 +1,6 @@
 import { categories, experimentPresets, libraryEntry } from './library.js';
 import { renderFullResults } from './full-results.js';
+import { showAlgorithmComparisons } from './algorithm-comparisons.js';
 const $=id=>document.getElementById(id);
 let preset,job,timer,connected=false,presetId,presetToken=0;
 const state=text=>{$('experiment-state').textContent=text;};
@@ -58,9 +59,18 @@ function fields(){
 }
 function report(data){
   const r=data.report;if(!r)return;$('experiment-results').hidden=false;
+  showAlgorithmComparisons(data);
   let comparison=$('ablation-results');
   if(!comparison){comparison=document.createElement('div');comparison.id='ablation-results';$('experiment-results').append(comparison);}
   comparison.hidden=!data.full_task_recording;comparison.replaceChildren();
+  if(data.comparison_recording){
+    const errors=Object.values(r.object_tracking);$('result-tracking').textContent=`${r.tracking_passed?'PASS':'FAIL'} · ${(1000*Math.max(...errors.map(e=>e.maximum_position_error_m))).toFixed(2)} mm`;
+    $('result-forces').textContent=r.sampled_interface_wrench_capability.passed&&Object.values(r.jaw_force).every(j=>j.passed)&&r.minimum_actuator_margin_Nm>=-1e-8?'PASS':'FAIL';
+    $('result-seal-label').textContent='STABILITY / CONTACT';const fractions=Object.values(r.maintained_contact_fraction).filter(v=>v!==null);$('result-seal').textContent=`${r.execution_passed?'PASS':'FAIL'} · ${(100*Math.min(...fractions)).toFixed(1)}% contact`;
+    $('result-residual').textContent=r.source?`ρ ${r.source.source_rho_after.toFixed(3)}`:r.selection.selected_types.join(' / ');
+    $('source-result').hidden=false;$('source-result').textContent=r.source?`Source polytope ${r.source.robustness_enabled?'ON · 8 vertices':'OFF · nominal only'} · 공통 polytope 독립 검산 ρ ${r.source.source_rho_after.toFixed(3)} · target ρ ${r.source.target_rho.toFixed(3)} · 고정 접촉점에서 자세·반력·토크 재계산`:`강제 유형 ${r.selection.selected_types.join(' / ')} · 전체 계획 비용 ${r.selection.objective.toFixed(3)} · native 실행 ${r.execution_passed?'PASS':'FAIL'}`;
+    for(const id of ['workspace-result','robustness-result'])$(id).hidden=true;$('report-json').textContent=JSON.stringify(r,null,2);return;
+  }
   if(data.full_task_recording){
     const errors=Object.values(r.object_tracking);$('result-tracking').textContent=`${r.tracking_passed?'PASS':'FAIL'} · ${(1000*Math.max(...errors.map(e=>e.maximum_position_error_m))).toFixed(2)} mm`;
     $('result-forces').textContent=r.sampled_interface_wrench_capability.passed&&Object.values(r.jaw_force).every(j=>j.passed)&&r.minimum_actuator_margin_Nm>=-1e-8?'PASS':'FAIL';$('result-seal-label').textContent='TASK / LOADED CONTACT';$('result-seal').textContent=`${r.task_passed&&r.contact_retention_passed?'PASS':'FAIL'} · ${(100*Math.min(...Object.values(r.maintained_contact_fraction).filter(v=>v!==null))).toFixed(1)}% contact`;
@@ -122,9 +132,9 @@ $('assembly-duration').oninput=()=>{if((articulated()||assembly()||panel())&&$('
 $('contacts-file').onchange=async event=>{try{const file=event.target.files[0];if(!file)return;if(file.size>32768)throw Error('32 KB 이하 JSON을 사용하세요.');const body=JSON.parse(await file.text());$('contacts-json').value=JSON.stringify(body.dense_source_groups||body.contracted_contacts||body,null,2);state('접촉 JSON을 불러왔습니다. 실행 시 표면·법선을 검사합니다.');}catch(error){state(error.message);}};
 function showRecordingExperiment(data){
   const id=libraryEntry(data).preset;
-  document.querySelector('.experiment-builder').hidden=!id&&!data.full_task_recording;
+  document.querySelector('.experiment-builder').hidden=!id&&!data.full_task_recording&&!data.comparison_recording;
   $('experiment-form').hidden=!id;
-  if(data.full_task_recording){$('builder-title').textContent=data.title;$('builder-note').textContent='전체 구간 계획·실행과 통제 ablation의 측정 결과';$('preset-tag').textContent=data.report.selection.selected_types.join(' / ');$('source-refinement-control').hidden=true;}
+  if(data.full_task_recording||data.comparison_recording){$('builder-title').textContent=data.title;$('builder-note').textContent='계획·실행과 통제 비교의 측정 결과';$('preset-tag').textContent=data.report.selection?.selected_types.join(' / ')||'SOURCE ROBUSTNESS';$('source-refinement-control').hidden=true;}
   $('experiment-results').hidden=!data.report;
   if(id){$('scenario-preset').value=id;if(presetId!==id)selectPreset(id).catch(error=>state(error.message));}
   report(data);

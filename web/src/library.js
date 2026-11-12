@@ -43,6 +43,8 @@ const catalog = new Map(entries.map(([id, category, group, title, detail, preset
   [id, { id, category, group, title, detail, preset: preset === true ? id : preset, order }]));
 
 export function libraryEntry(model) {
+  if(model.id.startsWith('robust_refinement_'))return {id:model.id,category:'diagnostic',group:0,title:model.title,detail:'3-arm · source polytope ON/OFF · matched push',order:entries.length};
+  if(model.id.startsWith('counterfactual_'))return {id:model.id,category:'diagnostic',group:1,title:model.title,detail:'다른 접촉 유형 · 전체 시퀀스 비교',order:entries.length};
   const ablation = model.id.match(/^full_(panel|box|assembly)_(.+)$/);
   if (ablation) return {id:model.id,category:'diagnostic',group:ablation[2]==='external_push'?0:1,title:model.title,detail:'전체 과제 · '+ablation[2],order:entries.length};
   return catalog.get(model.id) || catalog.get(model.scenario) || {
@@ -65,6 +67,9 @@ export function recordingScope(data) {
   if (data.known_modeling_issues?.length) {
     status = '구형 형상 · 재검증 필요';
     detail = data.known_modeling_issues.join(' ')+' 수정된 모델과 7조건 비교는 「자유 박스 · 전체 구간 최적화」(full_box)에서 확인하세요.';
+  } else if(data.comparison_recording){
+    status=(data.study_kind==='source_robustness'?'Source robustness · ':'강제 접촉 유형 · ')+(report.execution_passed?'PASS':'FAIL');
+    detail=data.study_kind==='source_robustness'?'소형 refinement의 wrench polytope ON/OFF를 비교합니다. 동일 제어기·물성·외력 조건이며 target 접촉점은 고정한 정지 지지 분리 실험입니다. 전체 이동 CITO나 폐루프 안정성 증명은 아닙니다.':'같은 전체 과제에서 접촉 유형을 강제로 바꾼 계획·native 실행입니다. 비용, 계획 실패와 실행 기준 위반을 구분합니다.';
   } else if (data.full_task_recording) {
     status = "전체 구간 · " + (report.execution_passed ? "검증 통과" : "검사 실패 포함");
     detail = "접촉 유형·팔 배정 후보, 이동 CITO·하중 전달 QP·릴리스 동역학과 native 접촉 실행을 기록합니다. Midpoint 구성 업데이트 변형이며 source 실패 시 기하 prior 사용 여부와 ablation 결과를 보고서에 표시합니다.";

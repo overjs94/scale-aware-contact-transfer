@@ -1,0 +1,1411 @@
+{
+  "schema_version": 1,
+  "source_robustness": {
+    "protocol": {
+      "version": 2,
+      "source_to_target_scale": 4.0,
+      "source_mass_kg": 0.03125,
+      "target_mass_kg": 2.0,
+      "source_position_radius_m": 0.0325,
+      "geometry_weight": 1000.0,
+      "target_initial_sites_m": [
+        [
+          -0.17,
+          -0.035,
+          -0.02
+        ],
+        [
+          0.0,
+          0.035,
+          -0.02
+        ],
+        [
+          0.17,
+          -0.035,
+          -0.02
+        ]
+      ],
+      "source_patch_half_size_m": 0.0325,
+      "mu": 0.8,
+      "target_normal_limit_N": 40.0,
+      "force_application_point_body_m": [
+        0.0,
+        0.18,
+        0.02
+      ],
+      "target_force_box_scales_N": [
+        2.56,
+        2.56,
+        8.0
+      ],
+      "force_direction_world": [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "force_levels_N": [
+        0.0,
+        -4.0,
+        4.0,
+        -8.0,
+        8.0,
+        -12.0,
+        12.0
+      ],
+      "force_sign_convention": "positive downward, negative upward; both tested before selecting a demonstration",
+      "pulse_start_s": 4.0,
+      "pulse_duration_s": 1.0,
+      "hold_duration_s": 5.0,
+      "physics_dt_s": 0.001,
+      "target_contact_geometry_adjustment": false,
+      "target_posture_and_forces_reoptimized": true,
+      "arm_control": "impedance_feedforward",
+      "object_actuators": 0,
+      "object_welds": 0,
+      "pass_position_error_m": 0.008,
+      "pass_rotation_error_rad": 0.06,
+      "pass_contact_fraction": 0.99,
+      "source_normals_fixed": true,
+      "source_and_target_task_basis_fixed_before_trials": true,
+      "statistical_success_rate_claimed": false
+    },
+    "trials": [
+      {
+        "recording_id": "robust_refinement_polytope_0N",
+        "force_N": 0.0,
+        "robustness_enabled": true,
+        "execution_passed": true,
+        "source_rho": 0.5978475203484359,
+        "target_rho": 0.597847520216248,
+        "source_optimization_vertex_count": 8,
+        "maximum_position_error_m": 3.671766865620891e-05,
+        "maximum_rotation_error_rad": 0.000313705415850594,
+        "final_position_error_m": 3.670964002725968e-05,
+        "minimum_contact_fraction": 1.0,
+        "failed_checks": [],
+        "normalized_force_box_coefficient": 0.0,
+        "inside_initial_static_box": true,
+        "native_case_id": "c8694e0add7408899b762798638c07821d16320f86ef3883fe20b5a0d2905b01",
+        "native_plan_id": "3a89d6e2668c4cea6200830b8343126e12bcf52a97779eb40a2e9b143026096e",
+        "native_scene_sha256": "4541f5a31f3765f07c73e51f76e4f0531bf9e63b34cdcc56f53cdca82aa824fc",
+        "native_trace_sha256": "36b9b564b92465846bc89e26e95f58cf9abddf38ca7e36217ce2f37e5debac3b"
+      },
+      {
+        "recording_id": "robust_refinement_nominal_0N",
+        "force_N": 0.0,
+        "robustness_enabled": false,
+        "execution_passed": true,
+        "source_rho": 0.3768107962775931,
+        "target_rho": 0.376810796289211,
+        "source_optimization_vertex_count": 1,
+        "maximum_position_error_m": 3.174147479899325e-05,
+        "maximum_rotation_error_rad": 0.00031409868101533404,
+        "final_position_error_m": 3.174147479899325e-05,
+        "minimum_contact_fraction": 1.0,
+        "failed_checks": [],
+        "normalized_force_box_coefficient": 0.0,
+        "inside_initial_static_box": true,
+        "native_case_id": "c8694e0add7408899b762798638c07821d16320f86ef3883fe20b5a0d2905b01",
+        "native_plan_id": "6128bea988ff6bbdeb3c73cff178d217487d54928b95e873071c37d05bc0aaff",
+        "native_scene_sha256": "4541f5a31f3765f07c73e51f76e4f0531bf9e63b34cdcc56f53cdca82aa824fc",
+        "native_trace_sha256": "dd8fa6598335aafaebb16d96f83cdf6dd18871002b3497d17ef03124cc5215b1"
+      },
+      {
+        "recording_id": "robust_refinement_polytope_-4N",
+        "force_N": -4.0,
+        "robustness_enabled": true,
+        "execution_passed": true,
+        "source_rho": 0.5978475203484359,
+        "target_rho": 0.597847520216248,
+        "source_optimization_vertex_count": 8,
+        "maximum_position_error_m": 0.001623625648077344,
+        "maximum_rotation_error_rad": 0.03970225442476307,
+        "final_position_error_m": 0.0005509010420206427,
+        "minimum_contact_fraction": 0.9938983050847457,
+        "failed_checks": [],
+        "normalized_force_box_coefficient": 0.5,
+        "inside_initial_static_box": true,
+        "native_case_id": "c8694e0add7408899b762798638c07821d16320f86ef3883fe20b5a0d2905b01",
+        "native_plan_id": "3a89d6e2668c4cea6200830b8343126e12bcf52a97779eb40a2e9b143026096e",
+        "native_scene_sha256": "4541f5a31f3765f07c73e51f76e4f0531bf9e63b34cdcc56f53cdca82aa824fc",
+        "native_trace_sha256": "0a5866fb98a238c6e4963b6f5309d913a6a477a616120ff2bf70bd4aa796e0ad"
+      },
+      {
+        "recording_id": "robust_refinement_nominal_-4N",
+        "force_N": -4.0,
+        "robustness_enabled": false,
+        "execution_passed": false,
+        "source_rho": 0.3768107962775931,
+        "target_rho": 0.376810796289211,
+        "source_optimization_vertex_count": 1,
+        "maximum_position_error_m": 0.015241682411434513,
+        "maximum_rotation_error_rad": 0.3503888825940424,
+        "final_position_error_m": 0.001627358402310602,
+        "minimum_contact_fraction": 0.893728813559322,
+        "failed_checks": [
+          "tracking_passed",
+          "task_passed",
+          "contact_retention_passed",
+          "wrench_capability",
+          "unexpected_loaded_contact"
+        ],
+        "normalized_force_box_coefficient": 0.5,
+        "inside_initial_static_box": false,
+        "native_case_id": "c8694e0add7408899b762798638c07821d16320f86ef3883fe20b5a0d2905b01",
+        "native_plan_id": "6128bea988ff6bbdeb3c73cff178d217487d54928b95e873071c37d05bc0aaff",
+        "native_scene_sha256": "4541f5a31f3765f07c73e51f76e4f0531bf9e63b34cdcc56f53cdca82aa824fc",
+        "native_trace_sha256": "c9c9f72f07ad6fae0c471fe01383751f6ae238b8d9bbb955c4bb5609f10319cb"
+      },
+      {
+        "recording_id": "robust_refinement_polytope_4N",
+        "force_N": 4.0,
+        "robustness_enabled": true,
+        "execution_passed": true,
+        "source_rho": 0.5978475203484359,
+        "target_rho": 0.597847520216248,
+        "source_optimization_vertex_count": 8,
+        "maximum_position_error_m": 0.001556450467918061,
+        "maximum_rotation_error_rad": 0.040038928527943635,
+        "final_position_error_m": 0.0008692305099347499,
+        "minimum_contact_fraction": 0.9923728813559322,
+        "failed_checks": [],
+        "normalized_force_box_coefficient": 0.5,
+        "inside_initial_static_box": true,
+        "native_case_id": "c8694e0add7408899b762798638c07821d16320f86ef3883fe20b5a0d2905b01",
+        "native_plan_id": "3a89d6e2668c4cea6200830b8343126e12bcf52a97779eb40a2e9b143026096e",
+        "native_scene_sha256": "4541f5a31f3765f07c73e51f76e4f0531bf9e63b34cdcc56f53cdca82aa824fc",
+        "native_trace_sha256": "c8014ef6e8bf7615c286ebc9a0da649974fad448283802c4e9bc9852e94f69f4"
+      },
+      {
+        "recording_id": "robust_refinement_nominal_4N",
+        "force_N": 4.0,
+        "robustness_enabled": false,
+        "execution_passed": false,
+        "source_rho": 0.3768107962775931,
+        "target_rho": 0.376810796289211,
+        "source_optimization_vertex_count": 1,
+        "maximum_position_error_m": 0.0018155721411166616,
+        "maximum_rotation_error_rad": 0.08862994739120941,
+        "final_position_error_m": 0.0015534264887603001,
+        "minimum_contact_fraction": 0.9811864406779661,
+        "failed_checks": [
+          "tracking_passed",
+          "task_passed",
+          "contact_retention_passed"
+        ],
+        "normalized_force_box_coefficient": 0.5,
+        "inside_initial_static_box": false,
+        "native_case_id": "c8694e0add7408899b762798638c07821d16320f86ef3883fe20b5a0d2905b01",
+        "native_plan_id": "6128bea988ff6bbdeb3c73cff178d217487d54928b95e873071c37d05bc0aaff",
+        "native_scene_sha256": "4541f5a31f3765f07c73e51f76e4f0531bf9e63b34cdcc56f53cdca82aa824fc",
+        "native_trace_sha256": "b54d21549a0d0831b08316fc286de860ebdffe7203cc85736bb7a36ff31b6069"
+      },
+      {
+        "recording_id": "robust_refinement_polytope_-8N",
+        "force_N": -8.0,
+        "robustness_enabled": true,
+        "execution_passed": false,
+        "source_rho": 0.5978475203484359,
+        "target_rho": 0.597847520216248,
+        "source_optimization_vertex_count": 8,
+        "maximum_position_error_m": 0.0523041681972993,
+        "maximum_rotation_error_rad": 0.5071060184663468,
+        "final_position_error_m": 0.0025983807087550993,
+        "minimum_contact_fraction": 0.8771186440677966,
+        "failed_checks": [
+          "tracking_passed",
+          "task_passed",
+          "contact_retention_passed",
+          "wrench_capability",
+          "unexpected_loaded_contact"
+        ],
+        "normalized_force_box_coefficient": 1.0,
+        "inside_initial_static_box": false,
+        "native_case_id": "c8694e0add7408899b762798638c07821d16320f86ef3883fe20b5a0d2905b01",
+        "native_plan_id": "3a89d6e2668c4cea6200830b8343126e12bcf52a97779eb40a2e9b143026096e",
+        "native_scene_sha256": "4541f5a31f3765f07c73e51f76e4f0531bf9e63b34cdcc56f53cdca82aa824fc",
+        "native_trace_sha256": "8f673cf227b5a2a73c838a4486457a5ea0ee601695e50f22c2fbf0ddbb35dd42"
+      },
+      {
+        "recording_id": "robust_refinement_nominal_-8N",
+        "force_N": -8.0,
+        "robustness_enabled": false,
+        "execution_passed": false,
+        "source_rho": 0.3768107962775931,
+        "target_rho": 0.376810796289211,
+        "source_optimization_vertex_count": 1,
+        "maximum_position_error_m": 0.06101373089313411,
+        "maximum_rotation_error_rad": 0.6498205530314771,
+        "final_position_error_m": 0.004255799420493115,
+        "minimum_contact_fraction": 0.8422033898305085,
+        "failed_checks": [
+          "tracking_passed",
+          "task_passed",
+          "contact_retention_passed",
+          "wrench_capability",
+          "unexpected_loaded_contact"
+        ],
+        "normalized_force_box_coefficient": 1.0,
+        "inside_initial_static_box": false,
+        "native_case_id": "c8694e0add7408899b762798638c07821d16320f86ef3883fe20b5a0d2905b01",
+        "native_plan_id": "6128bea988ff6bbdeb3c73cff178d217487d54928b95e873071c37d05bc0aaff",
+        "native_scene_sha256": "4541f5a31f3765f07c73e51f76e4f0531bf9e63b34cdcc56f53cdca82aa824fc",
+        "native_trace_sha256": "e5f94a0f7376dc07c1fb490ee6b275c73ba96eee938a82d0506be5c9453436b5"
+      },
+      {
+        "recording_id": "robust_refinement_polytope_8N",
+        "force_N": 8.0,
+        "robustness_enabled": true,
+        "execution_passed": false,
+        "source_rho": 0.5978475203484359,
+        "target_rho": 0.597847520216248,
+        "source_optimization_vertex_count": 8,
+        "maximum_position_error_m": 0.01039559268693535,
+        "maximum_rotation_error_rad": 0.2839855589617177,
+        "final_position_error_m": 0.003128596381954373,
+        "minimum_contact_fraction": 0.883728813559322,
+        "failed_checks": [
+          "tracking_passed",
+          "task_passed",
+          "contact_retention_passed",
+          "wrench_capability",
+          "unexpected_loaded_contact"
+        ],
+        "normalized_force_box_coefficient": 1.0,
+        "inside_initial_static_box": false,
+        "native_case_id": "c8694e0add7408899b762798638c07821d16320f86ef3883fe20b5a0d2905b01",
+        "native_plan_id": "3a89d6e2668c4cea6200830b8343126e12bcf52a97779eb40a2e9b143026096e",
+        "native_scene_sha256": "4541f5a31f3765f07c73e51f76e4f0531bf9e63b34cdcc56f53cdca82aa824fc",
+        "native_trace_sha256": "bd62bdc64c0c3391b76a105f28fe6ce56558314cea1e4d74ebe1196daf3276c0"
+      },
+      {
+        "recording_id": "robust_refinement_nominal_8N",
+        "force_N": 8.0,
+        "robustness_enabled": false,
+        "execution_passed": false,
+        "source_rho": 0.3768107962775931,
+        "target_rho": 0.376810796289211,
+        "source_optimization_vertex_count": 1,
+        "maximum_position_error_m": 0.0048478668258474895,
+        "maximum_rotation_error_rad": 0.22536742510635108,
+        "final_position_error_m": 0.0025915120169945237,
+        "minimum_contact_fraction": 0.8823728813559322,
+        "failed_checks": [
+          "tracking_passed",
+          "task_passed",
+          "contact_retention_passed",
+          "unexpected_loaded_contact"
+        ],
+        "normalized_force_box_coefficient": 1.0,
+        "inside_initial_static_box": false,
+        "native_case_id": "c8694e0add7408899b762798638c07821d16320f86ef3883fe20b5a0d2905b01",
+        "native_plan_id": "6128bea988ff6bbdeb3c73cff178d217487d54928b95e873071c37d05bc0aaff",
+        "native_scene_sha256": "4541f5a31f3765f07c73e51f76e4f0531bf9e63b34cdcc56f53cdca82aa824fc",
+        "native_trace_sha256": "ff53e431a5ad11cb1ae8bc9e502bd30d17324732d93956b0d77c102fef47ae10"
+      },
+      {
+        "recording_id": "robust_refinement_polytope_-12N",
+        "force_N": -12.0,
+        "robustness_enabled": true,
+        "execution_passed": false,
+        "source_rho": 0.5978475203484359,
+        "target_rho": 0.597847520216248,
+        "source_optimization_vertex_count": 8,
+        "maximum_position_error_m": 0.7925413212386156,
+        "maximum_rotation_error_rad": 3.141592653589793,
+        "final_position_error_m": 0.7895311992142675,
+        "minimum_contact_fraction": 0.3566101694915254,
+        "failed_checks": [
+          "tracking_passed",
+          "task_passed",
+          "contact_retention_passed",
+          "wrench_capability",
+          "unexpected_loaded_contact"
+        ],
+        "normalized_force_box_coefficient": 1.5,
+        "inside_initial_static_box": false,
+        "native_case_id": "c8694e0add7408899b762798638c07821d16320f86ef3883fe20b5a0d2905b01",
+        "native_plan_id": "3a89d6e2668c4cea6200830b8343126e12bcf52a97779eb40a2e9b143026096e",
+        "native_scene_sha256": "4541f5a31f3765f07c73e51f76e4f0531bf9e63b34cdcc56f53cdca82aa824fc",
+        "native_trace_sha256": "7022b82b09559448dfbeb1965fbe2728d56f76d198f29ab74dde234b581e4214"
+      },
+      {
+        "recording_id": "robust_refinement_nominal_-12N",
+        "force_N": -12.0,
+        "robustness_enabled": false,
+        "execution_passed": false,
+        "source_rho": 0.3768107962775931,
+        "target_rho": 0.376810796289211,
+        "source_optimization_vertex_count": 1,
+        "maximum_position_error_m": 0.7515434787716224,
+        "maximum_rotation_error_rad": 3.141592653589793,
+        "final_position_error_m": 0.7494952496757237,
+        "minimum_contact_fraction": 0.35033898305084743,
+        "failed_checks": [
+          "tracking_passed",
+          "task_passed",
+          "contact_retention_passed",
+          "wrench_capability",
+          "unexpected_loaded_contact"
+        ],
+        "normalized_force_box_coefficient": 1.5,
+        "inside_initial_static_box": false,
+        "native_case_id": "c8694e0add7408899b762798638c07821d16320f86ef3883fe20b5a0d2905b01",
+        "native_plan_id": "6128bea988ff6bbdeb3c73cff178d217487d54928b95e873071c37d05bc0aaff",
+        "native_scene_sha256": "4541f5a31f3765f07c73e51f76e4f0531bf9e63b34cdcc56f53cdca82aa824fc",
+        "native_trace_sha256": "a5c202b3ec3e783864ed99a5dbc12950f49cad9bc07f4d93f00f73840b27d205"
+      },
+      {
+        "recording_id": "robust_refinement_polytope_12N",
+        "force_N": 12.0,
+        "robustness_enabled": true,
+        "execution_passed": false,
+        "source_rho": 0.5978475203484359,
+        "target_rho": 0.597847520216248,
+        "source_optimization_vertex_count": 8,
+        "maximum_position_error_m": 0.024134213880611672,
+        "maximum_rotation_error_rad": 0.5310094797506626,
+        "final_position_error_m": 0.005589940637438396,
+        "minimum_contact_fraction": 0.8403389830508474,
+        "failed_checks": [
+          "tracking_passed",
+          "task_passed",
+          "contact_retention_passed",
+          "wrench_capability",
+          "unexpected_loaded_contact"
+        ],
+        "normalized_force_box_coefficient": 1.5,
+        "inside_initial_static_box": false,
+        "native_case_id": "c8694e0add7408899b762798638c07821d16320f86ef3883fe20b5a0d2905b01",
+        "native_plan_id": "3a89d6e2668c4cea6200830b8343126e12bcf52a97779eb40a2e9b143026096e",
+        "native_scene_sha256": "4541f5a31f3765f07c73e51f76e4f0531bf9e63b34cdcc56f53cdca82aa824fc",
+        "native_trace_sha256": "9c5278e187b148f9b67a79a0ea12ffbaf65e6ca124a9cd3b650b810c3d235870"
+      },
+      {
+        "recording_id": "robust_refinement_nominal_12N",
+        "force_N": 12.0,
+        "robustness_enabled": false,
+        "execution_passed": false,
+        "source_rho": 0.3768107962775931,
+        "target_rho": 0.376810796289211,
+        "source_optimization_vertex_count": 1,
+        "maximum_position_error_m": 0.007716411328299939,
+        "maximum_rotation_error_rad": 0.2811848472287782,
+        "final_position_error_m": 0.004955443400946608,
+        "minimum_contact_fraction": 0.8669491525423729,
+        "failed_checks": [
+          "tracking_passed",
+          "task_passed",
+          "contact_retention_passed",
+          "unexpected_loaded_contact"
+        ],
+        "normalized_force_box_coefficient": 1.5,
+        "inside_initial_static_box": false,
+        "native_case_id": "c8694e0add7408899b762798638c07821d16320f86ef3883fe20b5a0d2905b01",
+        "native_plan_id": "6128bea988ff6bbdeb3c73cff178d217487d54928b95e873071c37d05bc0aaff",
+        "native_scene_sha256": "4541f5a31f3765f07c73e51f76e4f0531bf9e63b34cdcc56f53cdca82aa824fc",
+        "native_trace_sha256": "7f57a8d6838cdbede0a9ae0487e3428568dbbf8da9cdf934b2aca1f6162d1a19"
+      }
+    ],
+    "matched_plan_ids": {
+      "polytope": [
+        "c8694e0add7408899b762798638c07821d16320f86ef3883fe20b5a0d2905b01",
+        "3a89d6e2668c4cea6200830b8343126e12bcf52a97779eb40a2e9b143026096e"
+      ],
+      "nominal": [
+        "c8694e0add7408899b762798638c07821d16320f86ef3883fe20b5a0d2905b01",
+        "6128bea988ff6bbdeb3c73cff178d217487d54928b95e873071c37d05bc0aaff"
+      ]
+    },
+    "controller_settings_equal": true,
+    "nominal_trials_per_condition": 1,
+    "stationary_diagnostic_not_full_motion_CITO": true,
+    "source_objective": "geometry_weight * sum squared displacement - rho",
+    "nominal_objective": "same geometry cost, nominal equilibrium only; rho term and disturbed vertices removed"
+  },
+  "contact_types": {
+    "panel": {
+      "task": "panel",
+      "scope": "frozen material geometry and object keyframe; posture re-realized for actual hardware; independent cone and torque constraints",
+      "objective_definition": "common geometry cost + common posture-reference cost - independently computed rho; not a sequence objective",
+      "common_evaluation_rho": 0.1,
+      "selected_types": [
+        "G",
+        "P",
+        "P"
+      ],
+      "selected_sequence_objective": -64.12505251610231,
+      "E": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "D": [
+        [
+          0.15,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.15,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.15,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rows": [
+        {
+          "types": [
+            "P",
+            "P",
+            "P"
+          ],
+          "assignment": [
+            0,
+            1,
+            2
+          ],
+          "keyframe_index": 3,
+          "keyframe_id": "reorient",
+          "source_and_object_pose_held_fixed": true,
+          "frozen_material_points_m": [
+            [
+              -0.3,
+              0.0,
+              0.0
+            ],
+            [
+              0.08300000630535355,
+              -0.1320026404162773,
+              -0.02
+            ],
+            [
+              0.08300000060397063,
+              0.1320026411436283,
+              -0.02
+            ]
+          ],
+          "sequence_objective": null,
+          "sequence_not_reoptimized": true,
+          "native_geometry_passed": true,
+          "geometry_violations": [],
+          "planning_passed": true,
+          "stage": "independent_frozen_geometry_SOCP",
+          "rho": 3.0240315498195365,
+          "rho_required": 0.1,
+          "solver_status": "Solved",
+          "primal_residual": 5.530793956154412e-08,
+          "frozen_keyframe_cost": -3.022772837645738,
+          "geometry_cost": 0.0012422740049463123,
+          "posture_cost": 1.6438168852463347e-05,
+          "maximum_margin_reaction_forces_N": {
+            "edge_grip": 13.278856741943148,
+            "under_left": 14.22919151717288,
+            "under_right": 13.213619219846038
+          },
+          "maximum_margin_peak_joint_torque_Nm": 31.1130709921152,
+          "common_rho_metrics": {
+            "rho": 0.1,
+            "passed": true,
+            "peak_joint_torque_Nm": 28.690857021972914,
+            "minimum_joint_torque_margin_Nm": 9.953055799201675,
+            "peak_interface_force_N": {
+              "edge_grip": 6.874044861982899,
+              "under_left": 8.436249641943165,
+              "under_right": 10.313132059172183
+            }
+          }
+        },
+        {
+          "types": [
+            "G",
+            "P",
+            "P"
+          ],
+          "assignment": [
+            0,
+            1,
+            2
+          ],
+          "keyframe_index": 3,
+          "keyframe_id": "reorient",
+          "source_and_object_pose_held_fixed": true,
+          "frozen_material_points_m": [
+            [
+              -0.3,
+              0.0,
+              0.0
+            ],
+            [
+              0.08300000630535355,
+              -0.1320026404162773,
+              -0.02
+            ],
+            [
+              0.08300000060397063,
+              0.1320026411436283,
+              -0.02
+            ]
+          ],
+          "sequence_objective": null,
+          "sequence_not_reoptimized": true,
+          "native_geometry_passed": true,
+          "geometry_violations": [],
+          "planning_passed": true,
+          "stage": "independent_frozen_geometry_SOCP",
+          "rho": 8.249982955758542,
+          "rho_required": 0.1,
+          "solver_status": "Solved",
+          "primal_residual": 2.6984628576087744e-07,
+          "frozen_keyframe_cost": -8.24873626336488,
+          "geometry_cost": 0.0012422740049463123,
+          "posture_cost": 4.418388716726573e-06,
+          "maximum_margin_reaction_forces_N": {
+            "edge_grip": 15.272518267576434,
+            "under_left": 20.34091399190355,
+            "under_right": 20.047140665748483
+          },
+          "maximum_margin_peak_joint_torque_Nm": 35.404800267534945,
+          "common_rho_metrics": {
+            "rho": 0.1,
+            "passed": true,
+            "peak_joint_torque_Nm": 29.263384492835446,
+            "minimum_joint_torque_margin_Nm": 10.843372689445859,
+            "peak_interface_force_N": {
+              "edge_grip": 4.655662748543351,
+              "under_left": 8.923832561015695,
+              "under_right": 11.399057774311075
+            }
+          }
+        }
+      ],
+      "counterfactuals": [
+        {
+          "types": [
+            "P",
+            "P",
+            "P"
+          ],
+          "assignment": [
+            0,
+            1,
+            2
+          ],
+          "stage": "native_execution",
+          "execution_passed": false,
+          "new_physical_trial_executed": true,
+          "sequence_objective": -30.58144703976605,
+          "maximum_position_error_m": 0.08638860001501651,
+          "maximum_rotation_error_rad": 0.7815032550156067,
+          "failed_checks": [
+            "tracking_passed",
+            "task_passed",
+            "contact_retention_passed",
+            "wrench_capability"
+          ],
+          "failure": null,
+          "recording_id": "counterfactual_panel_PPP"
+        }
+      ]
+    },
+    "box": {
+      "task": "box",
+      "scope": "frozen material geometry and object keyframe; posture re-realized for actual hardware; independent cone and torque constraints",
+      "objective_definition": "common geometry cost + common posture-reference cost - independently computed rho; not a sequence objective",
+      "common_evaluation_rho": 0.1,
+      "selected_types": [
+        "G",
+        "P",
+        "G"
+      ],
+      "selected_sequence_objective": -124.69738538200475,
+      "E": [
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          1.0,
+          0.0,
+          -2.245405449496085e-18,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          -2.245405449496085e-18,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "D": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.15
+        ]
+      ],
+      "rows": [
+        {
+          "types": [
+            "P",
+            "P",
+            "P"
+          ],
+          "assignment": [
+            0,
+            1,
+            2
+          ],
+          "keyframe_index": 4,
+          "keyframe_id": "opening",
+          "source_and_object_pose_held_fixed": true,
+          "frozen_material_points_m": [
+            [
+              -0.32000000000000006,
+              -0.02,
+              0.0
+            ],
+            [
+              0.09999433974924915,
+              -1.9644988828160277e-05,
+              -0.10000000000000003
+            ],
+            [
+              0.39999999999999986,
+              0.02,
+              0.04000000000000003
+            ]
+          ],
+          "sequence_objective": null,
+          "sequence_not_reoptimized": true,
+          "native_geometry_passed": true,
+          "geometry_violations": [],
+          "planning_passed": false,
+          "stage": "IK_geometry_or_allocation",
+          "failure": "Condensed allocation rejected: PrimalInfeasible",
+          "physical_execution_performed": false,
+          "local_failure_not_global_infeasibility": true
+        },
+        {
+          "types": [
+            "P",
+            "P",
+            "G"
+          ],
+          "assignment": [
+            0,
+            1,
+            2
+          ],
+          "keyframe_index": 4,
+          "keyframe_id": "opening",
+          "source_and_object_pose_held_fixed": true,
+          "frozen_material_points_m": [
+            [
+              -0.32000000000000006,
+              -0.02,
+              0.0
+            ],
+            [
+              0.09999433974924915,
+              -1.9644988828160277e-05,
+              -0.10000000000000003
+            ],
+            [
+              0.39999999999999986,
+              0.02,
+              0.04000000000000003
+            ]
+          ],
+          "sequence_objective": null,
+          "sequence_not_reoptimized": true,
+          "native_geometry_passed": true,
+          "geometry_violations": [],
+          "planning_passed": true,
+          "stage": "independent_frozen_geometry_SOCP",
+          "rho": 5.6380405342106075,
+          "rho_required": 0.1,
+          "solver_status": "AlmostSolved",
+          "primal_residual": 1.4566126083082054e-13,
+          "frozen_keyframe_cost": -5.633878593370168,
+          "geometry_cost": 1.161011179503925e-09,
+          "posture_cost": 0.004161939679427974,
+          "maximum_margin_reaction_forces_N": {
+            "base_grasp": 3.088167839127063,
+            "base_support": 29.145333981819814,
+            "moving_manipulation": 13.386690239444578
+          },
+          "maximum_margin_peak_joint_torque_Nm": 42.5610814894696,
+          "common_rho_metrics": {
+            "rho": 0.1,
+            "passed": true,
+            "peak_joint_torque_Nm": 39.83646135023636,
+            "minimum_joint_torque_margin_Nm": 8.402008616914896,
+            "peak_interface_force_N": {
+              "base_grasp": 0.628576408993197,
+              "base_support": 18.17250603933056,
+              "moving_manipulation": 8.2087176882835
+            }
+          }
+        },
+        {
+          "types": [
+            "G",
+            "P",
+            "P"
+          ],
+          "assignment": [
+            0,
+            1,
+            2
+          ],
+          "keyframe_index": 4,
+          "keyframe_id": "opening",
+          "source_and_object_pose_held_fixed": true,
+          "frozen_material_points_m": [
+            [
+              -0.32000000000000006,
+              -0.02,
+              0.0
+            ],
+            [
+              0.09999433974924915,
+              -1.9644988828160277e-05,
+              -0.10000000000000003
+            ],
+            [
+              0.39999999999999986,
+              0.02,
+              0.04000000000000003
+            ]
+          ],
+          "sequence_objective": null,
+          "sequence_not_reoptimized": true,
+          "native_geometry_passed": true,
+          "geometry_violations": [],
+          "planning_passed": true,
+          "stage": "independent_frozen_geometry_SOCP",
+          "rho": 0.9509344528543575,
+          "rho_required": 0.1,
+          "solver_status": "Solved",
+          "primal_residual": 4.883727200422072e-09,
+          "frozen_keyframe_cost": -0.9475074832842283,
+          "geometry_cost": 1.161011179503925e-09,
+          "posture_cost": 0.003426968409118069,
+          "maximum_margin_reaction_forces_N": {
+            "base_grasp": 15.26538296596101,
+            "base_support": 16.15781388949497,
+            "moving_manipulation": 5.027010129238361
+          },
+          "maximum_margin_peak_joint_torque_Nm": 40.088751231170264,
+          "common_rho_metrics": {
+            "rho": 0.1,
+            "passed": true,
+            "peak_joint_torque_Nm": 39.87529137056693,
+            "minimum_joint_torque_margin_Nm": 8.57267189892768,
+            "peak_interface_force_N": {
+              "base_grasp": 6.932276374356106,
+              "base_support": 15.743903767366369,
+              "moving_manipulation": 4.486387156286659
+            }
+          }
+        },
+        {
+          "types": [
+            "G",
+            "P",
+            "G"
+          ],
+          "assignment": [
+            0,
+            1,
+            2
+          ],
+          "keyframe_index": 4,
+          "keyframe_id": "opening",
+          "source_and_object_pose_held_fixed": true,
+          "frozen_material_points_m": [
+            [
+              -0.32000000000000006,
+              -0.02,
+              0.0
+            ],
+            [
+              0.09999433974924915,
+              -1.9644988828160277e-05,
+              -0.10000000000000003
+            ],
+            [
+              0.39999999999999986,
+              0.02,
+              0.04000000000000003
+            ]
+          ],
+          "sequence_objective": null,
+          "sequence_not_reoptimized": true,
+          "native_geometry_passed": true,
+          "geometry_violations": [],
+          "planning_passed": true,
+          "stage": "independent_frozen_geometry_SOCP",
+          "rho": 15.150593333112417,
+          "rho_required": 0.1,
+          "solver_status": "Solved",
+          "primal_residual": 7.021370151960582e-10,
+          "frozen_keyframe_cost": -15.149713831649956,
+          "geometry_cost": 1.161011179503925e-09,
+          "posture_cost": 0.0008795003014490938,
+          "maximum_margin_reaction_forces_N": {
+            "base_grasp": 35.53597064454155,
+            "base_support": 35.44039222344821,
+            "moving_manipulation": 32.46401576723341
+          },
+          "maximum_margin_peak_joint_torque_Nm": 47.020358641264544,
+          "common_rho_metrics": {
+            "rho": 0.1,
+            "passed": true,
+            "peak_joint_torque_Nm": 39.93722891421169,
+            "minimum_joint_torque_margin_Nm": 8.881076489152747,
+            "peak_interface_force_N": {
+              "base_grasp": 6.348336756607276,
+              "base_support": 15.489324970376558,
+              "moving_manipulation": 3.6371028980266815
+            }
+          }
+        }
+      ],
+      "counterfactuals": [
+        {
+          "types": [
+            "P",
+            "P",
+            "G"
+          ],
+          "assignment": [
+            0,
+            1,
+            2
+          ],
+          "stage": "native_execution",
+          "execution_passed": false,
+          "new_physical_trial_executed": true,
+          "sequence_objective": -46.34021528319194,
+          "maximum_position_error_m": 0.015951357275969757,
+          "maximum_rotation_error_rad": 0.04108378811263072,
+          "failed_checks": [
+            "tracking_passed",
+            "contact_retention_passed"
+          ],
+          "failure": null,
+          "recording_id": "counterfactual_box_PPG"
+        }
+      ]
+    },
+    "assembly": {
+      "task": "assembly",
+      "scope": "frozen material geometry and object keyframe; posture re-realized for actual hardware; independent cone and torque constraints",
+      "objective_definition": "common geometry cost + common posture-reference cost - independently computed rho; not a sequence objective",
+      "common_evaluation_rho": 0.1,
+      "selected_types": [
+        "G",
+        "P",
+        "G"
+      ],
+      "selected_sequence_objective": -54.94566369515949,
+      "E": [
+        [
+          0.8,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.8,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.8,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.8,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.8,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.8
+        ],
+        [
+          0.2,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.2,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.2,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.2,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.2,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.2
+        ]
+      ],
+      "D": [
+        [
+          0.15,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.15,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.15,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rows": [
+        {
+          "types": [
+            "P",
+            "P",
+            "P"
+          ],
+          "assignment": [
+            0,
+            1,
+            2
+          ],
+          "keyframe_index": 3,
+          "keyframe_id": "reorient_tabletop",
+          "source_and_object_pose_held_fixed": true,
+          "frozen_material_points_m": [
+            [
+              -0.3,
+              -0.18,
+              0.0
+            ],
+            [
+              0.10900022997680008,
+              0.04800032768744676,
+              -0.02
+            ],
+            [
+              0.0,
+              0.02,
+              -0.04
+            ]
+          ],
+          "sequence_objective": null,
+          "sequence_not_reoptimized": true,
+          "native_geometry_passed": true,
+          "geometry_violations": [],
+          "planning_passed": false,
+          "stage": "IK_geometry_or_allocation",
+          "failure": "Condensed allocation rejected: PrimalInfeasible",
+          "physical_execution_performed": false,
+          "local_failure_not_global_infeasibility": true
+        },
+        {
+          "types": [
+            "P",
+            "P",
+            "G"
+          ],
+          "assignment": [
+            0,
+            1,
+            2
+          ],
+          "keyframe_index": 3,
+          "keyframe_id": "reorient_tabletop",
+          "source_and_object_pose_held_fixed": true,
+          "frozen_material_points_m": [
+            [
+              -0.3,
+              -0.18,
+              0.0
+            ],
+            [
+              0.10900022997680008,
+              0.04800032768744676,
+              -0.02
+            ],
+            [
+              0.0,
+              0.02,
+              -0.04
+            ]
+          ],
+          "sequence_objective": null,
+          "sequence_not_reoptimized": true,
+          "native_geometry_passed": true,
+          "geometry_violations": [],
+          "planning_passed": false,
+          "stage": "IK_geometry_or_allocation",
+          "failure": "Condensed allocation rejected: PrimalInfeasible",
+          "physical_execution_performed": false,
+          "local_failure_not_global_infeasibility": true
+        },
+        {
+          "types": [
+            "G",
+            "P",
+            "P"
+          ],
+          "assignment": [
+            0,
+            1,
+            2
+          ],
+          "keyframe_index": 3,
+          "keyframe_id": "reorient_tabletop",
+          "source_and_object_pose_held_fixed": true,
+          "frozen_material_points_m": [
+            [
+              -0.3,
+              -0.18,
+              0.0
+            ],
+            [
+              0.10900022997680008,
+              0.04800032768744676,
+              -0.02
+            ],
+            [
+              0.0,
+              0.02,
+              -0.04
+            ]
+          ],
+          "sequence_objective": null,
+          "sequence_not_reoptimized": true,
+          "native_geometry_passed": true,
+          "geometry_violations": [],
+          "planning_passed": false,
+          "stage": "IK_geometry_or_allocation",
+          "failure": "Condensed allocation rejected: PrimalInfeasible",
+          "physical_execution_performed": false,
+          "local_failure_not_global_infeasibility": true
+        },
+        {
+          "types": [
+            "G",
+            "P",
+            "G"
+          ],
+          "assignment": [
+            0,
+            1,
+            2
+          ],
+          "keyframe_index": 3,
+          "keyframe_id": "reorient_tabletop",
+          "source_and_object_pose_held_fixed": true,
+          "frozen_material_points_m": [
+            [
+              -0.3,
+              -0.18,
+              0.0
+            ],
+            [
+              0.10900022997680008,
+              0.04800032768744676,
+              -0.02
+            ],
+            [
+              0.0,
+              0.02,
+              -0.04
+            ]
+          ],
+          "sequence_objective": null,
+          "sequence_not_reoptimized": true,
+          "native_geometry_passed": true,
+          "geometry_violations": [],
+          "planning_passed": true,
+          "stage": "independent_frozen_geometry_SOCP",
+          "rho": 8.013608013936572,
+          "rho_required": 0.1,
+          "solver_status": "AlmostSolved",
+          "primal_residual": 3.9695992153088167e-11,
+          "frozen_keyframe_cost": -8.012741168276577,
+          "geometry_cost": 0.0006249896534554092,
+          "posture_cost": 0.00024185600653957686,
+          "maximum_margin_reaction_forces_N": {
+            "top_gripper": 15.233214662784139,
+            "point_support": 25.162228125546225,
+            "leg_gripper": 5.973448312892512
+          },
+          "maximum_margin_peak_joint_torque_Nm": 57.126743982838285,
+          "common_rho_metrics": {
+            "rho": 0.1,
+            "passed": true,
+            "peak_joint_torque_Nm": 50.48878165221902,
+            "minimum_joint_torque_margin_Nm": 8.953087247458832,
+            "peak_interface_force_N": {
+              "top_gripper": 7.31347859377719,
+              "point_support": 16.101383453523905,
+              "leg_gripper": 3.944101418574449
+            }
+          }
+        }
+      ],
+      "counterfactuals": [
+        {
+          "types": [
+            "G",
+            "P",
+            "P"
+          ],
+          "assignment": [
+            0,
+            1,
+            2
+          ],
+          "stage": "planning",
+          "execution_passed": false,
+          "new_physical_trial_executed": false,
+          "sequence_objective": null,
+          "maximum_position_error_m": null,
+          "maximum_rotation_error_rad": null,
+          "failed_checks": [],
+          "failure": "Structurally insufficient contact-type wrench span on free leg: maximum rank 3<6 before assembly",
+          "recording_id": null
+        }
+      ]
+    }
+  },
+  "algorithm_scope": {
+    "network_inference": false,
+    "supplied_contracted_groups": true,
+    "source_fallbacks_explicit": true,
+    "full_motion_integration": "independent/contact-coordinate midpoint variants; not literal manuscript Eq.17",
+    "arm_control": "impedance + planned reaction feedforward; Sf=0",
+    "hardware_calibration": false,
+    "crisp_cross_validation_of_new_tasks": false,
+    "full_paper_pipeline_executed": false
+  }
+}

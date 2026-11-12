@@ -1,0 +1,62 @@
+[
+  {
+    "name": "desktop",
+    "mode": "polytope",
+    "errors": [],
+    "loaded_actual_assets": 8,
+    "overflow": false,
+    "force": "외력 적용 중 · 2.62 N · world frame",
+    "status": "Source robustness · PASS",
+    "comparison_figures": [
+      {
+        "loaded": true,
+        "src": "./data/source-robustness-comparison.svg"
+      }
+    ]
+  },
+  {
+    "name": "desktop",
+    "mode": "nominal",
+    "errors": [],
+    "loaded_actual_assets": 8,
+    "overflow": false,
+    "force": "외력 적용 중 · 2.62 N · world frame",
+    "status": "Source robustness · FAIL",
+    "comparison_figures": [
+      {
+        "loaded": true,
+        "src": "./data/source-robustness-comparison.svg"
+      }
+    ]
+  },
+  {
+    "name": "mobile",
+    "mode": "polytope",
+    "errors": [],
+    "loaded_actual_assets": 8,
+    "overflow": false,
+    "force": "외력 적용 중 · 2.62 N · world frame",
+    "status": "Source robustness · PASS",
+    "comparison_figures": [
+      {
+        "loaded": true,
+        "src": "./data/source-robustness-comparison.svg"
+      }
+    ]
+  },
+  {
+    "name": "mobile",
+    "mode": "nominal",
+    "errors": [],
+    "loaded_actual_assets": 8,
+    "overflow": false,
+    "force": "외력 적용 중 · 2.62 N · world frame",
+    "status": "Source robustness · FAIL",
+    "comparison_figures": [
+      {
+        "loaded": true,
+        "src": "./data/source-robustness-comparison.svg"
+      }
+    ]
+  }
+]

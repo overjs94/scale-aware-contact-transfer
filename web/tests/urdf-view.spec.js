@@ -571,3 +571,32 @@ for (const task of ['assembly','box','panel']) {
     if(task==='assembly'){expect(r.task_metrics.leg_released).toBe(true);expect(r.task_metrics.lateral_error_m).toBeLessThan(.002);}
   });
 }
+
+test('matched source-polytope ablation preserves both outcomes and the applied force arrow',async({page})=>{
+ await page.goto('/?model=robust_refinement_polytope_-4N');
+ await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+ await expect(page.locator('#scenario-status')).toContainText('Source robustness · PASS');
+ await expect(page.locator('#source-result')).toContainText('ON · 8 vertices');
+ const results=page.locator('#algorithm-comparison-results');await expect(results).toContainText('Source polytope ON/OFF');
+ await expect(results.locator('tr[data-robustness="true"][data-force="-4"]')).toContainText('PASS');
+ await expect(results.locator('tr[data-robustness="false"][data-force="-4"]')).toContainText('FAIL');
+ const study=await page.evaluate(async()=>await(await fetch('/data/algorithm-comparisons.json')).json());
+ const trials=study.source_robustness.trials;expect(trials).toHaveLength(14);expect(study.source_robustness.controller_settings_equal).toBe(true);
+ for(const enabled of [true,false]){const same=trials.filter(t=>t.robustness_enabled===enabled);expect(new Set(same.map(t=>t.native_plan_id)).size).toBe(1);expect(same.find(t=>t.force_N===0).execution_passed).toBe(true);}
+ const on=trials.find(t=>t.force_N===-4&&t.robustness_enabled),off=trials.find(t=>t.force_N===-4&&!t.robustness_enabled);
+ expect(on.inside_initial_static_box).toBe(true);expect(off.inside_initial_static_box).toBe(false);expect(on.source_rho).toBeGreaterThan(off.source_rho);
+ await page.getByRole('button',{name:'외력 최대 · 화살표 · 4.5 s',exact:true}).click();
+ await expect(page.locator('#disturbance-state')).toHaveAttribute('data-active','true');await expect(page.locator('#disturbance-state')).toContainText('4.00 N');
+ await page.goto('/?model=robust_refinement_nominal_-4N');await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+ await expect(page.locator('#scenario-status')).toContainText('Source robustness · FAIL');await expect(page.locator('#result-tracking')).toContainText('FAIL');await expect(page.locator('#source-result')).toContainText('OFF · nominal only');
+});
+
+for(const [task,types] of [['panel','PPP'],['box','PPG']])test(`forced ${task} ${types}: worse sequence and measured execution failure remain visible`,async({page})=>{
+ await page.goto(`/?model=counterfactual_${task}_${types}`);await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+ await expect(page.locator('#scenario-status')).toContainText('강제 접촉 유형 · FAIL');await expect(page.locator('#source-result')).toContainText(types.split('').join(' / '));
+ const study=await page.evaluate(async()=>await(await fetch('/data/algorithm-comparisons.json')).json());const group=study.contact_types[task],other=group.counterfactuals.find(r=>r.types.join('')===types);
+ expect(other.stage).toBe('native_execution');expect(other.new_physical_trial_executed).toBe(true);expect(other.sequence_objective).toBeGreaterThan(group.selected_sequence_objective);expect(other.execution_passed).toBe(false);
+ await expect(page.locator('#algorithm-comparison-results')).toContainText('시퀀스 비용');
+ const d=await page.evaluate(async id=>await(await fetch('/data/'+id+'.json')).json(),`counterfactual_${task}_${types}`);
+ expect(d.report.selection.source_refinement_enabled).toBe(true);expect(d.report.object_pose_prescribed).toBe(false);expect(d.report.object_equality_constraints_used).toBe(0);
+});

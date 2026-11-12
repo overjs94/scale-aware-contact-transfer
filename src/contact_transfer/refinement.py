@@ -21,7 +21,8 @@ class RefinementResult:
 
 def refine_contacts(patches, task: TaskWrench, capabilities=None, *,
                     position_radius=.03, normal_radius=.1, rho_min=0.,
-                    geometry_weight=0., reaction_maps=None, settings=None):
+                    geometry_weight=0., reaction_maps=None, settings=None,
+                    robustness_enabled=True):
     m = len(patches)
     caps = capabilities or [Capability() for _ in patches]
     if not m or len(caps) != m:
@@ -30,11 +31,14 @@ def refine_contacts(patches, task: TaskWrench, capabilities=None, *,
         raise ValueError('One object/link reaction map per contact required')
     if position_radius < 0 or normal_radius < 0 or rho_min < 0 or geometry_weight < 0:
         raise ValueError("radii, margin and weights must be nonnegative")
+    if not robustness_enabled and (rho_min>0 or geometry_weight<=0):
+        raise ValueError('Nominal-only ablation needs rho_min=0 and a positive common geometry weight')
     opti = ca.Opti()
     geometry = [p.instantiate(opti) for p in patches]
-    rho = opti.variable()
-    opti.subject_to(rho >= rho_min)
-    opti.set_initial(rho, rho_min)
+    rho = opti.variable() if robustness_enabled else ca.DM(0.)
+    if robustness_enabled:
+        opti.subject_to(rho >= rho_min)
+        opti.set_initial(rho, rho_min)
     geometry_cost = 0
     for patch, (_, p, R) in zip(patches, geometry):
         p0, R0 = patch.position(patch.initial), patch.rotation(patch.initial)
@@ -44,7 +48,8 @@ def refine_contacts(patches, task: TaskWrench, capabilities=None, *,
             opti.subject_to(1-ca.dot(R[:, 2], R0[:, 2]) <= normal_radius)
             geometry_cost += ca.sumsqr(p-p0)
     reactions = []
-    for vertex in task.vertices:
+    vertices=task.vertices if robustness_enabled else [np.zeros(task.E.shape[1])]
+    for vertex in vertices:
         lam = [cap.reaction(opti) for cap in caps]
         total = sum((reaction_maps[i](g[1], g[2], f) if reaction_maps is not None
                      else map_reaction(g[1], g[2], f)) for i, (g, f) in enumerate(zip(geometry, lam)))

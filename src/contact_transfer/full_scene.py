@@ -89,11 +89,11 @@ def build_scene(problem,path,*,timestep=.001,contacts_enabled=True):
             if name.startswith('arm') and '_collision_' in name:g.set('contype','1');g.set('conaffinity','1')
             elif any(name.startswith(n+'_') for n in components) and '_collision_' in name:g.set('contype','2');g.set('conaffinity','0')
     fixtures=[]
-    if task.id=='panel':
+    if task.id=='panel' and task.include_fixtures:
         jig=Robot(task.original.path.parent/task.original.data['jig_urdf']);append_urdf_robot(world,act,jig,'jig_',robot_collisions=True)
         for i,g in enumerate(ET.parse(jig.path).findall('link/collision')):
             R,p=origin(g);fixtures.append(dict(name=f'jig_{i}',position=p.tolist(),size=np.fromstring(g.find('geometry/box').get('size'),sep=' ').tolist(),quaternion_xyzw=Rotation.from_matrix(R).as_quat().tolist()))
-    elif task.id=='assembly':
+    elif task.id=='assembly' and task.include_fixtures:
         for f in task.fixtures:ET.SubElement(world,'geom',name=f['name'],type='box',size=_text(np.asarray(f['size'])/2),pos=_text(f['position']),quat=_text(np.array(f['quaternion_xyzw'])[[3,0,1,2]]),contype='1',conaffinity='3');fixtures.append(f)
     ET.SubElement(world,'geom',name='floor',type='plane',size='3 3 .1',contype='1',conaffinity='3');out=Path(path);out.parent.mkdir(parents=True,exist_ok=True);ET.indent(root);out.write_bytes(ET.tostring(root,encoding='utf-8',xml_declaration=True));return FullScene(out,roots,frames,joints,geometries,allowed,tuple(fixtures))
 
@@ -101,6 +101,7 @@ def build_scene(problem,path,*,timestep=.001,contacts_enabled=True):
 def support_contacts(problem,phase,steps):
     """Actual jig surfaces or equal/opposite shoulder seating candidates."""
     task=problem.task_definition;out=[]
+    if not task.include_fixtures:return ()
     if task.id=='panel':
         qgoal=task.keyframes[-1]['object_q'];T=task.object.fk(qgoal,task.object.tree.root);bottom=float(np.fromstring(ET.parse(task.object.path).find('link/collision/geometry/box').get('size'),sep=' ')[2]/2)
         for i,g in enumerate(ET.parse(task.original.path.parent/task.original.data['jig_urdf']).findall('link/collision')):
