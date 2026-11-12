@@ -256,7 +256,7 @@ class MobileController:
         return np.r_[cmd,np.clip(tp,-rp.effort,rp.effort)]
 
 
-def run_mobile(output='outputs/mobile_panel',*,case_path=None,plan=None,progress=None):
+def run_mobile(output='outputs/mobile_panel',*,case_path=None,plan=None,progress=None,disturbances=()):
     output=Path(output);output.mkdir(parents=True,exist_ok=True)
     if plan is None:
         if progress:progress('optimization')
@@ -274,7 +274,9 @@ def run_mobile(output='outputs/mobile_panel',*,case_path=None,plan=None,progress
     bad=planned_collisions(plan,scene)
     if bad:raise RuntimeError('Planned mesh penetration: '+json.dumps(bad))
     if progress:progress('simulation')
-    trace=scene.run(controller,controller.reference,case.data['duration'],case_id=hashlib.sha256(json.dumps(case.data,sort_keys=True).encode()).hexdigest(),plan_id=hashlib.sha256(plan.q.tobytes()+plan.reactions.tobytes()).hexdigest(),initial_q=controller.reference(0)[0],progress=(lambda t,d:progress('simulation',time_s=t,duration_s=d)) if progress else None);trace.metadata.update(scenario='mobile_panel',fixtures=fixtures,mobile_base_pose_prescribed=False,object_pose_prescribed=False)
+    from .perturbations import WrenchSchedule
+    schedule=WrenchSchedule(disturbances)
+    trace=scene.run(controller,controller.reference,case.data['duration'],external_forces=schedule,case_id=hashlib.sha256(json.dumps(case.data,sort_keys=True).encode()).hexdigest(),plan_id=hashlib.sha256(plan.q.tobytes()+plan.reactions.tobytes()).hexdigest(),initial_q=controller.reference(0)[0],progress=(lambda t,d:progress('simulation',time_s=t,duration_s=d)) if progress else None);trace.metadata.update(external_disturbances=schedule.to_list(),scenario='mobile_panel',fixtures=fixtures,mobile_base_pose_prescribed=False,object_pose_prescribed=False)
     trace.save(output/'execution.npz');np.savez_compressed(output/'plan.npz',time=plan.times,q=plan.q,v=plan.v,a=plan.a,reactions=plan.reactions,torque=plan.torque)
     report,flags=mobile_report(plan,trace);(output/'report.json').write_text(json.dumps(report,indent=2,allow_nan=False)+'\n');(output/'case.json').write_text(json.dumps(case.data,indent=2)+'\n');np.savez_compressed(output/'mobile_metrics.npz',contact_flags=flags)
     return plan,trace,report,flags

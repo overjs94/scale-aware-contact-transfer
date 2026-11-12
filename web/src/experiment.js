@@ -2,11 +2,27 @@ const $=id=>document.getElementById(id);
 let preset,job,timer,connected=false;
 const state=text=>{$('experiment-state').textContent=text;};
 const stages={queued:'대기',source_refinement_and_optimization:'소형 접촉점 refinement · target 하중/토크 최적화',optimization:'SE(3) IK 경로 · IPOPT 접촉력/토크 최적화',simulation:'MuJoCo 동역학 실행',validation:'접촉 · 삽입 · 해제 검증',export:'기록 내보내기',complete:'계산 완료',failed:'실패',cancelled:'취소됨'};
+const articulated=()=>['hinged_door','folding_panel','drawer'].includes(preset?.id);
 const assembly=()=>preset?.id==='table_assembly';
 const panel=()=>['panel_fixture','mobile_panel'].includes(preset?.id);
 const mobile=()=>preset?.id==='mobile_panel';
 const names={grip_and_support:'상판 파지·구형 지지',grasp_settled:'파지 유지',lift_tabletop:'상판·다리 들어 올리기',reorient_tabletop:'상판 12° 재정렬',approach_socket:'다리 접근',align_leg:'peg / socket 정렬',insert_leg:'다리 삽입',assembled_and_released:'gripper 해제·조립 유지'};
+function articulatedFields(){
+  const angular=preset.id!=='drawer';$('keyframe-inputs').replaceChildren();
+  $('preset-tag').textContent='PANDA · PASSIVE OBJECT';$('builder-title').textContent={hinged_door:'문 열기',folding_panel:'접이식 상판 펼치기',drawer:'서랍 당기기'}[preset.id];
+  $('builder-note').textContent=`수동 ${angular?'hinge':'rail'} · 물체 actuator 0 · ${preset.tool==='G'?'native gripper':'spherical point tool'}`;
+  $('tool-chips').replaceChildren();const chip=document.createElement('span');chip.textContent=preset.tool==='G'?'⋈ Gripper handle grasp':'● Spherical point contact';$('tool-chips').append(chip);
+  $('mass-control').hidden=true;$('panel-mass').disabled=true;$('source-refinement-control').hidden=true;$('duration-control').hidden=false;$('assembly-duration').disabled=false;$('assembly-duration').min=12;
+  $('planner-description').textContent='물체의 수동 관절 관성·중력·스프링·마찰과 접촉력·팔 토크를 최적화합니다. 물체 pose를 강제하거나 actuator로 움직이지 않습니다. 접촉점·초기 파지·관절 경로는 주어진 조건이며, articulated contraction 학습은 아직 포함하지 않습니다.';
+  const scale=Number($('assembly-duration').value)/preset.duration;
+  for(const [label,time,q] of [['접촉',0,preset.initial_coordinate],['시작',preset.motion_start,preset.initial_coordinate],['중간',(preset.motion_start+preset.motion_end)/2,(preset.initial_coordinate+preset.target_coordinate)/2],['목표',preset.motion_end,preset.target_coordinate],['유지',preset.duration,preset.target_coordinate]]){
+    const row=document.createElement('div');row.className='assembly-key';for(const text of [label,`${(time*scale).toFixed(1)} s`,`${(q*(angular?180/Math.PI:1000)).toFixed(1)} ${angular?'deg':'mm'}`]){const el=document.createElement('span');el.textContent=text;row.append(el);}$('keyframe-inputs').append(row);
+  }
+  $('keyframe-help').textContent='초기 접촉 → 이동 → 유지 · 물체 관절의 측정값을 재생합니다.';
+  $('contacts-json').value=JSON.stringify({kind:preset.tool,link:'moving',point_link:preset.contact_object,inward_link:preset.inward_object},null,2);$('contacts-json').readOnly=true;$('contacts-file').disabled=true;
+}
 function fields(){
+  if(articulated())return articulatedFields();
   const isAssembly=assembly();const isPanel=panel();const detailed=isAssembly||isPanel;$('keyframe-inputs').replaceChildren();
   $('preset-tag').textContent=mobile()?'RBY1 + PANDA':'PANDA × 3';
   $('builder-title').textContent=mobile()?'작업영역 확장 · RBY1 + Panda':isPanel?'본 실험 · 패널 → 지그 → 릴리스':isAssembly?'책상 상판·다리 조립':'Three Franka · 패널 운반';
@@ -40,6 +56,14 @@ function fields(){
 }
 function report(data){
   const r=data.report;if(!r)return;$('experiment-results').hidden=false;
+  if(r.articulated_object){
+    const angular=r.coordinate_units==='rad',factor=angular?180/Math.PI:1000,unit=angular?'deg':'mm';
+    $('result-tracking').textContent=`${r.execution_passed?'PASS':'FAIL'} · ${(r.final_error*factor).toFixed(3)} ${unit}`;
+    $('result-forces').textContent=`${r.peak_contact_force_N.toFixed(2)} N · peak`;
+    $('result-seal-label').textContent='PASSIVE JOINT / CONTACT';$('result-seal').textContent=`0 actuators · ${(100*r.contact_fraction).toFixed(1)}% contact`;
+    for(const id of ['source-result','workspace-result','robustness-result'])$(id).hidden=true;
+    $('result-residual').textContent=r.primal_residual.toExponential(2);$('report-json').textContent=JSON.stringify(r,null,2);return;
+  }
   const isAssembly=r.scenario==='table_assembly';const isPanel=r.scenario==='panel_fixture';const isMobile=r.scenario==='mobile_panel';const errors=isPanel?r.keyframe_errors.map(k=>k.panel.translation_m):isAssembly?r.keyframe_errors.flatMap(k=>[k.tabletop.translation_m,...(k.time<=(r.leg_release_time_s||28)?[k.leg.translation_m]:[])]):r.keyframe_errors.map(k=>k.translation_m);
   $('result-tracking').textContent=(r.tracking_passed?'PASS':'FAIL')+' · '+Math.max(...errors.map(v=>v*1000)).toFixed(2)+' mm';
   $('result-forces').textContent=isMobile?(r.force_envelopes_passed?'PASS':'FAIL'):r.force_envelopes_passed?'PASS':'FAIL';
@@ -49,6 +73,8 @@ function report(data){
   if(isMobile){const p=r.workspace_comparison.panda,g=r.workspace_comparison.tip_right;$('workspace-result').textContent=`WORKSPACE · 목적 접촉점: 고정 Panda ${p.fixed_base_target_distance_m.toFixed(3)} m > 도달 상한 ${p.URDF_chain_radius_bound_m.toFixed(3)} m · RBY1 (동일 torso) ${g.fixed_base_target_distance_m.toFixed(3)} m > ${g.URDF_chain_radius_bound_m.toFixed(3)} m · 실제 베이스 이동 ${r.base_travel_m.toFixed(3)} m`;}
   $('source-result').hidden=!(isPanel||isMobile);
   if(isPanel||isMobile)$('source-result').textContent=`SOURCE · ${r.source.synthetic_input?'synthetic 입력':'외부 contracted 입력'} · refinement ${r.source.source_refinement_enabled?'ON':'OFF'} · ρ ${r.source.source_rho_before.toFixed(3)} → ${r.source.source_rho_after.toFixed(3)} · target ${r.target_validation?.length?'최소 ρ '+Math.min(...r.target_validation.map(v=>v.rho)).toFixed(3):'nominal 공동 토크 검증'} · 학습 추론 미실행`;
+  $('robustness-result').hidden=!r.robustness;
+  if(r.robustness)$('robustness-result').textContent=`외력 ${r.robustness.force_peak_N} N · 자세 회복 ${r.robustness.recovery_passed?'PASS':'FAIL'} · 접촉 허용영역 포함 전체 검사 ${r.robustness.all_task_checks_passed?'PASS':'FAIL'} · 최대 오차 ${(r.robustness.peak_pose_error_m*1000).toFixed(2)} mm`;
   $('result-residual').textContent=r.primal_residual.toExponential(2);$('report-json').textContent=JSON.stringify(r,null,2);
 }
 async function request(path,options={}){const target=path.startsWith('/api/')?new URL('.'+path,document.baseURI):path;const response=await fetch(target,options);const body=await response.json();if(!response.ok)throw Error(body.error||'계산 서버 오류');return body;}
@@ -61,20 +87,31 @@ async function poll(){const active=job;if(!active)return;try{
 }catch(error){if(job===active){state(error.message);finish();}}}
 $('experiment-form').onsubmit=async event=>{event.preventDefault();try{
   let payload;
-  if(panel())payload={preset:mobile()?'mobile_panel':'panel_fixture',duration:Number($('assembly-duration').value),refine_source:$('source-refinement').checked,contracted_source:JSON.parse($('contacts-json').value)};
+  if(articulated())payload={preset:preset.id,duration:Number($('assembly-duration').value)};
+  else if(panel())payload={preset:mobile()?'mobile_panel':'panel_fixture',duration:Number($('assembly-duration').value),refine_source:$('source-refinement').checked,contracted_source:JSON.parse($('contacts-json').value)};
   else if(assembly())payload={preset:'table_assembly',duration:Number($('assembly-duration').value)};
   else{const keyframes=structuredClone(preset.keyframes);document.querySelectorAll('#keyframe-inputs input').forEach(input=>{const k=keyframes[Number(input.dataset.key)],v=Number(input.value);if(input.dataset.field==='time')k.time=v;else k.object_pose[['x','y','z'].indexOf(input.dataset.field)]=v;});payload={preset:'three_franka',mass:Number($('panel-mass').value),keyframes,contacts:JSON.parse($('contacts-json').value)};}
   $('experiment-run').disabled=true;$('scenario-preset').disabled=true;state('작업 제출 중…');const result=await request('/api/experiments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});job=result.id;$('experiment-cancel').disabled=false;await poll();
 }catch(error){state(error.message);finish();}};
 $('experiment-cancel').onclick=async()=>{if(job){try{await request('/api/experiments/'+job+'/cancel',{method:'POST'});state('취소됨');finish();}catch(error){state(error.message);}}};
-$('experiment-reset').onclick=()=>{$('assembly-duration').value=mobile()?36:30;if(panel())$('contacts-json').value=JSON.stringify(preset.contracted_source,null,2);fields();};
-$('assembly-duration').oninput=()=>{if((assembly()||panel())&&$('assembly-duration').checkValidity())fields();};
+$('experiment-reset').onclick=()=>{$('assembly-duration').value=articulated()?14:mobile()?36:30;if(panel())$('contacts-json').value=JSON.stringify(preset.contracted_source,null,2);fields();};
+$('assembly-duration').oninput=()=>{if((articulated()||assembly()||panel())&&$('assembly-duration').checkValidity())fields();};
 $('contacts-file').onchange=async event=>{try{const file=event.target.files[0];if(!file)return;if(file.size>32768)throw Error('32 KB 이하 JSON을 사용하세요.');const body=JSON.parse(await file.text());$('contacts-json').value=JSON.stringify(body.contracted_contacts||body,null,2);state('접촉 JSON을 불러왔습니다. 실행 시 표면·법선을 검사합니다.');}catch(error){state(error.message);}};
 window.addEventListener('recording-selected',event=>report(event.detail));
-async function selectPreset(id){preset=await(await fetch(id==='mobile_panel'?'./data/mobile-preset.json':id==='panel_fixture'?'./data/panel-preset.json':id==='table_assembly'?'./data/assembly-preset.json':'./data/franka-preset.json')).json();if(['panel_fixture','mobile_panel'].includes(id)){preset.contracted_source=await(await fetch(id==='mobile_panel'?'./data/mobile-source.json':'./data/panel-source.json')).json();$('assembly-duration').value=id==='mobile_panel'?36:30;$('contacts-json').value=JSON.stringify(preset.contracted_source,null,2);}fields();}
+async function selectPreset(id){
+  const isArticulated=['hinged_door','folding_panel','drawer'].includes(id);
+  const url=isArticulated?`./data/${id}-preset.json`:id==='mobile_panel'?'./data/mobile-preset.json':id==='panel_fixture'?'./data/panel-preset.json':id==='table_assembly'?'./data/assembly-preset.json':'./data/franka-preset.json';
+  preset=await(await fetch(url)).json();
+  $('assembly-duration').value=isArticulated?14:id==='mobile_panel'?36:30;
+  if(['panel_fixture','mobile_panel'].includes(id)){
+    preset.contracted_source=await(await fetch(id==='mobile_panel'?'./data/mobile-source.json':'./data/panel-source.json')).json();
+    $('contacts-json').value=JSON.stringify(preset.contracted_source,null,2);
+  }
+  fields();
+}
 $('scenario-preset').onchange=async()=>{try{await selectPreset($('scenario-preset').value);window.dispatchEvent(new CustomEvent('experiment-preview',{detail:$('scenario-preset').value}));}catch(error){state(error.message);}};
 export async function initializeExperiment(){
-  const requested=new URLSearchParams(location.search).get('model');const id=['three_franka','table_assembly','panel_fixture','mobile_panel'].includes(requested)?requested:'mobile_panel';$('scenario-preset').value=id;await selectPreset(id);
+  const requested=new URLSearchParams(location.search).get('model');const id=['hinged_door','folding_panel','drawer','three_franka','table_assembly','panel_fixture','mobile_panel'].includes(requested)?requested:'mobile_panel';$('scenario-preset').value=id;await selectPreset(id);
   try{const health=await request('/api/health');if(health.ready){if(health.experiments_ready===false){state('Panda 충돌 mesh 준비 필요 · python tools/fetch_panda_meshes.py');return;}connected=true;$('experiment-run').disabled=false;state('Python 연결됨 · source/target 최적화와 접촉 동역학 실행 가능');return;}}catch{}
   state('GitHub Pages: 실제 실행 기록 재생 · 새 계산은 Python 백엔드에서 실행합니다. 서버: .venv/bin/python web/server.py');
 }

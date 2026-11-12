@@ -1,5 +1,14 @@
 # Implementation scope
 
+Three passive one-joint articulated extensions (hinged door, folding panel,
+drawer) optimize generalized contact force/arm torque along supplied joint
+paths and execute using native MuJoCo contact, with no object actuator or pose
+replay. Contact-disabled controls fail all three tasks. They do not implement
+learned articulated contraction or general multi-joint articulated CITO.
+The mobile scenario also has deterministic same-plan/gain external-force tests;
+the 25 N trial recovers position but remains a planned-capability failure.
+See [measurements, equations and limitations](contact-validation-and-datasets.md).
+
 Executable v0.1 research implementation; experimental reproduction of every
 paper component is not complete.
 

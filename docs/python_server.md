@@ -12,6 +12,13 @@ MuJoCo 프로세스를 실행하지 않습니다. 페이지에서 조건을 바�
 실제 계산 시간과 시뮬레이션 내 30초는 서로 다릅니다. API는 현재 계산 단계와
 시뮬레이션 진행 시간을 보고하며, 실행 취소를 지원합니다.
 
+`hinged_door`, `folding_panel`, `drawer`도 같은 API/작업 프로세스를 사용합니다.
+예: `{"preset":"drawer","duration":14}`. 세 과제의 duration 범위는 12–60초이며
+관절 경로·계획 표본 시간도 함께 조절합니다. 물체 actuator 없이 수동 hinge/rail을
+로봇 접촉으로 움직입니다. 이 preset의 contact와 물성은 고정된 authored 입력이고,
+네트워크 추론이나 소형 articulated source refinement는 실행하지 않습니다.
+기본 14초 실행과 [물리 검증 범위](contact-validation-and-datasets.md)를 함께 확인하세요.
+
 ```sh
 # 저장소 루트에서, 패키지와 mesh가 아직 없을 때:
 python -m pip install -e ".[simulation,conic]"

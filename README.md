@@ -39,6 +39,23 @@ GitHub Pages는 무료 정적 기록 재생이며 Python 서버를 실행하지 
 로컬 UI에서 contracted source JSON을 입력·업로드하고 같은 과제를 재계산하며
 source refinement on/off를 비교할 수 있습니다.
 
+## 수동 관절 물체 · 외력 시험 · 렌더링
+
+[문 열기](https://overjs94.github.io/Contact_contraction/?model=hinged_door),
+[접이식 상판](https://overjs94.github.io/Contact_contraction/?model=folding_panel),
+[서랍 당기기](https://overjs94.github.io/Contact_contraction/?model=drawer)를 각각 14초/5 keyframe으로
+추가했습니다. 물체 actuator 없이 실제 로봇 접촉으로 수동 hinge/rail을 움직이며, 접촉을 끈
+대조 실행은 세 과제 모두 실패합니다. 주어진 contact/관절 경로의 일반화된 힘·토크 최적화이며
+articulated contraction 학습이나 일반 다관절 CITO를 수행한 것은 아닙니다.
+
+Studio PBR/그림자와 Analysis/collision 표시를 선택할 수 있습니다.
+[2 N](https://overjs94.github.io/Contact_contraction/?model=mobile_push_2),
+[8 N](https://overjs94.github.io/Contact_contraction/?model=mobile_push_8),
+[25 N](https://overjs94.github.io/Contact_contraction/?model=mobile_push_25) 외력 실행 기록은
+같은 mobile 계획·제어 이득을 사용합니다. 25 N은 위치 회복 후에도 계획 접촉 허용영역을 벗어나
+전체 FAIL로 보존했습니다. [물리 검증·제어 수식·오픈 데이터셋 및 조건](docs/contact-validation-and-datasets.md)을
+함께 확인하세요. 가정된 joint/contact 물성은 실물에서 보정하지 않았습니다.
+
 ## 설치
 
 검증은 Python 3.12, Linux에서 수행했습니다. Windows에서는 WSL2 사용을

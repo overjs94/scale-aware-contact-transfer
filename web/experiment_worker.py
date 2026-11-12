@@ -13,7 +13,14 @@ def status(stage, **extra):
 try:
     status('optimization')
     case_id=json.loads((root/'case.json').read_text()).get('id')
-    if case_id=='mobile_panel':
+    if case_id in {'hinged_door','folding_panel','drawer'}:
+        from contact_transfer.articulated import run_articulated
+        from contact_transfer.articulated_view import export_articulated_view
+        duration=json.loads((root/'case.json').read_text())['duration']
+        plan,trace,report,flags=run_articulated(case_id,root/'result',case_path=root/'case.json',progress=lambda t,d:status('simulation',time_s=t,duration_s=duration))
+        status('export')
+        data=export_articulated_view(plan,trace,report,flags,root/'viewer')
+    elif case_id=='mobile_panel':
         from contact_transfer.mobile_panel import run_mobile
         from contact_transfer.mobile_view import export_mobile_view
         plan,trace,report,flags=run_mobile(root/'result',case_path=root/'case.json',progress=status)

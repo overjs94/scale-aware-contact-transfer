@@ -1,6 +1,27 @@
 {
   "models": [
     {
+      "id": "drawer",
+      "title": "\uc11c\ub78d \ub2f9\uae30\uae30 \u00b7 14 s",
+      "engine": "mujoco_contact_recording",
+      "dof": 9,
+      "floating_base": false
+    },
+    {
+      "id": "folding_panel",
+      "title": "\uc811\uc774\uc2dd \uc0c1\ud310 \ud3bc\uce58\uae30 \u00b7 14 s",
+      "engine": "mujoco_contact_recording",
+      "dof": 7,
+      "floating_base": false
+    },
+    {
+      "id": "hinged_door",
+      "title": "\uc218\ub3d9 \ud78c\uc9c0 \u00b7 \ubb38 \uc5f4\uae30 \u00b7 14 s",
+      "engine": "mujoco_contact_recording",
+      "dof": 7,
+      "floating_base": false
+    },
+    {
       "id": "mobile_panel",
       "title": "\uc791\uc5c5\uc601\uc5ed \ud655\uc7a5 \u00b7 RBY1 + Panda \u00b7 36 s",
       "engine": "mujoco_contact_recording",
@@ -97,8 +118,29 @@
       "engine": "mujoco_contact_recording",
       "dof": 25,
       "floating_base": false
+    },
+    {
+      "id": "mobile_push_2",
+      "title": "\uc678\ub825 2 N \u00b7 RBY1 + Panda",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "mobile_push_8",
+      "title": "\uc678\ub825 8 N \u00b7 RBY1 + Panda",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "mobile_push_25",
+      "title": "\uc678\ub825 25 N \u00b7 RBY1 + Panda",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
     }
   ],
-  "tests_passed": 93,
+  "tests_passed": 102,
   "draft_version": "12"
 }

@@ -1,0 +1,177 @@
+{
+  "engine": "MuJoCo 4.0.0",
+  "articulated_baselines": {
+    "hinged_door": {
+      "scenario": "hinged_door",
+      "articulated_object": true,
+      "passive_joint_type": "revolute",
+      "object_joint_actuators": 0,
+      "object_pose_prescribed": false,
+      "initial_grasp_or_contact_supplied": true,
+      "contacts_enabled": true,
+      "initial_coordinate": 0,
+      "target_coordinate": 1.0471975511965976,
+      "final_coordinate": 1.048194972755889,
+      "coordinate_units": "rad",
+      "final_error": 0.000997482147850448,
+      "maximum_tracking_error": 0.003781990283774437,
+      "contact_fraction": 0.9636295463067117,
+      "peak_contact_force_N": 11.025899048321817,
+      "minimum_actuator_margin": 10.243403505647391,
+      "unexpected_penetrations_m": {},
+      "primal_residual": 0.0,
+      "duration_seconds": 14.0,
+      "engine_version": "4.0.0",
+      "full_geometry_certified": false,
+      "network_inference_executed": false,
+      "source_contact_refinement_executed": false,
+      "planner_scope": "supplied link-local contact and joint path; generalized object torque/contact-force allocation",
+      "limitations": [
+        "authored hinge/rail mass, friction and spring; no hardware calibration",
+        "provided contact and initial grasp; no learned articulated contraction",
+        "one passive joint per fixture; no general multi-joint articulated planning",
+        "soft contact and convex robot meshes; no continuous geometry certificate"
+      ],
+      "execution_passed": true
+    },
+    "folding_panel": {
+      "scenario": "folding_panel",
+      "articulated_object": true,
+      "passive_joint_type": "revolute",
+      "object_joint_actuators": 0,
+      "object_pose_prescribed": false,
+      "initial_grasp_or_contact_supplied": true,
+      "contacts_enabled": true,
+      "initial_coordinate": 1.3089969389957472,
+      "target_coordinate": 0,
+      "final_coordinate": -8.164655151921495e-05,
+      "coordinate_units": "rad",
+      "final_error": 8.164655151921495e-05,
+      "maximum_tracking_error": 0.0004923757537660389,
+      "contact_fraction": 1.0,
+      "peak_contact_force_N": 13.821351374030765,
+      "minimum_actuator_margin": 9.124021189248996,
+      "unexpected_penetrations_m": {},
+      "primal_residual": 0.0,
+      "duration_seconds": 14.0,
+      "engine_version": "4.0.0",
+      "full_geometry_certified": false,
+      "network_inference_executed": false,
+      "source_contact_refinement_executed": false,
+      "planner_scope": "supplied link-local contact and joint path; generalized object torque/contact-force allocation",
+      "limitations": [
+        "authored hinge/rail mass, friction and spring; no hardware calibration",
+        "provided contact and initial grasp; no learned articulated contraction",
+        "one passive joint per fixture; no general multi-joint articulated planning",
+        "soft contact and convex robot meshes; no continuous geometry certificate"
+      ],
+      "execution_passed": true
+    },
+    "drawer": {
+      "scenario": "drawer",
+      "articulated_object": true,
+      "passive_joint_type": "prismatic",
+      "object_joint_actuators": 0,
+      "object_pose_prescribed": false,
+      "initial_grasp_or_contact_supplied": true,
+      "contacts_enabled": true,
+      "initial_coordinate": 0,
+      "target_coordinate": 0.22,
+      "final_coordinate": 0.2199213203561408,
+      "coordinate_units": "m",
+      "final_error": 7.867964385921411e-05,
+      "maximum_tracking_error": 9.723073135149739e-05,
+      "contact_fraction": 1.0,
+      "peak_contact_force_N": 2.375509755411729,
+      "minimum_actuator_margin": 10.931208666004725,
+      "unexpected_penetrations_m": {},
+      "primal_residual": 0.0,
+      "duration_seconds": 14.0,
+      "engine_version": "4.0.0",
+      "full_geometry_certified": false,
+      "network_inference_executed": false,
+      "source_contact_refinement_executed": false,
+      "planner_scope": "supplied link-local contact and joint path; generalized object torque/contact-force allocation",
+      "limitations": [
+        "authored hinge/rail mass, friction and spring; no hardware calibration",
+        "provided contact and initial grasp; no learned articulated contraction",
+        "one passive joint per fixture; no general multi-joint articulated planning",
+        "soft contact and convex robot meshes; no continuous geometry certificate"
+      ],
+      "execution_passed": true
+    }
+  },
+  "articulated_contact_disabled_and_timestep_check": {
+    "hinged_door": {
+      "final_coordinate": 0.0,
+      "target_coordinate": 1.0471975511965976,
+      "final_error": 1.0471975511965976,
+      "contact_fraction": 0.0,
+      "execution_passed": false
+    },
+    "folding_panel": {
+      "final_coordinate": 1.5000765959722893,
+      "target_coordinate": 0,
+      "final_error": 1.5000765959722893,
+      "contact_fraction": 0.0,
+      "execution_passed": false
+    },
+    "drawer": {
+      "final_coordinate": 0.0,
+      "target_coordinate": 0.22,
+      "final_error": 0.22,
+      "contact_fraction": 0.0,
+      "execution_passed": false
+    },
+    "hinged_door_dt_half": {
+      "final_error": 0.0010008001994192828,
+      "maximum_tracking_error": 0.003720195730161995,
+      "contact_fraction": 0.9647522029873133,
+      "execution_passed": true
+    }
+  },
+  "mobile_external_force_sweep": {
+    "protocol": "predefined amplitude sweep, world-Y, same saved plan and gains",
+    "trials": [
+      {
+        "force_peak_N": 2,
+        "pulse_start_s": 16.0,
+        "pulse_duration_s": 0.5,
+        "impulse_Ns": 0.5,
+        "peak_pose_error_m": 0.0056189372833807885,
+        "post_pulse_error_m": 0.0056189372833807885,
+        "recovery_passed": true,
+        "all_task_checks_passed": true,
+        "scope": "one deterministic world-Y pulse at COM; same plan/gains, not a robustness certificate"
+      },
+      {
+        "force_peak_N": 8,
+        "pulse_start_s": 16.0,
+        "pulse_duration_s": 0.5,
+        "impulse_Ns": 2.0,
+        "peak_pose_error_m": 0.006096919213762389,
+        "post_pulse_error_m": 0.00562107572500894,
+        "recovery_passed": true,
+        "all_task_checks_passed": true,
+        "scope": "one deterministic world-Y pulse at COM; same plan/gains, not a robustness certificate"
+      },
+      {
+        "force_peak_N": 25,
+        "pulse_start_s": 16.0,
+        "pulse_duration_s": 0.5,
+        "impulse_Ns": 6.25,
+        "peak_pose_error_m": 0.012948752385586055,
+        "post_pulse_error_m": 0.005606993413271987,
+        "recovery_passed": true,
+        "all_task_checks_passed": false,
+        "scope": "one deterministic world-Y pulse at COM; same plan/gains, not a robustness certificate"
+      }
+    ]
+  },
+  "scope": "Authored passive one-joint furniture prototypes and deterministic external-force checks; not calibrated hardware results",
+  "mobile_friction": {
+    "planned_point_capability_mu": 0.8,
+    "simulator_explicit_tool_pair_mu": 0.9,
+    "meaning": "25 N failure is an inner planned capability violation, not an engine friction-cone violation"
+  }
+}

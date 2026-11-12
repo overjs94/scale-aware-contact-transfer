@@ -10,6 +10,7 @@ import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
 PRESETS = ROOT/'src/contact_transfer/scenarios'
+ARTICULATED = {'hinged_door','folding_panel','drawer'}
 
 
 def number(value, low, high):
@@ -24,6 +25,8 @@ def vector(value, low, high):
 
 
 def prepare_request(request, destination):
+    if isinstance(request,dict) and request.get('preset') in ARTICULATED:
+        return prepare_articulated_request(request,destination)
     if isinstance(request,dict) and request.get('preset')=='mobile_panel':
         return prepare_mobile_request(request,destination)
     if isinstance(request,dict) and request.get('preset')=='panel_fixture':
@@ -59,6 +62,19 @@ def prepare_request(request, destination):
     (destination/'case.json').write_text(json.dumps(d,indent=2))
     from contact_transfer.contracted import ContractedCase
     ContractedCase.load(destination/'case.json')
+    return d
+
+
+def prepare_articulated_request(request,destination):
+    if set(request)-{'preset','duration'}:raise ValueError('Articulated accepts preset and duration only')
+    source=PRESETS/'articulated';d=json.loads((source/(request['preset']+'.json')).read_text())
+    duration=number(request.get('duration',14),12,60)
+    if not math.isclose(round(duration/d['timestep'])*d['timestep'],duration,abs_tol=1e-9):raise ValueError('Duration must match timestep')
+    scale=duration/d['duration']
+    for name in ['duration','motion_start','motion_end','sample_dt']:d[name]*=scale
+    destination=Path(destination);destination.mkdir(parents=True)
+    for name in {d['robot_urdf'],d['object_urdf'],'panda.srdf','LICENSE.panda','LICENSE.authored','franka_panda_provenance.json'}:shutil.copyfile(source/name,destination/name)
+    (destination/'case.json').write_text(json.dumps(d,indent=2))
     return d
 
 

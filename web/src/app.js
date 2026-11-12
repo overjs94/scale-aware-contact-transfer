@@ -1,3 +1,4 @@
+import { createStudio } from "./studio.js";
 import { initializeExperiment } from "./experiment.js";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -35,10 +36,15 @@ const sun = new THREE.DirectionalLight(0xddeaff, 3.5);
 sun.position.set(3, -2, 5); scene.add(sun);
 const rim = new THREE.DirectionalLight(0x4ac7ba, 1.8);
 rim.position.set(-2, 3, 2); scene.add(rim);
+const forceArrow=new THREE.ArrowHelper(new THREE.Vector3(0,1,0),new THREE.Vector3(),.5,0xef683c,.08,.04);forceArrow.visible=false;scene.add(forceArrow);
 let grid;
+const studio=createStudio(scene,renderer,sun,rim,canvasFallback);
+studio.set("studio");
 const robotGroup = new THREE.Group(); scene.add(robotGroup);
 const up = new THREE.Vector3(0, 1, 0);
 let center = new THREE.Vector3(0, 0, .4), extent = 1.;
+
+$("scene-style").onchange=()=>studio.set($("scene-style").value,grid);
 
 function resize() {
   const box = $("viewport").getBoundingClientRect();
@@ -63,7 +69,7 @@ function buildGeometry(data) {
     disposeModel(robotGroup.children[0]);
   }
   geometry = []; objectMesh = undefined;
-  for (const item of (data.instances?.some(i=>i.role==="static_jig") ? [] : data.environment) || []) {
+  for (const item of (data.instances?.some(i=>["static_jig","articulated_object"].includes(i.role)) ? [] : data.environment) || []) {
     if (item.type !== "box") continue;
     const mesh = new THREE.Mesh(new THREE.BoxGeometry(...item.size), new THREE.MeshStandardMaterial({color:item.color, transparent:true, opacity:.6}));
     mesh.position.fromArray(item.position); if(item.quaternion_xyzw) mesh.quaternion.fromArray(item.quaternion_xyzw); robotGroup.add(mesh);
@@ -98,6 +104,7 @@ function buildGeometry(data) {
   grid.rotation.x = Math.PI / 2;
   grid.position.set(center.x, center.y, Math.min(0, box.min.z) - .005);
   grid.material.transparent = true; grid.material.opacity = .8; scene.add(grid);
+  studio.set($("scene-style")?.value||"studio",grid);
   resetCamera();
 }
 async function loadGeometry() {
@@ -118,6 +125,7 @@ async function loadGeometry() {
     const instances = data.instances || [{ manifest: `./models/${data.id}/model.json` }];
     const results = await Promise.allSettled(instances.map(async spec => {
       const robot = await loadURDFModel(spec.manifest, mode);
+      studio.materialize(robot,spec.role,mode);
       const recording = data.instances ? { ...spec, q: data.q.map(q => spec.q_indices.map(i => q[i])) } : data;
       try { applyRecordedPose(robot, recording, frameFloat); }
       catch (error) { disposeModel(robot); throw error; }
@@ -136,7 +144,7 @@ async function loadGeometry() {
       : mode === "collision"
         ? "URDF collision 형상을 표시합니다. 형상 표시는 접촉 계산·충돌 검증 결과와 별개입니다."
         : data.engine === "mujoco_contact_recording"
-          ? data.scenario === "mobile_panel" ? "공식 RBY1 URDF·mesh, 차동구동 모바일 베이스와 고정 Panda의 실제 접촉 실행입니다." : data.scenario === "panel_fixture" ? "원본 Panda URDF·mesh, 자유 패널 URDF와 고정 지그를 표시합니다. 소형 접촉 refinement 후 실행한 기록입니다." : data.scenario === "table_assembly" ? "Panda 3대와 두 자유 부품의 실제 접촉 실행입니다. 상판·다리의 visual/collision URDF에 빈 socket과 peg 형상을 포함합니다." : "3개 URDF 팔과 도구의 실제 접촉 실행입니다. Point는 구형 tool, gripper는 두 손가락 접촉, suction은 압력 제한 seal 모델입니다."
+          ? data.scenario === "mobile_panel" ? "공식 RBY1 URDF·mesh, 차동구동 모바일 베이스와 고정 Panda의 실제 접촉 실행입니다." : data.articulated_object ? "수동 관절의 URDF와 측정된 움직임을 표시합니다. 물체 actuator 없이 로봇 접촉으로 구동했습니다." : data.scenario === "panel_fixture" ? "원본 Panda URDF·mesh, 자유 패널 URDF와 고정 지그를 표시합니다. 소형 접촉 refinement 후 실행한 기록입니다." : data.scenario === "table_assembly" ? "Panda 3대와 두 자유 부품의 실제 접촉 실행입니다. 상판·다리의 visual/collision URDF에 빈 socket과 peg 형상을 포함합니다." : "3개 URDF 팔과 도구의 실제 접촉 실행입니다. Point는 구형 tool, gripper는 두 손가락 접촉, suction은 압력 제한 seal 모델입니다."
           : "URDF visual·mesh의 origin과 scale을 적용했습니다. 기록된 시뮬레이션은 관절 추종 검증입니다.";
     $("geometry-status").dataset.state = "ready";
     $("geometry-status").dataset.model = data.id;
@@ -169,6 +177,10 @@ function updateGeometry(value) {
       .slerp(new THREE.Quaternion().fromArray(dataset.object.poses[hi], 3), f);
   }
   urdfModels.forEach(item => applyRecordedPose(item.robot, item.recording, value));
+  const time=dataset.times[lo]*(1-f)+dataset.times[hi]*f;const pulses=dataset.external_disturbances||[];const pulse=pulses.find(p=>time>=p.start&&time<=p.start+p.duration);forceArrow.visible=false;
+  if(pulse&&dataset.objects?.[0]?.poses){const object=dataset.objects[0],pose=object.poses[lo],next=object.poses[hi],quat=new THREE.Quaternion().fromArray(pose,3).slerp(new THREE.Quaternion().fromArray(next,3),f);const origin=new THREE.Vector3(...pose.slice(0,3)).lerp(new THREE.Vector3(...next.slice(0,3)),f).add(new THREE.Vector3(...pulse.point_body_m).applyQuaternion(quat));const magnitude=Math.sin(Math.PI*(time-pulse.start)/pulse.duration)**2;const force=new THREE.Vector3(...pulse.force_world_N).multiplyScalar(magnitude);if(force.length()>.01){forceArrow.position.copy(origin);forceArrow.setDirection(force.clone().normalize());forceArrow.setLength(.12+force.length()*.015,.08,.04);forceArrow.visible=true;}}
+  $('disturbance-state').hidden=!pulses.length;
+  $('disturbance-state').textContent=pulse?`외력 적용 중 · ${(Math.sin(Math.PI*(time-pulse.start)/pulse.duration)**2*Math.hypot(...pulse.force_world_N)).toFixed(2)} N · world frame` : pulses.length?`외력: ${pulses.map(p=>`${p.start}–${p.start+p.duration} s / 최대 ${Math.hypot(...p.force_world_N)} N`).join(', ')}`:'';
   displayedPositions = positions;
 }
 // Preserve orbit/zoom and real URDF coordinates when WebGL is unavailable.
@@ -177,6 +189,7 @@ function drawCanvasScene() {
   const canvas = renderer.domElement, ctx = canvas.getContext("2d");
   const w = canvas.width, h = canvas.height, scale = Math.min(devicePixelRatio, 2);
   ctx.clearRect(0, 0, w, h);
+  if(studio.mode==="studio"){ctx.fillStyle="#dce3e9";ctx.fillRect(0,0,w,h);}
   if (!dataset || !displayedPositions.length) return;
   camera.updateMatrixWorld();
   const project = p => { const v = p.clone().project(camera); return [(v.x + 1) * w / 2, (1 - v.y) * h / 2, v.z]; };
@@ -252,11 +265,11 @@ function showData(data) {
   if (data.id === "dual_cito") $("geometry-mode").value = "skeleton";
   $("model-title").textContent = data.title;
   $("model-description").textContent = data.engine === "kinematic_preview" ? "29개 관절과 floating base를 가진 휴머노이드의 기구학을 확인합니다." : data.engine === "cito_trajectory" ? "접촉을 유지하며 물체를 들어 올리는 제한 모델의 최적화 결과입니다." : "URDF 관성으로 계산한 폐루프 토크 제어 결과를 재생합니다.";
-  if (data.instances) $("model-description").textContent = data.scenario === "mobile_panel" ? "RBY1 모바일 듀얼암 + 고정 Panda · 초기 지지 전달 → 고정 작업영역 밖으로 이동 → 지그 안착·릴리스" : data.scenario === "panel_fixture" ? "본 실험: 소형 접촉 위치 refinement → 패널 운반·재배향 → 지그 안착·하중 전달 → 전체 릴리스 · 자유 강체 실행" : data.scenario === "table_assembly" ? "밑면이 위인 상판 grip & support → 12° reorientation → 다리 정렬·삽입 → gripper 해제 · 30초 실제 동역학 실행" : `주어진 contracted contact → ${data.keyframes.length}개 keyframe 최적화 → 3개 팔의 접촉 동역학 실행입니다.`;
+  if (data.instances) $("model-description").textContent = data.articulated_object ? "수동 물체 관절 · 로봇 접촉으로 구동 · 주어진 접촉점과 관절 경로의 힘·토크 최적화" : data.scenario === "mobile_panel" ? "RBY1 모바일 듀얼암 + 고정 Panda · 초기 지지 전달 → 고정 작업영역 밖으로 이동 → 지그 안착·릴리스" : data.scenario === "panel_fixture" ? "본 실험: 소형 접촉 위치 refinement → 패널 운반·재배향 → 지그 안착·하중 전달 → 전체 릴리스 · 자유 강체 실행" : data.scenario === "table_assembly" ? "밑면이 위인 상판 grip & support → 12° reorientation → 다리 정렬·삽입 → gripper 해제 · 30초 실제 동역학 실행" : `주어진 contracted contact → ${data.keyframes.length}개 keyframe 최적화 → 3개 팔의 접촉 동역학 실행입니다.`;
   $("engine-badge").innerHTML = "<span></span>" + engineLabel(data);
   $("engine-badge").classList.toggle("kinematic", data.engine === "kinematic_preview");
   $("scene-label").textContent = data.engine === "cito_trajectory" ? "COUPLED ROBOT–OBJECT TRAJECTORY" : data.engine === "kinematic_preview" ? "FLOATING-BASE KINEMATIC PREVIEW" : "RECORDED CLOSED-LOOP SIMULATION";
-  if (data.instances) $("scene-label").textContent = `THREE-ARM CONTACT DYNAMICS · ${data.keyframes.length} KEYFRAMES`;
+  if (data.instances) $("scene-label").textContent = data.articulated_object ? "PASSIVE ARTICULATED OBJECT · MEASURED CONTACT DYNAMICS" : `COOPERATIVE CONTACT DYNAMICS · ${data.keyframes.length} KEYFRAMES`;
   $("dof").textContent = data.dof; $("base").textContent = data.scenario === "mobile_panel" ? "Mobile SE(2)" : data.floating_base ? "Floating +6" : "Fixed";
   $("physics-step").textContent = data.summary.physics_dt ? (data.summary.physics_dt * 1000).toFixed(0) + " ms" : data.engine === "cito_trajectory" ? "100 ms" : "—";
   const end = data.times.at(-1);
@@ -297,7 +310,7 @@ function updateFrame() {
   $("timeline").value = frameFloat / (dataset.times.length - 1);
   $("time-now").textContent = time.toFixed(2) + " s";
   $("error-now").textContent = chartValues.length ? number(chartValues[index]) : "—";
-  $("tool-state").textContent = ["panel_fixture","mobile_panel"].includes(dataset.scenario) ? Object.entries(dataset.tool_states).map(([name,values])=>`${name}: ${values[index]?"접촉":"해제"}`).join(" · ") : dataset.scenario === "table_assembly" ? `상판 gripper: ${dataset.tool_states.top_gripper_contact[index] ? "양쪽 pad 접촉" : "분리"} · 구형 support: ${dataset.tool_states.point_contact[index] ? "접촉" : "분리"} · 다리 gripper: ${dataset.tool_states.leg_gripper_contact[index] ? "양쪽 pad 접촉" : "해제"} · socket: ${dataset.tool_states.socket_contact[index] ? "접촉" : "비접촉"}` : dataset.tool_states
+  $("tool-state").textContent = (["panel_fixture","mobile_panel"].includes(dataset.scenario)||dataset.articulated_object) ? Object.entries(dataset.tool_states).map(([name,values])=>`${name}: ${values[index]?"접촉":"해제"}`).join(" · ") : dataset.scenario === "table_assembly" ? `상판 gripper: ${dataset.tool_states.top_gripper_contact[index] ? "양쪽 pad 접촉" : "분리"} · 구형 support: ${dataset.tool_states.point_contact[index] ? "접촉" : "분리"} · 다리 gripper: ${dataset.tool_states.leg_gripper_contact[index] ? "양쪽 pad 접촉" : "해제"} · socket: ${dataset.tool_states.socket_contact[index] ? "접촉" : "비접촉"}` : dataset.tool_states
     ? `구형 tool: ${dataset.tool_states.point_contact[index] ? "접촉" : "분리"} · Gripper: ${dataset.tool_states.gripper_contact[index] ? "양쪽 pad 접촉" : "미파지"} · Suction: ${dataset.tool_states.suction_sealed[index] ? "seal 유지" : "해제"}` : "";
   const ratio = dataset.torque_ratio[index];
   $("torque-now").textContent = ratio === null || ratio === undefined ? "—" : (ratio * 100).toFixed(1) + "%";

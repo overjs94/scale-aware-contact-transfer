@@ -34,12 +34,12 @@ def trajectory_reference(result, q_indices, v_indices):
 
 
 class MujocoContactScene:
-    """Named scalar joints, direct unit-gear torque/position actuators, free objects.
+    """Controlled scalar joints and free or explicitly named passive objects.
 
-    Load the calibrated robot/gripper/object/fixture scene from MJCF, including
+    Load a robot/gripper/object/fixture scene from MJCF, including
     collision meshes and exclusions. The dynamics-only exporter is unchanged.
     """
-    def __init__(self, scene, joint_names, actuator_names, object_names, *, actuator_modes=None):
+    def __init__(self, scene, joint_names, actuator_names, object_names, *, actuator_modes=None, articulated_object_joints=None):
         import mujoco
         self.mj = mujoco
         self.scene = Path(scene).resolve()
@@ -81,10 +81,18 @@ class MujocoContactScene:
                     raise ValueError('position mode requires a positive PD position actuator')
         if set(self.actuators) != set(range(self.model.nu)):
             raise ValueError("all scene actuators must be explicitly controlled")
-        for body in self.objects:
+        articulated_object_joints=dict(articulated_object_joints or {})
+        if set(articulated_object_joints)-set(self.object_names):raise ValueError('Articulated mapping must name logged objects')
+        self.observed_names=[];self.observed_ids=[]
+        for name,body in zip(self.object_names,self.objects):
             adr = self.model.body_jntadr[body]
-            if adr < 0 or self.model.jnt_type[adr] != mujoco.mjtJoint.mjJNT_FREE:
-                raise ValueError("objects must have a free joint; replay never prescribes their pose")
+            if adr>=0 and self.model.jnt_type[adr]==mujoco.mjtJoint.mjJNT_FREE:continue
+            if name not in articulated_object_joints:raise ValueError('objects must have a free joint or an explicit passive articulated joint')
+            joint=int(ids(mujoco.mjtObj.mjOBJ_JOINT,[articulated_object_joints[name]])[0])
+            if self.model.jnt_bodyid[joint]!=body or joint in self.joints or int(self.model.jnt_type[joint]) not in [int(mujoco.mjtJoint.mjJNT_HINGE),int(mujoco.mjtJoint.mjJNT_SLIDE)]:raise ValueError('Articulated object joint must be passive, scalar and on its logged body')
+            if np.any(self.model.actuator_trnid[:,0]==joint):raise ValueError('Articulated object joint must not have an actuator')
+            self.observed_names.append(articulated_object_joints[name]);self.observed_ids.append(joint)
+        self.observed_ids=np.array(self.observed_ids,int)
         enabled = (self.model.geom_contype != 0) | (self.model.geom_conaffinity != 0)
         if np.count_nonzero(enabled) < 2 and self.model.npair == 0:
             raise ValueError("scene needs collision-enabled geometry")
@@ -103,7 +111,7 @@ class MujocoContactScene:
         self.vadr = self.model.jnt_dofadr[self.joints]
 
     def run(self, controller, reference, duration, *, case_id, plan_id, attachments=(),
-            initial_q=None, external_forces=None, progress=None):
+            initial_q=None, initial_articulated_q=None, external_forces=None, progress=None):
         """reference(t)->(q_d,v_d,a_d); controller.command returns torque (Nm) or position (rad), per joint mode.
 
         attachments contains (time, equality_name, active). Named equality
@@ -111,7 +119,8 @@ class MujocoContactScene:
         not finger closure or verified grasp retention. Start at the scene's
         initial state, never at interpolated optimized object poses.
 
-        initial_q sets controlled scalar joints once, before stepping. Optional
+        initial_q and initial_articulated_q set controlled/passive scalar joints
+        once after reset, before stepping; they are never object references. Optional
         external_forces(mj, model, data, t) may add generalized/body forces after
         the runner clears applied-force arrays each step; it must not prescribe
         object state. Stateful force models are owned/reset by the caller.
@@ -137,8 +146,14 @@ class MujocoContactScene:
             if not np.isfinite(initial_q).all():
                 raise ValueError("initial_q must be finite")
             data.qpos[self.qadr] = initial_q
+        for name,value in dict(initial_articulated_q or {}).items():
+            if name not in self.observed_names or not np.isfinite(value):raise ValueError('Initial articulated state must name an observed passive joint')
+            jid=int(self.observed_ids[self.observed_names.index(name)])
+            if model.jnt_limited[jid] and not model.jnt_range[jid,0]<=value<=model.jnt_range[jid,1]:raise ValueError('Initial articulated coordinate outside joint limits')
+            data.qpos[model.jnt_qposadr[jid]]=value
         mj.mj_forward(model, data)
         times, qs, refs, poses, torques, contacts = [], [], [], [], [], []
+        observed_q,observed_v=[],[]
         for k in range(steps+1):
             for event_step, eid, active in events:
                 if event_step == k:
@@ -157,6 +172,8 @@ class MujocoContactScene:
                 raise ValueError("reference must return finite q/v/a")
             q, v = data.qpos[self.qadr].copy(), data.qvel[self.vadr].copy()
             times.append(t); qs.append(q); refs.append(desired[0])
+            if len(self.observed_ids):
+                observed_q.append(data.qpos[model.jnt_qposadr[self.observed_ids]].tolist());observed_v.append(data.qvel[model.jnt_dofadr[self.observed_ids]].tolist())
             poses.append(np.c_[data.xpos[self.objects], data.xquat[self.objects][:, [1, 2, 3, 0]]])
             for i in range(data.ncon):
                 c = data.contact[i]
@@ -200,10 +217,11 @@ class MujocoContactScene:
                         "tolerance": float(model.opt.tolerance), "cone": int(model.opt.cone),
                         "disableflags": int(model.opt.disableflags), "enableflags": int(model.opt.enableflags),
                         "gravity": model.opt.gravity.tolist(), "geom_friction": model.geom_friction.tolist(),
-                        "geom_solref": model.geom_solref.tolist(), "geom_solimp": model.geom_solimp.tolist()},
+                        "geom_solref": model.geom_solref.tolist(), "pair_friction":model.pair_friction.tolist(), "pair_solref":model.pair_solref.tolist(), "pair_solimp":model.pair_solimp.tolist(), "pair_dim":model.pair_dim.tolist(), "geom_solimp": model.geom_solimp.tolist()},
                     "attachments": [list(e) for e in attachments],
                     "actuator_modes": self.actuator_modes,
                     "full_geometry_certified": False}
+        if len(self.observed_ids):metadata['articulated_state']=dict(joint_names=self.observed_names,q=observed_q,v=observed_v)
         log = ExecutionTrace(metadata, np.array(times), np.array(qs), np.array(refs),
                              np.array(torques).reshape(steps, len(self.joints)), np.array(poses))
         if contacts:

@@ -317,3 +317,41 @@ test('mobile form submits the mixed embodiment and source JSON to Python',async(
   await page.locator('#experiment-run').click();await expect(page.locator('#experiment-state')).toHaveText('계산 완료');
   expect(payload).toMatchObject({preset:'mobile_panel',duration:45,contracted_source:{origin:'synthetic_mobile_handover_fixture'}});
 });
+
+for(const id of ['hinged_door','folding_panel','drawer']){
+  test(`${id}: passive measured joint and studio rendering preserve URDF FK`,async({page})=>{
+    await page.goto(`/?model=${id}`);
+    await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+    await expect(page.locator('#result-tracking')).toContainText('PASS');
+    await expect(page.locator('#result-seal')).toContainText('0 actuators');
+    await expect(page.locator('#scenario-preset')).toHaveValue(id);
+    await expect(page.locator('#assembly-duration')).toHaveValue('14');
+    await page.getByRole('button',{name:'mid_motion · 6.5 s',exact:true}).click();
+    await page.locator('#scene-style').selectOption('analysis');
+    await page.locator('#scene-style').selectOption('studio');
+    await expect(page.locator('#time-now')).toHaveText('6.50 s');
+    const error=await page.evaluate(async id=>{
+      const {loadURDFModel,applyRecordedPose,disposeModel}=await import('/test-module.js');
+      const d=await(await fetch(`/data/${id}.json`)).json();let error=0;
+      for(const mode of ['visual','collision'])for(const spec of d.instances){
+        const robot=await loadURDFModel(spec.manifest,mode),rec={...spec,q:d.q.map(row=>spec.q_indices.map(i=>row[i]))};
+        for(const frame of [0,195,d.q.length-1]){applyRecordedPose(robot,rec,frame);for(const [name,link] of Object.entries(robot.links)){const i=d.link_names.indexOf(spec.id+'_'+name);link.matrixWorld.elements.slice(12,15).forEach((v,j)=>error=Math.max(error,Math.abs(v-d.positions[frame][i][j])));}}
+        disposeModel(robot);
+      }return error;
+    },id);
+    expect(error).toBeLessThan(1e-7);
+    await page.locator('#geometry-mode').selectOption('collision');
+    await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+  });
+}
+test('external pulse shows measured recovery and preserves capability failure',async({page})=>{
+  await page.goto('/?model=mobile_push_25');
+  await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+  await expect(page.locator('#robustness-result')).toContainText('자세 회복 PASS');
+  await expect(page.locator('#robustness-result')).toContainText('전체 검사 FAIL');
+  await page.locator('#play').click();
+  const expectedForce=await page.locator('#timeline').evaluate(el=>{el.value=String(16.25/36);el.dispatchEvent(new Event('input'));return (25*Math.sin(Math.PI*(Number(el.value)*36-16)/.5)**2).toFixed(2);});
+  await expect(page.locator('#disturbance-state')).toContainText(expectedForce+' N');
+  await page.locator('#timeline').evaluate(el=>{el.value=String(18/36);el.dispatchEvent(new Event('input'));});
+  await expect(page.locator('#disturbance-state')).not.toContainText('적용 중');
+});
