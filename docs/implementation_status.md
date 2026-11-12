@@ -1,5 +1,12 @@
 # Implementation scope
 
+Current consolidated report (2026-11-12):
+[code structure, solver/control changes and verified boundaries](system-architecture-and-progress.md).
+The Robotiq-equipped three-Panda first lift now passes source refinement,
+robust endpoint realization, the explicitly named midpoint CITO variant,
+independent plan checks and native MuJoCo execution. This does not complete
+III-D candidate search or the full reorient/jig/release sequence.
+
 The free articulated-object tasks now execute link-aware geometric contraction of
 125 supplied synthetic contact samples into three anchors, geometry-only scale
 transfer, and three-arm G/P/G IK plus coupled 7D object-force/robot-torque
@@ -31,13 +38,14 @@ paper component is not complete.
 | Contact search | Candidate/node update loop with user geometry oracle | Complete STOCS merit/oracle algorithm not reproduced |
 | Collision | Differentiable margins and trajectory validator callbacks | Bundled dynamics-only models do not provide full mesh clearances |
 | Control | Hybrid motion/force, pose/force feedforward comparison, joint nullspace impedance, virtual PMI position admittance | Simulation level; full nonlinear multibody/contact PMI and hardware servo validation remain pending |
-| MuJoCo | URDF inertia export, state mapping, headless tracking | Markers are not collision geometry |
+| MuJoCo | URDF inertia export, state mapping, tracking and native multi-arm/tool/free-object contact scenes | The basic marker-only tracking exporter remains distinct from the full collision scene builders |
 | Mesh visualization | Eight full upstream URDFs, STL/DAE loading, visual/collision selector and recorded joint/base poses | Upstream mesh network access and WebGL required; display does not enable contact dynamics |
 | Fixed-geometry SOCP | Clarabel box margin, exact friction cones, fixed-posture torque bounds | Geometry/closure/collision remain NLP or scene checks |
-| Contact scene replay | Supplied MJCF, scalar-joint torque control, free objects, contact traces, equality hold/release | Real furniture collision assets and gripper calibration external |
+| Contact scene replay | MJCF, scalar-joint torque/position commands, passive observed joints, free objects, contact traces and internal gripper constraints | Model/scene-specific geometry; simulation force bounds are not hardware calibration |
 | Engine comparison | Portable trace, optional CRISP CANAL/SubADMM SDK client, rotated-contact frame/impulse checks and fixed-Panda/free-panel runner | Complete task/precision insertion/jam comparison remains pending; SDK installed separately |
 | Three-arm contact experiment | Assumed network groups, 3 keyframes, 2 CITO solves, URDF sphere/fingers/cup, actual dynamic replay and vent/release | Authored Cartesian arms, fixed contact assignments; force-only gripper and lumped suction model |
 | Solver comparison | Fresh stationary CITO trials and residual-qualified timing tool | SNOPT unavailable in validated runtime; no assembly benchmark |
+| Robotiq 2F-85 | Native linkage/mass/mesh, finite clamp and measured-jaw feedback; mounted G/P/P first lift | Mounted PD halves approximate a tendon under soft coupling; CRISP closed-loop import and hardware calibration pending |
 | Hardware | Position/velocity/effort separation | No physical communication or validation |
 
 Restricted CITO tests cover stationary impulse balance and a 3 cm object lift

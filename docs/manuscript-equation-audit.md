@@ -8,8 +8,11 @@ This audit supersedes the numerical-procedure findings in the historical v12 aud
 The new rigid-panel source/target optimizations and solver-free finite-step
 grasp diagnosis are documented in
 [grasp-discretization-diagnosis.md](grasp-discretization-diagnosis.md).
-Static keyframe verification is now executed with explicit finger resultants;
-the original articulated-arm CITO intervals have not passed final acceptance.
+Static keyframe verification is executed with explicit finger resultants.
+The original poststep-Euler/instantaneous-grasp carry trials have not passed;
+the separately named midpoint configuration variant now passes a three-Panda
+first lift, including the Robotiq MuJoCo case. See the
+[current consolidated structure and progress report](system-architecture-and-progress.md).
 
 ## Scope that must be preserved
 
@@ -43,9 +46,9 @@ the original articulated-arm CITO intervals have not passed final acceptance.
 | Part | Core implementation | Scenario execution boundary |
 |---|---|---|
 | III-B / (7) | `refinement.py`, `pipeline.py` | Rigid panel/mobile source fixtures call this stage. New free-object nominal baselines do not. |
-| III-C / (8)–(14) | `realization.py` robust contact/posture/vertex torque NLP | Generic component exists; native scene runners mostly use fixed-pose IK and nominal force allocation, not the complete problem. Finger-resultant/aperture/clearance integration remains required. |
+| III-C / (8)–(14) | `realization.py`, `paper_keyframe.py` robust contact/posture/vertex torque NLP | The paper-panel runner executes explicit finger/aperture keyframes and independent checks. Existing mobile/free-object nominal runners remain separate; they do not automatically execute the full problem. |
 | III-D / (15)–(16) | `sequence.choose_sequence` enumerates candidate combinations and intervals | Must be connected to every paper-task adapter. Supplied G/P assignments in a demo are not a completed sequence search. |
-| IV / (17)–(19) | `trajectory.solve_cito` restricted dynamics/complementarity NLP | Cartesian contact examples execute it. Panda/mobile/free-articulated nominal paths are not CITO results. Object-link and mobile/environment model extensions must enter the same transcription. |
+| IV / (17)–(19) | `trajectory.solve_cito` restricted dynamics/complementarity NLP | Cartesian examples and the explicitly named Panda/Robotiq first-lift midpoint variant execute it. Legacy Panda/mobile/free-articulated nominal paths remain separate. Full sequence, literal formulation and extended-object/mobile transcription validation remain pending. |
 | Geometric oracle / validation | Callbacks and explicit `full_geometry_checked` | A missing collision model/oracle cannot be accepted as a full-geometry certificate. |
 | Learning / III-A | Supplied predictions/group IDs | No trained grouping/anchor inference is claimed. A G grasp-frame centroid inside a handle is not a source surface contact for (7). |
 
@@ -60,10 +63,13 @@ The uploaded planning formulation does not prescribe a particular hybrid,
 joint-impedance or admittance controller. These are the requested execution
 layer, to be specified and tested separately against its planned reactions.
 
-Current saved nominal baselines use computed torque + Cartesian PD + planned
-wrench feedforward, with independent finger squeeze PD. They have no measured
-wrench feedback, force/motion selection projector, or force-tracking certificate.
-A normal-force limit in an NLP is not a hybrid force controller.
+Legacy saved nominal baselines use computed torque + Cartesian PD + planned
+wrench feedforward, with independent finger squeeze PD. The new paper-panel
+runner additionally exposes selected hybrid feedback/feedforward and projected
+joint impedance. Its qualified first-lift mode is pose/joint impedance plus
+planned wrench feedforward; the Robotiq adds measured jaw-force admittance.
+The current CRISP hybrid-feedback trial remains failed. A normal-force limit
+in an NLP is not itself a hybrid force controller.
 
 The requested torque-arm controller uses a contact-frame orthogonal force
 projector Sf and Sm=I−Sf, measured wrench feedback on Sf, motion feedback on Sm,

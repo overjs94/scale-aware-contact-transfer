@@ -3,6 +3,10 @@
 URDF 기반 동역학·기구학과 논문의 Sec. III-B–IV를 위한 연구용 Python 패키지입니다.
 로봇별 System_Param의 질량·관성·축·링크 길이를 재작성하지 않고 URDF에서 읽습니다.
 
+**현재 전체 구조·개선·solver 보고:** [코드 구조도와 진행 보고서](docs/system-architecture-and-progress.md).
+Source/target/CITO, 저수준 제어, MuJoCo/CRISP, Robotiq 기구·렌더링, 검증 결과와
+남은 논문 단계의 범위를 함께 정리했습니다.
+
 
 ## 자유 articulated object · 3-arm 명목 진단 baseline
 

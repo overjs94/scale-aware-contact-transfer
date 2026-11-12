@@ -1,0 +1,45 @@
+{
+  "date_utc": "2026-11-12T14:03:59.581866+00:00",
+  "implementation_commit": "5ad60156c9d6df32fc3bbb793b5f28a9dae6d1ea",
+  "scope": "Regression of existing implementation baseline, before new full-scenario/type-selection/ablation integration",
+  "python": {
+    "command": "OPENBLAS_NUM_THREADS=1 .venv/bin/python -m pytest -q",
+    "passed": 131,
+    "warnings": 1,
+    "seconds": 1137.06,
+    "log_sha256": "042fdd4fe96667094217174c3c5abfc90fc8ab56579874a5c184b5d98886c99b",
+    "warning_origin": "inherited anyio pytest plugin deprecated pytest internal import"
+  },
+  "web": {
+    "command": "CHROMIUM_PATH=/usr/bin/chromium npm --prefix web test -- --timeout=60000",
+    "passed": 33,
+    "duration": "6.7m",
+    "log_sha256": "ca7631c5afdd91a89cad89cace2dd0d4a733f5b1f7c20e369344cf98317a8524",
+    "assets": "offline mesh fixtures for deterministic FK/UI regression; real asset QA recorded separately in prior integration"
+  },
+  "runtime": {
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "casadi": "3.7.2",
+    "pin": "4.1.0",
+    "mujoco": "4.0.0",
+    "clarabel": "0.11.1",
+    "pytest": "9.2.0"
+  },
+  "ipopt": {
+    "version": "3.14.11",
+    "linear_solver": "MUMPS 5.4.1",
+    "evidence": "native startup output of a one-variable version probe"
+  },
+  "architecture": {
+    "python_modules_documented": 58,
+    "diagram": "docs/images/system-architecture.svg",
+    "graphviz_source": "docs/diagrams/system-architecture.dot"
+  },
+  "public_deployment": {
+    "commit": "52b561a4c99c36ebc98de181863c5484def30873",
+    "workflow_run_id": "43229391428",
+    "conclusion": "success",
+    "includes": "static publication, Pages deployment and live recording/mesh checks"
+  }
+}
