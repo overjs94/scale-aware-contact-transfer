@@ -64,6 +64,7 @@ def prepare_panel_manifest(episode,controller,directory,*,solver='canal',mu=.8):
     if solver not in {'canal','sub_admm'}:raise ValueError('Unknown CRISP solver')
     if any(s['controller']!='torque' for s in episode.problem.case.data['arms']):raise ValueError('CRISP bridge currently supports direct torque arms only')
     if any(s['model']!='franka_panda' for s in episode.problem.case.data['arms']):raise ValueError('This CRISP panel adapter currently validates Panda arms only')
+    if any(s.get('gripper_profile') for s in episode.problem.case.data['arms']):raise ValueError('The native closed-loop Robotiq mechanism is currently supported by the MuJoCo adapter, not this CRISP URDF bridge')
     p=episode.problem;directory=Path(directory).resolve();directory.mkdir(parents=True,exist_ok=True)
     rows=[];exclusions=[];joint_names=[];q0=controller.reference(0)[0];offset=0
     for i,(r,spec) in enumerate(zip(controller.robots,p.case.data['arms'])):

@@ -43,8 +43,13 @@ class PaperPanelProblem:
     system: MechanicalSystem
 
     @classmethod
-    def create(cls,directory='outputs/paper_panel',case_path=None,tool_types=('G','P','P'),assignment=(0,1,2)):
+    def create(cls,directory='outputs/paper_panel',case_path=None,tool_types=('G','P','P'),assignment=(0,1,2),gripper_model='panda_hand'):
         case=PanelCase.load(case_path);out=Path(directory);out.mkdir(parents=True,exist_ok=True)
+        if gripper_model not in {'panda_hand','robotiq_2f85'}:raise ValueError('Unknown gripper model')
+        if gripper_model=='robotiq_2f85':
+            if tool_types[0]!='G':raise ValueError('Robotiq requires a G hardware slot')
+            from .robotiq_panel import prepare_arm
+            prepare_arm(case,out)
         if tool_types not in [('G','P','P'),('P','P','P')] or sorted(assignment)!=[0,1,2]:raise ValueError('Unsupported hardware vector or noninjective assignment')
         if tool_types[0]=='P':
             spec=case.data['arms'][0];spec.update(kind='P',urdf='point_arm.urdf',locked_joints={});base=case.robots[0].base_pose
@@ -66,11 +71,16 @@ class PaperPanelProblem:
             # One holding primitive is shared across all keyframes of a grasp.
             patches[-1]=SurfacePatch.fixed(p,n)
             Rt=Rotation.from_quat(spec['tool_quaternion_xyzw']).as_matrix()
-            a0,center,hw,hh=native_finger_geometry(full)
             size=np.fromstring(ET.parse(case.panel.path).find('link/collision/geometry/box').get('size'),sep=' ')
             width=float(np.abs(Rt[:,1])@size)
+            profile=spec.get('gripper_profile')
+            if profile:
+                if abs(width-profile['aperture_m'])>1e-6:raise ValueError('Robotiq holding primitive requires native force calibration at this aperture')
+                hw,hh=profile['half_width'],profile['half_height'];center=np.array(profile['grasp_center_tool']);a0=0.;inset=profile['minimum_inset_m']
+            else:
+                a0,center,hw,hh=native_finger_geometry(full);inset=hh/2
             # Place a conservative pad rectangle wholly inside the panel's edge.
-            inset=hh/2;tcp=p-inset*n;Tlt=np.eye(4);Tlt[:3,:3]=Rt;Tlt[:3,3]=tcp
+            tcp=p-inset*n;Tlt=np.eye(4);Tlt[:3,:3]=Rt;Tlt[:3,3]=tcp
             Tli=np.eye(4);Tli[:3,:3]=Rc@np.diag([1.,-1.,-1.]);Tli[:3,3]=p
             Tti=np.linalg.inv(Tlt)@Tli;Tlc=np.eye(4);Tlc[:3,:3]=Rc;Tlc[:3,3]=p
             Ttg=np.eye(4);Ttg[:3,3]=center;Tcg=np.linalg.inv(Tlc)@Tlt@Ttg
@@ -78,10 +88,13 @@ class PaperPanelProblem:
             ET.SubElement(joint,'parent',link=spec['tool_frame']);ET.SubElement(joint,'child',link='paper_interface')
             ET.SubElement(joint,'origin',xyz=' '.join(map(str,Tti[:3,3])),rpy=' '.join(map(str,Rotation.from_matrix(Tti[:3,:3]).as_euler('xyz'))))
             path=out/f'interface{index}.urdf';ET.indent(root);root.write(path,encoding='utf-8',xml_declaration=True)
-            qhold=(width-a0)/2;fingers=[full.joint_names.index(f'panda_finger_joint{k}') for k in [1,2]]
-            if not max(full.lower[fingers])<=qhold<=min(full.upper[fingers]):raise ValueError('Panel cannot fit URDF gripper aperture')
-            cap=FingerGrasp(width,hw,min(hh,inset+float(Rt[:,2]@(-n))*center[2])*.9,.8,18.,aperture_min=max(0,a0),aperture_max=2*min(full.upper[fingers])+a0,interface_from_grasp=Tcg)
-            robot=Robot(path,base_pose=full.base_pose,locked_joints={full.joint_names[j]:qhold for j in fingers})
+            if profile:
+                cap=FingerGrasp(width,hw,hh,profile['mu'],profile['closing_force_limit_N'],aperture_min=0.,aperture_max=profile['aperture_max_m'],interface_from_grasp=Tcg,force_component_limits=np.full(3,profile['force_component_limit_N']));locks=profile['hold']
+            else:
+                qhold=(width-a0)/2;fingers=[full.joint_names.index(f'panda_finger_joint{k}') for k in [1,2]]
+                if not max(full.lower[fingers])<=qhold<=min(full.upper[fingers]):raise ValueError('Panel cannot fit URDF gripper aperture')
+                cap=FingerGrasp(width,hw,min(hh,inset+float(Rt[:,2]@(-n))*center[2])*.9,.8,18.,aperture_min=max(0,a0),aperture_max=2*min(full.upper[fingers])+a0,interface_from_grasp=Tcg);locks={full.joint_names[j]:qhold for j in fingers}
+            robot=Robot(path,base_pose=full.base_pose,locked_joints=locks)
             robots.append(robot);caps.append(cap);frames.append('paper_interface')
         system=MechanicalSystem([r.symbolic() for r in robots],case.panel.symbolic())
         return cls(case,out,source,tuple(robots),tuple(caps),tuple(frames),tuple(patches),system)

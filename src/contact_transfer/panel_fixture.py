@@ -146,16 +146,35 @@ def build_panel_scene(case,destination):
     assets=ET.SubElement(root,'asset');world=ET.SubElement(root,'worldbody');actuators=ET.SubElement(root,'actuator');contact=ET.SubElement(root,'contact')
     for robot,spec in zip(case.full_robots,case.data['arms']):
         prefix=spec['id']+'_';cache='rb5_meshes' if spec['model']=='rb5' else 'panda_meshes';meshes={p.name:p.resolve() for p in (Path.cwd()/'.cache'/cache).glob('*.stl')}
+        profile=spec.get('gripper_profile')
+        if profile:meshes.update({p.name:p.resolve() for p in (Path.cwd()/'.cache/robotiq_2f85/assets').glob('*.stl')})
         geoms=append_urdf_robot(world,actuators,robot,prefix,mesh_files=meshes,assets=assets,robot_collisions=True)
         if spec['controller']=='position':
             for motor in list(actuators):
                 if not motor.get('name').startswith(prefix):continue
                 name=motor.get('joint')[len(prefix):];j=robot.joint_names.index(name);attrs=dict(motor.attrib);actuators.remove(motor)
                 attrs.update(kp=str(cfg['position_kp']),kv=str(cfg['position_kd']),ctrlrange=_text([robot.lower[j],robot.upper[j]]),forcerange=_text([-robot.effort[j],robot.effort[j]]));ET.SubElement(actuators,'position',**attrs)
+        if profile:
+            for node in world.iter('joint'):
+                name=node.get('name','').removeprefix(prefix)
+                if name in profile['properties']:
+                    for k,v in profile['properties'][name].items():node.set(k,str(v))
+            for motor in list(actuators):
+                name=motor.get('joint','').removeprefix(prefix)
+                if not motor.get('name','').startswith(prefix) or name not in profile['drivers']:continue
+                j=robot.joint_names.index(name);attrs=dict(motor.attrib);actuators.remove(motor);weight=profile['drivers'][name];attrs.update(kp=str(weight*profile['servo_kp']),kv=str(weight*profile['servo_kd']),ctrlrange=_text([robot.lower[j],robot.upper[j]]),forcelimited='true',forcerange=_text([-robot.effort[j],robot.effort[j]]));ET.SubElement(actuators,'position',**attrs)
+            eq=root.find('equality')
+            if eq is None:eq=ET.SubElement(root,'equality')
+            for entry in profile['equalities']:
+                attrs=dict(entry['attributes'])
+                for key in ['body1','body2','joint1','joint2']:
+                    if key in attrs:attrs[key]=prefix+attrs[key]
+                ET.SubElement(eq,entry['type'],**attrs)
+            for entry in profile['excludes']:ET.SubElement(contact,'exclude',**{k:prefix+v for k,v in entry.items()})
         for geom in geoms:
-            pad='leftfinger_collision_' in geom or 'rightfinger_collision_' in geom
+            pad='leftfinger_collision_' in geom or 'rightfinger_collision_' in geom or profile and ('left_pad_collision_' in geom or 'right_pad_collision_' in geom)
             if pad or spec['kind']=='P' and geom.startswith(prefix+'tool_collision_'):
-                mu=cfg['pad_friction'] if pad else case.data['optimization']['point_mu'];ET.SubElement(contact,'pair',geom1=geom,geom2='panel_collision_0',condim='4' if pad else '3',friction=_text([mu,mu,cfg['pad_torsional_friction_m'] if pad else 0,0,0]),solref='.008 1',solimp='.95 .99 .001')
+                mu=profile['mu'] if pad and profile else cfg['pad_friction'] if pad else case.data['optimization']['point_mu'];ET.SubElement(contact,'pair',geom1=geom,geom2='panel_collision_0',condim='4' if pad and not profile else '3',friction=_text([mu,mu,cfg['pad_torsional_friction_m'] if pad and not profile else 0,0,0]),solref='.004 1' if pad and profile else '.008 1',solimp='.95 .99 .001')
         if spec['model']=='franka_panda':
             for pair in ET.parse(case.path.parent/'panda.srdf').findall('disable_collisions'):
                 a,b=pair.get('link1'),pair.get('link2')

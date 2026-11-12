@@ -47,11 +47,13 @@ class MujocoContactScene:
         self.data = mujoco.MjData(self.model)
         self.joint_names, self.actuator_names, self.object_names = map(list, (joint_names, actuator_names, object_names))
         self.actuator_modes = list(['torque']*len(self.joint_names) if actuator_modes is None else actuator_modes)
-        if len(self.actuator_modes)!=len(self.joint_names) or any(m not in {'torque','position'} for m in self.actuator_modes):
-            raise ValueError('one torque/position actuator mode per joint required')
+        if len(self.actuator_modes)!=len(self.joint_names) or any(m not in {'torque','position','passive'} for m in self.actuator_modes):
+            raise ValueError('one explicit torque/position/passive mode per observed joint required')
         if len(self.joint_names) != len(self.actuator_names) or not self.object_names:
             raise ValueError("one actuator per joint and at least one dynamic object required")
-        if any(len(names) != len(set(names)) for names in (self.joint_names, self.actuator_names, self.object_names)):
+        if any((mode=='passive')!=(name is None) for name,mode in zip(self.actuator_names,self.actuator_modes)):
+            raise ValueError('Passive observed joints require None actuator names')
+        if any(len(names) != len(set(names)) for names in (self.joint_names, [a for a in self.actuator_names if a is not None], self.object_names)):
             raise ValueError("scene names must be unique")
 
         def ids(kind, names):
@@ -61,11 +63,13 @@ class MujocoContactScene:
             return np.array(result, dtype=int)
 
         self.joints = ids(mujoco.mjtObj.mjOBJ_JOINT, self.joint_names)
-        self.actuators = ids(mujoco.mjtObj.mjOBJ_ACTUATOR, self.actuator_names)
+        self.actuator_joint_indices=np.flatnonzero(np.array(self.actuator_modes)!='passive')
+        self.actuators = ids(mujoco.mjtObj.mjOBJ_ACTUATOR, [self.actuator_names[j] for j in self.actuator_joint_indices])
         self.objects = ids(mujoco.mjtObj.mjOBJ_BODY, self.object_names)
-        for joint, actuator, mode in zip(self.joints, self.actuators, self.actuator_modes):
+        for joint in self.joints:
             if int(self.model.jnt_type[joint]) not in (int(mujoco.mjtJoint.mjJNT_HINGE), int(mujoco.mjtJoint.mjJNT_SLIDE)):
-                raise ValueError("controlled joints must be scalar")
+                raise ValueError("observed robot joints must be scalar")
+        for joint, actuator, mode in zip(self.joints[self.actuator_joint_indices], self.actuators, [self.actuator_modes[j] for j in self.actuator_joint_indices]):
             if (self.model.actuator_trntype[actuator] != mujoco.mjtTrn.mjTRN_JOINT
                     or self.model.actuator_trnid[actuator, 0] != joint
                     or self.model.actuator_dyntype[actuator] != mujoco.mjtDyn.mjDYN_NONE
@@ -192,16 +196,19 @@ class MujocoContactScene:
             tau = np.asarray(controller.command(q, v, *desired), float).reshape(len(self.joints))
             if not np.isfinite(tau).all():
                 raise RuntimeError("controller returned nonfinite command")
-            for value, actuator, mode in zip(tau, self.actuators, self.actuator_modes):
+            passive=np.array(self.actuator_modes)=='passive'
+            if np.any(tau[passive]!=0):raise RuntimeError('A passive observed joint cannot receive an effort or position command')
+            for j,actuator in zip(self.actuator_joint_indices,self.actuators):
+                value,mode=tau[j],self.actuator_modes[j]
                 if model.actuator_ctrllimited[actuator] and not model.actuator_ctrlrange[actuator, 0] <= value <= model.actuator_ctrlrange[actuator, 1]:
                     raise RuntimeError("command exceeds scene actuator control range")
                 if mode=='torque' and model.actuator_forcelimited[actuator] and not model.actuator_forcerange[actuator, 0] <= value <= model.actuator_forcerange[actuator, 1]:
                     raise RuntimeError("command exceeds scene actuator force range")
-            data.ctrl[self.actuators] = tau
+            data.ctrl[self.actuators] = tau[self.actuator_joint_indices]
             mj.mj_step(model, data)
             applied=tau.copy()
-            for j,mode in enumerate(self.actuator_modes):
-                if mode=='position':applied[j]=data.actuator_force[self.actuators[j]]
+            for j,actuator in zip(self.actuator_joint_indices,self.actuators):
+                if self.actuator_modes[j]=='position':applied[j]=data.actuator_force[actuator]
             torques.append(applied)
             if not np.isfinite(data.qpos).all() or not np.isfinite(data.qvel).all():
                 raise RuntimeError("nonfinite simulation state")

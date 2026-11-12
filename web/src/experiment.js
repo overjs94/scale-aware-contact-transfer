@@ -57,6 +57,16 @@ function fields(){
 }
 function report(data){
   const r=data.report;if(!r)return;$('experiment-results').hidden=false;
+  if(['robotiq_clamp','coupled_panel_lift'].includes(data.scenario)){
+    for(const id of ['source-result','workspace-result','robustness-result'])$(id).hidden=true;
+    const component=data.scenario==='robotiq_clamp';
+    $('result-tracking').textContent=component?(r.mechanics.passed?'PASS · mechanics':'FAIL'):(r.tracking_and_contact_passed?'PASS':'FAIL')+` · ${(r.maximum_position_error_m*1000).toFixed(3)} mm`;
+    $('result-forces').textContent=component?`${Math.max(...r.maximum_jaw_force_N).toFixed(2)} N / jaw`:(r.physical_finger_force_limits_passed&&r.sampled_interface_wrench_capability.passed?'PASS':'FAIL');
+    $('result-seal-label').textContent=component?'NATIVE GRIPPER / FREE BLOCK':'MULTI-ARM / FIRST LIFT';
+    $('result-seal').textContent=component?`${r.native_internal_equalities} internal constraints · no object weld`:`${(100*Math.min(...Object.values(r.maintained_contact_fraction).filter(v=>v!==null))).toFixed(1)}% contact`;
+    $('result-residual').textContent=component?Math.max(...Object.values(r.mechanics.residuals)).toExponential(2):r.independent_plan.residuals.momentum.toExponential(2);
+    $('report-json').textContent=JSON.stringify(r,null,2);return;
+  }
   if(r.articulated_object||r.free_articulated_object){
     const angular=r.coordinate_units==='rad',factor=angular?180/Math.PI:1000,unit=angular?'deg':'mm';
     $('result-tracking').textContent=`${r.execution_passed?'PASS':'FAIL'} · ${(r.final_error*factor).toFixed(3)} ${unit}`;

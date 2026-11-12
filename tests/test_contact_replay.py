@@ -109,3 +109,14 @@ def test_position_actuator_logs_actual_torque_not_radian_command(scene):
     assert log.torque[0,0]==pytest.approx(2.)  # 4 Nm demanded, capped at 2
     assert abs(log.torque[-1,0])<.01 and log.q[-1,0]==pytest.approx(.04,abs=.0001)
     assert log.metadata['actuator_modes']==['position']
+
+
+def test_passive_robot_coordinate_is_observed_without_an_actuator(scene):
+    scene.write_text(scene.read_text().replace('<motor name="motor" joint="slide" ctrllimited="true" ctrlrange="-10 10"/>',''))
+    sim=MujocoContactScene(scene,['slide'],[None],['panel'],actuator_modes=['passive'])
+    controller=SimpleNamespace(command=lambda *args:np.zeros(1))
+    log=sim.run(controller,stationary,.02,case_id='passive',plan_id='observe')
+    assert sim.model.nu==0 and log.q.shape==(11,1)
+    np.testing.assert_array_equal(log.torque,0.)
+    bad=SimpleNamespace(command=lambda *args:np.ones(1))
+    with pytest.raises(RuntimeError,match='passive observed joint'):sim.run(bad,stationary,.02,case_id='passive',plan_id='bad')

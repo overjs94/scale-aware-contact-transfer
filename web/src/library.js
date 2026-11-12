@@ -3,7 +3,7 @@
 export const categories = [
   { id: "paper", title: "논문 목표", description: "Contact contraction을 다중 팔로 실현하는 목표 과제입니다. 현재 기록은 기준 동작이며 전체 최적화 검증은 진행 중입니다.", groups: ["핵심 과제 · 단일 강체", "확장 · 모바일 협력", "확장 · 자유 articulated", "보조 · 다물체 조립"] },
   { id: "embodiment", title: "단일 embodiment", description: "각 로봇의 URDF·기구학·관절 추종을 확인합니다. 논문 목표의 협력 물체 조작 실험과 구분합니다.", groups: ["로봇팔 · 관절 추종", "휴머노이드 · 기구학"] },
-  { id: "diagnostic", title: "요소·강건성", description: "외란 응답, 접촉 도구와 수동 관절, 제한 CITO를 개별적으로 확인하는 진단 실험입니다.", groups: ["외력 · 강건성", "다중 팔 · 도구·계획 검증", "단일 팔 · 수동 관절"] },
+  { id: "diagnostic", title: "요소·강건성", description: "외란 응답, 접촉 도구와 수동 관절, 제한 CITO를 개별적으로 확인하는 진단 실험입니다.", groups: ["외력 · 강건성", "다중 팔 · 도구·계획 검증", "단일 팔 · 수동 관절", "그리퍼 · 구동·파지력"] },
 ];
 
 const entries = [
@@ -26,6 +26,9 @@ const entries = [
   ["mobile_push_8", "diagnostic", 0, "모바일 협력 · 외력 8 N", "RBY1 + Panda · 화살표 표시", "mobile_panel"],
   ["mobile_push_25", "diagnostic", 0, "모바일 협력 · 외력 25 N", "RBY1 + Panda · 화살표 표시", "mobile_panel"],
   ["dual_cito", "diagnostic", 1, "Dual-arm · 제한 CITO", "Cartesian arm × 2 · 최적화 궤적"],
+  ["panda_robotiq_lift", "diagnostic", 1, "Panda × 3 · Robotiq 첫 lift", "G / P / P · 최적화 + native 접촉 실행"],
+  ["panda_coupled_lift", "diagnostic", 1, "Panda × 3 · 최적화된 첫 lift", "G / P / P · 첫 구간 계획·실행"],
+  ["robotiq_2f85", "diagnostic", 3, "Robotiq 2F-85 · 양 jaw 40 N", "실제 mesh · 수동 링크·구동기 · 자유 블록"],
   ["three_arm", "diagnostic", 1, "Cartesian × 3 · 접촉 도구", "Point / gripper / suction"],
   ["three_franka", "diagnostic", 1, "Panda × 3 · 접촉 도구", "Point / gripper / suction", true],
   ["hinged_door", "diagnostic", 2, "고정 힌지 · 문 열기", "단일 팔 · point contact", true],
@@ -63,6 +66,12 @@ export function recordingScope(data) {
   } else if (entry.category === "embodiment") {
     status = data.engine === "kinematic_preview" ? "기구학 미리보기" : "관절 추종 검증";
     detail = data.engine === "kinematic_preview" ? "URDF 관절·floating base의 좌표 재생입니다. 물체 접촉, 균형 제어와 보행을 검증하지 않았습니다." : "단일 로봇 모델의 관절 명령 추종 기록입니다. 협력 물체 조작과 접촉력 제어의 검증 결과는 아닙니다.";
+  } else if (data.scenario === "coupled_panel_lift") {
+    status = "다중 팔 · 첫 lift " + (report.execution_passed ? "검증" : "검사 실패");
+    detail = "Source refinement와 target realization, 주어진 G/P/P 배치의 첫 구간 CITO 및 접촉 실행 기록입니다. Midpoint 구성 업데이트 변형이며, 전체 재배향·안착·릴리스와 III-D 탐색의 검증은 남아 있습니다.";
+  } else if (data.scenario === "robotiq_clamp") {
+    status = "그리퍼 파지력 · 요소 검증";
+    detail = "수동 링크를 포함한 실제 그리퍼 기구와 유한 구동기, 자유 블록의 파지력 시험입니다. 논문 목표의 다중 팔 contact realization과 구분합니다.";
   } else if ((data.external_disturbances || []).length) {
     const passed = report.robustness?.all_task_checks_passed ?? report.execution_passed;
     status = "외란 시험" + (passed === false ? " · 검사 실패 포함" : "");

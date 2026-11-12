@@ -22,12 +22,14 @@ class FingerGrasp:
  aperture_min: float=0.
  aperture_max: float=.08
  interface_from_grasp: object=field(default_factory=lambda:np.eye(4))
+ force_component_limits: object=None
  kind: str=field(default='G',init=False)
  has_moment: bool=field(default=True,init=False)
  def __post_init__(self):
   T=np.asarray(self.interface_from_grasp,float);values=[self.aperture_required,self.half_width,self.half_height,self.mu,self.closing_force_per_finger,self.aperture_min,self.aperture_max]
   if not np.isfinite(values).all() or self.half_width<=0 or self.half_height<=0 or self.mu<=0 or self.closing_force_per_finger<=0 or not 0<=self.aperture_min<=self.aperture_required<=self.aperture_max:raise ValueError('Invalid finger geometry, friction, aperture or force bound')
   if T.shape!=(4,4) or not np.allclose(T[3],[0,0,0,1]) or not np.allclose(T[:3,:3].T@T[:3,:3],np.eye(3)) or not np.isclose(np.linalg.det(T[:3,:3]),1):raise ValueError('Proper grasp/interface transform required')
+  if self.force_component_limits is not None and (np.asarray(self.force_component_limits).shape!=(3,) or np.any(np.asarray(self.force_component_limits)<=0) or not np.isfinite(self.force_component_limits).all()):raise ValueError('Positive grasp-frame force component limits required')
  def maps(self,aperture=None):
   a=self.aperture_required if aperture is None else aperture;T=ca.DM(self.interface_from_grasp);out=[]
   for sign in [-1,1]:
@@ -53,7 +55,10 @@ class FingerGrasp:
    f=opti.variable(3);opti.subject_to(f[2]>=0);opti.subject_to(ca.sumsqr(f[:2])<=(self.mu*f[2])**2);
    opti.set_initial(f,warm[index] if warm is not None else [0,0,initial_scale*self.closing_force_per_finger/8]);forces.append(f)
   for finger in [0,1]:opti.subject_to(sum(f[2] for f in forces[4*finger:4*finger+4])<=scale*self.closing_force_per_finger)
-  return sum(B@f for B,f in zip(self.maps(aperture),forces)),ca.vertcat(*forces)
+  wrench=sum(B@f for B,f in zip(self.maps(aperture),forces))
+  if self.force_component_limits is not None:
+   force=ca.DM(np.asarray(self.interface_from_grasp)[:3,:3]).T@wrench[3:];limit=scale*ca.DM(self.force_component_limits);opti.subject_to(opti.bounded(-limit,force,limit))
+  return wrench,ca.vertcat(*forces)
  def conic_matrices(self,aperture=None):
   """Aeq*u=w, Alinear*u<=blinear, and eight SOC blocks C*u∈Q3."""
   B=np.hstack([np.asarray(ca.DM(x)) for x in self.maps(aperture)]);A=[];b=[]
@@ -61,6 +66,9 @@ class FingerGrasp:
    row=np.zeros(24);row[np.arange(4*finger,4*finger+4)*3+2]=1;A.append(row);b.append(self.closing_force_per_finger)
   for point in range(8):
    row=np.zeros(24);row[point*3+2]=-1;A.append(row);b.append(0.)
+  if self.force_component_limits is not None:
+   force=np.asarray(self.interface_from_grasp)[:3,:3].T@B[3:]
+   for row,limit in zip(force,self.force_component_limits):A.extend([row,-row]);b.extend([limit,limit])
   cones=[]
   for point in range(8):
    C=np.zeros((3,24));C[0,point*3+2]=self.mu;C[1,point*3]=1;C[2,point*3+1]=1;cones.append(C)

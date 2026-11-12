@@ -23,10 +23,10 @@ class PanelGeometry:
         self.object_address=self.model.jnt_qposadr[mj.mj_name2id(self.model,mj.mjtObj.mjOBJ_JOINT,'panel_free')]
         self.intended=set()
         for full,spec in zip(problem.case.full_robots,problem.case.data['arms']):
-            links=['tool'] if spec['kind']=='P' else ['panda_leftfinger','panda_rightfinger']
+            links=['tool'] if spec['kind']=='P' else ['left_pad','right_pad'] if spec.get('gripper_profile') else ['panda_leftfinger','panda_rightfinger']
             for link in links:
                 count=len(ET.parse(full.path).findall(f"link[@name='{link}']/collision"))
-                self.intended.add(spec['id']+'_'+link+'_collision_'+str(count-1))
+                for i in range(count) if spec.get('gripper_profile') else [count-1]:self.intended.add(spec['id']+'_'+link+'_collision_'+str(i))
 
     def set_state(self,q):
         q=np.asarray(q,float).ravel();m=self.model;d=self.data;mj=self.mj
@@ -77,13 +77,30 @@ class PanelGeometry:
         callback=Distance();self.callbacks.append(callback)
         return lambda q:callback(q)
 
-    def validate(self,trajectory,substeps=10):
+    def validate(self,trajectory,substeps=10,object_interpolation='independent_se3'):
         from scipy.interpolate import CubicHermiteSpline
         from scipy.spatial.transform import Slerp,Rotation
         t=np.r_[0,np.cumsum(trajectory.dt)];sys=self.problem.system
         joints=CubicHermiteSpline(t,trajectory.q[:,:sys.object_q.start],trajectory.v[:,:sys.object_v.start])
+        if object_interpolation not in {'independent_se3','holding_grasp'}:raise ValueError('Unknown reference interpolation')
+        holding=next((i for i,c in enumerate(self.problem.capabilities) if c.kind=='G'),None)
+        if object_interpolation=='holding_grasp' and holding is None:raise ValueError('Holding-grasp interpolation requires a gripper')
+        if object_interpolation=='holding_grasp':
+            robot=self.problem.robots[holding];frame=self.problem.frames[holding];qs=sys.q_slices[holding]
+            initial=trajectory.q[0,sys.object_q];To=np.eye(4);To[:3,3]=initial[:3];To[:3,:3]=Rotation.from_quat(initial[3:]).as_matrix();tool_to_object=np.linalg.inv(robot.fk(trajectory.q[0,qs],frame))@To
+            for q in trajectory.q:
+                T=robot.fk(q[qs],frame)@tool_to_object;actual=q[sys.object_q]
+                if max(np.linalg.norm(T[:3,3]-actual[:3]),(Rotation.from_matrix(T[:3,:3]).inv()*Rotation.from_quat(actual[3:])).magnitude())>2e-5:raise ValueError('Holding-grasp reference cannot interpolate a released or changing grasp')
         rot=Slerp(t,Rotation.from_quat(trajectory.q[:,sys.object_q.start+3:sys.object_q.start+7]));states=[]
         for i,h in enumerate(trajectory.dt):
             for s in np.linspace(0,1,substeps,endpoint=False):
-                now=t[i]+s*h;position=(1-s)*trajectory.q[i,sys.object_q.start:sys.object_q.start+3]+s*trajectory.q[i+1,sys.object_q.start:sys.object_q.start+3];states.append(np.r_[joints(now),position,rot(now).as_quat()])
+                now=t[i]+s*h;qr=joints(now)
+                if object_interpolation=='holding_grasp':
+                    # Match CoupledEpisode.desired_object_pose: interpolate
+                    # robot references and carry the held-object reference
+                    # through FK. This does not prescribe simulated state.
+                    To=robot.fk(qr[qs],frame)@tool_to_object;pose=np.r_[To[:3,3],Rotation.from_matrix(To[:3,:3]).as_quat()]
+                else:
+                    position=(1-s)*trajectory.q[i,sys.object_q.start:sys.object_q.start+3]+s*trajectory.q[i+1,sys.object_q.start:sys.object_q.start+3];pose=np.r_[position,rot(now).as_quat()]
+                states.append(np.r_[qr,pose])
         states.append(trajectory.q[-1]);return not self.discover(states)

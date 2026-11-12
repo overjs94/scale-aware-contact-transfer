@@ -1,6 +1,20 @@
 {
   "models": [
     {
+      "id": "robotiq_2f85",
+      "title": "Robotiq 2F-85 \u00b7 \uc591 jaw 40 N \u00b7 native mechanism",
+      "engine": "mujoco_contact_recording",
+      "dof": 8,
+      "floating_base": false
+    },
+    {
+      "id": "panda_robotiq_lift",
+      "title": "Panda \u00d7 3 \u00b7 Robotiq 2F-85 \u00b7 \ucd5c\uc801\ud654\ub41c \uccab lift",
+      "engine": "mujoco_contact_recording",
+      "dof": 29,
+      "floating_base": false
+    },
+    {
       "id": "free_portable_drawer",
       "title": "\uc790\uc720 \uc218\ub0a9\ud568 \u00b7 \ubcf8\uccb4 \uc9c0\uc9c0 + \uc11c\ub78d \ub2f9\uae30\uae30",
       "engine": "mujoco_contact_recording",

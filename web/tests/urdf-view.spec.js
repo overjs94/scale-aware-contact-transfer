@@ -150,7 +150,7 @@ test("library separates paper tasks, single embodiments and diagnostics with mat
   await expect(page.locator('#scenario-preset')).toHaveValue('panel_fixture');
   await expect(page.locator('#builder-title')).toContainText('패널');
   await page.locator('.category-choice[data-category="diagnostic"]').click();
-  await expect(page.locator('.model-choice:visible')).toHaveCount(10);
+  await expect(page.locator('.model-choice:visible')).toHaveCount(12);
   await page.locator('.model-choice[data-id="hinged_door"]').click();
   await expect(page.locator('#scenario-preset')).toHaveValue('hinged_door');
   await expect(page.locator('#scenario-scope')).toContainText('세계에 고정된 수동 관절');
@@ -198,6 +198,61 @@ test('three Panda arms use actual articulated URDF recordings', async ({page}) =
     return errors;
   });
   errors.forEach(error=>expect(error).toBeLessThan(1e-7));
+});
+
+test('native Robotiq linkage uses recorded passive joints and a free block',async({page})=>{
+  const pageErrors=[];page.on('pageerror',error=>pageErrors.push(error.message));
+  await page.goto('/?model=robotiq_2f85');
+  await page.evaluate(async()=>{window.modelAPI=await import('/test-module.js');});
+  await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+  await expect(page.locator('#scenario-status')).toHaveText('그리퍼 파지력 · 요소 검증');
+  await expect(page.locator('.category-choice[data-category="diagnostic"]')).toHaveAttribute('aria-pressed','true');
+  const errors=await page.evaluate(async()=>{
+    const data=await(await fetch('/data/robotiq_2f85.json')).json();
+    const {loadURDFModel,applyRecordedPose,disposeModel}=window.modelAPI;const out=[];
+    for(const mode of ['visual','collision']) for(const spec of data.instances){
+      const model=await loadURDFModel(spec.manifest,mode);let error=0;
+      const recording={...spec,q:data.q.map(row=>spec.q_indices.map(i=>row[i]))};
+      for(const frame of [0,80,160]){
+        applyRecordedPose(model,recording,frame);
+        for(const [name,link] of Object.entries(model.links)){
+          const index=spec.id==='gripper'?data.link_names.indexOf(name):data.link_names.indexOf('calibration_block');
+          link.matrixWorld.elements.slice(12,15).forEach((v,j)=>error=Math.max(error,Math.abs(v-data.positions[frame][index][j])));
+        }
+      }
+      disposeModel(model);out.push(error);
+    }
+    return out;
+  });
+  errors.forEach(error=>expect(error).toBeLessThan(1e-7));
+  await page.locator('#geometry-mode').selectOption('collision');
+  await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+  expect(pageErrors).toEqual([]);
+});
+
+test('three-arm Robotiq lift replays measured linkage and free-panel poses',async({page})=>{
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.goto('/?model=panda_robotiq_lift');
+  await page.evaluate(async()=>{window.modelAPI=await import('/test-module.js');});
+  await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+  await expect(page.locator('#scenario-status')).toHaveText('다중 팔 · 첫 lift 검증');
+  const result=await page.evaluate(async()=>{
+    const data=await(await fetch('/data/panda_robotiq_lift.json')).json();
+    const {loadURDFModel,applyRecordedPose,disposeModel}=window.modelAPI;let error=0;
+    for(const spec of data.instances){
+      const model=await loadURDFModel(spec.manifest);const recording={...spec,q:data.q.map(q=>spec.q_indices.map(i=>q[i]))};
+      for(const frame of [0,200,400]){
+        applyRecordedPose(model,recording,frame);
+        for(const [name,link] of Object.entries(model.links)){
+          const index=data.link_names.indexOf(spec.id+'_'+name);
+          link.matrixWorld.elements.slice(12,15).forEach((v,j)=>error=Math.max(error,Math.abs(v-data.positions[frame][index][j])));
+        }
+      }
+      disposeModel(model);
+    }
+    return {error,dof:data.dof,instances:data.instances.length,passed:data.report.execution_passed,full:data.report.full_paper_pipeline_executed};
+  });
+  expect(result).toMatchObject({dof:29,instances:4,passed:true,full:false});expect(result.error).toBeLessThan(1e-7);expect(errors).toEqual([]);
 });
 
 test('experiment form submits edits, polls and displays the completed recording',async({page})=>{

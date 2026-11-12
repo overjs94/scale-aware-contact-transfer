@@ -1,0 +1,9 @@
+{
+  "id": "robotiq_calibration_block",
+  "urdf": "robot.urdf",
+  "packages": {},
+  "source": "authored free calibration block",
+  "license": "MIT",
+  "license_file": "LICENSE.authored",
+  "urdf_sha256": "456659f8844a99de9ccce926cce4027b6fd7ddcdb063b43e16676420603d15ff"
+}

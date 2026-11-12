@@ -38,3 +38,23 @@ def test_panda_grasp_discretization_mismatch_is_first_order_not_a_solver_failure
     rows=grasp_discretization_probe(r,'tip',q,v,[.1,.05,.025]);error=np.array([a['max_residual'] for a in rows])
     assert error[0]>1e-3;np.testing.assert_allclose(error[:-1]/error[1:],2.,rtol=.01)
     v[1:]=0;assert grasp_discretization_probe(r,'tip',q,v,[.1])[0]['max_residual']<1e-12
+
+
+def test_collision_sampling_matches_the_executed_holding_reference():
+    from types import SimpleNamespace
+    from scipy.spatial.transform import Rotation
+    from contact_transfer.panel_fixture import PanelCase
+    from contact_transfer.paper_geometry import PanelGeometry
+    c=PanelCase.load();r=c.robots[0];q0=np.array(c.data['arms'][0]['q_initial']);q1=q0.copy();q1[0]+=.4
+    rel=np.eye(4);rel[:3,3]=[.05,.03,.07];states=[]
+    for q in [q0,q1]:
+        T=r.fk(q,'tip')@rel;states.append(np.r_[q,T[:3,3],Rotation.from_matrix(T[:3,:3]).as_quat()])
+    sys=SimpleNamespace(object_q=slice(7,14),object_v=slice(7,13),q_slices=[slice(0,7)])
+    g=PanelGeometry.__new__(PanelGeometry);g.problem=SimpleNamespace(system=sys,robots=[r],capabilities=[SimpleNamespace(kind='G')],frames=['tip'])
+    captured=[];g.discover=lambda samples:captured.extend(samples) or []
+    trajectory=SimpleNamespace(q=np.array(states),v=np.zeros((2,13)),dt=np.array([1.]))
+    assert g.validate(trajectory,object_interpolation='holding_grasp')
+    for q in captured:
+        T=r.fk(q[:7],'tip')@rel;np.testing.assert_allclose(T[:3,3],q[7:10],atol=1e-12)
+    captured.clear();g.validate(trajectory)
+    assert max(np.linalg.norm((r.fk(q[:7],'tip')@rel)[:3,3]-q[7:10]) for q in captured)>1e-3

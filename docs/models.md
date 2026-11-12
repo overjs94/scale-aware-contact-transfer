@@ -1,5 +1,9 @@
 # Bundled embodiment models
 
+The optional [Robotiq 2F-85 tool profile](robotiq-gripper.md) retains its native
+eight-joint mechanism, finite actuation and original mesh. It is separate from
+the eight arm/whole-body presets below.
+
 All eight mechanics presets are offline, expanded URDF dynamics/kinematics subsets of upstream descriptions.
 Mass, COM, inertial rotation, joint axes, limits and origins are retained.
 Meshes/collisions and vendor simulation/controller/transmission tags were removed.

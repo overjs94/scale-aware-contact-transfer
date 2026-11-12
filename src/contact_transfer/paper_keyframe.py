@@ -95,6 +95,13 @@ def realize_system_keyframe(system,q_initial,object_configuration,interfaces,tas
   tau=opti.variable(system.nu);opti.subject_to(opti.bounded(-system.effort,tau,system.effort));opti.set_initial(tau,0);total=system.B@tau;lam=[]
   for contact_index,(spec,(p,R,J),a) in enumerate(zip(interfaces,geom,apertures)):
    seed=None if warm is None else warm['coordinates'][vertex_index][contact_index] if hasattr(spec.capability,'aperture_required') else warm['reactions'][vertex_index,contact_index]
+   if warm is not None and hasattr(spec.capability,'reaction_with_witness'):
+    # Maximum-margin SOCP witnesses can carry arbitrary saturated internal
+    # preload. Recover a small witness, then add balanced internal normal
+    # preload using only spare closing capacity. Its resultant is exactly zero.
+    check=spec.capability.check(warm['reactions'][vertex_index,contact_index])
+    if check['feasible']:
+     fingers=check['finger_forces'].copy();spare=spec.capability.closing_force_per_finger-max(fingers[:4,2].sum(),fingers[4:,2].sum());fingers[:,2]+=.1*max(0.,spare)/4;seed=fingers.ravel()
    w=spec.capability.reaction(opti,aperture=a,initial=seed);lam.append(w);total+=J.T@w
   if warm is not None:
    tau0=np.asarray(system.B).T@b0-sum(T@w for T,w in zip(torque_maps,warm['reactions'][vertex_index]));opti.set_initial(tau,tau0)

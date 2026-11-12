@@ -87,7 +87,7 @@ function buildGeometry(data) {
   const points = data.positions[0].map(p => new THREE.Vector3(...p));
   const box = new THREE.Box3().setFromPoints(points);
   center = box.getCenter(new THREE.Vector3());
-  extent = Math.max(.4, box.getSize(new THREE.Vector3()).length() * .65);
+  extent = Math.max(data.viewer_min_extent || .4, box.getSize(new THREE.Vector3()).length() * .65);
   const radius = Math.max(.009, Math.min(.022, extent * .018));
   const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0x97a9bd, metalness: .48, roughness: .32 });
   const jointMaterial = new THREE.MeshStandardMaterial({ color: 0x256c75, metalness: .5, roughness: .3 });
@@ -156,6 +156,7 @@ async function loadGeometry() {
         : data.engine === "mujoco_contact_recording"
           ? data.scenario === "mobile_panel" ? "공식 RBY1 URDF·mesh, 차동구동 모바일 베이스와 고정 Panda의 실제 접촉 실행입니다." : data.free_articulated_object ? "자유 본체+내부 관절의 실제 동역학, 세 팔의 링크별 contracted contact realization입니다." : data.articulated_object ? "수동 관절의 URDF와 측정된 움직임을 표시합니다. 물체 actuator 없이 로봇 접촉으로 구동했습니다." : data.scenario === "panel_fixture" ? "원본 Panda URDF·mesh, 자유 패널 URDF와 고정 지그를 표시합니다. 소형 접촉 refinement 후 실행한 기록입니다." : data.scenario === "table_assembly" ? "Panda 3대와 두 자유 부품의 실제 접촉 실행입니다. 상판·다리의 visual/collision URDF에 빈 socket과 peg 형상을 포함합니다." : "3개 URDF 팔과 도구의 실제 접촉 실행입니다. Point는 구형 tool, gripper는 두 손가락 접촉, suction은 압력 제한 seal 모델입니다."
           : "URDF visual·mesh의 origin과 scale을 적용했습니다. 기록된 시뮬레이션은 관절 추종 검증입니다.";
+    if (data.display?.geometry && !canvasFallback) $("geometry-status").textContent = data.display.geometry;
     $("geometry-status").dataset.state = "ready";
     $("geometry-status").dataset.model = data.id;
     updateGeometry(frameFloat);
@@ -262,6 +263,7 @@ function drawChart() {
   $("chart-label").textContent = dataset.chart_label || (dataset.object ? "OBJECT LIFT" : "JOINT TRACKING ERROR");
   $("error-unit").textContent = dataset.chart_unit || (dataset.object ? "m" : "rad");
   $("chart-note").textContent = dataset.engine === "kinematic_preview" ? "기구학 재생: 동역학 추종 오차 없음" : dataset.scenario === "table_assembly" ? "실제 peg tip / socket 위치에서 계산 · 28 s에 다리 gripper 해제" : dataset.instances ? "실제 접촉 동역학 실행 기록 · keyframe별 추종·접촉 상태 확인" : dataset.object ? "1 kg 물체 · 두 Cartesian arm · 3 cm 이동" : "관절 위치 오차의 2-norm";
+  if (dataset.display?.chart_note) $("chart-note").textContent = dataset.display.chart_note;
   if (!chartValues.length) { $("chart-line").setAttribute("points", ""); $("chart-area").setAttribute("d", ""); return; }
   const min = Math.min(0, ...chartValues), max = Math.max(1e-8, ...chartValues);
   const points = chartValues.map((y, i) => [i / (chartValues.length - 1) * 260, 80 - (y-min) / (max-min) * 66]);
@@ -344,8 +346,10 @@ function showData(data) {
   $("engine-badge").classList.toggle("kinematic", data.engine === "kinematic_preview");
   $("scene-label").textContent = data.engine === "cito_trajectory" ? "COUPLED ROBOT–OBJECT TRAJECTORY" : data.engine === "kinematic_preview" ? "FLOATING-BASE KINEMATIC PREVIEW" : "RECORDED CLOSED-LOOP SIMULATION";
   if (data.instances) $("scene-label").textContent = data.free_articulated_object ? "LINK-AWARE CONTRACTION → THREE-ARM REALIZATION · FREE ARTICULATED BODY" : data.articulated_object ? "PASSIVE ARTICULATED OBJECT · MEASURED CONTACT DYNAMICS" : `COOPERATIVE CONTACT DYNAMICS · ${data.keyframes.length} KEYFRAMES`;
+  if (data.display?.description) $("model-description").textContent = data.display.description;
+  if (data.display?.scene_label) $("scene-label").textContent = data.display.scene_label;
   $("dof").textContent = data.dof; $("base").textContent = data.free_articulated_object ? "Free object + joint" : data.scenario === "mobile_panel" ? "Mobile SE(2)" : data.floating_base ? "Floating +6" : "Fixed";
-  $("physics-step").textContent = data.summary.physics_dt ? (data.summary.physics_dt * 1000).toFixed(0) + " ms" : data.engine === "cito_trajectory" ? "100 ms" : "—";
+  $("physics-step").textContent = data.summary.physics_dt ? Number((data.summary.physics_dt * 1000).toFixed(3)) + " ms" : data.engine === "cito_trajectory" ? "100 ms" : "—";
   const end = data.times.at(-1);
   $("duration").textContent = end.toFixed(1) + " s";
   $("time-total").textContent = end.toFixed(2) + " s"; $("chart-end").textContent = end.toFixed(1) + " s";
@@ -385,7 +389,7 @@ function updateFrame() {
   $("timeline").value = frameFloat / (dataset.times.length - 1);
   $("time-now").textContent = time.toFixed(2) + " s";
   $("error-now").textContent = chartValues.length ? number(chartValues[index]) : "—";
-  $("tool-state").textContent = (["panel_fixture","mobile_panel"].includes(dataset.scenario)||dataset.articulated_object) ? Object.entries(dataset.tool_states).map(([name,values])=>`${name}: ${values[index]?"접촉":"해제"}`).join(" · ") : dataset.scenario === "table_assembly" ? `상판 gripper: ${dataset.tool_states.top_gripper_contact[index] ? "양쪽 pad 접촉" : "분리"} · 구형 support: ${dataset.tool_states.point_contact[index] ? "접촉" : "분리"} · 다리 gripper: ${dataset.tool_states.leg_gripper_contact[index] ? "양쪽 pad 접촉" : "해제"} · socket: ${dataset.tool_states.socket_contact[index] ? "접촉" : "비접촉"}` : dataset.tool_states
+  $("tool-state").textContent = (dataset.tool_states && !dataset.tool_states.suction_sealed && dataset.scenario !== "table_assembly") ? Object.entries(dataset.tool_states).map(([name,values])=>`${name}: ${values[index]?"접촉":"해제"}`).join(" · ") : dataset.scenario === "table_assembly" ? `상판 gripper: ${dataset.tool_states.top_gripper_contact[index] ? "양쪽 pad 접촉" : "분리"} · 구형 support: ${dataset.tool_states.point_contact[index] ? "접촉" : "분리"} · 다리 gripper: ${dataset.tool_states.leg_gripper_contact[index] ? "양쪽 pad 접촉" : "해제"} · socket: ${dataset.tool_states.socket_contact[index] ? "접촉" : "비접촉"}` : dataset.tool_states
     ? `구형 tool: ${dataset.tool_states.point_contact[index] ? "접촉" : "분리"} · Gripper: ${dataset.tool_states.gripper_contact[index] ? "양쪽 pad 접촉" : "미파지"} · Suction: ${dataset.tool_states.suction_sealed[index] ? "seal 유지" : "해제"}` : "";
   const ratio = dataset.torque_ratio[index];
   $("torque-now").textContent = ratio === null || ratio === undefined ? "—" : (ratio * 100).toFixed(1) + "%";

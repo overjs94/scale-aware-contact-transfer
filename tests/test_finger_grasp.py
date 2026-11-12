@@ -15,6 +15,21 @@ def test_finger_aperture_is_explicit_in_symbolic_resultant_map():
  cap=FingerGrasp(.04,.008,.012,.8,20.);a=ca.SX.sym('a');B=ca.horzcat(*cap.maps(a));fn=ca.Function('finger_map',[a],[B]);assert np.linalg.norm(np.array(fn(.04))-np.array(fn(.06)))>.01
 
 
+def test_external_force_bound_is_in_grasp_frame_and_scales_with_impulse():
+ from scipy.spatial.transform import Rotation
+ from contact_transfer.optimization import solve
+ T=np.eye(4);T[:3,:3]=Rotation.from_euler('z',.7).as_matrix();T[:3,3]=[.02,-.01,.03]
+ unconstrained=FingerGrasp(.04,.008,.012,.8,60.,interface_from_grasp=T)
+ limited=FingerGrasp(.04,.008,.012,.8,60.,interface_from_grasp=T,force_component_limits=[50,50,50])
+ # The friction/closing-force model allows this load, the external bound does not.
+ local=np.array([0,0,0,0,0,-55.]);force=T[:3,:3]@local[3:];w=np.r_[np.cross(T[:3,3],force),force]
+ assert unconstrained.check(w)['feasible'] and not limited.check(w)['feasible']
+ # Optimize an impulse using the NLP path, independently check P/h as force.
+ opti=ca.Opti();P=limited.reaction(opti,scale=.1)
+ opti.minimize(ca.dot(ca.DM(T[:3,:3]@np.array([0.,0.,1.])),P[3:]));sol,_=solve(opti);p=np.array(sol.value(P)).ravel();grasp_force=T[:3,:3].T@p[3:]
+ assert abs(grasp_force[2]+5)<1e-6 and limited.check(p/.1)['feasible']
+
+
 def test_cito_uses_finger_resultants_and_explicit_holding_aperture(slider_urdf):
  from contact_transfer import Robot
  from contact_transfer.system import MechanicalSystem,RigidObject
