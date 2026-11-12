@@ -269,3 +269,10 @@ page error와 overflow가 없었습니다. Plan bundle 세 개는 별도 output 
 모든 keyframe/interval의 현재 native mechanics gate를 다시 통과했습니다.
 
 Portable assembly bundle의 별도 새 native 실행도 완료해 동일한 삽입·릴리스·힘/토크 검사를 통과했습니다. 원본 optimizer를 다시 실행한 결과로 집계하지 않습니다.
+
+
+GitHub Pages 최종 배포도 완료했습니다. 공개 commit `f52db9f`의
+[배포 실행](https://github.com/overjs94/Contact_contraction/actions/runs/43313294181)이
+48초에 성공했으며 배포 후 실제 URL·보고서·upstream mesh 검사까지 포함합니다.
+최종 47개 기록의 build에서는 세 주 과제와 외란 표시 브라우저 검사 4개도 재통과했습니다.
+[배포 증거 JSON](validation/full_tasks/deployment.json)에 코드 commit과 검증 수를 기록했습니다.
