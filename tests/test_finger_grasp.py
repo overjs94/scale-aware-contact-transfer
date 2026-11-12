@@ -30,6 +30,22 @@ def test_external_force_bound_is_in_grasp_frame_and_scales_with_impulse():
  assert abs(grasp_force[2]+5)<1e-6 and limited.check(p/.1)['feasible']
 
 
+def test_scaled_tangent_coordinates_keep_exact_friction_and_finite_jaw_limits():
+ from contact_transfer.optimization import solve
+ cap=FingerGrasp(.04,.008,.012,.6,40.);opti=ca.Opti();w,u=cap.reaction_with_witness(opti,force_coordinates='scaled_tangent');opti.subject_to(w[:5]==0);opti.minimize(w[5]+1e-9*ca.sumsqr(u));sol,_=solve(opti);value=np.array(sol.value(w)).ravel();witness=np.array(sol.value(u)).reshape(8,3)
+ np.testing.assert_allclose(value[5],-48.,atol=1e-5)
+ assert np.max(np.linalg.norm(witness[:,:2],axis=1)-.6*witness[:,2])<1e-7
+ assert all(witness[i:i+4,2].sum()<=40.+1e-7 for i in [0,4])
+
+
+def test_common_motor_virtual_work_cut_couples_the_two_jaws():
+ from contact_transfer.optimization import solve
+ A=np.zeros((1,24));A[0,2::3]=.1;cap=FingerGrasp(.04,.008,.012,.6,40.,finger_linear_limits=(A,[4.]))
+ assert not cap.check(np.array([0,0,0,0,0,-30.]))['feasible']
+ for coordinates in ['cartesian','scaled_tangent']:
+  opti=ca.Opti();w,u=cap.reaction_with_witness(opti,force_coordinates=coordinates);opti.subject_to(w[:5]==0);opti.minimize(w[5]);sol,_=solve(opti);value=np.array(sol.value(w)).ravel();np.testing.assert_allclose(value[5],-24.,atol=1e-5);assert cap.check(value,tolerance=2e-6)['feasible']
+
+
 def test_cito_uses_finger_resultants_and_explicit_holding_aperture(slider_urdf):
  from contact_transfer import Robot
  from contact_transfer.system import MechanicalSystem,RigidObject

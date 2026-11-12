@@ -31,6 +31,30 @@ def test_failed_conic_balance_is_never_a_margin_certificate():
     assert not check['certificate'] and check['status']=='PrimalInfeasible'
 
 
+def test_fixed_margin_feasibility_certifies_same_box_without_claiming_optimality():
+    task=GeneralizedTaskLoad(np.r_[0.,0.,0.,0.,0.,-9.81],np.eye(6)[:,5:],np.eye(1));mapping=np.eye(6);mapping[5,5]=-1;cap=Capability(mu=.8,normal_max=20.)
+    check=fixed_generalized_margin([mapping],task,[cap],fixed_rho=5.)
+    assert check['certificate'] and check['fixed_rho_feasibility'];assert abs(check['rho']-5.)<1e-7
+    for vertex,reaction in zip(task.vertices,check['reactions'][:,0]):np.testing.assert_allclose(mapping@reaction,task.nominal+5.*task.E@task.D@vertex,atol=1e-7)
+    impossible=fixed_generalized_margin([mapping],task,[cap],fixed_rho=12.);assert not impossible['certificate']
+
+
+def test_stationary_conic_condensation_minimizes_weighted_robot_effort():
+    task=GeneralizedTaskLoad(np.array([-10.]),np.ones((1,1)),np.ones((1,1)));mapping=np.zeros((1,6));mapping[0,5]=-1;torque_maps=[]
+    for i in range(2):
+        T=np.zeros((2,6));T[i,5]=1;torque_maps.append(T)
+    check=fixed_generalized_margin([mapping,mapping],task,[Capability(mu=.8,normal_max=20.)]*2,torque_gravity=np.zeros(2),torque_maps=torque_maps,effort=np.ones(2)*100,fixed_rho=0.,torque_weight=np.diag([1.,4.]))
+    assert check['certificate'];np.testing.assert_allclose(check['reactions'].mean(axis=0)[:,5],[8.,2.],atol=1e-6)
+
+
+def test_unloaded_robot_has_zero_reaction_while_environment_supports_object(slider_urdf):
+    from contact_transfer.trajectory import Contact
+    robot=Robot(slider_urdf);sys=MechanicalSystem([robot.symbolic()],RigidObject(1.,np.zeros(3),np.eye(3)*.02));q=np.r_[0.,0.,.5,0.,0.,.5,0.,0.,0.,1.];n=np.array([0.,0.,-1.]);R=contact_basis(n);task=GeneralizedTaskLoad(np.r_[0.,0.,0.,0.,0.,-9.81],np.eye(6)[:,5:],np.eye(1));cap=Capability(mu=.8,normal_max=20.);interface=Interface('support',0,'link2',None,SurfacePatch.fixed(np.zeros(3),n),cap,np.zeros(3),R,force_enabled=False);environment=Contact('jig',np.zeros(3),[0,0,1],cap,plane_offset=.5)
+    result=realize_system_keyframe(sys,q,q[sys.object_q],[interface],task,environment=[environment],rho_min=.1)
+    np.testing.assert_array_equal(result.reactions,0.);assert result.rho>9.8
+    np.testing.assert_allclose(result.environment_reactions['jig'][:,2],9.81-result.rho*task.vertices[:,0],atol=1e-5)
+
+
 def test_panda_grasp_discretization_mismatch_is_first_order_not_a_solver_failure():
     from contact_transfer.panel_fixture import PanelCase
     from contact_transfer.paper_validation import grasp_discretization_probe

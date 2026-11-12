@@ -85,7 +85,7 @@ class MechanicalSystem:
         for r, qs, vs in zip(self.robots, self.q_slices, self.v_slices):
             configs.append(integrate_floating(q[qs], delta[vs]) if r.floating_base
                            else q[qs]+delta[vs])
-        configs.append(integrate_floating(q[self.object_q], delta[self.object_v]))
+        configs.append(self.object.integrate_configuration(q[self.object_q],delta[self.object_v]) if hasattr(self.object,'integrate_configuration') else integrate_floating(q[self.object_q], delta[self.object_v]))
         return ca.vertcat(*configs)
 
     def point_jacobian_object(self, q, point_object, frame=None):

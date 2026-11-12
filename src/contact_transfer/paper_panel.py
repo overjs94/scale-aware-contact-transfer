@@ -43,7 +43,7 @@ class PaperPanelProblem:
     system: MechanicalSystem
 
     @classmethod
-    def create(cls,directory='outputs/paper_panel',case_path=None,tool_types=('G','P','P'),assignment=(0,1,2),gripper_model='panda_hand'):
+    def create(cls,directory='outputs/paper_panel',case_path=None,tool_types=('G','P','P'),assignment=(0,1,2),gripper_model='panda_hand',point_tool='legacy',refine_source=True):
         case=PanelCase.load(case_path);out=Path(directory);out.mkdir(parents=True,exist_ok=True)
         if gripper_model not in {'panda_hand','robotiq_2f85'}:raise ValueError('Unknown gripper model')
         if gripper_model=='robotiq_2f85':
@@ -54,13 +54,22 @@ class PaperPanelProblem:
         if tool_types[0]=='P':
             spec=case.data['arms'][0];spec.update(kind='P',urdf='point_arm.urdf',locked_joints={});base=case.robots[0].base_pose
             robot=Robot(case.path.parent/'point_arm.urdf',base_pose=base);case.robots=(robot,*case.robots[1:]);case.full_robots=(robot,*case.full_robots[1:])
+        if point_tool not in {'legacy','canonical'}:raise ValueError('Unknown point tool profile')
+        if point_tool=='canonical':
+            from .spherical_tool import mount
+            full=list(case.full_robots);reduced=list(case.robots)
+            for i,spec in enumerate(case.data['arms']):
+                if spec['kind']=='P':
+                    full[i],profile=mount(full[i],out/f'shared_point_{i}.urdf');reduced[i]=full[i];spec.update(point_tool_profile=profile,locked_joints={})
+            case.full_robots=tuple(full);case.robots=tuple(reduced)
+        case.data['source_refinement']=bool(refine_source)
         case.data['hardware_types']=list(tool_types);case.data['group_to_hardware_arm']=list(assignment)
         case.data['arms']=[case.data['arms'][i] for i in assignment];case.robots=tuple(case.robots[i] for i in assignment);case.full_robots=tuple(case.full_robots[i] for i in assignment)
         raw=load_source(case.path.parent/case.data['source_file'])
         for spec,group in zip(case.data['arms'],raw['groups']):
             spec['group_id']=group['group_id']
             if spec['kind']=='G' and group['group_id']!='edge_grip':raise ValueError('This grasp primitive requires the accessible panel edge')
-        source=refine_source_and_transfer(case.path.parent/case.data['source_file'],geometry_weight=0.,object_rotation=pose_matrix(case.data['keyframes'][0]['object_pose'])[:3,:3])
+        source=refine_source_and_transfer(case.path.parent/case.data['source_file'],enabled=refine_source,geometry_weight=0.,object_rotation=pose_matrix(case.data['keyframes'][0]['object_pose'])[:3,:3])
         raw=load_source(case.path.parent/case.data['source_file']);robots=[];caps=[];frames=[];patches=[]
         for index,(spec,full,group,point,normal) in enumerate(zip(case.data['arms'],case.full_robots,raw['groups'],source['target_positions_m'],source['target_normals'])):
             p,n=np.asarray(point),np.asarray(normal);Rc=contact_basis(n)
@@ -106,9 +115,9 @@ class PaperPanelProblem:
     def task(self,pose):
         return GeneralizedTaskLoad(-self.case.panel.gravity(pose),np.eye(6),np.diag(self.case.data['optimization']['disturbance_scale']))
 
-    def keyframe(self,key,settings=None,geometry_constraints=None,shared_points=None):
+    def keyframe(self,key,settings=None,geometry_constraints=None,shared_points=None,environment=(),active_groups=None,zero_force=False,q_reference=None):
         pose=np.array(key['object_pose']);T=pose_matrix(pose);initial=[]
-        source=refine_source_and_transfer(self.case.path.parent/self.case.data['source_file'],geometry_weight=0.,object_rotation=T[:3,:3])
+        source=refine_source_and_transfer(self.case.path.parent/self.case.data['source_file'],enabled=self.case.data.get('source_refinement',True),geometry_weight=0.,object_rotation=T[:3,:3])
         interfaces=self.interfaces(source)
         if shared_points is not None:
             for interface,p in zip(interfaces,shared_points):interface.patch=SurfacePatch.fixed(p,interface.prior_rotation[:,2])
@@ -116,7 +125,13 @@ class PaperPanelProblem:
             point=np.asarray(interface.patch.position(interface.patch.initial)).ravel();target=np.eye(4);target[:3,3]=T[:3,3]+T[:3,:3]@point
             local=Rotation.from_quat(spec['tool_quaternion_xyzw']).as_matrix() if spec['kind']=='P' else contact_basis(self.source['target_normals'][i])@np.diag([1.,-1.,-1.]);target[:3,:3]=T[:3,:3]@local
             initial.extend(numerical_pose_ik(r,self.frames[i],target,spec['q_initial']))
-        result=realize_system_keyframe(self.system,np.r_[initial,pose],pose,interfaces,self.task(pose),rho_min=.1,position_radius=.012,characteristic_length=.6,q_reference=np.r_[np.concatenate([s['q_initial'] for s in self.case.data['arms']]),pose],geometry_constraints=geometry_constraints,settings=settings or SolverSettings(options={'expand':False}))
+        for interface in interfaces:interface.force_enabled=not zero_force
+        selected=interfaces if active_groups is None else [s for s in interfaces if s.group_id in active_groups]
+        seed=np.r_[initial,pose];reference=np.r_[np.concatenate([s['q_initial'] for s in self.case.data['arms']]),pose] if q_reference is None else np.r_[q_reference,pose]
+        if not selected:seed=reference.copy()
+        result=realize_system_keyframe(self.system,seed,pose,selected,self.task(pose),environment=environment,rho_min=.1,position_radius=.012,characteristic_length=.6,q_reference=reference,geometry_constraints=geometry_constraints,settings=settings or SolverSettings(options={'expand':False}))
+        if len(selected)!=len(interfaces):
+            result.positions=np.array(source['target_positions_m']);result.rotations=np.array([contact_basis(n) for n in source['target_normals']]);result.reactions=np.zeros((len(self.task(pose).vertices),len(interfaces),6));result.apertures=tuple(c.aperture_required if hasattr(c,'aperture_required') else None for c in self.capabilities)
         result.source=source
         return result
 

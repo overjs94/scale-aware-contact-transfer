@@ -7,6 +7,11 @@ URDF 기반 동역학·기구학과 논문의 Sec. III-B–IV를 위한 연구�
 Source/target/CITO, 저수준 제어, MuJoCo/CRISP, Robotiq 기구·렌더링, 검증 결과와
 남은 논문 단계의 범위를 함께 정리했습니다.
 
+세 목표 과제의 공통 전체 계획 runner는 `tools/run_full_scenarios.py`입니다.
+[통합 범위·실행 ledger](docs/full-scenario-implementation.md)에 동일 구형 팁,
+실제 G/P·팔 배정 후보 탐색, 전체 전이·native 실행과 ablation의 구현 및
+현재 검증 상태를 정리했습니다. 아래의 기존 공개 기록과 검증 범위는 구분합니다.
+
 
 ## 자유 articulated object · 3-arm 명목 진단 baseline
 

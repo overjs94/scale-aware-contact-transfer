@@ -20,6 +20,7 @@ class Interface:
  capability: object
  prior_position: np.ndarray
  prior_rotation: np.ndarray
+ force_enabled: bool=True
 
 @dataclass
 class KeyframeCertificate:
@@ -49,15 +50,28 @@ def realize_system_keyframe(system,q_initial,object_configuration,interfaces,tas
    if base_constraints is None:raise ValueError('Floating robot keyframes require explicit support/workspace constraints')
  if base_constraints is not None:base_constraints(opti,Q)
  warm=None
- if not environment and not any(r.floating_base for r in system.robots):
+ if not any(r.floating_base for r in system.robots):
   from .generalized_conic import fixed_generalized_margin
-  maps=[];torque_maps=[]
+  maps=[];torque_maps=[];caps=[];enabled=[];warm_count=len(interfaces)+len(environment)
   for spec in interfaces:
-   _,_,_,J0=relative_interface(system,ca.DM(q_initial),spec,spec.patch.position(spec.patch.initial),spec.patch.rotation(spec.patch.initial));J0=np.asarray(ca.DM(J0));maps.append(-J0.T[system.object_v,:]);torque_maps.append(np.asarray(system.B).T@J0.T)
+   _,_,_,J0=relative_interface(system,ca.DM(q_initial),spec,spec.patch.position(spec.patch.initial),spec.patch.rotation(spec.patch.initial));J0=np.asarray(ca.DM(J0));maps.append(-J0.T[system.object_v,:]);torque_maps.append(np.asarray(system.B).T@J0.T);caps.append(spec.capability);enabled.append(spec.force_enabled)
+  for contact in environment:
+   gap,J0,_=contact.geometry(system,ca.DM(q_initial));J0=np.asarray(ca.DM(J0));J0=np.c_[np.zeros((system.nv,3)),J0.T];maps.append(-J0[system.object_v]);torque_maps.append(np.asarray(system.B).T@J0);caps.append(contact.capability);inside=True
+   if getattr(contact,'patch_half_size',None) is not None:inside=np.all(abs(np.array(ca.DM(contact.support_coordinates(system,ca.DM(q_initial)))).ravel())<=contact.patch_half_size+1e-10)
+   if contact.plane_bounds is not None:
+    point=np.array(ca.DM(system.point_world(ca.DM(q_initial),contact.point_object,contact.object_frame))).ravel();inside=inside and np.all(point[:2]>=contact.plane_bounds[0]-1e-10) and np.all(point[:2]<=contact.plane_bounds[1]+1e-10)
+   enabled.append(abs(float(ca.evalf(gap)))<=1e-10 and inside)
   b0=np.asarray(ca.DM(system.bias(ca.DM(q_initial),ca.DM.zeros(system.nv)))).ravel()
-  trial=fixed_generalized_margin(maps,task,[spec.capability for spec in interfaces],torque_gravity=np.asarray(system.B).T@b0,torque_maps=torque_maps,effort=system.effort,rho_min=rho_min)
+  selected=np.flatnonzero(enabled);trial=fixed_generalized_margin([maps[i] for i in selected],task,[caps[i] for i in selected],torque_gravity=np.asarray(system.B).T@b0,torque_maps=[torque_maps[i] for i in selected],effort=system.effort,rho_min=rho_min) if len(selected) else {'certificate':False}
+  if len(selected) and not trial['certificate'] and trial['status'] in {'NumericalError','InsufficientProgress','MaxIterations'} and np.isfinite(trial['rho']) and trial['rho']>=rho_min:
+   trial=fixed_generalized_margin([maps[i] for i in selected],task,[caps[i] for i in selected],torque_gravity=np.asarray(system.B).T@b0,torque_maps=[torque_maps[i] for i in selected],effort=system.effort,rho_min=rho_min,fixed_rho=max(rho_min,.99*trial['rho']))
   if trial['certificate']:
    warm=trial
+   expanded=np.zeros((len(task.vertices),warm_count,6));coordinates=[[np.zeros(24 if hasattr(c,'aperture_required') else 3) for c in caps] for _ in task.vertices]
+   for j,i in enumerate(selected):
+    expanded[:,i]=warm['reactions'][:,j]
+    for k,row in enumerate(warm['coordinates']):coordinates[k][i]=row[j]
+   warm['reactions']=expanded;warm['coordinates']=coordinates
    # A maximum-margin conic witness lies on several cone/capacity boundaries.
    # Convexly mix each symmetric-box vertex with the nominal (vertex mean)
    # witness to initialize a smaller, still feasible margin for the NLP.
@@ -65,7 +79,7 @@ def realize_system_keyframe(system,q_initial,object_configuration,interfaces,tas
    warm['rho']*=scale
    values=warm['reactions'];warm['reactions']=values.mean(axis=0,keepdims=True)+scale*(values-values.mean(axis=0,keepdims=True))
    warm['coordinates']=[list(row) for row in warm['coordinates']]
-   for c in range(len(interfaces)):
+   for c in range(warm_count):
     values=np.array([row[c] for row in warm['coordinates']]);nominal=values.mean(axis=0)
     for k in range(len(values)):warm['coordinates'][k][c]=nominal+scale*(values[k]-nominal)
  geom=[];apertures=[]
@@ -101,12 +115,16 @@ def realize_system_keyframe(system,q_initial,object_configuration,interfaces,tas
     # preload using only spare closing capacity. Its resultant is exactly zero.
     check=spec.capability.check(warm['reactions'][vertex_index,contact_index])
     if check['feasible']:
-     fingers=check['finger_forces'].copy();spare=spec.capability.closing_force_per_finger-max(fingers[:4,2].sum(),fingers[4:,2].sum());fingers[:,2]+=.1*max(0.,spare)/4;seed=fingers.ravel()
-   w=spec.capability.reaction(opti,aperture=a,initial=seed);lam.append(w);total+=J.T@w
+     seed=spec.capability.balanced_preload(check['finger_forces']).ravel()
+   w=spec.capability.reaction(opti,aperture=a,initial=seed) if spec.force_enabled else ca.DM.zeros(6);lam.append(w);total+=J.T@w
   if warm is not None:
    tau0=np.asarray(system.B).T@b0-sum(T@w for T,w in zip(torque_maps,warm['reactions'][vertex_index]));opti.set_initial(tau,tau0)
-  for contact in environment:
-   gap,J,_=contact.geometry(system,Q);f=contact.capability.reaction(opti)[3:];total+=J.T@f;opti.subject_to(f[2]*gap<=1e-8);environment_reactions[contact.name].append(f)
+  for environment_index,contact in enumerate(environment):
+   gap,J,_=contact.geometry(system,Q);f=contact.capability.reaction(opti,initial=None if warm is None else warm['reactions'][vertex_index,len(interfaces)+environment_index])[3:];total+=J.T@f;opti.subject_to(f[2]*gap<=1e-8);environment_reactions[contact.name].append(f)
+   if getattr(contact,'patch_half_size',None) is not None:
+    tangent=contact.support_coordinates(system,Q)
+    for axis in range(2):
+     for sign in [-1,1]:opti.subject_to(f[2]*(sign*tangent[axis]-contact.patch_half_size[axis])<=1e-8)
    if contact.plane_bounds is not None:
     point=system.point_world(Q,contact.point_object,contact.object_frame)
     for axis in range(2):

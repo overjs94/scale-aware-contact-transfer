@@ -100,7 +100,7 @@ class CoupledContactController:
                 from .robotiq import RobotiqForceServo
                 self.gripper_servos.append(RobotiqForceServo(spec['gripper_profile']))
             else:self.gripper_servos.append(None)
-        self.measured=np.zeros((len(self.robots),6));self.filtered=np.zeros_like(self.measured);self.jaw_measured=[np.zeros(2 if g else len(f)) for g,f in zip(self.gripper_servos,self.fingers)];self.previous_origins=None;self.object_R=np.eye(3);self.object_p=np.zeros(3);self.logs=[]
+        self.measured=np.zeros((len(self.robots),6));self.filtered=np.zeros_like(self.measured);self.jaw_measured=[np.zeros(2 if g else len(f)) for g,f in zip(self.gripper_servos,self.fingers)];self.previous_origins=None;self.object_R=np.eye(3);self.object_p=np.zeros(3);self.object_rotations=[np.eye(3) for _ in self.robots];self.object_positions=[np.zeros(3) for _ in self.robots];self.logs=[]
 
     def reference(self,t):
         self.t=t;i,k,local=self.episode.phase(t);sys=self.problem.system
@@ -126,14 +126,15 @@ class CoupledContactController:
         pose=np.r_[data.xpos[body],data.xquat[body][[1,2,3,0]]]
         self.observe_contacts(data.qpos[addresses],pose,contacts)
 
-    def observe_contacts(self,q,object_pose,contacts):
+    def observe_contacts(self,q,object_pose,contacts,frame_poses=None):
         """Engine-neutral observer: world [moment;force] ON pair's second geom."""
         self.object_R=Rotation.from_quat(object_pose[3:]).as_matrix();self.object_p=np.array(object_pose[:3]);sums=np.zeros_like(self.measured);origins=[];rotations=[];self.jaw_measured=[np.zeros(2 if g else len(f)) for g,f in zip(self.gripper_servos,self.fingers)]
         for i,(r,frame,spec,a,b,fingers) in enumerate(zip(self.robots,self.problem.frames,self.case.data['arms'],self.offsets[:-1],self.offsets[1:],self.fingers)):
+            pose=(frame_poses or {}).get(spec.get('object_frame'),object_pose);self.object_rotations[i]=Rotation.from_quat(pose[3:]).as_matrix();self.object_positions[i]=np.asarray(pose[:3])
             qi=q[a:b];T=r.fk(qi,frame);origins.append(T[:3,3]);rotations.append(T[:3,:3])
             for c in contacts:
                 names=c['pair'];tool=next((j for j,n in enumerate(names) if n.startswith(spec['id']+'_')),None)
-                if tool is None or names[1-tool]!='panel_collision_0':continue
+                if tool is None or names[1-tool] not in spec.get('allowed_object_geoms',['panel_collision_0']):continue
                 if not any(tag in names[tool] for tag in ['_tool_collision_','_panda_leftfinger_collision_','_panda_rightfinger_collision_','_left_pad_collision_','_right_pad_collision_']):continue
                 value=np.asarray(c['wrench']);sign=1 if tool==1 else -1;F=sign*value[3:];M=sign*value[:3]+np.cross(np.asarray(c['position'])-T[:3,3],F);sums[i]+=np.r_[M,F]
                 if self.gripper_servos[i]:
@@ -151,10 +152,10 @@ class CoupledContactController:
     def command(self,q,v,qd,vd,ad):
         i,k,_=self.episode.phase(self.t);reactions=self.episode.reactions(self.t);out=[];force_error=[];jaw=[];saturation=[]
         for j,(r,servo,spec,cap,frame,point,R,a,b,fingers) in enumerate(zip(self.robots,self.servos,self.case.data['arms'],self.problem.capabilities,self.problem.frames,self.episode.keyframes[i].positions,self.episode.keyframes[i].rotations,self.offsets[:-1],self.offsets[1:],self.fingers)):
-            T=r.fk(q[a:b],frame);Rc=self.object_R@R;w=reactions[j];F=Rc@w[3:];M=Rc@w[:3]
+            T=r.fk(q[a:b],frame);object_R=self.object_rotations[j];object_p=self.object_positions[j];Rc=object_R@R;w=reactions[j];F=Rc@w[3:];M=Rc@w[:3]
             active=self.episode.attached(j,self.t)
             servo.selection=HybridSelection.normal() if cap.kind=='P' and active and self.episode.control_mode!='impedance_feedforward' else HybridSelection(np.zeros(6))
-            if cap.kind=='G':M+=np.cross(self.object_p+self.object_R@point-T[:3,3],F)
+            if cap.kind=='G':M+=np.cross(object_p+object_R@point-T[:3,3],F)
             desired=np.r_[T[:3,:3].T@M,F]
             inputs=dict(reaction_desired=desired,reaction_measured=self.measured[j],contact_rotation_world=Rc,dt=self.dt)
             if isinstance(servo,HybridPositionAdmittance):tau=servo.command(q[a:b],qd[a:b],vd[a:b],**inputs)

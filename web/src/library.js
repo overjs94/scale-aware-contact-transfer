@@ -7,6 +7,9 @@ export const categories = [
 ];
 
 const entries = [
+  ["full_panel", "paper", 0, "패널 · 전체 구간 최적화", "유형·팔 배정 탐색 → CITO → 접촉 실행"],
+  ["full_box", "paper", 2, "자유 박스 · 전체 구간 최적화", "본체·뚜껑 functional contact → 세 팔"],
+  ["full_assembly", "paper", 3, "가구 조립 · 전체 구간 최적화", "두 자유 부품 → 삽입·하중 전달·릴리스"],
   ["panel_fixture", "paper", 0, "패널 운반 → 지그 → 릴리스", "Panda × 3 · G / P / P", true],
   ["mobile_panel", "paper", 1, "작업영역 확장 · RBY1 + Panda", "모바일 듀얼암 + 고정 팔", true],
   ["free_box_lid", "paper", 2, "자유 박스 · 뚜껑 열기", "Panda × 3 · 본체 grip / support + 뚜껑", true],
@@ -40,6 +43,8 @@ const catalog = new Map(entries.map(([id, category, group, title, detail, preset
   [id, { id, category, group, title, detail, preset: preset === true ? id : preset, order }]));
 
 export function libraryEntry(model) {
+  const ablation = model.id.match(/^full_(panel|box|assembly)_(.+)$/);
+  if (ablation) return {id:model.id,category:'diagnostic',group:ablation[2]==='external_push'?0:1,title:model.title,detail:'전체 과제 · '+ablation[2],order:entries.length};
   return catalog.get(model.id) || catalog.get(model.scenario) || {
     id: model.id, category: "diagnostic", group: 1, title: model.title,
     detail: "개별 검증", order: entries.length,
@@ -57,7 +62,10 @@ export function recordingScope(data) {
   const full = report.full_paper_pipeline_executed === true &&
     ["III-B", "III-C", "III-D", "IV"].every(section => sections[section] === true);
   let status, detail;
-  if (full) {
+  if (data.full_task_recording) {
+    status = "전체 구간 · " + (report.execution_passed ? "검증 통과" : "검사 실패 포함");
+    detail = "접촉 유형·팔 배정 후보, 모든 keyframe과 CITO 전이, native 접촉 실행을 기록합니다. Midpoint 구성 업데이트 변형이며 source 실패 시 기하 prior 사용 여부와 ablation 결과를 보고서에 표시합니다.";
+  } else if (full) {
     status = "Sec. III-B–IV 실행 기록";
     detail = "전체 단계의 실행 provenance가 포함된 기록입니다. 개별 검사 결과는 실행 보고서에서 확인하세요.";
   } else if (entry.category === "paper") {

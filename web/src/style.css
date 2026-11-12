@@ -45,3 +45,5 @@
   #scenario-category,#scenario-status{font-size:9px}
 }
 .scenario-control{display:flex;gap:12px;align-items:center;margin-bottom:18px;color:#b2ced8;font-size:11px}.scenario-control select{background:#102031;color:#c4f4e9;border:1px solid #3b6369;padding:8px;border-radius:6px;max-width:100%}.mass-label[hidden]{display:none}.assembly-key{display:grid;grid-template-columns:20px 42px 1fr;gap:5px 9px;padding:9px 0;border-bottom:1px solid #26404e;font-size:10px;align-items:center}.assembly-key>span:first-child{color:#52c8b5;font:10px monospace}.assembly-key>span:nth-child(2){color:#afcfde}.assembly-key>span:last-child{grid-column:3;color:#7792a8;font:9px monospace}.assembly-key>span:nth-child(3){color:#c7e8e4}@media(max-width:680px){.scenario-control{align-items:flex-start;flex-direction:column;gap:5px}.assembly-key{font-size:10px}}
+
+#ablation-results{overflow-x:auto;margin-top:20px}#ablation-results table{border-collapse:collapse;width:100%;font-size:11px}#ablation-results th,#ablation-results td{padding:10px 12px;text-align:left;border-bottom:1px solid #35505b;white-space:nowrap}#ablation-results th{color:#76d5c6;font-weight:500}

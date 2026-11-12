@@ -1,5 +1,6 @@
 import numpy as np
 import casadi as ca
+import pytest
 
 from contact_transfer.contacts import Capability
 from contact_transfer.system import MechanicalSystem, RigidObject
@@ -8,13 +9,14 @@ from contact_transfer import Robot
 from contact_transfer.embodiments import load, catalog
 
 
-def test_cito_support_impulse_and_unrelaxed_residuals():
+@pytest.mark.parametrize('friction_speed_model',['auxiliary_cone','direct_norm'])
+def test_cito_support_impulse_and_unrelaxed_residuals(friction_speed_model):
     body = RigidObject(1., np.zeros(3), np.eye(3)*.02)
     system = MechanicalSystem([], body)
     q = np.array([0., 0, .5, 0, 0, 0, 1])
     contact = Contact("ground", np.zeros(3), [0, 0, 1],
                       Capability(mu=.5, normal_max=30), plane_offset=.5)
-    result = solve_cito(system, q, q, [contact], steps=8, duration=.4)
+    result = solve_cito(system, q, q, [contact], steps=8, duration=.4,friction_speed_model=friction_speed_model)
     assert result.complementarity_residual < 2e-5
     assert result.friction_residual < 2e-5
     assert result.minimum_gap >= -2e-6
@@ -23,7 +25,8 @@ def test_cito_support_impulse_and_unrelaxed_residuals():
     np.testing.assert_allclose(result.impulses["ground"][:, 2].sum(), 9.81*.4, atol=2e-5)
 
 
-def test_dual_arm_attached_object_translation(slider_urdf):
+@pytest.mark.parametrize('eliminate_endpoint_redundancy',[False,True])
+def test_dual_arm_attached_object_translation(slider_urdf,eliminate_endpoint_redundancy):
     robot = Robot(slider_urdf).symbolic()
     system = MechanicalSystem([robot, robot], RigidObject(1., np.zeros(3), np.eye(3)*.02))
     q = np.r_[-.25, 0, .5, .25, 0, .5, 0, 0, .5, 0, 0, 0, 1]
@@ -34,7 +37,7 @@ def test_dual_arm_attached_object_translation(slider_urdf):
                         robot_index=0, frame="link2", attached_steps=tuple(range(8))),
                 Contact("right", [.25, 0, 0], [0, 0, -1], cap,
                         robot_index=1, frame="link2", attached_steps=tuple(range(8)))]
-    result = solve_cito(system, q, goal, contacts, steps=8, duration=.8)
+    result = solve_cito(system, q, goal, contacts, steps=8, duration=.8,eliminate_endpoint_redundancy=eliminate_endpoint_redundancy)
     np.testing.assert_allclose(result.q[-1], goal, atol=1e-6)
     assert result.primal_residual < 2e-6
     assert result.gripper_velocity_residual < 2e-6
