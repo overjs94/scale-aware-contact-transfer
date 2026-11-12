@@ -61,12 +61,23 @@ def validate_rigid_trajectory(problem,trajectory,contacts):
                 residual['grasp_closure_rad']=max(residual['grasp_closure_rad'],Rotation.from_matrix(closure_R).magnitude())
         dyn=M@(vnext-v)-h*(np.asarray(sys.B)@trajectory.tau[l]-b)-impulse;residual['momentum']=max(residual['momentum'],float(np.max(abs(dyn))))
         for r,qs,vs in zip(problem.robots,sys.q_slices,sys.v_slices):
-            residual['joint_integration']=max(residual['joint_integration'],np.max(abs(qnext[qs]-r.integrate(q[qs],h*vnext[vs]))))
+            vint=.5*(v[vs]+vnext[vs]) if trajectory.configuration_update=='independent_midpoint' else vnext[vs]
+            residual['joint_integration']=max(residual['joint_integration'],np.max(abs(qnext[qs]-r.integrate(q[qs],h*vint))))
             residual['joint_limit']=max(residual['joint_limit'],np.max(r.lower-qnext[qs]),np.max(qnext[qs]-r.upper))
             residual['velocity_limit']=max(residual['velocity_limit'],np.max(abs(vnext[vs])-r.velocity))
-        integrated=obj.integrate(q[sys.object_q],h*vnext[sys.object_v]);actual=qnext[sys.object_q]
+        vint=.5*(v[sys.object_v]+vnext[sys.object_v]) if trajectory.configuration_update=='independent_midpoint' else vnext[sys.object_v]
+        integrated=obj.integrate(q[sys.object_q],h*vint);actual=qnext[sys.object_q]
         residual['object_translation_integration']=max(residual['object_translation_integration'],np.max(abs(integrated[:3]-actual[:3])))
         residual['object_rotation_integration']=max(residual['object_rotation_integration'],(Rotation.from_quat(integrated[3:]).inv()*Rotation.from_quat(actual[3:])).magnitude())
         residual['torque_limit']=max(residual['torque_limit'],np.max(abs(trajectory.tau[l])-sys.effort))
     residual['endpoint_velocity']=float(np.max(abs(trajectory.v[[0,-1]])))
-    residual={k:float(max(0,v)) for k,v in residual.items()};return dict(residuals=residual,passed=max(residual.values())<=2e-5,mechanics='independent native Pinocchio RNEA/M/J + NumPy contact transforms',continuous_collision_certificate=False)
+    residual={k:float(max(0,v)) for k,v in residual.items()}
+    diagnostic={}
+    if trajectory.configuration_update=='grasp_consistent':
+        # The root update in this explicitly identified variant is the grasp
+        # retraction, checked by closure/no-slip, rather than independent Euler.
+        for key in ['object_translation_integration','object_rotation_integration']:diagnostic[key]=residual.pop(key)
+        bounds=trajectory.configuration_defect_bounds
+        if len(bounds)!=2:residual['configuration_defect_bound']=float('inf')
+        else:residual['configuration_defect_bound']=max(0.,diagnostic['object_translation_integration']-bounds[0],diagnostic['object_rotation_integration']-np.sqrt(3)*bounds[1])
+    return dict(residuals=residual,reference_discretization_defect=diagnostic,configuration_update=trajectory.configuration_update,passed=max(residual.values())<=2e-5,mechanics='independent native Pinocchio RNEA/M/J + NumPy contact transforms',continuous_collision_certificate=False)

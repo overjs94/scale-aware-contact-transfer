@@ -56,7 +56,18 @@ def realize_system_keyframe(system,q_initial,object_configuration,interfaces,tas
    _,_,_,J0=relative_interface(system,ca.DM(q_initial),spec,spec.patch.position(spec.patch.initial),spec.patch.rotation(spec.patch.initial));J0=np.asarray(ca.DM(J0));maps.append(-J0.T[system.object_v,:]);torque_maps.append(np.asarray(system.B).T@J0.T)
   b0=np.asarray(ca.DM(system.bias(ca.DM(q_initial),ca.DM.zeros(system.nv)))).ravel()
   trial=fixed_generalized_margin(maps,task,[spec.capability for spec in interfaces],torque_gravity=np.asarray(system.B).T@b0,torque_maps=torque_maps,effort=system.effort,rho_min=rho_min)
-  if trial['certificate']:warm=trial
+  if trial['certificate']:
+   warm=trial
+   # A maximum-margin conic witness lies on several cone/capacity boundaries.
+   # Convexly mix each symmetric-box vertex with the nominal (vertex mean)
+   # witness to initialize a smaller, still feasible margin for the NLP.
+   scale=max(.9,rho_min/max(warm['rho'],1e-15));scale=min(scale,1.)
+   warm['rho']*=scale
+   values=warm['reactions'];warm['reactions']=values.mean(axis=0,keepdims=True)+scale*(values-values.mean(axis=0,keepdims=True))
+   warm['coordinates']=[list(row) for row in warm['coordinates']]
+   for c in range(len(interfaces)):
+    values=np.array([row[c] for row in warm['coordinates']]);nominal=values.mean(axis=0)
+    for k in range(len(values)):warm['coordinates'][k][c]=nominal+scale*(values[k]-nominal)
  geom=[];apertures=[]
  for spec in interfaces:
   _,p,R=spec.patch.instantiate(opti);T,pw,Rw,J=relative_interface(system,Q,spec,p,R);equality(opti,T[:3,3]-pw)
@@ -89,6 +100,10 @@ def realize_system_keyframe(system,q_initial,object_configuration,interfaces,tas
    tau0=np.asarray(system.B).T@b0-sum(T@w for T,w in zip(torque_maps,warm['reactions'][vertex_index]));opti.set_initial(tau,tau0)
   for contact in environment:
    gap,J,_=contact.geometry(system,Q);f=contact.capability.reaction(opti)[3:];total+=J.T@f;opti.subject_to(f[2]*gap<=1e-8);environment_reactions[contact.name].append(f)
+   if contact.plane_bounds is not None:
+    point=system.point_world(Q,contact.point_object,contact.object_frame)
+    for axis in range(2):
+     opti.subject_to(f[2]*(contact.plane_bounds[0][axis]-point[axis])<=1e-8);opti.subject_to(f[2]*(point[axis]-contact.plane_bounds[1][axis])<=1e-8)
   perturb=ca.MX.zeros(system.nv);perturb[system.object_v]=rho*ca.DM(task.E)@ca.DM(task.D)@ca.DM(vertex);equality(opti,nominal-perturb-total);reactions.append(lam);torques.append(tau)
  opti.minimize(objective);sol,res=solve(opti,settings)
  return KeyframeCertificate(np.r_[np.asarray(sol.value(qr)).ravel(),qo],np.array([np.asarray(sol.value(p)).ravel() for p,R,J in geom]),np.array([np.asarray(sol.value(R)) for p,R,J in geom]),tuple(None if a is None else float(sol.value(a)) for a in apertures),float(sol.value(rho)),np.array([[np.asarray(sol.value(w)).ravel() for w in row] for row in reactions]),np.array([np.asarray(sol.value(t)).ravel() for t in torques]),{name:np.array([np.asarray(sol.value(w)).ravel() for w in ws]) for name,ws in environment_reactions.items()},float(sol.value(objective)),res)

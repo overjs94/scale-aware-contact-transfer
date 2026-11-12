@@ -41,3 +41,16 @@ def test_position_admittance_uses_force_feedback_and_respects_velocity_bounds():
  command=c.command(q,qd,q,reaction_desired=desired,reaction_measured=measured,contact_rotation_world=np.eye(3),dt=.01);assert command[5]>0 and np.max(abs(command-q))<=.01+1e-9
  c.reset();command=c.command(q,qd,q,reaction_desired=desired,reaction_measured=desired,contact_rotation_world=np.eye(3),dt=.01);assert command[5]==pytest.approx(0,abs=1e-8)
  with pytest.raises(ValueError):c.command(q,qd,q,reaction_desired=desired,reaction_measured=desired,contact_rotation_world=np.eye(3),dt=0)
+
+
+def test_feedforward_comparison_disables_force_feedback_and_keeps_motion_selection():
+ r=CartesianRobot();q=np.zeros(6);qd=q.copy();qd[5]=.01;desired=np.r_[np.zeros(5),-10.]
+ # Hybrid FF has no normal pose stiffness and ignores the measured load.
+ c=HybridTorqueImpedance(r,'tip',force_k=0,force_i=0)
+ for measured in [desired,np.zeros(6),-5*desired]:
+  command=c.command(q,q,qd,q,q,reaction_desired=desired,reaction_measured=measured,contact_rotation_world=np.eye(3),dt=.001)
+  assert command[5]==pytest.approx(10.,abs=1e-6)
+ # Full pose impedance + the same FF explicitly restores normal tracking.
+ c=HybridTorqueImpedance(r,'tip',HybridSelection(np.zeros(6)),force_k=0,force_i=0)
+ command=c.command(q,q,qd,q,q,reaction_desired=desired,reaction_measured=np.zeros(6),contact_rotation_world=np.eye(3),dt=.001)
+ assert command[5]==pytest.approx(40.,abs=1e-6)

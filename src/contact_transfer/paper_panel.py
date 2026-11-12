@@ -93,14 +93,17 @@ class PaperPanelProblem:
     def task(self,pose):
         return GeneralizedTaskLoad(-self.case.panel.gravity(pose),np.eye(6),np.diag(self.case.data['optimization']['disturbance_scale']))
 
-    def keyframe(self,key,settings=None,geometry_constraints=None):
+    def keyframe(self,key,settings=None,geometry_constraints=None,shared_points=None):
         pose=np.array(key['object_pose']);T=pose_matrix(pose);initial=[]
         source=refine_source_and_transfer(self.case.path.parent/self.case.data['source_file'],geometry_weight=0.,object_rotation=T[:3,:3])
-        for i,(r,spec,interface) in enumerate(zip(self.robots,self.case.data['arms'],self.interfaces())):
+        interfaces=self.interfaces(source)
+        if shared_points is not None:
+            for interface,p in zip(interfaces,shared_points):interface.patch=SurfacePatch.fixed(p,interface.prior_rotation[:,2])
+        for i,(r,spec,interface) in enumerate(zip(self.robots,self.case.data['arms'],interfaces)):
             point=np.asarray(interface.patch.position(interface.patch.initial)).ravel();target=np.eye(4);target[:3,3]=T[:3,3]+T[:3,:3]@point
             local=Rotation.from_quat(spec['tool_quaternion_xyzw']).as_matrix() if spec['kind']=='P' else contact_basis(self.source['target_normals'][i])@np.diag([1.,-1.,-1.]);target[:3,:3]=T[:3,:3]@local
             initial.extend(numerical_pose_ik(r,self.frames[i],target,spec['q_initial']))
-        result=realize_system_keyframe(self.system,np.r_[initial,pose],pose,self.interfaces(source),self.task(pose),rho_min=.1,position_radius=.012,characteristic_length=.6,q_reference=np.r_[np.concatenate([s['q_initial'] for s in self.case.data['arms']]),pose],geometry_constraints=geometry_constraints,settings=settings or SolverSettings(options={'expand':False}))
+        result=realize_system_keyframe(self.system,np.r_[initial,pose],pose,interfaces,self.task(pose),rho_min=.1,position_radius=.012,characteristic_length=.6,q_reference=np.r_[np.concatenate([s['q_initial'] for s in self.case.data['arms']]),pose],geometry_constraints=geometry_constraints,settings=settings or SolverSettings(options={'expand':False}))
         result.source=source
         return result
 
@@ -132,7 +135,7 @@ class PaperPanelProblem:
             result.append(Contact(spec['group_id'],p,R[:,2],cap,robot_index=i,frame=self.frames[i],object_frame='panel',rotation_object=R,attached_steps=tuple(range(steps)) if cap.kind=='G' else (),maintained_steps=tuple(range(steps)) if cap.kind=='P' else (),sticking_steps=tuple(range(steps)) if cap.kind=='P' and point_phase=='sticking' else (),project_to_surface=cap.kind=='P',align_normal=cap.kind=='P',tangent_bounds=(-extent-offset,extent-offset) if cap.kind=='P' else None))
         return result
 
-    def transition(self,left,right,duration,*,steps=8,settings=None,validator=None,scene_constraints=None,point_phase='maintained',grasp_velocity_model='instantaneous',objective_mode='motion_cost'):
+    def transition(self,left,right,duration,*,steps=8,settings=None,validator=None,scene_constraints=None,point_phase='maintained',grasp_velocity_model='instantaneous',objective_mode='motion_cost',configuration_update='independent_se3'):
         contacts=self.contacts(left,steps,point_phase);poses=np.array([left.q[self.system.object_q],right.q[self.system.object_q]]);rot=Slerp([0,1],Rotation.from_quat(poses[:,3:]));Q=[]
         for j in range(steps+1):
             s=min(j/(steps-1),1.);f=10*s**3-15*s**4+6*s**5;pose=np.r_[(1-f)*poses[0,:3]+f*poses[1,:3],rot(f).as_quat()];T=pose_matrix(pose);qr=[]
@@ -160,4 +163,6 @@ class PaperPanelProblem:
             for c,w in zip(contacts,lam):impulses[c.name].append(dt*(w[3:] if c.capability.kind=='P' else w))
         initial=TrajectoryResult(Q,V,U,np.full(steps,dt),{k:np.asarray(v) for k,v in impulses.items()},0.,0.,0.,0.,0.,False,())
         desired=[pose_matrix(np.r_[(1-j/steps)*poses[0,:3]+j/steps*poses[1,:3],rot(j/steps).as_quat()]) for j in range(steps+1)]
-        return solve_cito(self.system,left.q,right.q,contacts,steps=steps,duration=duration,dt_bounds=(duration/steps*.5,duration/steps*1.5),fixed_dt=False,initial=initial,desired_object_poses=desired,characteristic_length=.6,kinematic_tolerance=1e-5,grasp_velocity_model=grasp_velocity_model,objective_mode=objective_mode,friction_relaxations=(1e-3,1e-5,1e-8),velocity_relaxations=(1e-3,1e-5,0.),scene_constraints=scene_constraints,full_geometry_validator=validator,settings=settings or SolverSettings(max_iterations=1200,options={'expand':False}))
+        torque_weight=np.diag(.01/self.system.effort**2)
+        velocity_weight=np.diag(np.r_[np.concatenate([.1/r.velocity**2 for r in self.robots]),[.1,.1,.1,.4,.4,.4]])
+        return solve_cito(self.system,left.q,right.q,contacts,steps=steps,duration=duration,dt_bounds=(duration/steps*.9,duration/steps*1.1),fixed_dt=False,initial=initial,desired_object_poses=desired,characteristic_length=.6,Kp=np.eye(3)*500,kR=50,Q_tau=torque_weight,Q_v=velocity_weight,duration_weight=.1,witness_regularization=1e-6,exact_sticking_velocity=True,kinematic_tolerance=1e-5,grasp_velocity_model=grasp_velocity_model,objective_mode=objective_mode,configuration_update=configuration_update,friction_relaxations=(1e-3,1e-5,1e-8),velocity_relaxations=(1e-3,1e-5,0.),scene_constraints=scene_constraints,full_geometry_validator=validator,settings=settings or SolverSettings(max_iterations=1200,options={'expand':False}))

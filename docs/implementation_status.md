@@ -25,17 +25,17 @@ paper component is not complete.
 | URDF symbolic mechanics | Lie recursive Newton--Euler, M/C/G, FK/J/Jdot, export | Graph construction cost grows with model size |
 | Floating base | Numerical/symbolic state and dynamics; unactuated system assembly | Whole-body support controller not supplied |
 | III-B | Local charts, exact quadratic friction cone, box vertices, force bounds | Smooth local charts required |
-| III-C | Arm posture, contact geometry, robustness and vertex torque bounds | Arm helper uses fixed bases; detailed finger/aperture geometry external |
-| III-D | Configured type/assignment enumeration and transition callbacks | Shared-keyframe/interval joint NLP not implemented yet |
+| III-C | Arm posture, contact geometry, robustness and vertex torque bounds; panel adapter has explicit opposing finger patches/aperture | Simulation grasp capacity is declared, not hardware calibrated |
+| III-D | Configured type/assignment enumeration and fixed-endpoint transition callbacks | Complete Panda candidate comparison remains pending; shared-endpoint joint NLP is an optional extension |
 | IV restricted CITO | Dynamics, Lie integration, complementarity, maximum dissipation, gripper phases | Candidates and attachment phases supplied |
 | Contact search | Candidate/node update loop with user geometry oracle | Complete STOCS merit/oracle algorithm not reproduced |
 | Collision | Differentiable margins and trajectory validator callbacks | Bundled dynamics-only models do not provide full mesh clearances |
-| Control | Computed torque, Cartesian admittance, position servo | Simulation level; no hard real-time guarantee |
+| Control | Hybrid motion/force, pose/force feedforward comparison, joint nullspace impedance, virtual PMI position admittance | Simulation level; full nonlinear multibody/contact PMI and hardware servo validation remain pending |
 | MuJoCo | URDF inertia export, state mapping, headless tracking | Markers are not collision geometry |
 | Mesh visualization | Eight full upstream URDFs, STL/DAE loading, visual/collision selector and recorded joint/base poses | Upstream mesh network access and WebGL required; display does not enable contact dynamics |
 | Fixed-geometry SOCP | Clarabel box margin, exact friction cones, fixed-posture torque bounds | Geometry/closure/collision remain NLP or scene checks |
 | Contact scene replay | Supplied MJCF, scalar-joint torque control, free objects, contact traces, equality hold/release | Real furniture collision assets and gripper calibration external |
-| Engine comparison | Validated portable trace and matched endpoint comparisons | CRISP C++ runner/adapter and insertion/jam classifier not implemented |
+| Engine comparison | Portable trace, optional CRISP CANAL/SubADMM SDK client, rotated-contact frame/impulse checks and fixed-Panda/free-panel runner | Complete task/precision insertion/jam comparison remains pending; SDK installed separately |
 | Three-arm contact experiment | Assumed network groups, 3 keyframes, 2 CITO solves, URDF sphere/fingers/cup, actual dynamic replay and vent/release | Authored Cartesian arms, fixed contact assignments; force-only gripper and lumped suction model |
 | Solver comparison | Fresh stationary CITO trials and residual-qualified timing tool | SNOPT unavailable in validated runtime; no assembly benchmark |
 | Hardware | Position/velocity/effort separation | No physical communication or validation |
@@ -53,3 +53,10 @@ inertias/effort values are not independent calibration or payload identification
 The planning/execution workflow and CRISP integration boundary are specified in
 [contact_execution.md](contact_execution.md). Synthetic contact replay tests do
 not provide real dual-arm furniture transport or precision insertion evidence.
+
+The first coupled Panda lift has a separate optimize/execute entry point,
+`tools/run_paper_panel.py`. It keeps literal manuscript and midpoint
+configuration transcriptions distinct, revalidates recorded plans independently,
+and exposes MuJoCo/CRISP and low-level control choices. See
+[CRISP, controller comparisons and the exact PMI scope](crisp-and-midpoint.md).
+This runner does not mark the full reorient/jig/release or all scenarios complete.

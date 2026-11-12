@@ -40,6 +40,8 @@ class FingerGrasp:
   if holding:opti.subject_to(a==self.aperture_required)
   return a
  def reaction(self,opti,scale=1.,initial=None,aperture=None):
+  return self.reaction_with_witness(opti,scale,initial,aperture)[0]
+ def reaction_with_witness(self,opti,scale=1.,initial=None,aperture=None):
   forces=[];warm=None
   try:initial_scale=float(scale)
   except (TypeError,RuntimeError):initial_scale=float(opti.debug.value(scale,opti.initial()))
@@ -51,7 +53,7 @@ class FingerGrasp:
    f=opti.variable(3);opti.subject_to(f[2]>=0);opti.subject_to(ca.sumsqr(f[:2])<=(self.mu*f[2])**2);
    opti.set_initial(f,warm[index] if warm is not None else [0,0,initial_scale*self.closing_force_per_finger/8]);forces.append(f)
   for finger in [0,1]:opti.subject_to(sum(f[2] for f in forces[4*finger:4*finger+4])<=scale*self.closing_force_per_finger)
-  return sum(B@f for B,f in zip(self.maps(aperture),forces))
+  return sum(B@f for B,f in zip(self.maps(aperture),forces)),ca.vertcat(*forces)
  def conic_matrices(self,aperture=None):
   """Aeq*u=w, Alinear*u<=blinear, and eight SOC blocks C*u∈Q3."""
   B=np.hstack([np.asarray(ca.DM(x)) for x in self.maps(aperture)]);A=[];b=[]

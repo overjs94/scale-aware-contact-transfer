@@ -360,3 +360,9 @@ For new computations, open the Python-served UI and choose **책상 조립 · G 
 The existing backend now implements this scenario, duration retiming, isolated
 jobs, progress and cancellation. See [what the Python server does](docs/python_server.md).
 GitHub Pages continues to serve the measured recording without a compute backend.
+
+The coupled Panda lift now has an optional CRISP execution backend and explicit
+hybrid-feedback versus pose/force-feedforward controller comparisons. See
+[the reproducible commands and PMI scope](docs/crisp-and-midpoint.md).
+The CRISP SDK is installed separately under its academic/non-commercial license;
+it is not bundled with this package or the public viewer.

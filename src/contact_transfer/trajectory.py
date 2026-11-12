@@ -38,6 +38,7 @@ class Contact:
     align_normal: bool = False
     aperture_rate_max: float = .12
     rotation_object: object = None
+    plane_bounds: object = None
 
     def __post_init__(self):
         self.point_object = np.asarray(self.point_object, float).reshape(3)
@@ -52,6 +53,9 @@ class Contact:
             R=np.asarray(self.rotation_object,float)
             if R.shape!=(3,3) or not np.allclose(R.T@R,np.eye(3)) or not np.isclose(np.linalg.det(R),1) or not np.allclose(R[:,2],self.normal):
                 raise ValueError('Interface rotation must be proper with the prescribed outward normal')
+        if self.plane_bounds is not None:
+            bounds=np.asarray(self.plane_bounds,float)
+            if self.robot_index is not None or self.environment_robot_index is not None or bounds.shape!=(2,2) or np.any(bounds[0]>=bounds[1]) or not np.isfinite(bounds).all():raise ValueError('Finite XY bounds currently support object/environment planes only')
 
     def basis(self):
         return contact_basis(self.normal) if self.rotation_object is None else np.asarray(self.rotation_object)
@@ -120,6 +124,9 @@ class TrajectoryResult:
     grasp_velocity_model: str = 'instantaneous'
     instantaneous_grasp_velocity_residual: float = 0.
     objective_mode: str = 'motion_cost'
+    configuration_update: str = 'independent_se3'
+    configuration_defect_bounds: tuple = ()
+    exact_sticking_velocity: bool = False
 
 
 def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
@@ -129,6 +136,10 @@ def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
                feasibility_warm_start=False,
                grasp_velocity_model='instantaneous',
                objective_mode='motion_cost',
+               configuration_update='independent_se3',
+               configuration_defect_bounds=(.0002,.0005),
+               witness_regularization=0.,
+               exact_sticking_velocity=False,
                kinematic_tolerance=1e-7,
                characteristic_length=1., Kp=None, kR=1., Q_tau=None, Q_v=None,
                duration_weight=1.,
@@ -143,6 +154,10 @@ def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
         raise ValueError("object length and orientation/duration weights must be positive")
     if grasp_velocity_model not in {'instantaneous','pose_difference'}:raise ValueError('Unknown grasp velocity discretization')
     if objective_mode not in {'motion_cost','feasibility'}:raise ValueError('Unknown trajectory objective mode')
+    if configuration_update not in {'independent_se3','independent_midpoint','grasp_consistent'}:raise ValueError('Unknown configuration update')
+    if configuration_update=='grasp_consistent' and grasp_velocity_model!='instantaneous':raise ValueError('Grasp-consistent update retains instantaneous no-slip')
+    if len(configuration_defect_bounds)!=2 or min(configuration_defect_bounds)<=0:raise ValueError('Positive translational/rotational integration defect bounds required')
+    if witness_regularization<0:raise ValueError('Nonnegative witness tie-break regularization required')
     friction_relaxations=tuple(0. for _ in relaxations) if friction_relaxations is None else tuple(friction_relaxations)
     velocity_relaxations=tuple(0. for _ in relaxations) if velocity_relaxations is None else tuple(velocity_relaxations)
     if len(friction_relaxations)!=len(relaxations) or len(velocity_relaxations)!=len(relaxations) or min(*friction_relaxations,*velocity_relaxations)<0 or velocity_relaxations[-1]!=0:
@@ -256,15 +271,29 @@ def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
                     tangent = (R.T@(Tee[:3,3]-point))[:2]
                     opti.subject_to(opti.bounded(contact.tangent_bounds[0],tangent,contact.tangent_bounds[1]))
                 if l in contact.sticking_steps:
-                    opti.subject_to(opti.bounded(-kinematic_tolerance, vel[:2], kinematic_tolerance))
+                    # Exact equalities are useful for the coupled arm solve,
+                    # but can overcount redundant rows in unactuated support
+                    # problems. Keep the established bounded form by default.
+                    if exact_sticking_velocity:
+                        if l<steps-1:equality(opti,vel[:2])
+                    else:opti.subject_to(opti.bounded(-kinematic_tolerance,vel[:2],kinematic_tolerance))
                     grasp_velocities.append(vel[:2])
                 P = opti.variable(3) if active else ca.DM.zeros(3)
                 if active:
                     opti.subject_to(opti.bounded(0, P[2], h*cap.normal_max))
                     opti.subject_to(ca.sumsqr(P[:2]) <= (cap.mu*P[2])**2)
-                    opti.subject_to(P[2]*gap <= eps)
+                    # An explicitly maintained zero gap already satisfies
+                    # complementarity. Avoid a redundant near-active product
+                    # row parallel to its exact gap equality.
+                    if not exact_sticking_velocity or (l not in contact.maintained_steps and l not in contact.sticking_steps):
+                        opti.subject_to(P[2]*gap <= eps)
                     comp.append(P[2]*gap)
-                    if l in contact.sticking_steps:
+                    if contact.plane_bounds is not None:
+                        point=system.point_world(Q[:,l+1],contact.point_object,contact.object_frame)
+                        for axis in range(2):
+                            for outside in [contact.plane_bounds[0][axis]-point[axis],point[axis]-contact.plane_bounds[1][axis]]:
+                                opti.subject_to(P[2]*outside<=eps);comp.append(ca.fmax(P[2]*outside,0))
+                    if l in contact.sticking_steps and exact_sticking_velocity:
                         # vt=0 makes the entire Coulomb disk maximally
                         # dissipative. Eliminate the redundant speed cone at
                         # its singular apex rather than add a zero-gradient row.
@@ -274,7 +303,8 @@ def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
                         opti.subject_to(speed >= 0)
                         opti.subject_to(speed**2+eps_velocity**2 >= ca.sumsqr(vel[:2]))
                         dissipation = ca.dot(P[:2], vel[:2])+cap.mu*P[2]*speed
-                        opti.subject_to(opti.bounded(-eps_friction,dissipation,eps_friction))
+                        if not any(friction_relaxations):equality(opti,dissipation)
+                        else:opti.subject_to(opti.bounded(-eps_friction,dissipation,eps_friction))
                         friction.append(dissipation)
                     if initial is not None and contact.name in initial.impulses:
                         opti.set_initial(P, initial.impulses[contact.name][l])
@@ -284,7 +314,10 @@ def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
                 if attached:
                     warm_reaction = initial.impulses[contact.name][l] if initial is not None and contact.name in initial.impulses else None
                     a = apertures[contact.name][l+1] if contact.name in apertures else None
-                    P = cap.reaction(opti, scale=h, initial=warm_reaction,aperture=a)
+                    if hasattr(cap,'reaction_with_witness'):
+                        P,witness=cap.reaction_with_witness(opti,scale=h,initial=warm_reaction,aperture=a)
+                        objective+=witness_regularization*ca.sumsqr(witness)/h
+                    else:P = cap.reaction(opti, scale=h, initial=warm_reaction,aperture=a)
                     equality(opti, closure)
                     if cap.has_moment:
                         Tee = system.robots[contact.robot_index].fk(
@@ -338,7 +371,25 @@ def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
         dyn = (system.mass(Q[:, l])@(V[:, l+1]-V[:, l]) -
                h*(system.B@U[:, l]-system.bias(Q[:, l], V[:, l]))-generalized_impulse)
         equality(opti, dyn)
-        equality(opti, Q[:, l+1]-system.integrate(Q[:, l], h*V[:, l+1]))
+        integration_velocity=.5*(V[:,l]+V[:,l+1]) if configuration_update=='independent_midpoint' else V[:,l+1]
+        integrated=system.integrate(Q[:, l], h*integration_velocity)
+        root_name=system.object.tree.root if system.articulated_object else None
+        root_grasp=any(c.capability.has_moment and l in c.attached_steps and c.object_frame in (None,root_name,'object' if not system.articulated_object else root_name) for c in contacts)
+        if configuration_update=='grasp_consistent' and root_grasp:
+            # Explicit constrained-configuration variant: the root pose is
+            # determined by full-rank grasp closure. Integrate independent
+            # robot and internal-object coordinates; retain full momentum and
+            # bounded reaction/instantaneous no-slip equations. No simulator
+            # weld, prescribed object motion or additional force is introduced.
+            equality(opti,Q[:system.object_q.start,l+1]-integrated[:system.object_q.start])
+            equality(opti,Q[system.object_q.start+7:system.object_q.stop,l+1]-integrated[system.object_q.start+7:system.object_q.stop])
+            equality(opti,ca.sumsqr(Q[system.object_q.start+3:system.object_q.start+7,l+1])-1)
+            from .lie import quat_rotation
+            root=system.object_q.start
+            opti.subject_to(opti.bounded(-configuration_defect_bounds[0],Q[root:root+3,l+1]-integrated[root:root+3],configuration_defect_bounds[0]))
+            Ractual=quat_rotation(Q[root+3:root+7,l+1]);Rpred=quat_rotation(integrated[root+3:root+7])
+            opti.subject_to(opti.bounded(-configuration_defect_bounds[1],rotation_error(Ractual,Rpred),configuration_defect_bounds[1]));opti.subject_to(rotation_cost(Ractual,Rpred)<=1.)
+        else:equality(opti, Q[:, l+1]-integrated)
         objective += h*(ca.mtimes([U[:, l].T, Qt, U[:, l]])+
                         ca.mtimes([V[:, l].T, Qv, V[:, l]])+duration_weight)
         if desired_object_poses is not None:
@@ -361,7 +412,7 @@ def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
     min_gap = min([float(sol.value(x)) for x in gap_records], default=0.)
     gripper_res = max([float(np.max(np.abs(sol.value(x)))) for x in grasp_velocities], default=0.)
     if max(comp_res, fric_res, -min_gap, gripper_res) > acceptance:
-        raise RuntimeError("unrelaxed contact residual exceeds acceptance tolerance")
+        raise RuntimeError(f"unrelaxed contact residual exceeds acceptance tolerance: comp={comp_res:.3g}, friction={fric_res:.3g}, gap={min_gap:.3g}, velocity={gripper_res:.3g}")
     result = TrajectoryResult(
         np.array(sol.value(Q)).reshape(system.nq, steps+1).T,
         np.array(sol.value(V)).reshape(system.nv, steps+1).T,
@@ -374,6 +425,9 @@ def solve_cito(system, q_start, q_goal, contacts, *, steps=12, duration=1.,
     result.continuation=dict(normal_gap_Ns_m=tuple(relaxations),friction_work_Nm=friction_relaxations,velocity_m_s_or_rad_s=velocity_relaxations)
     result.grasp_velocity_model=grasp_velocity_model
     result.objective_mode=objective_mode
+    result.configuration_update=configuration_update
+    result.configuration_defect_bounds=tuple(configuration_defect_bounds) if configuration_update=='grasp_consistent' else ()
+    result.exact_sticking_velocity=bool(exact_sticking_velocity)
     result.instantaneous_grasp_velocity_residual=max([float(np.max(np.abs(sol.value(x)))) for x in instantaneous_grasp_velocities],default=0.)
     if full_geometry_validator is not None:
         if not full_geometry_validator(result):
