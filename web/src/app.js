@@ -431,7 +431,7 @@ async function init() {
   $("test-count").textContent = index.tests_passed;
   buildLibrary(index.models);
   const requestedModel = new URLSearchParams(location.search).get("model");
-  await selectModel(index.models.some(model => model.id === requestedModel) ? requestedModel : "free_box_lid");
+  await selectModel(index.models.some(model => model.id === requestedModel) ? requestedModel : ["full_assembly","full_panel","full_box","free_box_lid"].find(id=>index.models.some(m=>m.id===id)));
   try {
     const health = await fetch("./api/health");
     if (health.ok) backend = (await health.json()).ready === true;

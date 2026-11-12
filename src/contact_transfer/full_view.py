@@ -28,7 +28,11 @@ def export_full(episode,trace,report,scene,web_directory,*,variant='full',frames
         pose=trace.object_pose[idx,trace.metadata['object_names'].index(next(iter(scene.object_roots.values())))];coordinate=np.array(trace.metadata['articulated_state']['q'])[idx] if task.id=='box' else np.zeros((len(idx),0));qparts.append(np.c_[pose,coordinate]);robots.append(('object',obj,None))
     q=np.concatenate(qparts,axis=1);positions=[[] for _ in idx];names=[];edges=[];instances=[];offset=0;objects=[]
     for name,r,spec in robots:
-        model_id=dataset+'_'+name;directory=web/'models'/model_id;directory.mkdir(parents=True,exist_ok=True);shutil.copyfile(r.path,directory/'robot.urdf');authored=spec is None;lic='LICENSE.authored' if authored else 'LICENSE.panda';shutil.copyfile(task.original.path.parent/lic,directory/lic);meta=dict(packages={},source='Authored manipulation object; dynamics and collision geometry from URDF',license='MIT') if authored else json.loads((task.original.path.parent/'franka_panda_provenance.json').read_text())
+        model_id=dataset+'_'+name;directory=web/'models'/model_id;directory.mkdir(parents=True,exist_ok=True);shutil.copyfile(r.path,directory/'robot.urdf');authored=spec is None;lic='LICENSE.authored' if authored else 'LICENSE.panda';license_source=task.original.path.parent/lic
+        if not license_source.exists() and not authored:license_source=task.original.path.parent/'LICENSE.upstream'
+        shutil.copyfile(license_source,directory/lic);provenance=task.original.path.parent/'franka_panda_provenance.json'
+        if not provenance.exists():provenance=task.original.path.parent/'provenance.json'
+        meta=dict(packages={},source='Authored manipulation object; dynamics and collision geometry from URDF',license='MIT') if authored else json.loads(provenance.read_text())
         if spec is not None:
             shutil.copyfile(task.original.path.parent/'LICENSE.authored',directory/'LICENSE.authored');meta.setdefault('additional_licenses',[]).append(dict(license='MIT',license_file='LICENSE.authored'))
             if spec.get('gripper_profile'):

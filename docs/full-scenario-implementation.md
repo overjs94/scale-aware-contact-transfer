@@ -54,8 +54,8 @@ External-force trials use actual native force injection and replay arrows.
 | Target keyframe unload force flag and source-refinement switch | implemented; focused validation in progress |
 | All three task adapters / scenes / independent native mechanics | implemented; three-scene mass/gravity checks passed |
 | Robust target keyframes | panel 9, box 8 and assembly 10 declared keyframes; individual/sequence acceptance is recorded separately |
-| Type/assignment optimization connected to complete scenarios | implemented; exhaustive configured candidates, rejections and common sequence objective retained; no accepted complete search result yet |
-| Full native executions / ablation matrix / web records | runner/exporter implemented; acceptance runs in progress |
+| Type/assignment optimization connected to complete scenarios | implemented; exhaustive configured candidates, rejections and common sequence objective retained; assembly: 24 configured candidates, one accepted G/P/G sequence; panel/box complete acceptance remains pending |
+| Full native executions / ablation matrix / web records | assembly full native execution and URDF web replay passed; remaining full tasks and controlled ablations in progress |
 
 The ledger is updated from executed results. Pending cells must not produce
 `full_paper_pipeline_executed=true` in public recordings.
@@ -193,3 +193,11 @@ regularization reference retains the contact geometry and torque/force
 constraints while favoring a continuous branch. Box and assembly retain the
 hardware-seed reference. The rule and reference vector are stage metadata;
 old target solutions with a different rule are not reused for later keys.
+
+## First accepted complete task: furniture assembly
+
+The 30.4 s native MuJoCo run in `outputs/full_scenarios_v15/assembly/full` passed every declared gate. All ten keyframes and nine intervals passed independent mechanics and sampled geometry. Selection evaluated 24 configured type/assignment candidates and retained G/P/G with assignment 0/1/2. Every interval used 16 nodes. The strict original momentum equations and zero-defect independent midpoint configuration update were retained.
+
+Measured insertion depth was 25.0014 mm and lateral error 0.4535 mm. Maximum tabletop/leg tracking errors were 0.539/0.667 mm. All three required-contact fractions were 1.0. Peak measured jaw reaction was 32.096 N against the tested 40 N/jaw operating bound. All 1,641 sampled native interface resultants passed the finite capabilities; no unexpected loaded contact occurred. The leg gripper released and the tabletop supplied 3.92401 N of support for a 3.924 N leg.
+
+[Measured recording](../web/data/full_assembly.json) preserves the selected types, margins (minimum target rho 0.35431), actual passive gripper joints, free-body poses and independent acceptance report. Source point-model refinement used the explicit geometric fallback; this result does not claim successful source robustness refinement or learned network inference. The current public record contains the completed full trial; ablation rows are added only as their trials finish.

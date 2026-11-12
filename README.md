@@ -7,6 +7,8 @@ URDF 기반 동역학·기구학과 논문의 Sec. III-B–IV를 위한 연구�
 Source/target/CITO, 저수준 제어, MuJoCo/CRISP, Robotiq 기구·렌더링, 검증 결과와
 남은 논문 단계의 범위를 함께 정리했습니다.
 
+가구 조립의 첫 전체 G/P/G 계획·MuJoCo 실행이 통과했습니다. [측정 기록](web/data/full_assembly.json)과 [검증 범위](docs/full-scenario-implementation.md)를 확인할 수 있습니다. 패널·박스 전체 과제와 ablation 완료 여부는 이 ledger에 따로 기록합니다.
+
 세 목표 과제의 공통 전체 계획 runner는 `tools/run_full_scenarios.py`입니다.
 [통합 범위·실행 ledger](docs/full-scenario-implementation.md)에 동일 구형 팁,
 실제 G/P·팔 배정 후보 탐색, 전체 전이·native 실행과 ablation의 구현 및

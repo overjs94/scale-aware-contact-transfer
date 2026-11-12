@@ -1,6 +1,13 @@
 {
   "models": [
     {
+      "id": "full_assembly",
+      "title": "\uac00\uad6c \uc870\ub9bd \u00b7 \uc0c1\ud310 \uc9c0\uc9c0\u00b7\ub2e4\ub9ac \uc0bd\uc785\u00b7\ub9b4\ub9ac\uc2a4",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
       "id": "robotiq_2f85",
       "title": "Robotiq 2F-85 \u00b7 \uc591 jaw 40 N \u00b7 native mechanism",
       "engine": "mujoco_contact_recording",

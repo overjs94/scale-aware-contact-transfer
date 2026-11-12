@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { libraryEntry } from "../src/library.js";
 
 // Keep CI deterministic and offline. Real upstream assets are also exercised
 // separately during integration QA; these fixtures test URDF transforms.
@@ -132,9 +133,11 @@ test("three physical tools replay as three URDF instances with keyframe events",
 });
 
 test("library separates paper tasks, single embodiments and diagnostics with matching editors", async ({page})=>{
-  await page.goto('/');
+  await page.goto('/?model=free_box_lid');
+  const catalog=await(await page.request.get('/data/index.json')).json();
+  const counts=category=>catalog.models.filter(model=>libraryEntry(model).category===category).length;
   await expect(page.locator('.category-choice[data-category="paper"]')).toHaveAttribute('aria-pressed','true');
-  await expect(page.locator('.model-choice:visible')).toHaveCount(6);
+  await expect(page.locator('.model-choice:visible')).toHaveCount(counts('paper'));
   await expect(page.locator('#scenario-status')).toContainText('전체 최적화 미검증');
   await expect(page.locator('#scenario-status')).toHaveAttribute('data-full-pipeline','false');
   await page.locator('.category-choice[data-category="embodiment"]').click();
@@ -150,7 +153,7 @@ test("library separates paper tasks, single embodiments and diagnostics with mat
   await expect(page.locator('#scenario-preset')).toHaveValue('panel_fixture');
   await expect(page.locator('#builder-title')).toContainText('패널');
   await page.locator('.category-choice[data-category="diagnostic"]').click();
-  await expect(page.locator('.model-choice:visible')).toHaveCount(12);
+  await expect(page.locator('.model-choice:visible')).toHaveCount(counts('diagnostic'));
   await page.locator('.model-choice[data-id="hinged_door"]').click();
   await expect(page.locator('#scenario-preset')).toHaveValue('hinged_door');
   await expect(page.locator('#scenario-scope')).toContainText('세계에 고정된 수동 관절');
@@ -490,8 +493,46 @@ test('free-object form preserves edited dense groups while retiming',async({page
  await page.route('**/api/health',r=>r.fulfill({json:{ready:true,experiments_ready:true}}));let submitted;
  await page.route('**/api/experiments',async r=>{submitted=r.request().postDataJSON();await r.fulfill({status:202,json:{id:'dense'}});});
  await page.route('**/api/experiments/dense',r=>r.fulfill({json:{state:'completed',stage:'complete',recording:'/data/free_box_lid.json'}}));
- await page.goto('/');await expect(page.locator('#scenario-preset')).toHaveValue('free_box_lid');await expect(page.locator('#experiment-run')).toBeEnabled();
+ await page.goto('/?model=free_box_lid');await expect(page.locator('#scenario-preset')).toHaveValue('free_box_lid');await expect(page.locator('#experiment-run')).toBeEnabled();
  await page.locator('#contacts-json').evaluate(el=>{const d=JSON.parse(el.value);d[1].weights[0]=2;el.value=JSON.stringify(d);});
  await page.locator('#assembly-duration').fill('22');await page.locator('#experiment-run').click();
  await expect.poll(()=>submitted?.duration).toBe(22);expect(submitted.preset).toBe('free_box_lid');expect(submitted.dense_source_groups[1].weights[0]).toBe(2);
 });
+
+for (const task of ['assembly','box','panel']) {
+  test(`full ${task}: optimized multi-arm task retains measured URDF and acceptance provenance`,async({page})=>{
+    await page.goto(`/?model=full_${task}`);
+    await page.evaluate(async()=>{window.modelAPI=await import("/test-module.js");});
+    await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+    await expect(page.locator('#scenario-status')).toContainText('전체 구간 · 검증 통과');
+    await expect(page.locator('#result-tracking')).toContainText('PASS');
+    await expect(page.locator('#result-forces')).toContainText('PASS');
+    await expect(page.locator('#ablation-results')).toContainText('full');
+    await expect(page.locator('#experiment-form')).toBeHidden();
+    const result=await page.evaluate(async task=>{
+      const data=await(await fetch(`/data/full_${task}.json`)).json(),{loadURDFModel,applyRecordedPose,disposeModel}=window.modelAPI;let maximum=0;
+      for(const mode of ['visual','collision'])for(const spec of data.instances){
+        const robot=await loadURDFModel(spec.manifest,mode),recording={...spec,q:data.q.map(row=>spec.q_indices.map(i=>row[i]))};
+        for(const k of [0,Math.floor(data.q.length/2),data.q.length-1]){
+          applyRecordedPose(robot,recording,k);
+          for(const [name,link] of Object.entries(robot.links)){
+            const i=data.link_names.indexOf(spec.id+'_'+name);if(i<0)continue;
+            link.matrixWorld.elements.slice(12,15).forEach((v,j)=>{maximum=Math.max(maximum,Math.abs(v-data.positions[k][i][j]));});
+          }
+        }disposeModel(robot);
+      }
+      return {maximum,data};
+    },task);
+    expect(result.maximum).toBeLessThan(1e-6);
+    const d=result.data,r=d.report;
+    expect(d.full_task_recording).toBe(true);expect(d.multi_arm).toBe(true);expect(r.execution_passed).toBe(true);
+    expect(r.full_variant_pipeline_executed).toBe(true);expect(r.full_paper_pipeline_executed).toBe(false);
+    expect(r.selection.selection_executed).toBe(true);expect(r.selection.candidate_count).toBeGreaterThanOrEqual(12);
+    expect(r.selection.intervals).toBe(r.selection.keyframes-1);expect(r.selection.keyframes).toBeGreaterThanOrEqual(5);
+    expect(d.contact_contraction.network_inference_executed).toBe(false);expect(d.contact_contraction.dense_sample_count).toBe(0);
+    expect(d.provenance.canonical_point_tool.radius_m).toBe(.025);
+    expect(d.provenance.canonical_point_tool.ee_to_tip.slice(0,3).map(row=>row[3])).toEqual([0,0,.165]);
+    expect(r.object_equality_constraints_used).toBe(0);expect(r.sampled_interface_wrench_capability.passed).toBe(true);
+    if(task==='assembly'){expect(r.task_metrics.leg_released).toBe(true);expect(r.task_metrics.lateral_error_m).toBeLessThan(.002);}
+  });
+}

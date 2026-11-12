@@ -9,7 +9,7 @@ digraph FullScenario {
   source [label="III-B · source_transfer.py / refinement.py / pipeline.py\nCommon point model · geometry-only scale transfer\nExplicit geometric-prior fallback if source is infeasible"];
   subgraph cluster_search {
     label="III-D · full_pipeline.FullPlanner → sequence.choose_sequence\nEvaluate every configured P/G and injective fixed-through-sequence assignment";color="#a9bfd4";
-    target [label="III-C · paper_keyframe.realize_system_keyframe\nPosture + local geometry + margin rho\nSeparate force/torque distribution at every vertex"];
+    target [label="III-C · paper_keyframe.py / full_static.py\nCoupled NLP or fixed-geometry decomposition\nPosture + local geometry + margin rho\nSeparate force/torque distribution at every vertex"];
     polish [label="Endpoint polish + independent target checks\nNative IK / RNEA / Jacobians · Clarabel\nExact contact closure before fixing CITO endpoints",fillcolor="#e7f5ed",color="#4e9470"];
     kin [label="Numerical initialization · full_trajectory.py\nCommon grid · midpoint collocation / no-slip seed\nInitializer status cannot certify an execution"];
     cito [label="Moving intervals · trajectory.solve_cito\nOptimize q / v / torque / impulse / duration\nPre-state momentum, contact complementarity / friction\nEliminate equivalent redundant equality/inequality rows"];

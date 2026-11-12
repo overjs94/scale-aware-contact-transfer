@@ -1,7 +1,7 @@
 // Organize by experimental purpose, independently of robot or physics engine.
 // Membership in a paper task does not certify execution of the paper pipeline.
 export const categories = [
-  { id: "paper", title: "논문 목표", description: "Contact contraction을 다중 팔로 실현하는 목표 과제입니다. 현재 기록은 기준 동작이며 전체 최적화 검증은 진행 중입니다.", groups: ["핵심 과제 · 단일 강체", "확장 · 모바일 협력", "확장 · 자유 articulated", "보조 · 다물체 조립"] },
+  { id: "paper", title: "논문 목표", description: "Contact contraction을 다중 팔로 실현하는 목표 과제입니다. 전체 계획·실행 기록과 기존 기준 동작을 구분하며, 각 기록의 검증 범위를 표시합니다.", groups: ["핵심 과제 · 단일 강체", "확장 · 모바일 협력", "확장 · 자유 articulated", "보조 · 다물체 조립"] },
   { id: "embodiment", title: "단일 embodiment", description: "각 로봇의 URDF·기구학·관절 추종을 확인합니다. 논문 목표의 협력 물체 조작 실험과 구분합니다.", groups: ["로봇팔 · 관절 추종", "휴머노이드 · 기구학"] },
   { id: "diagnostic", title: "요소·강건성", description: "외란 응답, 접촉 도구와 수동 관절, 제한 CITO를 개별적으로 확인하는 진단 실험입니다.", groups: ["외력 · 강건성", "다중 팔 · 도구·계획 검증", "단일 팔 · 수동 관절", "그리퍼 · 구동·파지력"] },
 ];
