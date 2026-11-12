@@ -40,12 +40,16 @@ class FingerGrasp:
   if holding:opti.subject_to(a==self.aperture_required)
   return a
  def reaction(self,opti,scale=1.,initial=None,aperture=None):
-  forces=[]
-  for _ in range(8):
+  forces=[];warm=None
+  try:initial_scale=float(scale)
+  except (TypeError,RuntimeError):initial_scale=float(opti.debug.value(scale,opti.initial()))
+  if initial is not None and np.size(initial)==24:warm=np.asarray(initial,float).reshape(8,3)
+  elif initial is not None and np.size(initial)==6:
+   check=self.check(np.asarray(initial,float)/initial_scale)
+   if check['feasible']:warm=initial_scale*check['finger_forces']
+  for index in range(8):
    f=opti.variable(3);opti.subject_to(f[2]>=0);opti.subject_to(ca.sumsqr(f[:2])<=(self.mu*f[2])**2);
-   try:initial_scale=float(scale)
-   except (TypeError,RuntimeError):initial_scale=float(opti.debug.value(scale,opti.initial()))
-   opti.set_initial(f,[0,0,initial_scale*self.closing_force_per_finger/8]);forces.append(f)
+   opti.set_initial(f,warm[index] if warm is not None else [0,0,initial_scale*self.closing_force_per_finger/8]);forces.append(f)
   for finger in [0,1]:opti.subject_to(sum(f[2] for f in forces[4*finger:4*finger+4])<=scale*self.closing_force_per_finger)
   return sum(B@f for B,f in zip(self.maps(aperture),forces))
  def conic_matrices(self,aperture=None):

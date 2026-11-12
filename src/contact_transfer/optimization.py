@@ -14,6 +14,7 @@ class SolverSettings:
     verbose: bool = False
     backend: str = "ipopt"
     options: dict = field(default_factory=dict)
+    diagnostics_path: str | None = None
 
     def __post_init__(self):
         if self.backend not in {"ipopt", "snopt"}:
@@ -71,6 +72,16 @@ def solve(opti, settings=None):
             status = opti.stats().get("return_status", "unknown")
         except RuntimeError:
             status = "solver initialization failed"
+        if settings.diagnostics_path is not None:
+            import json
+            from pathlib import Path
+            path=Path(settings.diagnostics_path);path.parent.mkdir(parents=True,exist_ok=True)
+            try:
+                values=np.asarray(opti.debug.value(opti.g)).ravel();lower=np.asarray(opti.debug.value(opti.lbg)).ravel();upper=np.asarray(opti.debug.value(opti.ubg)).ravel();violation=np.maximum.reduce([lower-values,values-upper,np.zeros(len(values))]);indices=np.argsort(violation)[-20:][::-1]
+                finite=lambda v:float(v) if np.isfinite(v) else None
+                rows=[dict(index=int(i),violation=finite(violation[i]),value=finite(values[i]),lower=finite(lower[i]),upper=finite(upper[i]),source=opti.debug.g_describe(int(i))) for i in indices]
+                path.write_text(json.dumps(dict(status=status,accepted=False,constraints=rows),indent=2)+'\n')
+            except RuntimeError:path.write_text(json.dumps(dict(status=status,accepted=False,diagnostics='unavailable'))+'\n')
         suffix = "; SNOPT requires a working CasADi plugin and solver installation/license" if settings.backend == "snopt" else ""
         raise RuntimeError(f"NLP rejected [{settings.backend}]: {status}{suffix}") from error
     g = np.asarray(solution.value(opti.g)).reshape(-1)

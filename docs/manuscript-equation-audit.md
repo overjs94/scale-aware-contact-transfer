@@ -5,6 +5,12 @@ SHA-256: `03deabc2ff306db8582cda6ab24becab4e6681397ab4a5a4367c55ca7d9fe3ba`.
 The manuscript itself is not copied into the repository or public viewer.
 This audit supersedes the numerical-procedure findings in the historical v12 audit.
 
+The new rigid-panel source/target optimizations and solver-free finite-step
+grasp diagnosis are documented in
+[grasp-discretization-diagnosis.md](grasp-discretization-diagnosis.md).
+Static keyframe verification is now executed with explicit finger resultants;
+the original articulated-arm CITO intervals have not passed final acceptance.
+
 ## Scope that must be preserved
 
 - Eq. (7): source **surface** positions/normals, common unilateral P model,
