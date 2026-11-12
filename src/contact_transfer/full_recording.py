@@ -23,7 +23,7 @@ def write_json(path,value,*,compact=False):
 
 def fingerprint(problem,settings,steps):
     task=problem.task_definition
-    info=dict(task=task.id,posture_reference_rule=task.posture_reference_rule,types=problem.types,assignment=problem.assignment,refine_source=problem.refine_enabled,features=[vars(f) for f in task.features],keyframes=task.keyframes,settings={k:v for k,v in vars(settings).items() if k not in {'diagnostics_path','verbose'}},steps=steps,specs=problem.specs)
+    info=dict(task=task.id,gripper_force_coordinates=task.gripper_force_coordinates,posture_reference_rule=task.posture_reference_rule,posture_trust_radius_rad=task.posture_trust_radius_rad,types=problem.types,assignment=problem.assignment,refine_source=problem.refine_enabled,features=[vars(f) for f in task.features],keyframes=task.keyframes,settings={k:v for k,v in vars(settings).items() if k not in {'diagnostics_path','verbose'}},steps=steps,specs=problem.specs)
     h=hashlib.sha256(json.dumps(info,sort_keys=True,default=jsonable).encode())
     objects=task.object.bodies.values() if hasattr(task.object,'bodies') else [task.object]
     for r in [*problem.full_robots,*objects]:h.update(r.path.read_bytes());h.update(np.asarray(r.base_pose,dtype='<f8').tobytes())
@@ -35,6 +35,7 @@ def fingerprint(problem,settings,steps):
 
 
 def save_key(path,key,identity):
+    if getattr(key,'identical_keyframe_reuse',False):key.target_provenance={**getattr(key,'target_provenance',{}),'identical_keyframe_reuse':True,'new_target_solver_executed':False,'reuse_scope':'identical pose, transferred prior, force mode, environment and posture reference'}
     names=['q','positions','rotations','reactions','torques'];meta={f.name:getattr(key,f.name) for f in fields(key) if f.name not in names+['environment_reactions']};meta.update(identity=identity,posture_reference=getattr(key,'posture_reference',None),target_provenance=getattr(key,'target_provenance',dict(method='coupled_target_NLP')),phase=key.phase,retreat_m=getattr(key,'retreat_m',.06 if key.phase in {'released','release_leg'} else 0.),source=key.source,environment=list(key.environment_reactions),interfaces=[dict(group_id=s.group_id,force_enabled=s.force_enabled) for s in key.interfaces]);a={n:getattr(key,n) for n in names};a.update({'env_'+n:v for n,v in key.environment_reactions.items()});np.savez_compressed(path,metadata_json=json.dumps(meta,default=jsonable,allow_nan=False),**a)
 
 

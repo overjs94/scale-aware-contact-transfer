@@ -6,16 +6,16 @@ digraph FullScenario {
   tool [label="One P tool · spherical_tool.py\nmodels/tools/spherical_tip.urdf\nIdentical sphere + EE transform in all three tasks"];
   models [label="Authoritative mechanics\nurdf.py / robot.py / symbolic.py / system.py\nmulti_object.py: two independent SE(3) roots"];
   grip [label="Finite G model\nrobotiq.py / robotiq_panel.py / finger_grasp.py\nNative loops, jaw friction, aperture and motor/stop cut"];
-  source [label="III-B · source_transfer.py / refinement.py / pipeline.py\nCommon point model · geometry-only scale transfer\nExplicit geometric-prior fallback if source is infeasible"];
+  source [label="III-B · source_transfer.py / refinement.py / pipeline.py\nCommon point model · geometry-only scale transfer\nExplicit geometric-prior fallback without a source certificate"];
   subgraph cluster_search {
-    label="III-D · full_pipeline.FullPlanner → sequence.choose_sequence\nEvaluate every configured P/G and injective fixed-through-sequence assignment";color="#a9bfd4";
+    label="III-D · full_pipeline.FullPlanner → sequence.choose_sequence\nScreen configured P/G and fixed injective assignments";color="#a9bfd4";
     target [label="III-C · paper_keyframe.py / full_static.py\nCoupled NLP or fixed-geometry decomposition\nPosture + local geometry + margin rho\nSeparate force/torque distribution at every vertex"];
     polish [label="Endpoint polish + independent target checks\nNative IK / RNEA / Jacobians · Clarabel\nExact contact closure before fixing CITO endpoints",fillcolor="#e7f5ed",color="#4e9470"];
-    kin [label="Numerical initialization · full_trajectory.py\nCommon grid · midpoint collocation / no-slip seed\nInitializer status cannot certify an execution"];
-    cito [label="Moving intervals · trajectory.solve_cito\nOptimize q / v / torque / impulse / duration\nPre-state momentum, contact complementarity / friction\nEliminate equivalent redundant equality/inequality rows"];
+    kin [label="Numerical initialization · full_trajectory.py\nCommon grid · smooth IK / contact-velocity seed\nInitializer status cannot certify an execution"];
+    cito [label="Moving intervals · trajectory.solve_cito\nOptimize q / v / torque / impulse / duration\nPre-state momentum, contact complementarity / friction\nContact-coordinate midpoint for panel/box; joint midpoint for assembly\nEliminate equivalent redundant equality/inequality rows"];
     dwell [label="Stationary phases · full_static.py / generalized_conic.py\nCondense constant states from the same equations\nLoad-transfer QP / released-arm dynamics NLP\nFull native momentum/contact equations rechecked"];
     validation [label="Independent interval + reference checks\nfull_validation.py / full_execution.reference_geometry\nPinocchio / NumPy / native geometry · sampled clearance",fillcolor="#e7f5ed",color="#4e9470"];
-    rank [label="Complete-candidate ranking\nSum keyframe and interval objectives\nRetain numerical / structural / geometry rejections"];
+    rank [label="Complete-candidate ranking\nSum keyframe and interval objectives\nRetain numerical / structural / geometry rejections\nRecord conditional cost-bound pruning separately"];
     target -> polish -> kin -> cito -> validation -> rank;
     polish -> dwell -> validation;
   }

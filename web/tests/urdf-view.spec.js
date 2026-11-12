@@ -489,6 +489,23 @@ test('force peak event pauses with an explicitly visible force arrow',async({pag
  await expect(page.locator('#disturbance-state')).toHaveAttribute('data-active','false');
 });
 
+test('full assembly external push replays applied force and all controlled ablations',async({page})=>{
+ await page.goto('/?model=full_assembly_external_push');
+ await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+ const d=await page.evaluate(async()=>await(await fetch('/data/full_assembly_external_push.json')).json());
+ expect(d.report.execution_passed).toBe(true);expect(Object.keys(d.report.ablation_results)).toHaveLength(7);
+ expect(d.report.ablation_results.no_arm_force_feedforward.execution_passed).toBe(false);
+ expect(d.report.ablation_results.contact_disabled.execution_passed).toBe(false);
+ expect(d.report.ablation_results.fixed_path.execution_passed).toBe(true);
+ expect(d.report.ablation_results.fixed_path.selection.all_moving_object_intervals_cito_optimized).toBe(false);
+ expect(d.external_disturbances).toHaveLength(1);
+ const peak=d.events.find(e=>e.id==='외력 최대 · 화살표');
+ await page.getByRole('button',{name:`외력 최대 · 화살표 · ${peak.time.toFixed(1)} s`,exact:true}).click();
+ await expect(page.locator('#disturbance-state')).toHaveAttribute('data-active','true');
+ await expect(page.locator('#disturbance-state')).toContainText('5.00 N');
+ await expect(page.locator('#ablation-results')).toContainText('contact_disabled');
+});
+
 test('free-object form preserves edited dense groups while retiming',async({page})=>{
  await page.route('**/api/health',r=>r.fulfill({json:{ready:true,experiments_ready:true}}));let submitted;
  await page.route('**/api/experiments',async r=>{submitted=r.request().postDataJSON();await r.fulfill({status:202,json:{id:'dense'}});});

@@ -86,6 +86,9 @@ def support_patch_contains(problem,c,q,tolerance=2e-5):
 
 
 def validate_interval(problem,r,contacts,tolerance=2e-5):
+    from .trajectory import chart_active
+    chart_mode=r.configuration_update=='contact_coordinate_midpoint'
+    reconstruction=0.;minimum_chart_sigma=float('inf')
     sys=problem.system;obj=problem.task_definition.object;res=dict(momentum=0.,integration=0.,complementarity=0.,dissipation=0.,capability=0.,closure=0.,rotation_closure=0.,grasp_velocity=0.,point_alignment=0.,point_tangent_bounds=0.,limits=0.,endpoint_velocity=0.,quaternion_norm=0.);defect=dict(maximum_translation_component_m=0.,maximum_rotation_component_rad=0.,maximum_translation_norm_m=0.,maximum_rotation_norm_rad=0.,bounds=r.configuration_defect_bounds)
     for k,h in enumerate(r.dt):
         q,qn=r.q[k:k+2];v,vn=r.v[k:k+2];M=block_diag(*[robot.mass(q[s]) for robot,s in zip(problem.robots,sys.q_slices)],obj.mass(q[sys.object_q]));b=np.r_[*[robot.bias(q[qs],v[vs]) for robot,qs,vs in zip(problem.robots,sys.q_slices,sys.v_slices)],bias_object(problem,q[sys.object_q],v[sys.object_v])];impulse=np.zeros(sys.nv)
@@ -93,12 +96,17 @@ def validate_interval(problem,r,contacts,tolerance=2e-5):
             P=r.impulses[c.name][k];_,J,_,_=numeric_contact(problem,c,q);gap,Jn,closure,rotation=numeric_contact(problem,c,qn);relative=Jn@vn;impulse+=J.T@P
             if c.capability.kind=='P':
                 res['complementarity']=max(res['complementarity'],abs(P[2]*gap),-gap);res['dissipation']=max(res['dissipation'],abs(P[:2]@relative[:2]+c.capability.mu*P[2]*np.linalg.norm(relative[:2])));res['capability']=max(res['capability'],-P[2]/h,P[2]/h-c.capability.normal_max,(np.linalg.norm(P[:2])-c.capability.mu*P[2])/h)
+                if (c.nodes is not None and k not in c.nodes) or k in c.released_steps:res['capability']=max(res['capability'],np.max(abs(P))/h)
                 if c.robot_index is not None:
                     if k in c.maintained_steps or k in c.sticking_steps:
                         res['closure']=max(res['closure'],abs(gap))
                         if c.align_normal:
                             To=obj.fk(qn[sys.object_q],c.object_frame);Tee=problem.robots[c.robot_index].fk(qn[sys.q_slices[c.robot_index]],c.frame);Rw=To[:3,:3]@c.basis();res['point_alignment']=max(res['point_alignment'],np.max(abs(Rw[:,:2].T@Tee[:3,2])),Rw[:,2]@Tee[:3,2]+.5)
-                    if k in c.sticking_steps:res['grasp_velocity']=max(res['grasp_velocity'],np.max(abs(relative[:2])))
+                    if k in c.sticking_steps:
+                        res['grasp_velocity']=max(res['grasp_velocity'],np.max(abs(relative if chart_mode else relative[:2])))
+                        if chart_mode and c.name in r.contact_coordinate_charts:
+                            R=obj.fk(qn[sys.object_q],c.object_frame)[:3,:3]@c.basis();Jr=problem.robots[c.robot_index].jacobian(qn[sys.q_slices[c.robot_index]],c.frame,'world_aligned');Jo=obj.jacobian(qn[sys.object_q],c.object_frame,'world_aligned');omega=Jr[:3]@vn[sys.v_slices[c.robot_index]]-Jo[:3]@vn[sys.object_v]
+                            res['closure']=max(res['closure'],np.max(abs(closure)));res['grasp_velocity']=max(res['grasp_velocity'],np.max(abs(R[:,:2].T@omega)))
                     if c.tangent_bounds is not None and (c.nodes is None or k in c.nodes) and k not in c.released_steps:
                         tangent=(obj.fk(qn[sys.object_q],c.object_frame)[:3,:3]@c.basis()).T@closure;res['point_tangent_bounds']=max(res['point_tangent_bounds'],np.max(c.tangent_bounds[0]-tangent[:2]),np.max(tangent[:2]-c.tangent_bounds[1]))
                     if (c.nodes is not None and k not in c.nodes) or k in c.released_steps:res['capability']=max(res['capability'],np.max(abs(P))/h)
@@ -116,9 +124,21 @@ def validate_interval(problem,r,contacts,tolerance=2e-5):
                 res['closure']=max(res['closure'],np.max(abs(closure)));res['rotation_closure']=max(res['rotation_closure'],Rotation.from_matrix(rotation).magnitude());res['grasp_velocity']=max(res['grasp_velocity'],np.max(abs(relative)))
             else:res['capability']=max(res['capability'],np.max(abs(P))/h)
         res['momentum']=max(res['momentum'],np.max(abs(M@(vn-v)-h*(np.array(sys.B)@r.tau[k]-b)-impulse)))
-        vint=(v+vn)/2 if r.configuration_update in {'independent_midpoint','grasp_consistent_midpoint'} else vn;pred=[]
+        vint=(v+vn)/2 if r.configuration_update in {'independent_midpoint','grasp_consistent_midpoint','contact_coordinate_midpoint'} else vn;pred=[]
         for robot,qs,vs in zip(problem.robots,sys.q_slices,sys.v_slices):pred.extend(robot.integrate(q[qs],h*vint[vs]));res['limits']=max(res['limits'],np.max(robot.lower-qn[qs]),np.max(qn[qs]-robot.upper),np.max(abs(vn[vs])-robot.velocity))
         pred.extend(obj.integrate(q[sys.object_q],h*vint[sys.object_v]));pred=np.array(pred)
+        if chart_mode:
+            for c in contacts:
+                if c.name not in r.contact_coordinate_charts or not chart_active(c,k):continue
+                chart=r.contact_coordinate_charts[c.name];i=c.robot_index;indices=[sys.q_slices[i].start+j for j in chart['dependent']]
+                reconstruction=max(reconstruction,float(np.max(abs(qn[indices]-pred[indices]))));pred[indices]=qn[indices]
+                _,J,_,_=numeric_contact(problem,c,qn);A=J[:,sys.v_slices[i]]
+                if c.capability.kind=='P':
+                    R=obj.fk(qn[sys.object_q],c.object_frame)[:3,:3]@c.basis();Jr=problem.robots[i].jacobian(qn[sys.q_slices[i]],c.frame,'world_aligned');A=np.vstack([R[:,:2].T@Jr[:3],A]);scale=np.r_[np.full(2,.6),np.ones(3)]
+                elif c.capability.has_moment:scale=np.r_[np.full(3,.6),np.ones(3)]
+                else:A=A[3:];scale=np.ones(3)
+                minimum_chart_sigma=min(minimum_chart_sigma,float(np.linalg.svd((scale[:,None]*A)[:,chart['dependent']],compute_uv=False)[-1]))
+            res['contact_chart_singularity']=max(0.,1e-7-minimum_chart_sigma)
         if r.configuration_update=='grasp_consistent_midpoint':
             roots=obj.q_slices if isinstance(obj,RigidCollection) else {obj.tree.root:slice(0,7)}
             for name,sl in roots.items():
@@ -128,7 +148,13 @@ def validate_interval(problem,r,contacts,tolerance=2e-5):
         res['integration']=max(res['integration'],np.max(abs(qn-pred)));res['limits']=max(res['limits'],np.max(abs(r.tau[k])-sys.effort))
         for sl in getattr(obj,'quaternion_slices',(slice(3,7),)):res['quaternion_norm']=max(res['quaternion_norm'],abs(np.linalg.norm(qn[sys.object_q][sl])-1))
         if obj.n:res['limits']=max(res['limits'],np.max(obj.lower-qn[sys.object_q][7:]),np.max(qn[sys.object_q][7:]-obj.upper),np.max(abs(vn[sys.object_v][6:])-obj.velocity))
-    res['endpoint_velocity']=np.max(abs(r.v[[0,-1]]));res={k:float(max(0.,v)) for k,v in res.items()};return dict(passed=max(res.values())<=tolerance,residuals=res,configuration_update=r.configuration_update,configuration_defect=defect,independent='native Pinocchio mass/bias/J and NumPy transforms')
+    if problem.task_definition.id=='panel' and any(c.robot_index is None for c in contacts):
+        res['support_Hermite_control_gap']=0.
+        for k,h in enumerate(r.dt):
+            for c in contacts:
+                if c.robot_index is not None:continue
+                gap,J,_,_=numeric_contact(problem,c,r.q[k]);after,Jafter,_,_=numeric_contact(problem,c,r.q[k+1]);res['support_Hermite_control_gap']=max(res['support_Hermite_control_gap'],-gap-h*(J@r.v[k])[2]/3,-after+h*(Jafter@r.v[k+1])[2]/3)
+    res['endpoint_velocity']=np.max(abs(r.v[[0,-1]]));res={k:float(max(0.,v)) for k,v in res.items()};return dict(passed=max(res.values())<=tolerance and (not chart_mode or minimum_chart_sigma>=1e-7),residuals=res,configuration_update=r.configuration_update,configuration_defect=defect,contact_chart=dict(dependent_joint_midpoint_difference_rad=reconstruction,minimum_native_singular_value=minimum_chart_sigma if np.isfinite(minimum_chart_sigma) else None),independent='native Pinocchio mass/bias/J and NumPy transforms')
 
 
 class Geometry:

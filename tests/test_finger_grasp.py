@@ -22,6 +22,14 @@ def test_rounded_boundary_wrench_uses_existing_tolerance_without_accepting_overl
  assert not cap.check(np.array([0.,0.,0.,0.,0.,-48.-1e-3]),tolerance=1e-7)['feasible']
 
 
+def test_interior_seed_preserves_resultant_and_all_physical_finger_bounds():
+ cap=FingerGrasp(.04,.008,.012,.6,40.);w=np.array([0.,.1,.02,2.,1.,-10.]);check=cap.interior_witness(w);assert check['feasible'] and check['interior_margin']>1e-3
+ f=check['finger_forces'];B=np.hstack([np.asarray(x) for x in cap.maps()]);np.testing.assert_allclose(B@f.ravel(),w,atol=1e-8)
+ assert np.min(f[:,2])>1e-3 and np.min(.6*f[:,2]-np.linalg.norm(f[:,:2],axis=1))>1e-3
+ assert all(f[i:i+4,2].sum()<40 for i in [0,4])
+ assert not cap.interior_witness(np.array([0.,0.,0.,0.,0.,-100.]))['feasible']
+
+
 def test_external_force_bound_is_in_grasp_frame_and_scales_with_impulse():
  from scipy.spatial.transform import Rotation
  from contact_transfer.optimization import solve

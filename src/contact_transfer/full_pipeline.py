@@ -89,6 +89,9 @@ class FullPlanner:
             if not other.exists() or other.read_bytes()!=robot.path.read_bytes():raise RuntimeError('Archive mechanical URDF mismatch')
         with np.load(path,allow_pickle=False) as a:old_identity=json.loads(str(a['metadata_json']))['identity']
         key=load_key(path,old_identity);goal=self.task.keyframes[k]
+        if self.task.posture_reference_rule=='sequential_ik_branch':
+            reference=p.branch_reference(k)[:p.system.object_q.start]
+            if key.target_provenance.get('posture_reference_rule')!='sequential_ik_branch' or key.posture_reference is None or np.max(abs(key.posture_reference-reference))>2e-5 or np.max(abs(key.q[:p.system.object_q.start]-reference))>self.task.posture_trust_radius_rad+2e-5:return None
         if goal.get('retreat_m',.06 if goal['phase'] in {'released','release_leg'} else 0.)!=getattr(key,'retreat_m',.06 if key.phase in {'released','release_leg'} else 0.):return None
         if key.phase!=goal['phase'] or np.max(abs(key.q[p.system.object_q]-goal['object_q']))>2e-5 or key.source.get('source_refinement_enabled')!=self.refine_source:return None
         if set(key.environment_reactions)!=set(c.name for c in environment):raise RuntimeError('Archive support-candidate mismatch')
@@ -101,7 +104,7 @@ class FullPlanner:
             delta=key.positions[i]-prior['positions'][i];normal=1-key.rotations[i,:,2]@prior['normals'][i]
             if np.linalg.norm(delta)>.015+1e-8 or normal>.1+1e-8:raise RuntimeError('Archive leaves current transferred-prior trust region')
             if previous is not None and np.max(abs(key.positions[i]-previous.positions[i]))>2e-5:raise RuntimeError('Archive changes held material contact')
-            span=np.maximum(r.upper-r.lower,1e-3);objective+=np.sum(delta**2)/.6**2+normal+.01*np.sum(((key.q[qs]-spec['q_initial'])/span)**2)
+            reference=p.branch_reference(k)[qs] if self.task.posture_reference_rule=='sequential_ik_branch' else spec['q_initial'];span=np.maximum(r.upper-r.lower,1e-3);objective+=np.sum(delta**2)/.6**2+normal+.01*np.sum(((key.q[qs]-reference)/span)**2)
         key.objective=float(objective);key.source=prior['record'];key.archive_provenance=dict(path=str(path),sha256=hashlib.sha256(path.read_bytes()).hexdigest(),original_formulation_identity=old_identity,mechanical_URDFs_byte_identical=True,source_and_trust_region_rechecked=True);write_json(p.directory/f'key{k}-archive.json',key.archive_provenance);return key
     def transition(self,k,left,right,types,assignments):
         assignment=assignments[k]
@@ -124,6 +127,9 @@ class FullPlanner:
         contacts=interval_contacts(p,k,left,len(r.dt))
         independent=validate_interval(p,r,contacts)
         if not independent['passed']:raise RuntimeError('Cached/fresh CITO failed native independent checks')
+        # Retain a successful mechanical solve even if dense geometry rejects
+        # it. This archive is explicitly uncertified and never a cache hit.
+        save_interval(p.directory/f'interval{k}-mechanics-only.npz',r,identity)
         local=FullEpisode(p,(left,right),(r,),(contacts,));geometry=reference_geometry(local,self.scenes[(tuple(types),tuple(assignment))]);write_json(p.directory/f'interval{k}-validation.json',dict(independent=independent,reference_geometry=geometry))
         if not geometry['passed']:raise RuntimeError(f'Interval {k} reference geometry rejected; see {p.directory}')
         r.full_geometry_checked=True
@@ -148,16 +154,18 @@ class FullPlanner:
             if previous_coordinates!=dict(coordinates=c.force_coordinates or r.contact_force_coordinates,tangent_ratio_regularization=c.tangent_ratio_regularization):return None
         same_friction_model=r.friction_speed_model=='huber_norm' and r.friction_speed_smoothing==1e-6
         sticking_only=all(c.robot_index is not None and (c.capability.kind!='P' or len(c.sticking_steps)==len(r.dt)) for c in contacts)
-        if r.configuration_update!='independent_midpoint' or not r.full_geometry_checked or not (same_friction_model or sticking_only):return None
+        moving_object=np.max(abs(left.q[p.system.object_q]-right.q[p.system.object_q]))>1e-8
+        expected_update='contact_coordinate_midpoint' if self.task.id in {'panel','box'} and moving_object else 'independent_midpoint'
+        if r.configuration_update!=expected_update or not r.full_geometry_checked or not (same_friction_model or sticking_only):return None
         for robot in p.full_robots:
             other=folder/robot.path.name
             if not other.exists() or other.read_bytes()!=robot.path.read_bytes():raise RuntimeError('Interval archive mechanical URDF mismatch')
         if r.q.shape[1]!=p.system.nq or np.max(abs(r.q[[0,-1]]-np.array([left.q,right.q])))>2e-5:return None
         check=validate_interval(p,r,contacts)
-        if not check['passed']:raise RuntimeError('Interval archive rejected by current independent mechanics')
+        if not check['passed']:return None
         write_json(p.directory/f'interval{k}-archive.json',dict(path=str(path),sha256=hashlib.sha256(path.read_bytes()).hexdigest(),original_formulation_identity=old_identity,sliding_norm_branch_absent=sticking_only,identical_friction_regularization=same_friction_model,mechanical_URDFs_byte_identical=True,current_independent=check));return r
     def search(self,*,fixed=False):
-        start=perf_counter();given=tuple('GPP' if self.task.id=='panel' else 'GPG');allowed=[(kind,) for kind in given] if fixed else [tuple(sorted(f.allowed_types,reverse=True)) for f in self.task.features];assignments=[(0,1,2)] if fixed else list(permutations(range(len(self.task.arms))));sequences=[tuple(a for _ in self.task.keyframes) for a in assignments]
+        start=perf_counter();given=tuple('GPP' if self.task.id=='panel' else 'GPG');allowed=[(kind,) for kind in given] if fixed else [tuple(sorted(f.allowed_types)) for f in self.task.features];assignments=[(0,1,2)] if fixed else list(permutations(range(len(self.task.arms))));sequences=[tuple(a for _ in self.task.keyframes) for a in assignments]
         def key(k,types,assignment,previous):
             try:return self.keyframe(k,types,assignment,previous)
             except (RuntimeError,ValueError) as error:
@@ -166,17 +174,30 @@ class FullPlanner:
             try:return self.transition(k,left,right,types,assignments)
             except (RuntimeError,ValueError) as error:
                 self.ledger.append(dict(types=types,assignment=assignments[0],interval=k,accepted=False,reason=str(error)));write_json(self.directory/'candidate-ledger.json',self.ledger);raise RuntimeError(str(error)) from error
-        try:result=choose_sequence(allowed,sequences,key,transition)
+        try:result=choose_sequence(allowed,sequences,key,transition,transition_cost_lower_bound=0.)
         finally:write_json(self.directory/'stage-timings.json',self.timings)
-        p=self.problem(result.best.types,result.best.assignments[0]);contacts=tuple(interval_contacts(p,k,left,len(r.dt)) for k,(left,r) in enumerate(zip(result.best.keyframes,result.best.transitions)));episode=FullEpisode(p,result.best.keyframes,result.best.transitions,contacts);report=dict(selection_executed=not fixed,selection_method='exhaustive configured hardware-compatible P/G and fixed-through-sequence injective assignment candidates',candidate_count=int(np.prod([len(a) for a in allowed]))*len(sequences),accepted_candidates=[dict(types=c.types,assignment=c.assignments[0],objective=c.objective) for c in result.candidates],rejections=result.failures,selected_types=result.best.types,selected_assignment=result.best.assignments[0],objective=result.best.objective,objective_definition='sum keyframe geometry/posture minus robustness plus sum interval motion costs; no type penalty',planning_wall_time_s=perf_counter()-start,source_refinement_enabled=self.refine_source,source_certificates=[k.source for k in result.best.keyframes],target_keyframe_margins=[key.rho for key in episode.keyframes],target_methods=[getattr(key,'target_provenance',{}) for key in episode.keyframes],actual_interval_nodes=[len(r.dt) for r in episode.trajectories],solver_configuration={k:v for k,v in vars(self.settings).items() if k not in {'diagnostics_path','verbose'}},stage_cache_counts=dict(cached=sum(bool(t['cache_hit']) for t in self.timings),fresh=sum(not t['cache_hit'] for t in self.timings)),all_keyframes_optimized=True,all_intervals_cito_optimized=all(r.objective_mode=='motion_cost' for r in episode.trajectories),all_moving_object_intervals_cito_optimized=True,interval_methods=[r.objective_mode for r in episode.trajectories],keyframes=len(episode.keyframes),intervals=len(episode.trajectories),restricted_contact_candidates=True,sampled_geometry=True,continuous_certificate=False,configuration_update=[r.configuration_update for r in episode.trajectories],manuscript_literal_equations_passed=False,extension='free articulated object' if self.task.id=='box' else 'two independent floating bodies and equal/opposite inter-object contacts' if self.task.id=='assembly' else None,full_paper_pipeline_executed=False);write_json(self.directory/'selection.json',report);return episode,report
+        p=self.problem(result.best.types,result.best.assignments[0]);contacts=tuple(interval_contacts(p,k,left,len(r.dt)) for k,(left,r) in enumerate(zip(result.best.keyframes,result.best.transitions)));episode=FullEpisode(p,result.best.keyframes,result.best.transitions,contacts);report=dict(selection_executed=not fixed,selection_method='exhaustive configured hardware-compatible P/G and fixed-through-sequence injective assignment candidates',candidate_count=int(np.prod([len(a) for a in allowed]))*len(sequences),accepted_candidates=[dict(types=c.types,assignment=c.assignments[0],objective=c.objective) for c in result.candidates],rejections=result.failures,pruned_candidates=result.pruned,transition_cost_bound_scope='Nonnegative interval objective conditional on each realized keyframe sequence; not a global IK bound',selected_types=result.best.types,selected_assignment=result.best.assignments[0],objective=result.best.objective,objective_definition='sum keyframe geometry/posture minus robustness plus sum interval motion costs; no type penalty',planning_wall_time_s=perf_counter()-start,source_refinement_enabled=self.refine_source,source_certificates=[k.source for k in result.best.keyframes],target_keyframe_margins=[key.rho for key in episode.keyframes],target_methods=[getattr(key,'target_provenance',{}) for key in episode.keyframes],actual_interval_nodes=[len(r.dt) for r in episode.trajectories],solver_configuration={k:v for k,v in vars(self.settings).items() if k not in {'diagnostics_path','verbose'}},stage_cache_counts=dict(cached=sum(bool(t['cache_hit']) for t in self.timings),fresh=sum(not t['cache_hit'] for t in self.timings)),all_keyframes_optimized=True,all_intervals_cito_optimized=all(r.objective_mode=='motion_cost' for r in episode.trajectories),all_moving_object_intervals_cito_optimized=True,interval_methods=[r.objective_mode for r in episode.trajectories],keyframes=len(episode.keyframes),intervals=len(episode.trajectories),restricted_contact_candidates=True,sampled_geometry=True,continuous_certificate=False,configuration_update=[r.configuration_update for r in episode.trajectories],manuscript_literal_equations_passed=False,extension='free articulated object' if self.task.id=='box' else 'two independent floating bodies and equal/opposite inter-object contacts' if self.task.id=='assembly' else None,full_paper_pipeline_executed=False);write_json(self.directory/'selection.json',report);return episode,report
 
 
-def run_task(task_id,directory,*,variants=ABLATIONS,steps=16,max_steps=64,settings=None,progress=print,web_directory=None,keyframe_archive=None,interval_archive=None):
-    out=Path(directory);task=FullTask.load(task_id,out/'task');results={};full_episode=None;full_selection=None;recordings=[]
+def run_task(task_id,directory,*,variants=ABLATIONS,steps=16,max_steps=64,settings=None,progress=print,web_directory=None,keyframe_archive=None,interval_archive=None,accepted_full=None):
+    out=Path(directory);task=FullTask.load(task_id,out/'task');results={};full_episode,full_selection=(None,None) if accepted_full is None else accepted_full;recordings=[]
+    if accepted_full is not None and (out/'ablation-results.json').exists():results=__import__('json').loads((out/'ablation-results.json').read_text())['variants']
     for variant in variants:
         folder=out/variant;folder.mkdir(parents=True,exist_ok=True);start=perf_counter()
         try:
             if variant in {'full','no_source_refinement','fixed_contact_types'}:
+                reused=False;selection=None
+                if full_episode is not None and variant=='no_source_refinement':
+                    from copy import copy,deepcopy
+                    comparison=[];other=copy(full_episode.problem);other.refine_enabled=False;new_sources=[];identical=True
+                    for goal in task.keyframes:
+                        refined=full_episode.problem.source(goal);unrefined=other.source(goal);delta=max(float(np.max(abs(refined['positions']-unrefined['positions']))),float(np.max(abs(refined['normals']-unrefined['normals']))));comparison.append(dict(keyframe=goal['id'],maximum_prior_difference=delta,full=refined['record'],without_refinement=unrefined['record']));new_sources.append(unrefined['record']);identical=identical and delta<=1e-12
+                    write_json(folder/'source-equivalence.json',dict(identical=identical,keyframes=comparison))
+                    if identical:
+                        episode=FullEpisode(other,full_episode.keyframes,full_episode.trajectories,full_episode.contacts_by_interval);selection=deepcopy(full_selection);selection.update(source_refinement_enabled=False,source_certificates=new_sources,continuous_plan_reused=True,reuse_reason='Identical transferred geometric priors at every keyframe; source forces are never transferred',new_target_solver_executed=False,solver_timing_comparison_valid=False);reused=True
+                if full_episode is not None and variant=='fixed_contact_types' and tuple(full_episode.problem.types)==tuple('GPP' if task_id=='panel' else 'GPG') and tuple(full_episode.problem.assignment)==(0,1,2):
+                    from copy import deepcopy
+                    episode=full_episode;selection=deepcopy(full_selection);selection.update(selection_executed=False,candidate_count=1,accepted_candidates=[dict(types=episode.problem.types,assignment=(0,1,2),objective=selection['objective'])],continuous_plan_reused=True,reuse_reason='The supplied fixed candidate is the same continuous problem as the selected full candidate',new_target_solver_executed=False,solver_timing_comparison_valid=False);reused=True
                 if variant=='fixed_contact_types':
                     # Fixing the discrete candidate set does not change an
                     # individual candidate's continuous problem. Reuse only
@@ -186,16 +207,20 @@ def run_task(task_id,directory,*,variants=ABLATIONS,steps=16,max_steps=64,settin
                     for cached in (out/'full/planning').glob('*/*.npz'):
                         if re.fullmatch(r'(key|interval)\d+\.npz',cached.name):
                             target=folder/'planning'/cached.parent.name/cached.name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(cached,target)
-                archive=None if keyframe_archive is None else Path(keyframe_archive)/task_id/variant/'planning';previous_intervals=None if interval_archive is None else Path(interval_archive)/task_id/variant/'planning';planner=FullPlanner(task,folder/'planning',steps=steps,max_steps=max_steps,settings=settings,refine_source=variant!='no_source_refinement',progress=progress,keyframe_archive=archive,interval_archive=previous_intervals);episode,selection=planner.search(fixed=variant=='fixed_contact_types')
+                if not reused:
+                    archive=None if keyframe_archive is None else Path(keyframe_archive)/task_id/variant/'planning';previous_intervals=None if interval_archive is None else Path(interval_archive)/task_id/variant/'planning';planner=FullPlanner(task,folder/'planning',steps=steps,max_steps=max_steps,settings=settings,refine_source=variant!='no_source_refinement',progress=progress,keyframe_archive=archive,interval_archive=previous_intervals);episode,selection=planner.search(fixed=variant=='fixed_contact_types')
+                if reused:write_json(folder/'plan-origin.json',dict(planning_directory=str(full_episode.problem.directory),independent_native_validation_required=True,reason=selection['reuse_reason']))
                 if variant=='full':full_episode,full_selection=episode,selection
             else:
                 if full_episode is None:raise RuntimeError('This controlled ablation requires an accepted complete full-method plan')
                 episode=full_episode;selection=full_selection
                 if variant=='fixed_path':
+                    from copy import deepcopy
                     rs=[];cs=[]
                     for k,(left,right) in enumerate(zip(episode.keyframes[:-1],episode.keyframes[1:])):
-                        contacts=interval_contacts(episode.problem,k,left,steps);r=initial_interval(episode.problem,k,left,right,steps,task.keyframes[k+1]['time']-task.keyframes[k]['time'],contacts);r.objective_mode='fixed_path_force_allocation';rs.append(r);cs.append(contacts)
+                        nodes=len(episode.trajectories[k].dt);contacts=interval_contacts(episode.problem,k,left,nodes);r=initial_interval(episode.problem,k,left,right,nodes,float(episode.trajectories[k].dt.sum()),contacts);r.objective_mode='fixed_path_force_allocation';rs.append(r);cs.append(contacts)
                     episode=FullEpisode(episode.problem,episode.keyframes,rs,cs)
+                    selection=deepcopy(full_selection);selection.update(interval_methods=[r.objective_mode for r in rs],all_intervals_cito_optimized=False,all_moving_object_intervals_cito_optimized=False,fixed_path_same_phase_durations=True,sequence_objective_comparable=False,objective=None)
                 elif variant=='no_arm_force_feedforward':episode=FullEpisode(episode.problem,episode.keyframes,episode.trajectories,episode.contacts_by_interval,force_feedforward=False)
             disturbances=()
             if variant=='external_push':
@@ -203,8 +228,22 @@ def run_task(task_id,directory,*,variants=ABLATIONS,steps=16,max_steps=64,settin
                 roots=build_scene(episode.problem,folder/'force-target-scene.xml').object_roots;disturbances=(WrenchPulse(next(iter(roots.values())),episode.preparation+episode.time[-1]*.45,1.,(5.,0.,0.)),)
             trace,controller,scene,geometry=run_full_episode(episode,folder/'native',contacts_enabled=variant!='contact_disabled',allow_reduced_baseline=variant=='fixed_path',disturbances=disturbances,progress=lambda t,total:progress(f'{task_id}/{variant}: native {t:.0f}/{total:.1f}s',flush=True) if int(t)%5==0 else None);report=assess(episode,trace,controller,scene,geometry=geometry);report.update(variant=variant,selection=selection,full_variant_pipeline_executed=variant=='full',all_intervals_cito_optimized=variant!='fixed_path' and all(r.objective_mode=='motion_cost' for r in episode.trajectories),interval_methods=[r.objective_mode for r in episode.trajectories],fixed_path_integration_residuals=[validate_interval(episode.problem,r,c) for r,c in zip(episode.trajectories,episode.contacts_by_interval)] if variant=='fixed_path' else None);recordings.append((episode,trace,report,scene,variant))
         except (RuntimeError,ValueError) as error:report=dict(variant=variant,execution_passed=False,full_variant_pipeline_executed=False,failure=str(error))
-        report['trial_wall_time_s']=perf_counter()-start;write_json(folder/'result.json',report);results[variant]=report;write_json(out/'ablation-results.json',dict(task=task_id,variants=results,nominal_trials_per_variant=1,statistical_success_rate_claimed=False))
+        report['trial_wall_time_s']=perf_counter()-start;report['new_physical_trial_executed']='engine' in report;write_json(folder/'result.json',report)
+        # Independent controlled trials may run in separate Python workers.
+        # Merge only this worker's result under a task-local lock.
+        import fcntl,json
+        with (out/'.ablation-results.lock').open('w') as lock:
+            fcntl.flock(lock,fcntl.LOCK_EX)
+            if accepted_full is not None and (out/'ablation-results.json').exists():results=json.loads((out/'ablation-results.json').read_text())['variants']
+            results[variant]=report;write_json(out/'ablation-results.json',dict(task=task_id,variants=results,nominal_trials_per_variant=1,statistical_success_rate_claimed=False))
+        if web_directory is not None and recordings and recordings[-1][-1]==variant:
+            from .full_view import export_full
+            e,t,r,s,v=recordings[-1];export_full(e,t,r,s,web_directory,variant=v,ablation_results=results)
+            import json
+            for path in Path(web_directory).joinpath('data').glob('full_'+task_id+'*.json'):
+                existing=json.loads(path.read_text());existing['report']['ablation_results']=results;write_json(path,existing,compact=True)
     if web_directory is not None:
         from .full_view import export_full
+        if accepted_full is not None and (out/'ablation-results.json').exists():results=json.loads((out/'ablation-results.json').read_text())['variants']
         for episode,trace,report,scene,variant in recordings:export_full(episode,trace,report,scene,web_directory,variant=variant,ablation_results=results)
     return results

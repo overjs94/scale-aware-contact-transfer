@@ -40,11 +40,13 @@ def relative_interface(system,q,spec,point,rotation):
  i=spec.robot_index;r=system.robots[i];T=r.fk(q[system.q_slices[i]],spec.robot_frame);To=system.object_pose(q,spec.object_frame);p=To[:3,3]+To[:3,:3]@point;Rw=To[:3,:3]@rotation;Jr=r.jacobian(q[system.q_slices[i]],spec.robot_frame,'world_aligned');Jp=-system.point_jacobian_object(q,point,spec.object_frame);Jw=-system.angular_jacobian_object(q,spec.object_frame);Jp[:,system.v_slices[i]]+=Jr[3:,:];Jw[:,system.v_slices[i]]+=Jr[:3,:];return T,p,Rw,ca.vertcat(Rw.T@Jw,Rw.T@Jp)
 
 
-def realize_system_keyframe(system,q_initial,object_configuration,interfaces,task,*,environment=(),q_reference=None,rho_min=0.,position_radius=.02,normal_radius=.1,characteristic_length=1.,normal_weight=1.,posture_weight=.01,robustness_weight=1.,geometry_constraints=None,base_constraints=None,settings=None):
+def realize_system_keyframe(system,q_initial,object_configuration,interfaces,task,*,environment=(),q_reference=None,robot_configuration_bounds=None,rho_min=0.,position_radius=.02,normal_radius=.1,characteristic_length=1.,normal_weight=1.,posture_weight=.01,robustness_weight=1.,geometry_constraints=None,base_constraints=None,settings=None):
  if not (interfaces or environment) or characteristic_length<=0:raise ValueError('Object/robot or environmental contacts and positive object length required')
  q_initial=np.asarray(q_initial,float).reshape(system.nq);q_reference=q_initial.copy() if q_reference is None else np.asarray(q_reference,float).reshape(system.nq);qo=np.asarray(object_configuration,float).reshape(system.object_q.stop-system.object_q.start);opti=ca.Opti();qr=opti.variable(system.object_q.start);Q=ca.vertcat(qr,ca.DM(qo));opti.set_initial(qr,q_initial[:system.object_q.start]);objective=0.
  for r,qs in zip(system.robots,system.q_slices):
-  off=7 if r.floating_base else 0;qb=qr[qs.start+off:qs.stop];opti.subject_to(opti.bounded(r.lower,qb,r.upper));span=np.where(np.isfinite(r.upper-r.lower),r.upper-r.lower,2*np.pi);objective+=posture_weight*ca.sumsqr((qb-q_reference[qs.start+off:qs.stop])/np.maximum(span,1e-3))
+  off=7 if r.floating_base else 0;sl=slice(qs.start+off,qs.stop);qb=qr[sl];lower=r.lower if robot_configuration_bounds is None else np.maximum(r.lower,robot_configuration_bounds[0][sl]);upper=r.upper if robot_configuration_bounds is None else np.minimum(r.upper,robot_configuration_bounds[1][sl])
+  if np.any(lower>=upper):raise ValueError('Empty robot posture branch bounds')
+  opti.subject_to(opti.bounded(lower,qb,upper));span=np.where(np.isfinite(r.upper-r.lower),r.upper-r.lower,2*np.pi);objective+=posture_weight*ca.sumsqr((qb-q_reference[sl])/np.maximum(span,1e-3))
   if r.floating_base:
    equality(opti,ca.sumsqr(qr[qs.start+3:qs.start+7])-1)
    if base_constraints is None:raise ValueError('Floating robot keyframes require explicit support/workspace constraints')

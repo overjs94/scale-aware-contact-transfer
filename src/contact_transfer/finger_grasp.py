@@ -55,13 +55,22 @@ class FingerGrasp:
   return a
  def reaction(self,opti,scale=1.,initial=None,aperture=None):
   return self.reaction_with_witness(opti,scale,initial,aperture,force_coordinates=self.preferred_force_coordinates)[0]
- def reaction_with_witness(self,opti,scale=1.,initial=None,aperture=None,force_coordinates='cartesian'):
-  forces=[];warm=None
+ def interior_witness(self,wrench):
+  """Exact-wrench analytic-center seed; the physical capability is unchanged."""
+  import clarabel
+  import scipy.sparse as sp
+  B,L,b,C=self.conic_matrices();n=25;eq=np.c_[B,np.zeros(6)];linear=np.c_[L,np.ones(len(b))];bounds=np.zeros((2,n));bounds[0,-1]=-1.;bounds[1,-1]=1.;cones=[]
+  for c in C:
+   block=np.c_[-c,np.array([1.,0.,0.])];cones.append(block)
+  A=sp.csc_matrix(np.vstack([eq,linear,bounds,*cones]));rhs=np.r_[wrench,b,0.,1.,np.zeros(24)];objective=np.r_[np.zeros(24),-1.];settings=clarabel.DefaultSettings();settings.verbose=False;settings.tol_feas=1e-10;settings.tol_gap_abs=1e-10;settings.tol_gap_rel=1e-10;solver=clarabel.DefaultSolver(sp.diags(np.r_[np.full(24,1e-8),0.],format='csc'),objective,A,rhs,[clarabel.ZeroConeT(6),clarabel.NonnegativeConeT(len(b)+2),*[clarabel.SecondOrderConeT(3) for _ in C]],settings);s=solver.solve();x=np.asarray(s.x);u=x[:24];res=max(float(np.max(abs(B@u-wrench))),float(np.max(L@u-b)),max(float(np.linalg.norm((c@u)[1:])-(c@u)[0]) for c in C));return dict(feasible=str(s.status) in {'Solved','AlmostSolved'} and res<1e-7,primal_residual=res,finger_forces=u.reshape(8,3),status=str(s.status),interior_margin=float(x[-1]))
+ def reaction_with_witness(self,opti,scale=1.,initial=None,aperture=None,force_coordinates='cartesian',return_auxiliary=False):
+  forces=[];ratios=[];warm=None
   try:initial_scale=float(scale)
   except (TypeError,RuntimeError):initial_scale=float(opti.debug.value(scale,opti.initial()))
   if initial is not None and np.size(initial)==24:warm=np.asarray(initial,float).reshape(8,3)
   elif initial is not None and np.size(initial)==6:
-   check=self.check(np.asarray(initial,float)/initial_scale)
+   check=self.interior_witness(np.asarray(initial,float)/initial_scale)
+   if not check['feasible']:check=self.check(np.asarray(initial,float)/initial_scale)
    if check['feasible']:
     warm=self.balanced_preload(initial_scale*check['finger_forces'],scale=initial_scale)
   if force_coordinates not in {'cartesian','scaled_tangent'}:raise ValueError('Unknown finger-force coordinates')
@@ -69,6 +78,7 @@ class FingerGrasp:
    seed=warm[index] if warm is not None else np.array([0.,0.,initial_scale*self.closing_force_per_finger/8])
    if force_coordinates=='scaled_tangent':
     normal=opti.variable();ratio=opti.variable(2);opti.subject_to(normal>=0);opti.subject_to(ca.sumsqr(ratio)<=1);f=ca.vertcat(self.mu*normal*ratio,normal);opti.set_initial(normal,seed[2]);opti.set_initial(ratio,seed[:2]/(self.mu*seed[2]) if seed[2]>1e-12 else np.zeros(2))
+    ratios.append(ratio)
    else:
     f=opti.variable(3);opti.subject_to(f[2]>=0);opti.subject_to(ca.sumsqr(f[:2])<=(self.mu*f[2])**2);opti.set_initial(f,seed)
    forces.append(f)
@@ -78,7 +88,8 @@ class FingerGrasp:
    force=ca.DM(np.asarray(self.interface_from_grasp)[:3,:3]).T@wrench[3:];limit=scale*ca.DM(self.force_component_limits);opti.subject_to(opti.bounded(-limit,force,limit))
   if self.finger_linear_limits is not None:
    A,b=self.finger_linear_limits;opti.subject_to(ca.DM(A)@ca.vertcat(*forces)<=scale*ca.DM(b))
-  return wrench,ca.vertcat(*forces)
+  result=(wrench,ca.vertcat(*forces))
+  return (*result,ca.vertcat(*ratios) if ratios else ca.DM.zeros(0)) if return_auxiliary else result
  def conic_matrices(self,aperture=None):
   """Aeq*u=w, Alinear*u<=blinear, and eight SOC blocks C*u∈Q3."""
   B=np.hstack([np.asarray(ca.DM(x)) for x in self.maps(aperture)]);A=[];b=[]

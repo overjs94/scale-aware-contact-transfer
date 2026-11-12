@@ -16,6 +16,14 @@ def measured_contact_flags(episode,trace,scene,threshold=1e-3):
     return flags
 
 
+def planned_normal_reactions(episode,group_id,times):
+    """Stored plan loads, independent of disabled feedforward or observations."""
+    values=[]
+    for t in times:
+        i,k,_=episode.phase(t);r=episode.trajectories[i];values.append(r.impulses[group_id][k,2]/r.dt[k])
+    return np.asarray(values)
+
+
 def final_support_force(trace,object_geometries,counterpart,window=.25):
     """Mean world force on the named object from specified native counterparts."""
     h=trace.metadata['timestep'];steps=np.rint(trace.contact_time/h).astype(int);selected=trace.contact_time>=trace.time[-1]-window;total=np.zeros((len(trace.time),3))
@@ -50,11 +58,19 @@ def assess(episode,trace,controller,scene,*,geometry):
     frames=list(obj.names) if isinstance(obj,RigidCollection) else ['base','moving'] if task.id=='box' else [obj.tree.root]
     for frame in frames:
         target=np.array([np.r_[T[:3,3],Rotation.from_matrix(T[:3,:3]).as_quat()] for T in [obj.fk(q,frame) for q in desired]]);actual=trace.object_pose[:,frame_index(episode,trace,scene,frame)];pe=np.linalg.norm(actual[:,:3]-target[:,:3],axis=1);re=(Rotation.from_quat(target[:,3:]).inv()*Rotation.from_quat(actual[:,3:])).magnitude();errors[frame]=dict(maximum_position_error_m=float(pe[active].max()),final_position_error_m=float(pe[-1]),maximum_rotation_error_rad=float(re[active].max()),final_rotation_error_rad=float(re[-1]))
-    effort=np.concatenate([r.effort for r in controller.robots]);actuated=effort>0;margin=float(np.min(effort[actuated]-abs(trace.torque[:,actuated])));contact_fractions={};jaws={};dt=trace.metadata['timestep']
+    effort=np.concatenate([r.effort for r in controller.robots]);actuated=effort>0;margin=float(np.min(effort[actuated]-abs(trace.torque[:,actuated])));contact_fractions={};geometric_fractions={};required_samples={};jaws={};dt=trace.metadata['timestep']
     for arm,(f,spec,cap) in enumerate(zip(task.features,p.specs,p.capabilities)):
         needed=np.array([t>=episode.preparation+.1 and episode.attached(arm,t) and phase_mode(episode.keyframes[episode.phase(t)[0]].phase,f)=='holding' for t in trace.time[:-1]]);present=np.zeros(len(trace.time),bool);pair=trace.contact_pair;selected=(np.linalg.norm(trace.contact_wrench[:,3:],axis=1)>1e-3)&np.any(np.char.startswith(pair,spec['id']+'_'),axis=1)&np.any(np.isin(pair,scene.allowed_by_group[f.id]),axis=1);steps=np.rint(trace.contact_time[selected]/dt).astype(int);present[np.clip(steps,0,len(present)-1)]=True;contact_fractions[f.id]=float(present[:-1][needed].mean()) if needed.any() else None
+        geometric_fractions[f.id]=contact_fractions[f.id]
+        if cap.kind=='P':
+            # A zero-normal-force handoff is not a loaded support contact.
+            # Use the stored optimized plan, even in the no-feedforward
+            # ablation; never infer the requirement from measured forces.
+            needed=needed&(planned_normal_reactions(episode,f.id,trace.time[:-1])>.1)
+            contact_fractions[f.id]=float(present[:-1][needed].mean()) if needed.any() else None
+        required_samples[f.id]=int(needed.sum())
         if cap.kind=='G':
-            samples=np.array([entry['jaw_force'][arm] for entry in controller.logs]);values=samples[:len(needed)][needed];jaws[f.id]=dict(maximum_per_jaw_N=values.max(axis=0).tolist(),minimum_per_jaw_N=values.min(axis=0).tolist(),positive_reaction_fraction=(values>1e-3).mean(axis=0).tolist(),limit_N=cap.closing_force_per_finger,limit_margin_N=float(cap.closing_force_per_finger-values.max()),passed=bool(values.max()<=cap.closing_force_per_finger+1e-6 and min((values>1e-3).mean(axis=0))>=.99))
+            samples=np.array([entry['jaw_force'][arm] for entry in controller.logs]);values=samples[:len(needed)][needed];jaws[f.id]=dict(maximum_per_jaw_N=values.max(axis=0).tolist(),all_time_maximum_per_jaw_N=samples.max(axis=0).tolist(),force_limit_window='entire recorded execution including preparation and release',minimum_per_jaw_N=values.min(axis=0).tolist(),positive_reaction_fraction=(values>1e-3).mean(axis=0).tolist(),limit_N=cap.closing_force_per_finger,limit_margin_N=float(cap.closing_force_per_finger-samples.max()),passed=bool(samples.max()<=cap.closing_force_per_finger+1e-6 and min((values>1e-3).mean(axis=0))>=.99))
     measured=measured_contact_flags(episode,trace,scene);final_window=trace.time>=trace.time[-1]-.25;task_metrics={};task_pass=True
     if task.id=='box':
         theta=np.array(trace.metadata['articulated_state']['q'])[:,0];target=float(task.keyframes[-1]['object_q'][-1]);task_metrics=dict(final_hinge_angle_rad=float(theta[-1]),target_hinge_angle_rad=target,hinge_error_rad=float(abs(theta[-1]-target)),floating_box=True,passive_hinge=True);task_pass=abs(theta[-1]-target)<=.06
@@ -68,4 +84,4 @@ def assess(episode,trace,controller,scene,*,geometry):
         if not oracle.intended(pair) and np.linalg.norm(wrench[3:])>.1:
             name=' / '.join(pair);unexpected[name]=max(unexpected.get(name,0.),float(max(0.,-gap)))
     capability=capability_samples(episode,trace,scene);tracking=all(e['maximum_position_error_m']<=.008 and e['maximum_rotation_error_rad']<=.06 for e in errors.values());retention=all(v is None or v>=.99 for v in contact_fractions.values());passed=tracking and retention and margin>=-1e-8 and all(v['passed'] for v in jaws.values()) and capability['passed'] and task_pass and geometry['passed'] and not unexpected
-    return dict(execution_passed=bool(passed),engine=trace.metadata['engine'],duration_s=float(trace.time[-1]),object_tracking=errors,task_metrics=task_metrics,task_passed=bool(task_pass),tracking_passed=tracking,maintained_contact_fraction=contact_fractions,contact_retention_passed=retention,jaw_force=jaws,minimum_actuator_margin_Nm=margin,sampled_interface_wrench_capability=capability,unexpected_loaded_contact_penetrations_m=unexpected,reference_geometry=geometry,object_pose_prescribed=False,object_equality_constraints_used=0,internal_gripper_equalities=trace.metadata['internal_gripper_equalities'],controller=episode.control_mode,arm_measured_force_feedback=episode.control_mode=='hybrid_feedback',arm_force_selection=[0.]*6 if episode.control_mode=='impedance_feedforward' else [0.,0.,0.,0.,0.,1.],joint_nullspace_impedance=dict(stiffness=40.,damping=8.),arm_reaction_feedforward=episode.force_feedforward,measured_jaw_force_feedback=True,contacts_enabled=trace.metadata['contacts_enabled'],full_paper_pipeline_executed=False)
+    return dict(execution_passed=bool(passed),engine=trace.metadata['engine'],duration_s=float(trace.time[-1]),object_tracking=errors,task_metrics=task_metrics,task_passed=bool(task_pass),tracking_passed=tracking,maintained_contact_fraction=contact_fractions,geometric_holding_contact_fraction=geometric_fractions,required_loaded_contact_samples=required_samples,contact_retention_definition='P: stored planned normal reaction >0.1 N; G: attached holding gripper. Zero-force handoff remains in geometric_holding_contact_fraction.',contact_retention_passed=retention,jaw_force=jaws,minimum_actuator_margin_Nm=margin,sampled_interface_wrench_capability=capability,unexpected_loaded_contact_penetrations_m=unexpected,reference_geometry=geometry,object_pose_prescribed=False,object_equality_constraints_used=0,internal_gripper_equalities=trace.metadata['internal_gripper_equalities'],controller=episode.control_mode,arm_measured_force_feedback=episode.control_mode=='hybrid_feedback',arm_force_selection=[0.]*6 if episode.control_mode=='impedance_feedforward' else [0.,0.,0.,0.,0.,1.],joint_nullspace_impedance=dict(stiffness=40.,damping=8.),arm_reaction_feedforward=episode.force_feedforward,measured_jaw_force_feedback=True,jaw_force_fraction=episode.jaw_force_fraction,jaw_force_target_N={f.id:episode.jaw_force_fraction*c.closing_force_per_finger for f,c in zip(task.features,p.capabilities) if c.kind=='G'},contacts_enabled=trace.metadata['contacts_enabled'],full_paper_pipeline_executed=False)

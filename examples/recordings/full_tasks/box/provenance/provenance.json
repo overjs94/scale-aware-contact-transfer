@@ -1,0 +1,10 @@
+{
+  "origin": "authored synthetic multi-link contact transfer fixture",
+  "network_inference_executed": false,
+  "robot_mechanics": "Panda vendor link/joint mechanics preserved; authored tools",
+  "authored_point_tool": "0.14 m cylinder standoff, 0.05 kg added mass and explicit URDF inertia; original spherical tool retained",
+  "source": "1/4-scale link-local dense patches with supplied functional group IDs",
+  "initial_grasps": "native fingers initialized closed; grasp acquisition not simulated",
+  "object": "free root plus passive internal joint, no world hinge/pose drive/object actuator",
+  "parameter_calibration": "not hardware calibrated"
+}

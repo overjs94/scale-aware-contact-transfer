@@ -65,13 +65,13 @@ def fixed_posture_keyframe(problem,k,previous,environment,retreat):
     objective=-check['rho']
     for i,(f,r,spec,qs) in enumerate(zip(problem.task_definition.features,problem.robots,problem.specs,sys.q_slices)):
         if phase_mode(goal['phase'],f)=='released':continue
-        reference=previous.q[qs] if problem.task_definition.posture_reference_rule=='previous_keyframe' else spec['q_initial'];objective+=np.sum((previous.positions[i]-prior['positions'][i])**2)/.6**2+1-previous.rotations[i,:,2]@prior['normals'][i]+.01*np.sum(((q[qs]-reference)/np.maximum(r.upper-r.lower,1e-3))**2)
+        reference=problem.branch_reference(k)[qs] if problem.task_definition.posture_reference_rule=='sequential_ik_branch' else previous.q[qs] if problem.task_definition.posture_reference_rule=='previous_keyframe' else spec['q_initial'];objective+=np.sum((previous.positions[i]-prior['positions'][i])**2)/.6**2+1-previous.rotations[i,:,2]@prior['normals'][i]+.01*np.sum(((q[qs]-reference)/np.maximum(r.upper-r.lower,1e-3))**2)
     result=KeyframeCertificate(q,previous.positions.copy(),previous.rotations.copy(),previous.apertures,check['rho'],reaction,tau,{c.name:forces[c.name][:,3:] for c in environment},float(objective),check['primal_residual'])
-    result.source=prior['record'];result.phase=goal['phase'];result.retreat_m=retreat;result.interfaces=interfaces;result.fixed_posture_target=True;result.target_provenance=dict(method='declared_fixed_posture_robust_SOCP',posture_reference_rule=problem.task_definition.posture_reference_rule);result.posture_reference=previous.q[:sys.object_q.start].copy() if problem.task_definition.posture_reference_rule=='previous_keyframe' else np.concatenate([s['q_initial'] for s in problem.specs])
+    result.source=prior['record'];result.phase=goal['phase'];result.retreat_m=retreat;result.interfaces=interfaces;result.fixed_posture_target=True;result.target_provenance=dict(method='declared_fixed_posture_robust_SOCP',posture_reference_rule=problem.task_definition.posture_reference_rule);result.posture_reference=problem.branch_reference(k)[:sys.object_q.start].copy() if problem.task_definition.posture_reference_rule=='sequential_ik_branch' else previous.q[:sys.object_q.start].copy() if problem.task_definition.posture_reference_rule=='previous_keyframe' else np.concatenate([s['q_initial'] for s in problem.specs])
     return result
 
 
-def fixed_geometry_keyframe(problem,seed,interfaces,prior,environment,settings,*,q_reference=None):
+def fixed_geometry_keyframe(problem,seed,interfaces,prior,environment,settings,*,q_reference=None,robot_configuration_bounds=None):
     """Exact separable realization when held material points are fixed.
 
     The unconstrained-torque SOCP bounds rho independently of arm posture.
@@ -84,7 +84,7 @@ def fixed_geometry_keyframe(problem,seed,interfaces,prior,environment,settings,*
     from .lie import rotation_error,rotation_cost
     sys=problem.system;opti=ca.Opti();qr=opti.variable(sys.object_q.start);Q=ca.vertcat(qr,ca.DM(seed[sys.object_q]));opti.set_initial(qr,seed[:sys.object_q.start]);posture=0.;positions=[];rotations=[];geo=0.;contacts=[]
     for r,spec,qs in zip(problem.robots,problem.specs,sys.q_slices):
-        reference=spec['q_initial'] if q_reference is None else q_reference[qs];opti.subject_to(opti.bounded(r.lower,qr[qs],r.upper));posture+=.01*ca.sumsqr((qr[qs]-reference)/np.maximum(r.upper-r.lower,1e-3))
+        reference=spec['q_initial'] if q_reference is None else q_reference[qs];lower=r.lower if robot_configuration_bounds is None else np.maximum(r.lower,robot_configuration_bounds[0][qs]);upper=r.upper if robot_configuration_bounds is None else np.minimum(r.upper,robot_configuration_bounds[1][qs]);opti.subject_to(opti.bounded(lower,qr[qs],upper));posture+=.01*ca.sumsqr((qr[qs]-reference)/np.maximum(r.upper-r.lower,1e-3))
     for interface in interfaces:
         if len(interface.patch.initial):return None
         p=np.asarray(interface.patch.position(interface.patch.initial)).ravel();R=np.asarray(interface.patch.rotation(interface.patch.initial));delta=p-interface.prior_position;normal=1-R[:,2]@interface.prior_rotation[:,2]

@@ -1,6 +1,146 @@
 {
   "models": [
     {
+      "id": "full_panel_no_source_refinement",
+      "title": "\ud328\ub110 \u00b7 \uc6b4\ubc18\u00b7\uc7ac\ubc30\ud5a5\u00b7\uc548\ucc29\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 no_source_refinement",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "full_panel_external_push",
+      "title": "\ud328\ub110 \u00b7 \uc6b4\ubc18\u00b7\uc7ac\ubc30\ud5a5\u00b7\uc548\ucc29\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 external_push",
+      "engine": "mujoco_contact_recording",
+      "dof": 29,
+      "floating_base": false
+    },
+    {
+      "id": "full_panel_contact_disabled",
+      "title": "\ud328\ub110 \u00b7 \uc6b4\ubc18\u00b7\uc7ac\ubc30\ud5a5\u00b7\uc548\ucc29\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 contact_disabled",
+      "engine": "mujoco_contact_recording",
+      "dof": 29,
+      "floating_base": false
+    },
+    {
+      "id": "full_panel_no_arm_force_feedforward",
+      "title": "\ud328\ub110 \u00b7 \uc6b4\ubc18\u00b7\uc7ac\ubc30\ud5a5\u00b7\uc548\ucc29\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 no_arm_force_feedforward",
+      "engine": "mujoco_contact_recording",
+      "dof": 29,
+      "floating_base": false
+    },
+    {
+      "id": "full_panel_fixed_path",
+      "title": "\ud328\ub110 \u00b7 \uc6b4\ubc18\u00b7\uc7ac\ubc30\ud5a5\u00b7\uc548\ucc29\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 fixed_path",
+      "engine": "mujoco_contact_recording",
+      "dof": 29,
+      "floating_base": false
+    },
+    {
+      "id": "full_box_external_push",
+      "title": "\uc790\uc720 \ubc15\uc2a4 \u00b7 \ubcf8\uccb4 \uc9c0\uc9c0\u00b7\ub69c\uaed1 \uc5f4\uae30 \u00b7 external_push",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_panel_fixed_contact_types",
+      "title": "\ud328\ub110 \u00b7 \uc6b4\ubc18\u00b7\uc7ac\ubc30\ud5a5\u00b7\uc548\ucc29\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 fixed_contact_types",
+      "engine": "mujoco_contact_recording",
+      "dof": 29,
+      "floating_base": false
+    },
+    {
+      "id": "full_box",
+      "title": "\uc790\uc720 \ubc15\uc2a4 \u00b7 \ubcf8\uccb4 \uc9c0\uc9c0\u00b7\ub69c\uaed1 \uc5f4\uae30",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_box_no_arm_force_feedforward",
+      "title": "\uc790\uc720 \ubc15\uc2a4 \u00b7 \ubcf8\uccb4 \uc9c0\uc9c0\u00b7\ub69c\uaed1 \uc5f4\uae30 \u00b7 no_arm_force_feedforward",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_box_contact_disabled",
+      "title": "\uc790\uc720 \ubc15\uc2a4 \u00b7 \ubcf8\uccb4 \uc9c0\uc9c0\u00b7\ub69c\uaed1 \uc5f4\uae30 \u00b7 contact_disabled",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_box_no_source_refinement",
+      "title": "\uc790\uc720 \ubc15\uc2a4 \u00b7 \ubcf8\uccb4 \uc9c0\uc9c0\u00b7\ub69c\uaed1 \uc5f4\uae30 \u00b7 no_source_refinement",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_panel",
+      "title": "\ud328\ub110 \u00b7 \uc6b4\ubc18\u00b7\uc7ac\ubc30\ud5a5\u00b7\uc548\ucc29\u00b7\ub9b4\ub9ac\uc2a4",
+      "engine": "mujoco_contact_recording",
+      "dof": 29,
+      "floating_base": false
+    },
+    {
+      "id": "full_box_fixed_path",
+      "title": "\uc790\uc720 \ubc15\uc2a4 \u00b7 \ubcf8\uccb4 \uc9c0\uc9c0\u00b7\ub69c\uaed1 \uc5f4\uae30 \u00b7 fixed_path",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_box_fixed_contact_types",
+      "title": "\uc790\uc720 \ubc15\uc2a4 \u00b7 \ubcf8\uccb4 \uc9c0\uc9c0\u00b7\ub69c\uaed1 \uc5f4\uae30 \u00b7 fixed_contact_types",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_assembly_external_push",
+      "title": "\uac00\uad6c \uc870\ub9bd \u00b7 \uc0c1\ud310 \uc9c0\uc9c0\u00b7\ub2e4\ub9ac \uc0bd\uc785\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 external_push",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_assembly_contact_disabled",
+      "title": "\uac00\uad6c \uc870\ub9bd \u00b7 \uc0c1\ud310 \uc9c0\uc9c0\u00b7\ub2e4\ub9ac \uc0bd\uc785\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 contact_disabled",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_assembly_no_arm_force_feedforward",
+      "title": "\uac00\uad6c \uc870\ub9bd \u00b7 \uc0c1\ud310 \uc9c0\uc9c0\u00b7\ub2e4\ub9ac \uc0bd\uc785\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 no_arm_force_feedforward",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_assembly_fixed_path",
+      "title": "\uac00\uad6c \uc870\ub9bd \u00b7 \uc0c1\ud310 \uc9c0\uc9c0\u00b7\ub2e4\ub9ac \uc0bd\uc785\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 fixed_path",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_assembly_fixed_contact_types",
+      "title": "\uac00\uad6c \uc870\ub9bd \u00b7 \uc0c1\ud310 \uc9c0\uc9c0\u00b7\ub2e4\ub9ac \uc0bd\uc785\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 fixed_contact_types",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_assembly_no_source_refinement",
+      "title": "\uac00\uad6c \uc870\ub9bd \u00b7 \uc0c1\ud310 \uc9c0\uc9c0\u00b7\ub2e4\ub9ac \uc0bd\uc785\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 no_source_refinement",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
       "id": "full_assembly",
       "title": "\uac00\uad6c \uc870\ub9bd \u00b7 \uc0c1\ud310 \uc9c0\uc9c0\u00b7\ub2e4\ub9ac \uc0bd\uc785\u00b7\ub9b4\ub9ac\uc2a4",
       "engine": "mujoco_contact_recording",

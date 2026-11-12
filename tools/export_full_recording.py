@@ -19,8 +19,10 @@ def original_identity(path):
     with np.load(path,allow_pickle=False) as a:return json.loads(str(a['metadata_json']))['identity']
 
 
-def export_recording(root,task_id,variant,web):
-    root=Path(root);folder=root/task_id/variant;report=json.loads((folder/'result.json').read_text());selection=report['selection'];task=FullTask.load(task_id,root/task_id/'task');planning=root/task_id/(variant if variant in {'full','no_source_refinement','fixed_contact_types'} else 'full')/'planning';candidate=planning/(''.join(selection['selected_types'])+'_'+''.join(map(str,selection['selected_assignment'])));p=FullProblem.create(task,candidate,selection['selected_types'],selection['selected_assignment'],refine_source=selection['source_refinement_enabled']);keys=[];rs=[];cs=[]
+def load_recorded_plan(root,task_id,variant='full'):
+    root=Path(root);folder=root/task_id/variant;report=json.loads((folder/'result.json').read_text());selection=report['selection'];task=FullTask.load(task_id,root/task_id/'task');planning=root/task_id/(variant if variant in {'full','no_source_refinement','fixed_contact_types'} else 'full')/'planning';candidate=planning/(''.join(selection['selected_types'])+'_'+''.join(map(str,selection['selected_assignment'])))
+    if (folder/'plan-origin.json').exists():candidate=Path(json.loads((folder/'plan-origin.json').read_text())['planning_directory'])
+    p=FullProblem.create(task,candidate,selection['selected_types'],selection['selected_assignment'],refine_source=selection['source_refinement_enabled']);keys=[];rs=[];cs=[]
     for k,goal in enumerate(task.keyframes):
         path=candidate/f'key{k}.npz';key=load_key(path,original_identity(path));env=tuple(c for c in support_contacts(p,goal['phase'],1) if c.name in key.environment_reactions)
         if np.max(abs(key.q[p.system.object_q]-goal['object_q']))>2e-5 or not validate_keyframe(p,key,env)['passed']:raise RuntimeError(f'Current task/independent keyframe gate rejected {k}')
@@ -29,8 +31,13 @@ def export_recording(root,task_id,variant,web):
         path=candidate/f'interval{k}.npz';r=load_interval(path,original_identity(path));contacts=interval_contacts(p,k,left,len(r.dt))
         if not validate_interval(p,r,contacts)['passed']:raise RuntimeError(f'Current independent interval gate rejected {k}')
         if variant=='fixed_path':
-            steps=16;contacts=interval_contacts(p,k,left,steps);r=initial_interval(p,k,left,right,steps,task.keyframes[k+1]['time']-task.keyframes[k]['time'],contacts)
+            steps=len(r.dt);duration=float(r.dt.sum());contacts=interval_contacts(p,k,left,steps);r=initial_interval(p,k,left,right,steps,duration,contacts)
         rs.append(r);cs.append(contacts)
+    return p,tuple(keys),tuple(rs),tuple(cs),report
+
+
+def export_recording(root,task_id,variant,web):
+    root=Path(root);folder=root/task_id/variant;p,keys,rs,cs,report=load_recorded_plan(root,task_id,variant)
     # Playback needs the accepted phase schedule, not a second dense IK solve.
     episode=CoupledEpisode(p,tuple(keys),tuple(rs),contacts_by_interval=tuple(cs),control_mode='impedance_feedforward',jaw_force_fraction=.7);trace=ExecutionTrace.load(folder/'native/execution.npz');scene=build_scene(p,folder/'native/export-scene-check.xml',timestep=trace.metadata['timestep'],contacts_enabled=variant!='contact_disabled')
     if hashlib.sha256(scene.path.read_bytes()).hexdigest()!=trace.metadata['scene_sha256']:raise RuntimeError('Current native scene differs from recorded physics')

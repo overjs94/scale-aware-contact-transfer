@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="panel">
+  <link name="panel">
+    <inertial>
+      <mass value="2.0" />
+      <inertia ixx="0.026933333333333337" iyy="0.06026666666666666" izz="0.08666666666666667" ixy="0" ixz="0" iyz="0" />
+    </inertial>
+    <visual>
+      <geometry>
+        <box size="0.6 0.4 0.04" />
+      </geometry>
+      <material name="panel_color">
+        <color rgba=".72 .49 .27 1" />
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.6 0.4 0.04" />
+      </geometry>
+    </collision>
+  </link>
+</robot>

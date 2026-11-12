@@ -30,8 +30,8 @@ def test_cito_support_impulse_and_unrelaxed_residuals(friction_speed_model):
     np.testing.assert_allclose(result.impulses["ground"][:, 2].sum(), 9.81*.4, atol=2e-5)
 
 
-@pytest.mark.parametrize('eliminate_endpoint_redundancy',[False,True])
-def test_dual_arm_attached_object_translation(slider_urdf,eliminate_endpoint_redundancy):
+@pytest.mark.parametrize('eliminate_endpoint_redundancy,configuration_update',[(False,'independent_se3'),(True,'independent_se3'),(True,'contact_coordinate_midpoint')])
+def test_dual_arm_attached_object_translation(slider_urdf,eliminate_endpoint_redundancy,configuration_update):
     robot = Robot(slider_urdf).symbolic()
     system = MechanicalSystem([robot, robot], RigidObject(1., np.zeros(3), np.eye(3)*.02))
     q = np.r_[-.25, 0, .5, .25, 0, .5, 0, 0, .5, 0, 0, 0, 1]
@@ -42,10 +42,13 @@ def test_dual_arm_attached_object_translation(slider_urdf,eliminate_endpoint_red
                         robot_index=0, frame="link2", attached_steps=tuple(range(8))),
                 Contact("right", [.25, 0, 0], [0, 0, -1], cap,
                         robot_index=1, frame="link2", attached_steps=tuple(range(8)))]
-    result = solve_cito(system, q, goal, contacts, steps=8, duration=.8,eliminate_endpoint_redundancy=eliminate_endpoint_redundancy)
+    result = solve_cito(system, q, goal, contacts, steps=8, duration=.8,eliminate_endpoint_redundancy=eliminate_endpoint_redundancy,configuration_update=configuration_update,feasibility_warm_start=configuration_update=='contact_coordinate_midpoint')
     np.testing.assert_allclose(result.q[-1], goal, atol=1e-6)
     assert result.primal_residual < 2e-6
     assert result.gripper_velocity_residual < 2e-6
+    if configuration_update=='contact_coordinate_midpoint':
+        assert len(result.contact_coordinate_charts)==2
+        assert all(c['independent']==[] for c in result.contact_coordinate_charts.values())
 
 
 def test_floating_robot_environment_contact_velocity():

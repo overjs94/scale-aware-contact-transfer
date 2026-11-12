@@ -39,3 +39,41 @@ def test_complete_scenes_preserve_unactuated_objects_and_native_mechanics(task_i
 def test_complete_interval_cache_preserves_formulation_and_rejects_other_model(tmp_path):
     r=TrajectoryResult(np.zeros((3,2)),np.zeros((3,2)),np.zeros((2,2)),np.ones(2),{'p':np.zeros((2,3))},1.,0.,0.,0.,0.,False,(1e-3,1e-8));r.contact_force_coordinates='scaled_tangent';r.configuration_update='independent_midpoint';path=tmp_path/'interval.npz';save_interval(path,r,'model-A');loaded=load_interval(path,'model-A');assert loaded.contact_force_coordinates=='scaled_tangent' and loaded.configuration_update=='independent_midpoint';np.testing.assert_array_equal(loaded.impulses['p'],r.impulses['p'])
     with pytest.raises(ValueError,match='mismatch'):load_interval(path,'model-B')
+
+
+def test_contact_coordinates_choose_native_nonsingular_grasp_and_point_charts(tmp_path):
+    import casadi as ca
+    from contact_transfer.trajectory import Contact,contact_coordinate_charts,point_axis_velocity_jacobian
+    if not Path('.cache/robotiq_2f85/2f85.xml').exists():pytest.skip('Fetch pinned native gripper assets')
+    task=FullTask.load('box',tmp_path/'task');p=FullProblem.create(task,tmp_path/'problem','GPG');q=p.branch_reference(0);contacts=[]
+    for i,(feature,cap,frame) in enumerate(zip(task.features,p.capabilities,p.frames)):
+        contacts.append(Contact(feature.id,feature.surface,feature.normal,cap,robot_index=i,frame=frame,object_frame=feature.frame,attached_steps=(0,) if cap.kind=='G' else (),sticking_steps=(0,) if cap.kind=='P' else (),align_normal=cap.kind=='P'))
+    charts=contact_coordinate_charts(p.system,contacts,[q])
+    assert [charts[c.name]['rank'] for c in contacts]==[6,5,6]
+    assert [len(charts[c.name]['independent']) for c in contacts]==[1,2,1]
+    for c in contacts:
+        _,J,_,_=numeric_contact(p,c,q);A=J[:,p.system.v_slices[c.robot_index]]
+        if c.capability.kind=='P':
+            symbol=ca.MX.sym('q',p.system.nq);actual=np.array(ca.Function('axis',[symbol],[point_axis_velocity_jacobian(p.system,c,symbol)])(q));R=task.object.fk(q[p.system.object_q],c.object_frame)[:3,:3]@c.basis();native=np.zeros_like(actual);native[:,p.system.v_slices[c.robot_index]]=R[:,:2].T@p.robots[c.robot_index].jacobian(q[p.system.q_slices[c.robot_index]],c.frame,'world_aligned')[:3];native[:,p.system.object_v]=-R[:,:2].T@task.object.jacobian(q[p.system.object_q],c.object_frame,'world_aligned')[:3];np.testing.assert_allclose(actual,native,atol=1e-10);A=np.vstack([native[:,p.system.v_slices[c.robot_index]],A]);scale=np.r_[np.full(2,.6),np.ones(3)]
+        else:scale=np.r_[np.full(3,.6),np.ones(3)]
+        sigma=np.linalg.svd((scale[:,None]*A)[:,charts[c.name]['dependent']],compute_uv=False)[-1]
+        assert sigma>1e-7
+        np.testing.assert_allclose(sigma,charts[c.name]['minimum_reference_singular_value'],atol=1e-10)
+
+
+def test_required_support_load_uses_plan_when_force_feedforward_is_disabled():
+    from types import SimpleNamespace
+    from contact_transfer.full_assessment import planned_normal_reactions
+    plan=SimpleNamespace(dt=np.array([.2,.4]),impulses={'support':np.array([[0.,0.,1.],[0.,0.,0.]])})
+    def forbidden(*args):raise AssertionError('Execution commands or measured forces must not determine required contact')
+    episode=SimpleNamespace(trajectories=[plan],phase=lambda t:(0,0 if t<.2 else 1,t),reactions=forbidden,force_feedforward=False)
+    load=planned_normal_reactions(episode,'support',[.1,.2,.3])
+    np.testing.assert_allclose(load,[5.,0.,0.])
+    np.testing.assert_array_equal(load>.1,[True,False,False])
+
+
+def test_repeated_panel_dwell_has_exactly_the_same_ik_branch_reference(tmp_path):
+    if not Path('.cache/robotiq_2f85/2f85.xml').exists():pytest.skip('Fetch pinned native gripper assets')
+    task=FullTask.load('panel',tmp_path/'task');p=FullProblem.create(task,tmp_path/'problem','GPP')
+    np.testing.assert_array_equal(p.branch_reference(0),p.branch_reference(1))
+    assert np.linalg.norm(p.branch_reference(2)-p.branch_reference(1))>.01

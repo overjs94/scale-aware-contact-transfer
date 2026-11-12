@@ -1,0 +1,9 @@
+{
+  "packages": {},
+  "source": "Authored manipulation object; dynamics and collision geometry from URDF",
+  "license": "MIT",
+  "id": "full_assembly_fixed_contact_types_leg",
+  "urdf": "robot.urdf",
+  "license_file": "LICENSE.authored",
+  "urdf_sha256": "8bf5930560088f47d2ab21c6b117cc1d10143a773e122686e3ec761d1580fcf2"
+}

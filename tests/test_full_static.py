@@ -29,6 +29,12 @@ def test_load_transfer_condensation_preserves_native_momentum_and_last_zero_tool
     assert np.max(abs(r.impulses['tool'][-1]))==0.
     np.testing.assert_allclose(sum(r.impulses[c.name][-1,2] for c in supports),9.81*r.dt[-1],atol=1e-7)
     assert r.objective_mode=='stationary_contact_conic_QP'
+    # Inactive environment modes cannot reuse otherwise balanced reactions.
+    from dataclasses import replace
+    from contact_transfer.full_validation import validate_interval
+    disabled=tuple(replace(c,nodes=()) for c in supports)
+    rejected=validate_interval(p,r,(tool,*disabled))
+    assert not rejected['passed'] and rejected['residuals']['capability']>1.
 
 
 def test_released_arm_nlp_keeps_free_object_balanced_without_object_actuation(slider_urdf,tmp_path):

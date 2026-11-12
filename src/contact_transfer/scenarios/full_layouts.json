@@ -2,7 +2,8 @@
   "schema_version": 1,
   "units": "SI",
   "panel": {
-    "posture_reference_rule": "previous_keyframe",
+    "posture_reference_rule": "sequential_ik_branch",
+    "posture_trust_radius_rad": 0.3,
     "description": "Native Robotiq placement keeps the complete placement path away from the Panda folded-arm workspace boundary. Identical layout for every contact-type and ablation candidate.",
     "arm_base_translation_overrides_m": {"0": [-0.75, 0.0, 0.0]}
   }

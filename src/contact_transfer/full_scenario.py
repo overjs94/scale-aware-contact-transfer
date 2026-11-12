@@ -124,6 +124,8 @@ class FullTask:
     scale: float
     fixtures: tuple=()
     posture_reference_rule: str='hardware_seed'
+    posture_trust_radius_rad: float | None=None
+    gripper_force_coordinates: str='cartesian'
     @classmethod
     def load(cls,id,directory):
         out=Path(directory);out.mkdir(parents=True,exist_ok=True)
@@ -138,7 +140,7 @@ class FullTask:
                 p=np.array(g['position'])*raw['source_to_target_scale'];n=np.array(g['normal']);Rt=Rotation.from_quat(s['tool_quaternion_xyzw']).as_matrix();features.append(Feature(g['group_id'],'panel',p,n,p,Rt,nearest_box(c.panel,'panel',p),('P','G') if s['kind']=='G' else ('P',),s['kind']=='G'))
             keys=[dict(id=k['id'],time=k['time'],object_q=np.array(k['object_pose']),phase='released' if k['id']=='released' else 'unload' if k['id']=='load_transfer' else 'hold') for k in c.data['keyframes']]
             keys[-1]['freeze_holding_posture']=True;keys[-2]['freeze_posture']=True;keys.insert(-1,dict(id='open_gripper',time=keys[-2]['time']+.8,object_q=keys[-1]['object_q'].copy(),phase='released',retreat_m=0.,freeze_posture=True))
-            return cls(id,c,c.panel,tuple(features),tuple(keys),tuple(arms),tuple(np.array(s['q_initial']) for s in c.data['arms']),c.path.parent/'gripper_arm.urdf',4.,posture_reference_rule=layout['posture_reference_rule'])
+            return cls(id,c,c.panel,tuple(features),tuple(keys),tuple(arms),tuple(np.array(s['q_initial']) for s in c.data['arms']),c.path.parent/'gripper_arm.urdf',4.,posture_reference_rule=layout['posture_reference_rule'],posture_trust_radius_rad=layout['posture_trust_radius_rad'])
         if id=='box':
             c=FreeCase.load('free_box_lid');features=[]
             for i,s in enumerate(c.data['arms']):
@@ -147,7 +149,7 @@ class FullTask:
                 features.append(Feature(s['group_id'],s['link_id'],surface,n,p,Rotation.from_quat(s['tool_rotation_link_xyzw']).as_matrix(),size,('P','G') if s['kind']=='G' else ('P',)))
             times=sorted(set([0.,c.data['lift_start'],c.data['lift_end'],c.data['motion_start'],(c.data['motion_start']+c.data['motion_end'])/2,(c.data['motion_start']+3*c.data['motion_end'])/4,c.data['motion_end'],c.data['duration']]))
             keys=tuple(dict(id=['initial','lift_start','lift_done','open_start','opening','opening_late','open_done','hold_final'][i],time=t,object_q=box_reference(c,t)[0],phase='hold') for i,t in enumerate(times))
-            return cls(id,c,c.object,tuple(features),keys,c.full,tuple(np.array(s['q_seed']) for s in c.data['arms']),c.path.parent/'gripper_arm.urdf',c.data['source_to_target_scale'])
+            return cls(id,c,c.object,tuple(features),keys,c.full,tuple(np.array(s['q_seed']) for s in c.data['arms']),c.path.parent/'gripper_arm.urdf',c.data['source_to_target_scale'],gripper_force_coordinates='scaled_tangent')
         if id=='assembly':
             c=AssemblyCase.load();obj=RigidCollection({s['id']:r for s,r in zip(c.data['objects'],c.parts)});features=[]
             for s in c.data['arms']:
@@ -217,6 +219,26 @@ class FullProblem:
     specs: tuple
     system: MechanicalSystem
     refine_enabled: bool=True
+    def branch_reference(self,k):
+        """Task-data IK branch guide, not a force or trajectory certificate."""
+        if not hasattr(self,'_branch_references'):
+            from .full_trajectory import phase_mode
+            references=[];seeds=[np.array(s['q_initial']) for s in self.specs]
+            for index,goal in enumerate(self.task_definition.keyframes):
+                if index:
+                    before=self.task_definition.keyframes[index-1]
+                    if goal['phase']==before['phase'] and goal.get('retreat_m',.06)==before.get('retreat_m',.06) and np.array_equal(goal['object_q'],before['object_q']):
+                        references.append(references[-1].copy());continue
+                row=[]
+                for i,(feature,robot,frame,cap) in enumerate(zip(self.task_definition.features,self.robots,self.frames,self.capabilities)):
+                    To=self.task_definition.object.fk(goal['object_q'],feature.frame);target=To.copy();target[:3,3]+=To[:3,:3]@feature.surface;target[:3,:3]=To[:3,:3]@(contact_basis(feature.normal)@np.diag([1.,-1.,-1.]) if cap.kind=='G' else feature.tool_rotation);mode=phase_mode(goal['phase'],feature)
+                    if mode=='released':target[:3,3]+=To[:3,:3]@feature.normal*goal.get('retreat_m',.06);fit=release_ik(robot,frame,target,seeds[i])
+                    elif cap.kind=='P':fit=point_pose_ik(robot,frame,target[:3,3],To[:3,:3]@feature.normal,seeds[i])
+                    else:fit=numerical_pose_ik(robot,frame,target,seeds[i])
+                    seeds[i]=fit;row.extend(fit)
+                references.append(np.r_[row,goal['object_q']])
+            self._branch_references=references
+        return self._branch_references[k].copy()
     @property
     def case(self):
         if not hasattr(self,'_case'):self._case=SimpleNamespace(path=self.task_definition.original.path,panel=self.task_definition.object,full_robots=self.full_robots,data={'arms':list(self.specs),'simulation':{'timestep':.001}})
@@ -274,7 +296,9 @@ class FullProblem:
         if previous is not None and (key.get('freeze_posture') or key.get('freeze_holding_posture')):
             from .full_static import fixed_posture_keyframe
             return fixed_posture_keyframe(self,k,previous,environment,retreat)
-        if self.task_definition.posture_reference_rule=='hardware_seed' and previous is not None and key['phase']==previous.phase and retreat==getattr(previous,'retreat_m',.06 if previous.phase in {'released','release_leg'} else 0.) and np.array_equal(qo,previous.q[self.system.object_q]) and set(c.name for c in environment)==set(previous.environment_reactions):
+        same_posture_reference=self.task_definition.posture_reference_rule=='hardware_seed'
+        if previous is not None and self.task_definition.posture_reference_rule=='sequential_ik_branch':same_posture_reference=previous.posture_reference is not None and np.array_equal(self.branch_reference(k)[:self.system.object_q.start],previous.posture_reference)
+        if same_posture_reference and previous is not None and key['phase']==previous.phase and retreat==getattr(previous,'retreat_m',.06 if previous.phase in {'released','release_leg'} else 0.) and np.array_equal(qo,previous.q[self.system.object_q]) and set(c.name for c in environment)==set(previous.environment_reactions):
             # Identical task pose, transferred prior, force mode and environment
             # define the same robust realization problem. Preserve its solution
             # through a dwell instead of creating an arbitrary nullspace sweep
@@ -298,14 +322,16 @@ class FullProblem:
                 except RuntimeError:fit=numerical_pose_ik(r,frame,goal,spec['q_initial'])
             initial.extend(fit);interface.force_enabled=not unload
             if released:interfaces.pop()
-        seed=np.r_[initial,qo];reference=seed.copy()
+        seed=np.r_[initial,qo];reference=seed.copy();bounds=None
         for i,(f,spec,qs) in enumerate(zip(self.task_definition.features,self.specs,self.system.q_slices)):
             if key['phase']!='released' and not (key['phase']=='release_leg' and f.id=='leg_gripper'):reference[qs]=previous.q[qs] if previous is not None and self.task_definition.posture_reference_rule=='previous_keyframe' else spec['q_initial']
+        if self.task_definition.posture_reference_rule=='sequential_ik_branch':
+            reference=self.branch_reference(k);radius=self.task_definition.posture_trust_radius_rad;bounds=(reference[:self.system.object_q.start]-radius,reference[:self.system.object_q.start]+radius);seed[:self.system.object_q.start]=np.clip(seed[:self.system.object_q.start],bounds[0]+1e-6,bounds[1]-1e-6)
         target_settings=settings or SolverSettings(tolerance=1e-7,max_iterations=800,options={'expand':False});certificate=None
         if previous is not None and len(interfaces)==len(self.task_definition.features):
             from .full_static import fixed_geometry_keyframe
-            certificate=fixed_geometry_keyframe(self,seed,interfaces,prior,environment,target_settings,q_reference=reference)
-        if certificate is None:certificate=realize_system_keyframe(self.system,seed,qo,interfaces,self.task_load(qo),environment=environment,rho_min=.1,q_reference=reference,position_radius=.015,characteristic_length=.6,settings=target_settings)
+            certificate=fixed_geometry_keyframe(self,seed,interfaces,prior,environment,target_settings,q_reference=reference,robot_configuration_bounds=bounds)
+        if certificate is None:certificate=realize_system_keyframe(self.system,seed,qo,interfaces,self.task_load(qo),environment=environment,rho_min=.1,q_reference=reference,robot_configuration_bounds=bounds,position_radius=.015,characteristic_length=.6,settings=target_settings)
         # Keep a stable group order, including unloaded/released zero reactions.
         M=len(self.task_definition.features);old=certificate.reactions;reactions=np.zeros((len(old),M,6));positions=np.array([f.surface for f in self.task_definition.features]);rotations=np.array([contact_basis(f.normal) for f in self.task_definition.features]);apertures=[getattr(c,'aperture_required',None) for c in self.capabilities]
         for i,s in enumerate(interfaces):j=next(j for j,f in enumerate(self.task_definition.features) if f.id==s.group_id);reactions[:,j]=old[:,i];positions[j]=certificate.positions[i];rotations[j]=certificate.rotations[i]

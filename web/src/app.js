@@ -68,6 +68,9 @@ function resetCamera() {
 }
 function buildGeometry(data) {
   ++geometryToken; urdfModels = [];
+  const supplied=data.contact_contraction?.input_type==='supplied_contracted_contacts';
+  for(const option of $('contact-display').options)if(['both','dense'].includes(option.value))option.disabled=supplied;
+  if(supplied&&['both','dense'].includes($('contact-display').value))$('contact-display').value='contracted';
   while (robotGroup.children.length) {
     disposeModel(robotGroup.children[0]);
   }
@@ -428,7 +431,6 @@ $("run").onclick = async () => {
 async function init() {
   const response = await fetch("./data/index.json"), index = await response.json();
   $("model-count").textContent = String(index.models.length).padStart(2, "0");
-  $("test-count").textContent = index.tests_passed;
   buildLibrary(index.models);
   const requestedModel = new URLSearchParams(location.search).get("model");
   await selectModel(index.models.some(model => model.id === requestedModel) ? requestedModel : ["full_assembly","full_panel","full_box","free_box_lid"].find(id=>index.models.some(m=>m.id===id)));
@@ -436,7 +438,7 @@ async function init() {
     const health = await fetch("./api/health");
     if (health.ok) backend = (await health.json()).ready === true;
   } catch {}
-  $("backend-state").textContent = dataset?.instances ? "조건을 바꿔 다시 계산: contact-transfer demo-three-arm --viewer web"
+  $("backend-state").textContent = dataset?.full_task_recording ? "새 계획·물리 실행은 Python의 tools/run_full_scenarios.py에서 수행합니다. 공개 페이지는 저장된 결과 재생용입니다." : dataset?.instances ? "조건을 바꿔 다시 계산: contact-transfer demo-three-arm --viewer web"
     : backend ? "Python backend 연결됨 · 새 MuJoCo 계산을 실행합니다." : "이 링크는 계산 결과 재생용입니다. 새 계산은 로컬 또는 Codespaces의 Python 서버에서 실행합니다.";
   $("run").disabled = !backend || dataset?.floating_base || dataset?.id === "dual_cito" || !!dataset?.instances;
 }

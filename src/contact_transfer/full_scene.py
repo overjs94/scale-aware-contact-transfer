@@ -106,7 +106,7 @@ def support_contacts(problem,phase,steps):
         for i,g in enumerate(ET.parse(task.original.path.parent/task.original.data['jig_urdf']).findall('link/collision')):
             R,p=origin(g);size=np.fromstring(g.find('geometry/box').get('size'),sep=' ')
             if size[2]>size[0]:continue
-            point=T[:3,:3].T@(p-T[:3,3]);point[2]=-bottom;bounds=np.array([p[:2]-size[:2]/2,p[:2]+size[:2]/2]);out.append(Contact('jig_'+str(i),point,[0,0,1],Capability(mu=.8,normal_max=75.),plane_offset=p[2]+size[2]/2,plane_bounds=bounds,object_frame='panel'))
+            point=T[:3,:3].T@(p-T[:3,3]);point[2]=-bottom;bounds=np.array([p[:2]-size[:2]/2,p[:2]+size[:2]/2]);out.append(Contact('jig_'+str(i),point,[0,0,1],Capability(mu=.8,normal_max=75.),plane_offset=p[2]+size[2]/2,plane_bounds=bounds,object_frame='panel',force_coordinates='scaled_tangent',tangent_ratio_regularization=1e-6))
     elif task.id=='assembly':
         cfg=task.original.data['socket'];center=np.asarray(cfg['center_object']);shoulder=np.asarray(cfg.get('leg_shoulder_object',[0,0,-.14]));leg=task.object.bodies['leg'];box=ET.parse(leg.path).find('link/collision/geometry/box');half=np.fromstring(box.get('size'),sep=' ')/2
         for i,xy in enumerate([[-.8*half[0],-.8*half[1]],[.8*half[0],-.8*half[1]],[0,.8*half[1]]]):out.append(BodyContact('shoulder_'+str(i),center+np.r_[xy,0.],[0,0,1],Capability(mu=.6,normal_max=30.),object_frame='tabletop',other_frame='leg',other_point=shoulder+np.r_[xy,0.],patch_half_size=.002,force_coordinates='scaled_tangent',tangent_ratio_regularization=1e-6))

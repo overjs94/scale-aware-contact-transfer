@@ -15,8 +15,9 @@ from .multi_object import RigidCollection
 
 
 class FullEpisode(CoupledEpisode):
-    def __init__(self,problem,keyframes,trajectories,contacts_by_interval,*,reference_dt=.02,force_feedforward=True):
-        super().__init__(problem,tuple(keyframes),tuple(trajectories),contacts_by_interval=tuple(contacts_by_interval),control_mode='impedance_feedforward',jaw_force_fraction=.7)
+    def __init__(self,problem,keyframes,trajectories,contacts_by_interval,*,reference_dt=.02,force_feedforward=True,jaw_force_fraction=None):
+        fraction=({'box':.6,'panel':.45}.get(problem.task_definition.id,.7)) if jaw_force_fraction is None else jaw_force_fraction
+        super().__init__(problem,tuple(keyframes),tuple(trajectories),contacts_by_interval=tuple(contacts_by_interval),control_mode='impedance_feedforward',jaw_force_fraction=fraction)
         self.force_feedforward=force_feedforward;self.nodal_spline=self.spline;self.reference_dt=reference_dt
         # Only interpolation is cached. Model/plan/code identity must match;
         # velocity bounds and native geometry remain fresh execution gates.
@@ -106,6 +107,7 @@ def run_full_episode(episode,output,*,contacts_enabled=True,disturbances=(),prog
     if p.task_definition.id=='box':objects.append(scene.object_frames['moving']);articulated[scene.object_frames['moving']]=scene.object_joints['articulation']
     simulator=MujocoContactScene(scene.path,names,actuators,objects,actuator_modes=modes,articulated_object_joints=articulated);case_id,plan_id=episode.identity();schedule=WrenchSchedule(disturbances)
     trace=simulator.run(controller,controller.reference,episode.duration,initial_q=controller.reference(0)[0],case_id=case_id,plan_id=plan_id,external_forces=schedule,progress=progress);trace.metadata.update(object_pose_prescribed=False,object_equality_constraints_used=0,internal_gripper_equalities=int(simulator.model.neq),external_disturbances=schedule.to_list(),reference_interpolation=geometry['reference_interpolation'],contacts_enabled=contacts_enabled)
+    trace.metadata['controller_configuration']=dict(mode=episode.control_mode,arm_reaction_feedforward=episode.force_feedforward,jaw_force_fraction=episode.jaw_force_fraction,jaw_force_target_N={f.id:episode.jaw_force_fraction*c.closing_force_per_finger for f,c in zip(p.task_definition.features,p.capabilities) if c.kind=='G'},joint_nullspace_stiffness=40.,joint_nullspace_damping=8.)
     trace.save(out/'execution.npz');(out/'control.json').write_text(json.dumps(controller.logs,separators=(',',':')))
     # Task/capability assessment is provided separately; a trace alone is not a pass.
     return trace,controller,scene,geometry

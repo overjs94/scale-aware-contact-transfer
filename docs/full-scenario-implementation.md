@@ -55,7 +55,7 @@ External-force trials use actual native force injection and replay arrows.
 | All three task adapters / scenes / independent native mechanics | implemented; three-scene mass/gravity checks passed |
 | Robust target keyframes | panel 9, box 8 and assembly 10 declared keyframes; individual/sequence acceptance is recorded separately |
 | Type/assignment optimization connected to complete scenarios | implemented; exhaustive configured candidates, rejections and common sequence objective retained; assembly: 24 configured candidates, one accepted G/P/G sequence; panel/box complete acceptance remains pending |
-| Full native executions / ablation matrix / web records | assembly full native execution and URDF web replay passed; remaining full tasks and controlled ablations in progress |
+| Full native executions / ablation matrix / web records | assembly full native execution and all six controlled ablations executed; panel/box full native acceptance in progress |
 
 The ledger is updated from executed results. Pending cells must not produce
 `full_paper_pipeline_executed=true` in public recordings.
@@ -201,3 +201,121 @@ The 30.4 s native MuJoCo run in `outputs/full_scenarios_v15/assembly/full` passe
 Measured insertion depth was 25.0014 mm and lateral error 0.4535 mm. Maximum tabletop/leg tracking errors were 0.539/0.667 mm. All three required-contact fractions were 1.0. Peak measured jaw reaction was 32.096 N against the tested 40 N/jaw operating bound. All 1,641 sampled native interface resultants passed the finite capabilities; no unexpected loaded contact occurred. The leg gripper released and the tabletop supplied 3.92401 N of support for a 3.924 N leg.
 
 [Measured recording](../web/data/full_assembly.json) preserves the selected types, margins (minimum target rho 0.35431), actual passive gripper joints, free-body poses and independent acceptance report. Source point-model refinement used the explicit geometric fallback; this result does not claim successful source robustness refinement or learned network inference. The current public record contains the completed full trial; ablation rows are added only as their trials finish.
+
+
+## Contact-coordinate midpoint (numerical variant)
+
+A nonlinear held-contact manifold cannot in general satisfy generic joint
+midpoint collocation, exact holonomic closure and its instantaneous derivative
+as independent equations at finite step. Keeping all three caused severe
+conditioning problems in the box opening. The optional
+`contact_coordinate_midpoint` integrates object coordinates and a subset of
+independent robot joints. Dependent robot joints are reconstructed from exact
+contact closure. Full system momentum, instantaneous no-slip, torque and
+capability constraints remain; no object motion actuator is added.
+
+For a fixed-base 7-DoF arm, a rigid G has six constrained directions and one
+independent joint; a sticking P with tool-axis alignment has five constrained
+directions and two independent joints. P still transmits no contact moment.
+The dependent-joint subset maximizes the minimum singular value over the seed
+trajectory. Native Jacobians independently check the chosen chart at every
+solution node; a singular chart rejects the interval. Released arms retain
+ordinary joint midpoint integration. One interface per fixed-base robot is
+currently supported. RBY1/mobile charts are not implemented by this variant.
+
+With local coordinates z and reconstructed configuration q=Psi(z):
+
+```math
+z_{k+1}=z_k+\tfrac{h_k}{2}(\dot z_k+\dot z_{k+1}),\qquad
+g(q_k)=0,\quad J_g(q_k)v_k=0.
+```
+
+SE(3) object coordinates use the existing Lie-group midpoint update rather
+than addition of quaternion coordinates. `dependent_joint_midpoint_difference_rad`
+is a diagnostic of dependent-coordinate reconstruction, not an unreported
+violation of a constrained integration row. The result records its chart and
+integration variant. It is neither literal manuscript Eq. (17) nor a claim of
+passive midpoint integration of the whole multibody system.
+
+The first G/P/G box opening interval (0 to 30 degrees) passed a fresh motion
+NLP and native independent mechanics check at 16 nodes: momentum residual
+1.16e-9, closure 2.84e-14 m, relative velocity 1.39e-16, and minimum chart
+singular value 0.149. This is an interval result, not complete-task acceptance.
+Panel seating additionally bounds cubic Hermite control ordinates of the gap;
+endpoint bounds implied by fixed state/velocity are omitted. Dense native
+geometry checks remain mandatory and are not replaced by the interpolant.
+
+## Executed assembly ablations (one trial each)
+
+Recorded root: `outputs/full_scenarios_v15/assembly`. All methods use the
+same task, native contacts and operating limits. The reduced fixed path uses
+the selected full plan's actual phase durations and node counts.
+
+| Method | Execution | Max body position error (mm) | Final lateral error (mm) |
+|---|---|---:|---:|
+| Full | pass | 0.667 | 0.453 |
+| No source refinement | pass | 0.667 | 0.453 |
+| Fixed types G/P/G and assignment 0/1/2 | pass | 0.667 | 0.453 |
+| Fixed path, force allocation only | pass | 0.481 | 0.361 |
+| No arm reaction feedforward | fail (tracking gate) | 8.983 | 0.452 |
+| Robot/object contact disabled | fail | 252.648 | 232.381 |
+| 5 N external push | pass | 1.049 | 0.451 |
+
+The source common-P refinement is infeasible for this two-free-body example,
+so the documented geometric-prior fallback and the unrefined priors coincide
+at every keyframe. The selected full candidate also equals the prescribed
+fixed candidate. These two comparisons therefore reuse the same continuous
+optimization after explicit equivalence checks, and execute a fresh native
+trial. They do **not** establish a source-refinement or type-search advantage;
+their solver timing is not comparable. The fixed-path nominal trial passed
+with lower tracking error, so no nominal CITO tracking advantage is claimed.
+The feedforward and contact-disabled failures are retained in the web table.
+
+The push uses the simulator's native force API, at world +X, with 5 N peak,
+a one-second sin-squared profile and 2.5 Ns impulse. Its event buttons pause
+at force start, peak and end, and the viewer draws the applied-force arrow.
+
+
+## Cost pruning and physical handoff checks
+
+Configured types are visited G-first; assignment and candidate costs are
+unchanged. After each candidate's keyframes have been realized, the sum of
+those fixed endpoint costs is a lower bound on its sequence cost because
+all interval terms are nonnegative. A candidate whose bound exceeds an
+accepted incumbent is recorded in `pruned_candidates` without solving its
+intervals. The bound is conditional on these realized keyframes; no global
+bound over alternative IK/keyframe solutions or physical infeasibility is
+claimed. A regression compares the winner against exhaustive evaluation.
+
+For the panel's authored approach-to-seat interval, fixture impulses become
+available at its terminal seat. All sampled gaps and native collision
+constraints remain active throughout the approach. This is a restricted
+handoff schedule, not unrestricted automatic environment-mode discovery.
+The subsequent constant-state load transfer remains a separate conic QP.
+Native fixture contacts are enabled at every simulation time step.
+
+The successful 16-node seating solve passed independent momentum (1.38e-10),
+closure (7.85e-14 m), relative velocity (4.97e-13), contact-cone and original
+unsmoothed dissipation checks. Dense native reference geometry passed at
+197 samples with no violations and a maximum IK correction of 5.14e-6 rad.
+The initializer solves a constant-zero feasibility problem with a successful
+primal-feasible termination; the final motion-cost NLP retains its strict
+objective/KKT and unrelaxed physical acceptance settings.
+
+The first complete box trial exceeded the 40 N per-jaw operating envelope
+by 1.25 N. The model/capacity bound was retained and its squeeze target changed
+from 28 N to 24 N. A fresh native trial passed (maximum jaw 35.94 N,
+maximum body position error 3.30 mm, hinge error 0.00141 rad). Failed trials
+remain under the case's `diagnostics/` directory. `tools/replay_full_plan.py`
+revalidates the existing complete plan before rerunning only physical control;
+it does not claim a new target/trajectory solve.
+
+Native jaw limits now cover the **entire** recording, including preparation
+and release. Positive-jaw retention is measured during holding. Point-contact
+retention requires the stored optimized normal reaction to exceed 0.1 N;
+zero-force handoff steps do not require a positive measured reaction. The
+original geometric-holding contact fraction, including zero-force intervals,
+remains separately reported. The 99% retention threshold is unchanged, and
+the required load comes from stored impulses even in the no-feedforward
+ablation. A regression prevents zero execution commands from suppressing
+this requirement. Raw per-frame contact flags are never rewritten.
