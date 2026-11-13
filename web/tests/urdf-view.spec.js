@@ -99,10 +99,10 @@ test("three physical tools replay as three URDF instances with keyframe events",
   await expect(page.locator(".keyframe-choice")).toHaveCount(4);
   await page.getByRole("button", { name: "lift · 1.5 s", exact: true }).click();
   await expect(page.locator("#time-now")).toHaveText("1.50 s");
-  await expect(page.locator("#tool-state")).toContainText("seal 유지");
+  await expect(page.locator("#tool-state")).toContainText("Seal retained");
   await expect(page.locator("#torque-now")).toContainText("%");
   await page.getByRole("button", { name: "vent_and_release · 3.0 s", exact: true }).click();
-  await expect(page.locator("#tool-state")).toContainText("Suction: 해제");
+  await expect(page.locator("#tool-state")).toContainText("Suction: Released");
   const errors = await page.evaluate(async () => {
     const data = await (await fetch("/data/three_arm.json")).json();
     const {loadURDFModel, applyRecordedPose, disposeModel} = window.modelAPI;
@@ -138,41 +138,41 @@ test("library separates paper tasks, single embodiments and diagnostics with mat
   const counts=category=>catalog.models.filter(model=>libraryEntry(model).category===category).length;
   await expect(page.locator('.category-choice[data-category="paper"]')).toHaveAttribute('aria-pressed','true');
   await expect(page.locator('.model-choice:visible')).toHaveCount(counts('paper'));
-  await expect(page.locator('#scenario-status')).toContainText('구형 형상 · 재검증 필요');
+  await expect(page.locator('#scenario-status')).toContainText('Historical geometry · revalidation required');
   await expect(page.locator('#scenario-scope')).toContainText('50 mm');
   await expect(page.locator('#scenario-status')).toHaveAttribute('data-full-pipeline','false');
   await page.locator('.category-choice[data-category="embodiment"]').click();
   await expect(page.locator('.model-choice:visible')).toHaveCount(8);
   await page.locator('.model-choice[data-id="rb5"]').click();
-  await expect(page.locator('#scenario-category')).toContainText('단일 embodiment');
-  await expect(page.locator('#scenario-status')).toHaveText('관절 추종 검증');
+  await expect(page.locator('#scenario-category')).toContainText('Embodiment checks');
+  await expect(page.locator('#scenario-status')).toHaveText('Joint-tracking check');
   await expect(page.locator('.experiment-builder')).toBeHidden();
   await expect(page).toHaveURL(/model=rb5/);
   await page.locator('.category-choice[data-category="paper"]').click();
   await page.locator('.model-choice[data-id="panel_fixture"]').click();
   await expect(page.locator('.experiment-builder')).toBeVisible();
   await expect(page.locator('#scenario-preset')).toHaveValue('panel_fixture');
-  await expect(page.locator('#builder-title')).toContainText('패널');
+  await expect(page.locator('#builder-title')).toContainText('Panel');
   await page.locator('.category-choice[data-category="diagnostic"]').click();
   await expect(page.locator('.model-choice:visible')).toHaveCount(counts('diagnostic'));
   await page.locator('.model-choice[data-id="hinged_door"]').click();
   await expect(page.locator('#scenario-preset')).toHaveValue('hinged_door');
-  await expect(page.locator('#scenario-scope')).toContainText('세계에 고정된 수동 관절');
-  await expect(page.locator('#scenario-preset optgroup[label="논문 목표"] option')).toHaveCount(6);
-  await expect(page.locator('#scenario-preset optgroup[label="요소·강건성"] option')).toHaveCount(4);
+  await expect(page.locator('#scenario-scope')).toContainText('world-fixed passive joint');
+  await expect(page.locator('#scenario-preset optgroup[label="Primary tasks"] option')).toHaveCount(6);
+  await expect(page.locator('#scenario-preset optgroup[label="Diagnostics & robustness"] option')).toHaveCount(4);
 });
 
 test("library deep links retain failed force tests and distinguish G1 preview on mobile", async ({page})=>{
   await page.setViewportSize({width:390,height:844});
   await page.goto('/?model=mobile_push_25');
   await expect(page.locator('.category-choice[data-category="diagnostic"]')).toHaveAttribute('aria-pressed','true');
-  await expect(page.locator('#scenario-status')).toContainText('검사 실패 포함');
+  await expect(page.locator('#scenario-status')).toContainText('failed checks retained');
   await expect(page.locator('#scenario-preset')).toHaveValue('mobile_panel');
-  await expect(page.locator('#robustness-result')).toContainText('전체 검사 FAIL');
+  await expect(page.locator('#robustness-result')).toContainText('complete checks including interface admissibility FAIL');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
   await page.goto('/?model=unitree_g1');
   await expect(page.locator('.category-choice[data-category="embodiment"]')).toHaveAttribute('aria-pressed','true');
-  await expect(page.locator('#scenario-status')).toHaveText('기구학 미리보기');
+  await expect(page.locator('#scenario-status')).toHaveText('Kinematic preview');
   await expect(page.locator('.experiment-builder')).toBeHidden();
   await expect(page.locator('.model-choice[data-id="unitree_g1"]')).toBeInViewport();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
@@ -209,7 +209,7 @@ test('native Robotiq linkage uses recorded passive joints and a free block',asyn
   await page.goto('/?model=robotiq_2f85');
   await page.evaluate(async()=>{window.modelAPI=await import('/test-module.js');});
   await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
-  await expect(page.locator('#scenario-status')).toHaveText('그리퍼 파지력 · 요소 검증');
+  await expect(page.locator('#scenario-status')).toHaveText('Gripper-force component check');
   await expect(page.locator('.category-choice[data-category="diagnostic"]')).toHaveAttribute('aria-pressed','true');
   const errors=await page.evaluate(async()=>{
     const data=await(await fetch('/data/robotiq_2f85.json')).json();
@@ -239,7 +239,7 @@ test('three-arm Robotiq lift replays measured linkage and free-panel poses',asyn
   await page.goto('/?model=panda_robotiq_lift');
   await page.evaluate(async()=>{window.modelAPI=await import('/test-module.js');});
   await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
-  await expect(page.locator('#scenario-status')).toHaveText('다중 팔 · 첫 lift 검증');
+  await expect(page.locator('#scenario-status')).toHaveText('Multi-arm initial lift · checked');
   const result=await page.evaluate(async()=>{
     const data=await(await fetch('/data/panda_robotiq_lift.json')).json();
     const {loadURDFModel,applyRecordedPose,disposeModel}=window.modelAPI;let error=0;
@@ -269,7 +269,7 @@ test('experiment form submits edits, polls and displays the completed recording'
   await page.locator('#panel-mass').fill('1.2');
   await page.getByLabel('lift z',{exact:true}).fill('0.65');
   await page.locator('#experiment-run').click();
-  await expect(page.locator('#experiment-state')).toHaveText('계산 완료');
+  await expect(page.locator('#experiment-state')).toHaveText('Computation complete');
   expect(submitted.mass).toBe(1.2);expect(submitted.keyframes[1].object_pose[2]).toBe(.65);
   expect(submitted.contacts).toHaveLength(3);
   await expect(page.locator('#result-residual')).toContainText('e-');
@@ -283,7 +283,7 @@ test('experiment failures and cancellation stay visible',async({page})=>{
   await page.reload();await page.locator('#experiment-run').click();
   await expect(page.locator('#experiment-state')).toContainText('IPOPT');
   await page.locator('#experiment-cancel').click();
-  await expect(page.locator('#experiment-state')).toHaveText('취소됨');
+  await expect(page.locator('#experiment-state')).toHaveText('Cancelled');
   await page.route('**/api/experiments',route=>route.fulfill({status:400,json:{error:'normal must point out of the panel surface'}}));
   await page.locator('#experiment-run').click();
   await expect(page.locator('#experiment-state')).toContainText('normal must point out');
@@ -292,16 +292,16 @@ test('experiment failures and cancellation stay visible',async({page})=>{
 test('table assembly renders three arms and two free URDF parts through all eight keyframes',async({page})=>{
   await page.goto('/?model=table_assembly');
   await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
-  await expect(page.locator('#model-title')).toContainText('책상 조립');
+  await expect(page.locator('#model-title')).toContainText('Tabletop');
   await expect(page.locator('#dof')).toHaveText('25');
   await expect(page.locator('.keyframe-choice')).toHaveCount(9);
   await expect(page.locator('#result-seal')).toContainText('SEATED');
   await page.getByRole('button',{name:'reorient_tabletop · 12.0 s',exact:true}).click();
   await expect(page.locator('#time-now')).toHaveText('12.00 s');
-  await expect(page.locator('#tool-state')).toContainText('상판 gripper: 양쪽 pad 접촉');
+  await expect(page.locator('#tool-state')).toContainText('Tabletop gripper: Both pads in contact');
   await page.getByRole('button',{name:'assembled_and_released · 30.0 s',exact:true}).click();
-  await expect(page.locator('#tool-state')).toContainText('다리 gripper: 해제');
-  await expect(page.locator('#tool-state')).toContainText('socket: 접촉');
+  await expect(page.locator('#tool-state')).toContainText('Leg gripper: Released');
+  await expect(page.locator('#tool-state')).toContainText('socket: Contact');
   await expect(page.locator('#chart-label')).toHaveText('MEASURED INSERTION DEPTH');
   await expect(page.locator('#error-unit')).toHaveText('mm');
   await page.evaluate(async()=>{window.modelAPI=await import('/test-module.js');});
@@ -332,22 +332,22 @@ test('assembly duration submission uses the new Python scenario API',async({page
   await expect(page.locator('#experiment-run')).toBeEnabled();
   await page.locator('#assembly-duration').fill('36');
   await page.locator('#experiment-run').click();
-  await expect(page.locator('#experiment-state')).toHaveText('계산 완료');
+  await expect(page.locator('#experiment-state')).toHaveText('Computation complete');
   expect(payload).toEqual({preset:'table_assembly',duration:36});
   await expect(page.locator('#result-seal')).toContainText('SEATED');
 });
 
 test('primary panel recording refines source anchors, seats on a URDF jig and releases all tools',async({page})=>{
   await page.goto('/?model=panel_fixture');
-  await expect(page.locator('#model-title')).toContainText('패널 → 지그');
+  await expect(page.locator('#model-title')).toContainText('Panel transport');
   await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
   await expect(page.locator('#scenario-preset')).toHaveValue('panel_fixture');
-  await expect(page.locator('#source-result')).toContainText('synthetic 입력');
+  await expect(page.locator('#source-result')).toContainText('Synthetic input');
   await expect(page.locator('#source-result')).toContainText('1.053 → 1.116');
   await expect(page.locator('#result-seal')).toContainText('SUPPORTED');
   await page.getByRole('button',{name:'released · 30.0 s',exact:true}).click();
-  await expect(page.locator('#tool-state')).toContainText('edge_gripper_contact: 해제');
-  await expect(page.locator('#tool-state')).toContainText('support_right_contact: 해제');
+  await expect(page.locator('#tool-state')).toContainText('edge_gripper_contact: Released');
+  await expect(page.locator('#tool-state')).toContainText('support_right_contact: Released');
   await expect(page.locator('#chart-label')).toHaveText('MEASURED PANEL HEIGHT');
   const errors=await page.evaluate(async()=>{
     const {loadURDFModel,applyRecordedPose,disposeModel}=await import('/test-module.js');
@@ -374,7 +374,7 @@ test('panel API submits the source refinement ablation and duration',async({page
   await page.route('**/api/experiments/panel',route=>route.fulfill({json:{state:'completed',stage:'complete',recording:'/data/panel_fixture.json'}}));
   await page.goto('/?model=panel_fixture');await expect(page.locator('#experiment-run')).toBeEnabled();
   await page.locator('#source-refinement').uncheck();await page.locator('#assembly-duration').fill('36');
-  await page.locator('#experiment-run').click();await expect(page.locator('#experiment-state')).toHaveText('계산 완료');
+  await page.locator('#experiment-run').click();await expect(page.locator('#experiment-state')).toHaveText('Computation complete');
   expect(payload).toMatchObject({preset:'panel_fixture',duration:36,refine_source:false,contracted_source:{contact_frame:'object',origin:'synthetic_contracted_fixture'}});
 });
 
@@ -385,15 +385,15 @@ test('mobile RBY1 and fixed Panda replay wheel-driven workspace extension',async
   await expect(page.locator('#base')).toHaveText('Mobile SE(2)');
   await expect(page.locator('#scenario-preset')).toHaveValue('mobile_panel');
   await expect(page.locator('#preset-tag')).toHaveText('RBY1 + PANDA');
-  await expect(page.locator('#workspace-result')).toContainText('고정 Panda');
+  await expect(page.locator('#workspace-result')).toContainText('fixed Panda');
   await expect(page.locator('#workspace-result')).toContainText('1.399 m');
   await expect(page.locator('#result-seal')).toContainText('SUPPORTED');
   await page.getByRole('button',{name:'outside_fixed_workspace · 18.0 s',exact:true}).click();
-  await expect(page.locator('#tool-state')).toContainText('fixed_arm_support: 해제');
-  await expect(page.locator('#tool-state')).toContainText('rby_gripper: 접촉');
+  await expect(page.locator('#tool-state')).toContainText('fixed_arm_support: Released');
+  await expect(page.locator('#tool-state')).toContainText('rby_gripper: Contact');
   await expect(page.locator('#chart-label')).toHaveText('MEASURED MOBILE BASE TRAVEL');
   await page.getByRole('button',{name:'released · 36.0 s',exact:true}).click();
-  await expect(page.locator('#tool-state')).toContainText('rby_gripper: 해제');
+  await expect(page.locator('#tool-state')).toContainText('rby_gripper: Released');
   const errors=await page.evaluate(async()=>{
     const {loadURDFModel,applyRecordedPose,disposeModel}=await import('/test-module.js');
     const data=await(await fetch('/data/mobile_panel.json')).json();const errors=[];
@@ -417,7 +417,7 @@ test('mobile form submits the mixed embodiment and source JSON to Python',async(
   await page.route('**/api/experiments',route=>{payload=route.request().postDataJSON();return route.fulfill({status:202,json:{id:'mobile'}});});
   await page.route('**/api/experiments/mobile',route=>route.fulfill({json:{state:'completed',stage:'complete',recording:'/data/mobile_panel.json'}}));
   await page.goto('/?model=mobile_panel');await expect(page.locator('#experiment-run')).toBeEnabled();await page.locator('#assembly-duration').fill('45');
-  await page.locator('#experiment-run').click();await expect(page.locator('#experiment-state')).toHaveText('계산 완료');
+  await page.locator('#experiment-run').click();await expect(page.locator('#experiment-state')).toHaveText('Computation complete');
   expect(payload).toMatchObject({preset:'mobile_panel',duration:45,contracted_source:{origin:'synthetic_mobile_handover_fixture'}});
 });
 
@@ -450,13 +450,13 @@ for(const id of ['hinged_door','folding_panel','drawer']){
 test('external pulse shows measured recovery and preserves capability failure',async({page})=>{
   await page.goto('/?model=mobile_push_25');
   await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
-  await expect(page.locator('#robustness-result')).toContainText('자세 회복 PASS');
-  await expect(page.locator('#robustness-result')).toContainText('전체 검사 FAIL');
+  await expect(page.locator('#robustness-result')).toContainText('pose recovery PASS');
+  await expect(page.locator('#robustness-result')).toContainText('complete checks including interface admissibility FAIL');
   await page.locator('#play').click();
   const expectedForce=await page.locator('#timeline').evaluate(el=>{el.value=String(16.25/36);el.dispatchEvent(new Event('input'));return (25*Math.sin(Math.PI*(Number(el.value)*36-16)/.5)**2).toFixed(2);});
   await expect(page.locator('#disturbance-state')).toContainText(expectedForce+' N');
   await page.locator('#timeline').evaluate(el=>{el.value=String(18/36);el.dispatchEvent(new Event('input'));});
-  await expect(page.locator('#disturbance-state')).not.toContainText('적용 중');
+  await expect(page.locator('#disturbance-state')).not.toContainText('Applied external force');
 });
 
 for(const id of ['free_box_lid','free_folding_object','free_portable_drawer']){
@@ -482,7 +482,7 @@ for(const id of ['free_box_lid','free_folding_object','free_portable_drawer']){
 test('force peak event pauses with an explicitly visible force arrow',async({page})=>{
  await page.goto('/?model=free_box_push');
  await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
- await page.getByRole('button',{name:'외력 최대 · 화살표 · 8.5 s',exact:true}).click();
+ await page.getByRole('button',{name:'Peak external force · arrow · 8.5 s',exact:true}).click();
  await expect(page.locator('#time-now')).toHaveText('8.50 s');
  await expect(page.locator('#disturbance-state')).toHaveAttribute('data-active','true');
  await expect(page.locator('#disturbance-state')).toContainText('5.00 N');
@@ -500,11 +500,11 @@ test('full assembly external push replays applied force and all controlled ablat
  expect(d.report.ablation_results.fixed_path.execution_passed).toBe(true);
  expect(d.report.ablation_results.fixed_path.selection.all_moving_object_intervals_cito_optimized).toBe(false);
  expect(d.external_disturbances).toHaveLength(1);
- const peak=d.events.find(e=>e.id==='외력 최대 · 화살표');
- await page.getByRole('button',{name:`외력 최대 · 화살표 · ${peak.time.toFixed(1)} s`,exact:true}).click();
+ const peak=d.events.find(e=>e.id==='외력 최대 · 화살표'); // Original recording identifiers are preserved.
+ await page.getByRole('button',{name:`Peak external force · arrow · ${peak.time.toFixed(1)} s`,exact:true}).click();
  await expect(page.locator('#disturbance-state')).toHaveAttribute('data-active','true');
  await expect(page.locator('#disturbance-state')).toContainText('5.00 N');
- await expect(page.locator('#ablation-results tr[data-variant="contact_disabled"]')).toContainText('음성 대조군');
+ await expect(page.locator('#ablation-results tr[data-variant="contact_disabled"]')).toContainText('negative control');
 });
 
 test('free-object form preserves edited dense groups while retiming',async({page})=>{
@@ -522,12 +522,12 @@ for (const task of ['assembly','box','panel']) {
     await page.goto(`/?model=full_${task}`);
     await page.evaluate(async()=>{window.modelAPI=await import("/test-module.js");});
     await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
-    await expect(page.locator('#scenario-status')).toContainText('전체 구간 · 검증 통과');
+    await expect(page.locator('#scenario-status')).toContainText('Complete sequence · execution checks passed');
     await expect(page.locator('#result-tracking')).toContainText('PASS');
     await expect(page.locator('#result-forces')).toContainText('PASS');
     await expect(page.locator('#ablation-results tr[data-variant="full"]')).toContainText('PASS');
-    await expect(page.locator('#full-result-links')).toContainText('실패 이유');
-    await expect(page.locator('#ablation-results')).toContainText('성능 향상을 입증하지 못합니다');
+    await expect(page.locator('#full-result-links')).toContainText('failed checks');
+    await expect(page.locator('#ablation-results')).toContainText('does not demonstrate a type-selection benefit');
     await expect(page.locator('#experiment-form')).toBeHidden();
     const result=await page.evaluate(async task=>{
       const data=await(await fetch(`/data/full_${task}.json`)).json(),{loadURDFModel,applyRecordedPose,disposeModel}=window.modelAPI;let maximum=0;
@@ -549,8 +549,8 @@ for (const task of ['assembly','box','panel']) {
     expect(d.native_contact_samples.sample_times_s).toEqual(d.times);expect(d.native_contact_samples.frames).toHaveLength(d.times.length);
     await page.locator('#timeline').evaluate(el=>{el.value='.8';el.dispatchEvent(new Event('input'));});
     await page.locator('#contact-focus').selectOption(d.contact_contraction.groups[0].group_id);
-    await expect(page.locator('#play')).toHaveAttribute('aria-label','재생');
-    await expect(page.locator('#native-contact-state')).toContainText('보간 없음');
+    await expect(page.locator('#play')).toHaveAttribute('aria-label','Play');
+    await expect(page.locator('#native-contact-state')).toContainText('no contact interpolation');
     expect(Number(await page.locator('#native-contact-state').getAttribute('data-count'))).toBeGreaterThan(0);
     expect(d.full_task_recording).toBe(true);expect(d.multi_arm).toBe(true);expect(r.execution_passed).toBe(true);
     expect(r.full_variant_pipeline_executed).toBe(true);expect(r.full_paper_pipeline_executed).toBe(false);
@@ -560,7 +560,7 @@ for (const task of ['assembly','box','panel']) {
     expect(d.provenance.canonical_point_tool.radius_m).toBe(.025);
     expect(d.provenance.canonical_point_tool.ee_to_tip.slice(0,3).map(row=>row[3])).toEqual([0,0,.165]);
     expect(r.object_equality_constraints_used).toBe(0);expect(r.sampled_interface_wrench_capability.passed).toBe(true);
-    const negative=page.locator('#ablation-results tr[data-variant="contact_disabled"]');await expect(negative).toContainText('FAIL');await expect(negative).toContainText('목표');
+    const negative=page.locator('#ablation-results tr[data-variant="contact_disabled"]');await expect(negative).toContainText('FAIL');await expect(negative).toContainText('Task pose');
     if(task==='box'){
       const fixed=r.ablation_results.fixed_path,peak=Math.max(...Object.values(fixed.jaw_force).flatMap(j=>j.all_time_maximum_per_jaw_N||j.maximum_per_jaw_N));
       await expect(page.locator('#ablation-results tr[data-variant="fixed_path"]')).toContainText(peak.toFixed(2)+' N / 40 N');
@@ -576,8 +576,8 @@ test('matched source-polytope ablation preserves both outcomes and the applied f
  await page.goto('/?model=robust_refinement_polytope_-4N');
  await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
  await expect(page.locator('#scenario-status')).toContainText('Source robustness · PASS');
- await expect(page.locator('#source-result')).toContainText('ON · 8 vertices');
- const results=page.locator('#algorithm-comparison-results');await expect(results).toContainText('Source polytope ON/OFF');
+ await expect(page.locator('#source-result')).toContainText('ON · 8 box vertices');
+ const results=page.locator('#algorithm-comparison-results');await expect(results).toContainText('box-vertex robustness ON/OFF');
  await expect(results.locator('tr[data-robustness="true"][data-force="-4"]')).toContainText('PASS');
  await expect(results.locator('tr[data-robustness="false"][data-force="-4"]')).toContainText('FAIL');
  const study=await page.evaluate(async()=>await(await fetch('/data/algorithm-comparisons.json')).json());
@@ -585,18 +585,18 @@ test('matched source-polytope ablation preserves both outcomes and the applied f
  for(const enabled of [true,false]){const same=trials.filter(t=>t.robustness_enabled===enabled);expect(new Set(same.map(t=>t.native_plan_id)).size).toBe(1);expect(same.find(t=>t.force_N===0).execution_passed).toBe(true);}
  const on=trials.find(t=>t.force_N===-4&&t.robustness_enabled),off=trials.find(t=>t.force_N===-4&&!t.robustness_enabled);
  expect(on.inside_initial_static_box).toBe(true);expect(off.inside_initial_static_box).toBe(false);expect(on.source_rho).toBeGreaterThan(off.source_rho);
- await page.getByRole('button',{name:'외력 최대 · 화살표 · 4.5 s',exact:true}).click();
+ await page.getByRole('button',{name:'Peak external force · arrow · 4.5 s',exact:true}).click();
  await expect(page.locator('#disturbance-state')).toHaveAttribute('data-active','true');await expect(page.locator('#disturbance-state')).toContainText('4.00 N');
  await page.goto('/?model=robust_refinement_nominal_-4N');await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
- await expect(page.locator('#scenario-status')).toContainText('Source robustness · FAIL');await expect(page.locator('#result-tracking')).toContainText('FAIL');await expect(page.locator('#source-result')).toContainText('OFF · nominal only');
+ await expect(page.locator('#scenario-status')).toContainText('Source robustness · FAIL');await expect(page.locator('#result-tracking')).toContainText('FAIL');await expect(page.locator('#source-result')).toContainText('OFF · nominal equilibrium only');
 });
 
 for(const [task,types] of [['panel','PPP'],['box','PPG']])test(`forced ${task} ${types}: worse sequence and measured execution failure remain visible`,async({page})=>{
  await page.goto(`/?model=counterfactual_${task}_${types}`);await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
- await expect(page.locator('#scenario-status')).toContainText('강제 접촉 유형 · FAIL');await expect(page.locator('#source-result')).toContainText(types.split('').join(' / '));
+ await expect(page.locator('#scenario-status')).toContainText('Forced contact type · FAIL');await expect(page.locator('#source-result')).toContainText(types.split('').join(' / '));
  const study=await page.evaluate(async()=>await(await fetch('/data/algorithm-comparisons.json')).json());const group=study.contact_types[task],other=group.counterfactuals.find(r=>r.types.join('')===types);
  expect(other.stage).toBe('native_execution');expect(other.new_physical_trial_executed).toBe(true);expect(other.sequence_objective).toBeGreaterThan(group.selected_sequence_objective);expect(other.execution_passed).toBe(false);
- await expect(page.locator('#algorithm-comparison-results')).toContainText('시퀀스 비용');
+ await expect(page.locator('#algorithm-comparison-results')).toContainText('Sequence objective');
  const d=await page.evaluate(async id=>await(await fetch('/data/'+id+'.json')).json(),`counterfactual_${task}_${types}`);
  expect(d.report.selection.source_refinement_enabled).toBe(true);expect(d.report.object_pose_prescribed).toBe(false);expect(d.report.object_equality_constraints_used).toBe(0);
 });

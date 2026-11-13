@@ -1,6 +1,7 @@
 import { createStudio } from "./studio.js";
 import { initializeExperiment } from "./experiment.js";
 import { categories, libraryEntry, recordingScope } from "./library.js";
+import { englishRecording } from './presentation-en.js';
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { applyRecordedPose, disposeModel, loadURDFModel } from "./urdf-view.js";
@@ -18,7 +19,7 @@ try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); }
 catch {
   canvasFallback = true;
   const canvas = document.createElement("canvas");
-  canvas.setAttribute("aria-label", "CPU 투영 3D 로봇 뷰어");
+  canvas.setAttribute("aria-label", "CPU-projected 3D robot viewer");
   renderer = { domElement: canvas, setPixelRatio() {}, setClearColor() {},
     setSize(width, height) { canvas.width = width * Math.min(devicePixelRatio, 2); canvas.height = height * Math.min(devicePixelRatio, 2); },
     render: drawCanvasScene };
@@ -40,7 +41,7 @@ rim.position.set(-2, 3, 2); scene.add(rim);
 const forceArrow=new THREE.ArrowHelper(new THREE.Vector3(0,1,0),new THREE.Vector3(),.5,0xef683c,.08,.04);forceArrow.visible=false;for(const mesh of [forceArrow.line,forceArrow.cone]){mesh.material.depthTest=false;mesh.renderOrder=1100;}scene.add(forceArrow);
 let grid;let contactOverlay;let nativeContactOverlay;
 const contactColors=[0x25bfa3,0xf4a340,0xa788f5];
-const contactNames={base_grasp:'본체 파지',base_support:'본체 지지',moving_manipulation:'뚜껑 파지',edge_grip:'패널 edge 파지',under_left:'패널 왼쪽 지지',under_right:'패널 오른쪽 지지',top_gripper:'상판 파지',point_support:'상판 지지',leg_gripper:'다리 파지',support_0:'왼쪽 지지',support_1:'중앙 지지',support_2:'오른쪽 지지'};
+const contactNames={base_grasp:'Base grasp',base_support:'Base support',moving_manipulation:'Lid grasp',edge_grip:'Panel-edge grasp',under_left:'Left panel support',under_right:'Right panel support',top_gripper:'Tabletop grasp',point_support:'Tabletop support',leg_gripper:'Leg grasp',support_0:'Left support',support_1:'Center support',support_2:'Right support'};
 
 const studio=createStudio(scene,renderer,sun,rim,canvasFallback);
 studio.set("studio");
@@ -59,8 +60,8 @@ new ResizeObserver(resize).observe($("viewport")); resize();
 function toast(message) { $("toast").textContent = message; $("toast").classList.add("visible"); setTimeout(() => $("toast").classList.remove("visible"), 6000); }
 function number(x) { return x === null || x === undefined ? "—" : Math.abs(x) < .001 && x !== 0 ? x.toExponential(1) : x.toFixed(4); }
 function engineLabel(data) {
-  if (data.engine === "mujoco_contact_recording") return "MuJoCo · 접촉 동역학";
-  return data.engine === "kinematic_preview" ? "기구학 미리보기" : data.engine === "cito_trajectory" ? "CITO · 최적화 궤적" : data.live ? "MuJoCo · 새 계산 결과" : "MuJoCo · 계산 결과";
+  if (data.engine === "mujoco_contact_recording") return "MuJoCo · contact dynamics";
+  return data.engine === "kinematic_preview" ? "Kinematic preview" : data.engine === "cito_trajectory" ? "CITO · optimized trajectory" : data.live ? "MuJoCo · new execution" : "MuJoCo · recorded execution";
 }
 function resetCamera() {
   controls.target.copy(center);
@@ -81,17 +82,17 @@ function buildGeometry(data) {
   $('native-contact-controls').hidden=!data.native_contact_samples;
   $('full-result-links').hidden=!data.full_task_recording&&!data.comparison_recording;
   document.querySelectorAll('[data-baseline-link]').forEach(link=>link.hidden=!data.full_task_recording);
-  $('contact-focus').replaceChildren(new Option('선택',''));
+  $('contact-focus').replaceChildren(new Option('Choose a contact',''));
   for(const g of data.contact_contraction?.groups||[])$('contact-focus').append(new Option(contactNames[g.group_id]||g.group_id,g.group_id));
   const tool=data.provenance?.canonical_point_tool;$('native-contact-note').hidden=!data.native_contact_samples;
-  $('native-contact-note').textContent=data.native_contact_samples?'색 점: 계획된 contracted anchor. '+(tool?`P 장착 길이 EE → 접촉점 ${(1000*Math.hypot(...tool.ee_to_tip.slice(0,3).map(row=>row[3]))).toFixed(0)} mm / 구 반경 ${1000*tool.radius_m} mm. `:'')+(data.scenario==='full_box'?'G는 본체·뚜껑의 돌출 손잡이를 파지합니다. 본체 손잡이는 금속 연결부로 벽에 연결됩니다.':''):'';
+  $('native-contact-note').textContent=data.native_contact_samples?'Colored markers: planned representative contacts. '+(tool?`P mount, end effector → contact point ${(1000*Math.hypot(...tool.ee_to_tip.slice(0,3).map(row=>row[3]))).toFixed(0)} mm / sphere radius ${1000*tool.radius_m} mm. `:'')+(data.scenario==='full_box'?'G grasps the protruding base and lid handles. A rigid metal attachment joins the base handle to the wall.':''):'';
   contactOverlay=new THREE.Group();robotGroup.add(contactOverlay);
   for(const [i,g] of (data.contact_contraction?.groups||[]).entries()){
     const group=new THREE.Group();group.userData.contactGroup=g;const color=contactColors[i%contactColors.length];
     const points=new THREE.Points(new THREE.BufferGeometry().setFromPoints(g.target_points_m.map(p=>new THREE.Vector3(...p))),new THREE.PointsMaterial({color,size:.007,depthTest:false}));points.userData.dense=true;points.renderOrder=1001;group.add(points);
     const anchor=new THREE.Mesh(new THREE.SphereGeometry(.006,14,10),new THREE.MeshBasicMaterial({color,depthTest:false}));anchor.position.fromArray(g.target_anchor_m);anchor.userData.anchor=true;anchor.renderOrder=1002;group.add(anchor);contactOverlay.add(group);
   }
-  $('contraction-state').replaceChildren();if(data.contact_contraction){const c=data.contact_contraction;$('contraction-state').append(c.input_type==='supplied_contracted_contacts'?` · 주어진 ${c.contracted_contact_count} contracted contacts → 3 arms · `:` · ${c.dense_sample_count} samples → ${c.contracted_contact_count} anchors → 3 arms · `);for(const [i,g] of c.groups.entries()){const label=document.createElement('span');label.style.color='#'+contactColors[i%contactColors.length].toString(16).padStart(6,'0');label.textContent=` ${g.group_id}@${g.link_id} → ${c.assignment.find(a=>a.group_id===g.group_id).arm_id} `;$('contraction-state').append(label);}}
+  $('contraction-state').replaceChildren();if(data.contact_contraction){const c=data.contact_contraction;$('contraction-state').append(c.input_type==='supplied_contracted_contacts'?` · Supplied ${c.contracted_contact_count} contracted contacts → 3 arms · `:` · ${c.dense_sample_count} samples → ${c.contracted_contact_count} anchors → 3 arms · `);for(const [i,g] of c.groups.entries()){const label=document.createElement('span');label.style.color='#'+contactColors[i%contactColors.length].toString(16).padStart(6,'0');label.textContent=` ${g.group_id}@${g.link_id} → ${c.assignment.find(a=>a.group_id===g.group_id).arm_id} `;$('contraction-state').append(label);}}
   for (const item of (data.instances?.some(i=>["static_jig","articulated_object"].includes(i.role)) ? [] : data.environment) || []) {
     if (item.type !== "box") continue;
     const mesh = new THREE.Mesh(new THREE.BoxGeometry(...item.size), new THREE.MeshStandardMaterial({color:item.color, transparent:true, opacity:.6}));
@@ -137,12 +138,12 @@ async function loadGeometry() {
   updateGeometry(frameFloat);
   if (mode === "skeleton") {
     $("geometry-status").textContent = data.id === "dual_cito"
-      ? "두 Cartesian arm과 물체의 좌표 재생입니다. 이 제한 모델에는 외형 mesh가 없습니다."
-      : "URDF 링크 좌표를 표시합니다. Visual 또는 collision을 선택하면 원본 형상을 불러옵니다.";
+      ? "Playback of two Cartesian arms and an object. This restricted model has no exterior meshes."
+      : "URDF link coordinates. Select visual or collision geometry to load the original shapes.";
     $("geometry-status").dataset.state = "skeleton";
     $("loading").classList.add("hidden"); return;
   }
-  $("geometry-status").textContent = "URDF와 mesh를 불러오는 중입니다…";
+  $("geometry-status").textContent = "Loading URDF and meshes…";
   $("loading").classList.remove("hidden");
   try {
     const instances = data.instances || [{ manifest: `./models/${data.id}/model.json` }];
@@ -163,19 +164,19 @@ async function loadGeometry() {
     }
     urdfModels = loaded; loaded.forEach(item => robotGroup.add(item.robot));
     $("geometry-status").textContent = canvasFallback
-      ? "URDF/mesh 로드 완료. WebGL을 사용할 수 없어 링크 좌표를 CPU로 표시합니다."
+      ? "URDF/meshes loaded. WebGL is unavailable; link coordinates are projected on the CPU."
       : mode === "collision"
-        ? "URDF collision 형상을 표시합니다. 형상 표시는 접촉 계산·충돌 검증 결과와 별개입니다."
+        ? "URDF collision geometry. Geometry display is separate from contact computation and collision-validation results."
         : data.engine === "mujoco_contact_recording"
-          ? data.scenario === "mobile_panel" ? "공식 RBY1 URDF·mesh, 차동구동 모바일 베이스와 고정 Panda의 실제 접촉 실행입니다." : data.free_articulated_object ? "자유 본체+내부 관절의 실제 동역학, 세 팔의 링크별 contracted contact realization입니다." : data.articulated_object ? "수동 관절의 URDF와 측정된 움직임을 표시합니다. 물체 actuator 없이 로봇 접촉으로 구동했습니다." : data.scenario === "panel_fixture" ? "원본 Panda URDF·mesh, 자유 패널 URDF와 고정 지그를 표시합니다. 소형 접촉 refinement 후 실행한 기록입니다." : data.scenario === "table_assembly" ? "Panda 3대와 두 자유 부품의 실제 접촉 실행입니다. 상판·다리의 visual/collision URDF에 빈 socket과 peg 형상을 포함합니다." : "3개 URDF 팔과 도구의 실제 접촉 실행입니다. Point는 구형 tool, gripper는 두 손가락 접촉, suction은 압력 제한 seal 모델입니다."
-          : "URDF visual·mesh의 origin과 scale을 적용했습니다. 기록된 시뮬레이션은 관절 추종 검증입니다.";
+          ? data.scenario === "mobile_panel" ? "Official RBY1 URDF/meshes; measured contact execution with a differential-drive mobile base and a fixed Panda." : data.free_articulated_object ? "Native dynamics of a free base and internal joint; three-arm realization of link-aware contracted contacts." : data.articulated_object ? "URDF geometry and measured passive-joint motion, driven through robot contact without object actuators." : data.scenario === "panel_fixture" ? "Original Panda URDF/meshes, a free panel, and a fixed fixture; recorded execution after small-scale source contact refinement." : data.scenario === "table_assembly" ? "Three Panda arms and two free parts in native contact execution. Tabletop and leg URDFs include socket and peg visual/collision geometry." : "Native contact execution with three URDF arms and interfaces: a spherical point tool, a two-finger gripper, and a pressure-limited suction seal."
+          : "URDF mesh origins and scales are applied. This recording checks joint tracking.";
     if (data.display?.geometry && !canvasFallback) $("geometry-status").textContent = data.display.geometry;
     $("geometry-status").dataset.state = "ready";
     $("geometry-status").dataset.model = data.id;
     updateGeometry(frameFloat);
   } catch (error) {
     if (token !== geometryToken) return;
-    $("geometry-status").textContent = error.message + " 링크 좌표 표시를 선택하거나 네트워크를 확인해 주세요.";
+    $("geometry-status").textContent = error.message + " Select link coordinates or check network access.";
     $("geometry-status").dataset.state = "error";
     toast(error.message);
   } finally {
@@ -205,11 +206,11 @@ function updateGeometry(value) {
   const sample=Math.round(value),patches=dataset.native_contact_samples?.frames[sample]||[];
   nativeContactOverlay?.children.forEach((marker,i)=>{marker.visible=!!patches[i]&&$('native-contact-visible').checked;if(patches[i])marker.position.fromArray(patches[i].position_world_m);});
   $('native-contact-state').dataset.count=String(patches.length);
-  $('native-contact-state').textContent=dataset.native_contact_samples?`native ${dataset.times[sample].toFixed(3)} s · ${patches.length} 접촉면 · 보간 없음${patches.length?' · 최소 gap '+(1000*Math.min(...patches.map(p=>p.minimum_gap_m))).toFixed(3)+' mm':''}`:'';
+  $('native-contact-state').textContent=dataset.native_contact_samples?`native ${dataset.times[sample].toFixed(3)} s · ${patches.length} contact patches · no contact interpolation${patches.length?' · minimum signed gap '+(1000*Math.min(...patches.map(p=>p.minimum_gap_m))).toFixed(3)+' mm':''}`:'';
   const time=dataset.times[lo]*(1-f)+dataset.times[hi]*f;const pulses=dataset.external_disturbances||[];const pulse=pulses.find(p=>time>=p.start&&time<=p.start+p.duration);forceArrow.visible=false;
   if(pulse&&dataset.objects?.[0]?.poses){const object=dataset.objects.find(o=>o.native_body===pulse.body)||dataset.objects[0],pose=object.poses[lo],next=object.poses[hi],quat=new THREE.Quaternion().fromArray(pose,3).slerp(new THREE.Quaternion().fromArray(next,3),f);const origin=new THREE.Vector3(...pose.slice(0,3)).lerp(new THREE.Vector3(...next.slice(0,3)),f).add(new THREE.Vector3(...pulse.point_body_m).applyQuaternion(quat));const magnitude=Math.sin(Math.PI*(time-pulse.start)/pulse.duration)**2;const force=new THREE.Vector3(...pulse.force_world_N).multiplyScalar(magnitude);if(force.length()>.01){forceArrow.position.copy(origin);forceArrow.setDirection(force.clone().normalize());forceArrow.setLength(.12+force.length()*.015,.08,.04);forceArrow.visible=true;}}
   $('disturbance-state').hidden=!pulses.length;$('disturbance-state').dataset.active=String(forceArrow.visible);
-  $('disturbance-state').textContent=pulse?`외력 적용 중 · ${(Math.sin(Math.PI*(time-pulse.start)/pulse.duration)**2*Math.hypot(...pulse.force_world_N)).toFixed(2)} N · world frame` : pulses.length?`외력: ${pulses.map(p=>`${p.start}–${p.start+p.duration} s / 최대 ${Math.hypot(...p.force_world_N)} N`).join(', ')}`:'';
+  $('disturbance-state').textContent=pulse?`Applied external force · ${(Math.sin(Math.PI*(time-pulse.start)/pulse.duration)**2*Math.hypot(...pulse.force_world_N)).toFixed(2)} N · world frame` : pulses.length?`External disturbance: ${pulses.map(p=>`${p.start}–${p.start+p.duration} s / peak ${Math.hypot(...p.force_world_N)} N`).join(', ')}`:'';
   displayedPositions = positions;
 }
 // Preserve orbit/zoom and real URDF coordinates when WebGL is unavailable.
@@ -280,7 +281,7 @@ function drawChart() {
     dataset.object ? dataset.positions.map(p => p[dataset.object.index][2] - dataset.positions[0][dataset.object.index][2]) : []);
   $("chart-label").textContent = dataset.chart_label || (dataset.object ? "OBJECT LIFT" : "JOINT TRACKING ERROR");
   $("error-unit").textContent = dataset.chart_unit || (dataset.object ? "m" : "rad");
-  $("chart-note").textContent = dataset.engine === "kinematic_preview" ? "기구학 재생: 동역학 추종 오차 없음" : dataset.scenario === "table_assembly" ? "실제 peg tip / socket 위치에서 계산 · 28 s에 다리 gripper 해제" : dataset.instances ? "실제 접촉 동역학 실행 기록 · keyframe별 추종·접촉 상태 확인" : dataset.object ? "1 kg 물체 · 두 Cartesian arm · 3 cm 이동" : "관절 위치 오차의 2-norm";
+  $("chart-note").textContent = dataset.engine === "kinematic_preview" ? "Kinematic playback; no dynamic tracking-error measurement" : dataset.scenario === "table_assembly" ? "Computed from measured peg-tip/socket positions · leg gripper opens at 28 s" : dataset.instances ? "Measured contact-dynamics execution · inspect keyframe tracking and contact state" : dataset.object ? "1 kg object · two Cartesian arms · 3 cm displacement" : "Euclidean norm of joint-position error";
   if (dataset.display?.chart_note) $("chart-note").textContent = dataset.display.chart_note;
   if (!chartValues.length) { $("chart-line").setAttribute("points", ""); $("chart-area").setAttribute("d", ""); return; }
   const min = Math.min(0, ...chartValues), max = Math.max(1e-8, ...chartValues);
@@ -340,7 +341,8 @@ function buildLibrary(models) {
     $("model-list").append(panel);
   }
 }
-function showData(data) {
+function showData(original) {
+  const data=englishRecording(original);
   $("toast").classList.remove("visible");
   if (dataset?.id === "dual_cito" && data.id !== "dual_cito") $("geometry-mode").value = "visual";
   dataset = data; frameFloat = 0;
@@ -358,8 +360,8 @@ function showData(data) {
   if (document.querySelector(`.model-choice[data-id="${CSS.escape(data.id)}"]`)) {
     const url = new URL(location.href); url.searchParams.set("model", data.id); history.replaceState(null, "", url);
   }
-  $("model-description").textContent = data.engine === "kinematic_preview" ? "29개 관절과 floating base를 가진 휴머노이드의 기구학을 확인합니다." : data.engine === "cito_trajectory" ? "접촉을 유지하며 물체를 들어 올리는 제한 모델의 최적화 결과입니다." : "URDF 관성으로 계산한 폐루프 토크 제어 결과를 재생합니다.";
-  if (data.instances) $("model-description").textContent = data.free_articulated_object ? "자유 본체+내부 관절의 실제 동역학, 세 팔의 링크별 contracted contact realization입니다." : data.articulated_object ? "수동 물체 관절 · 로봇 접촉으로 구동 · 주어진 접촉점과 관절 경로의 힘·토크 최적화" : data.scenario === "mobile_panel" ? "RBY1 모바일 듀얼암 + 고정 Panda · 초기 지지 전달 → 고정 작업영역 밖으로 이동 → 지그 안착·릴리스" : data.scenario === "panel_fixture" ? "본 실험: 소형 접촉 위치 refinement → 패널 운반·재배향 → 지그 안착·하중 전달 → 전체 릴리스 · 자유 강체 실행" : data.scenario === "table_assembly" ? "밑면이 위인 상판 grip & support → 12° reorientation → 다리 정렬·삽입 → gripper 해제 · 30초 실제 동역학 실행" : `주어진 contracted contact → ${data.keyframes.length}개 keyframe 최적화 → 3개 팔의 접촉 동역학 실행입니다.`;
+  $("model-description").textContent = data.engine === "kinematic_preview" ? "Kinematic playback of a humanoid with 29 joints and a floating base." : data.engine === "cito_trajectory" ? "An optimized restricted-model trajectory that lifts an object while maintaining contact." : "Recorded closed-loop torque control using URDF inertial parameters.";
+  if (data.instances) $("model-description").textContent = data.free_articulated_object ? "Native dynamics of a free base and internal joint; three-arm realization of link-aware contracted contacts." : data.articulated_object ? "Passive object joint · driven by robot contact · reactions/torques optimized for supplied contacts and joint path" : data.scenario === "mobile_panel" ? "RBY1 mobile dual arm + fixed Panda · support handoff → travel beyond fixed-base reach → fixture placement and release" : data.scenario === "panel_fixture" ? "Small-scale source contact refinement → panel transport/reorientation → fixture placement/load transfer → complete release · native free-body execution" : data.scenario === "table_assembly" ? "Inverted tabletop grasp/support → 12° reorientation → leg alignment/insertion → gripper release · 30 s native dynamic execution" : `Supplied contracted contacts → ${data.keyframes.length} optimized keyframes → three-arm contact-dynamics execution.`;
   $("engine-badge").innerHTML = "<span></span>" + engineLabel(data);
   $("engine-badge").classList.toggle("kinematic", data.engine === "kinematic_preview");
   $("scene-label").textContent = data.engine === "cito_trajectory" ? "COUPLED ROBOT–OBJECT TRAJECTORY" : data.engine === "kinematic_preview" ? "FLOATING-BASE KINEMATIC PREVIEW" : "RECORDED CLOSED-LOOP SIMULATION";
@@ -378,7 +380,7 @@ function showData(data) {
     const button = document.createElement("button"); button.className = "keyframe-choice";
     button.textContent = keyframe.id + " · " + keyframe.time.toFixed(1) + " s";
     button.onclick = () => {
-      playing = false; $("play").textContent = "▶"; $("play").setAttribute("aria-label", "재생");
+      playing = false; $("play").textContent = "▶"; $("play").setAttribute("aria-label", "Play");
       let hi = data.times.findIndex(t => t >= keyframe.time); if (hi < 0) hi = data.times.length-1;
       const lo = Math.max(0, hi-1);
       frameFloat = lo+(keyframe.time-data.times[lo])/Math.max(1e-12, data.times[hi]-data.times[lo]); updateFrame();
@@ -391,12 +393,12 @@ function showData(data) {
   });
   revealLibraryChoice();
   if (downloadUrl) URL.revokeObjectURL(downloadUrl);
-  downloadUrl = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: "application/json" }));
+  downloadUrl = URL.createObjectURL(new Blob([JSON.stringify(original)], { type: "application/json" }));
   $("download-data").href = downloadUrl; $("download-data").download = data.id + "-simulation.json";
   $("run").disabled = !backend || data.engine === "kinematic_preview" || data.id === "dual_cito" || !!data.instances;
   $("amplitude").disabled = $("run-duration").disabled = !!data.instances;
-  $("backend-state").textContent = data.instances ? "조건을 바꿔 다시 계산: contact-transfer demo-three-arm --viewer web"
-    : backend ? "Python backend 연결됨 · 새 MuJoCo 계산을 실행합니다." : "이 링크는 계산 결과 재생용입니다. 새 계산은 로컬 또는 Codespaces의 Python 서버에서 실행합니다.";
+  $("backend-state").textContent = data.instances ? "To compute a new trial: contact-transfer demo-three-arm --viewer web"
+    : backend ? "Python backend connected · new MuJoCo trials can be computed." : "This page replays recorded results. New computations require the Python backend locally or in Codespaces.";
   buildGeometry(data); drawChart(); updateFrame();
   loadGeometry();
 }
@@ -407,8 +409,8 @@ function updateFrame() {
   $("timeline").value = frameFloat / (dataset.times.length - 1);
   $("time-now").textContent = time.toFixed(2) + " s";
   $("error-now").textContent = chartValues.length ? number(chartValues[index]) : "—";
-  $("tool-state").textContent = (dataset.tool_states && !dataset.tool_states.suction_sealed && dataset.scenario !== "table_assembly") ? Object.entries(dataset.tool_states).map(([name,values])=>`${name}: ${values[index]?"접촉":"해제"}`).join(" · ") : dataset.scenario === "table_assembly" ? `상판 gripper: ${dataset.tool_states.top_gripper_contact[index] ? "양쪽 pad 접촉" : "분리"} · 구형 support: ${dataset.tool_states.point_contact[index] ? "접촉" : "분리"} · 다리 gripper: ${dataset.tool_states.leg_gripper_contact[index] ? "양쪽 pad 접촉" : "해제"} · socket: ${dataset.tool_states.socket_contact[index] ? "접촉" : "비접촉"}` : dataset.tool_states
-    ? `구형 tool: ${dataset.tool_states.point_contact[index] ? "접촉" : "분리"} · Gripper: ${dataset.tool_states.gripper_contact[index] ? "양쪽 pad 접촉" : "미파지"} · Suction: ${dataset.tool_states.suction_sealed[index] ? "seal 유지" : "해제"}` : "";
+  $("tool-state").textContent = (dataset.tool_states && !dataset.tool_states.suction_sealed && dataset.scenario !== "table_assembly") ? Object.entries(dataset.tool_states).map(([name,values])=>`${name}: ${values[index]?"Contact":"Released"}`).join(" · ") : dataset.scenario === "table_assembly" ? `Tabletop gripper: ${dataset.tool_states.top_gripper_contact[index] ? "Both pads in contact" : "Separated"} · Spherical support: ${dataset.tool_states.point_contact[index] ? "Contact" : "Separated"} · Leg gripper: ${dataset.tool_states.leg_gripper_contact[index] ? "Both pads in contact" : "Released"} · socket: ${dataset.tool_states.socket_contact[index] ? "Contact" : "No contact"}` : dataset.tool_states
+    ? `Spherical tool: ${dataset.tool_states.point_contact[index] ? "Contact" : "Separated"} · Gripper: ${dataset.tool_states.gripper_contact[index] ? "Both pads in contact" : "No grasp"} · Suction: ${dataset.tool_states.suction_sealed[index] ? "Seal retained" : "Released"}` : "";
   const ratio = dataset.torque_ratio[index];
   $("torque-now").textContent = ratio === null || ratio === undefined ? "—" : (ratio * 100).toFixed(1) + "%";
   $("torque-meter").style.width = Math.min(100, (ratio || 0) * 100) + "%";
@@ -420,12 +422,12 @@ async function selectModel(id) {
   const token = ++loadToken; $("loading").classList.remove("hidden");
   try {
     const response = await fetch("./data/" + id + ".json");
-    if (!response.ok) throw Error("데이터를 불러오지 못했습니다.");
+    if (!response.ok) throw Error("Could not load the recording.");
     const data = await response.json();
     if (token === loadToken) showData(data);
   } catch (error) { if (token === loadToken) { toast(error.message); $("loading").classList.add("hidden"); } }
 }
-$("play").onclick = () => { playing = !playing; $("play").textContent = playing ? "Ⅱ" : "▶"; $("play").setAttribute("aria-label", playing ? "일시 정지" : "재생"); };
+$("play").onclick = () => { playing = !playing; $("play").textContent = playing ? "Ⅱ" : "▶"; $("play").setAttribute("aria-label", playing ? "Pause" : "Play"); };
 $("timeline").oninput = event => { if (dataset) { frameFloat = Number(event.target.value) * (dataset.times.length - 1); updateFrame(); } };
 $("speed").onchange = event => speed = Number(event.target.value);
 $("loop").onclick = () => { loop = !loop; $("loop").classList.toggle("active", loop); $("loop").setAttribute("aria-pressed", loop); };
@@ -435,7 +437,7 @@ $("contact-display").onchange=()=>updateFrame();
 $("native-contact-visible").onchange=()=>updateFrame();
 $("contact-focus").onchange=()=>{
   const id=$('contact-focus').value,g=dataset?.contact_contraction?.groups.find(g=>g.group_id===id),object=dataset?.objects?.find(o=>o.id===g?.link_id);if(!g||!object)return;
-  playing=false;$('play').textContent='▶';$('play').setAttribute('aria-label','재생');frameFloat=Math.round(frameFloat);updateFrame();
+  playing=false;$('play').textContent='▶';$('play').setAttribute('aria-label','Play');frameFloat=Math.round(frameFloat);updateFrame();
   const patches=dataset.native_contact_samples?.frames[frameFloat]?.filter(p=>p.group_id===id)||[],pose=object.poses[frameFloat];
   const point=patches.length?patches.reduce((a,p)=>a.add(new THREE.Vector3(...p.position_world_m)),new THREE.Vector3()).divideScalar(patches.length):new THREE.Vector3(...g.target_anchor_m).applyQuaternion(new THREE.Quaternion().fromArray(pose,3)).add(new THREE.Vector3(...pose.slice(0,3)));
   // Inspect the outside of the rotating lid, rather than looking through its
@@ -444,13 +446,13 @@ $("contact-focus").onchange=()=>{
   controls.target.copy(point);camera.position.copy(point).add(offset);controls.update();
 };
 $("run").onclick = async () => {
-  $("run").disabled = true; $("run").textContent = "계산 중…";
+  $("run").disabled = true; $("run").textContent = "Computing…";
   try {
     const response = await fetch("./api/simulate", { method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ model: dataset.id, duration: Number($("run-duration").value), amplitude: Number($("amplitude").value) }) });
     const result = await response.json();
-    if (!response.ok) throw Error(result.error || "시뮬레이션 실패");
-    result.live = true; showData(result); toast("새 MuJoCo 계산이 완료되었습니다.");
+    if (!response.ok) throw Error(result.error || "Simulation request failed");
+    result.live = true; showData(result); toast("New MuJoCo execution completed.");
   } catch (error) { toast(error.message); }
   finally { $("run").textContent = "Run simulation ↗"; $("run").disabled = !backend || dataset.id === "dual_cito" || dataset.floating_base || !!dataset.instances; }
 };
@@ -464,8 +466,8 @@ async function init() {
     const health = await fetch("./api/health");
     if (health.ok) backend = (await health.json()).ready === true;
   } catch {}
-  $("backend-state").textContent = dataset?.full_task_recording ? "새 계획·물리 실행은 Python의 tools/run_full_scenarios.py에서 수행합니다. 공개 페이지는 저장된 결과 재생용입니다." : dataset?.instances ? "조건을 바꿔 다시 계산: contact-transfer demo-three-arm --viewer web"
-    : backend ? "Python backend 연결됨 · 새 MuJoCo 계산을 실행합니다." : "이 링크는 계산 결과 재생용입니다. 새 계산은 로컬 또는 Codespaces의 Python 서버에서 실행합니다.";
+  $("backend-state").textContent = dataset?.full_task_recording ? "New plans and physical executions are computed with tools/run_full_scenarios.py. This public page replays saved results." : dataset?.instances ? "To compute a new trial: contact-transfer demo-three-arm --viewer web"
+    : backend ? "Python backend connected · new MuJoCo trials can be computed." : "This page replays recorded results. New computations require the Python backend locally or in Codespaces.";
   $("run").disabled = !backend || dataset?.floating_base || dataset?.id === "dual_cito" || !!dataset?.instances;
 }
 let previous = performance.now();

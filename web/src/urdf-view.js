@@ -19,15 +19,15 @@ export function disposeModel(root) {
 export async function loadURDFModel(manifestURL, mode = "visual") {
   if (!["visual", "collision"].includes(mode)) throw Error("Unknown URDF geometry mode");
   const response = await fetch(manifestURL);
-  if (!response.ok) throw Error("URDF 모델 정보를 불러오지 못했습니다.");
+  if (!response.ok) throw Error("Could not load the URDF model manifest.");
   const manifest = await response.json();
   const urdfURL = new URL(manifest.urdf, new URL(manifestURL, location.href));
   const source = await fetch(urdfURL);
-  if (!source.ok) throw Error("URDF 파일을 불러오지 못했습니다.");
+  if (!source.ok) throw Error("Could not load the URDF file.");
   const xml = await source.text();
   const document = new DOMParser().parseFromString(xml, "text/xml");
-  if (document.querySelector("parsererror") || document.documentElement.tagName !== "robot") throw Error("잘못된 URDF입니다.");
-  if (!document.querySelector(`link > ${mode}`)) throw Error(`URDF에 ${mode} 형상이 없습니다.`);
+  if (document.querySelector("parsererror") || document.documentElement.tagName !== "robot") throw Error("Invalid URDF document.");
+  if (!document.querySelector(`link > ${mode}`)) throw Error(`URDF has no ${mode} geometry.`);
   // A sentinel keeps primitive-only URDFs and nested DAE texture loads in the
   // same completion path. A failed mesh never becomes a silent partial model.
   const manager = new THREE.LoadingManager(), failures = [];
@@ -53,7 +53,7 @@ export async function loadURDFModel(manifestURL, mode = "visual") {
   let robot;
   await new Promise((resolve, reject) => {
     manager.onError = url => failures.push(url);
-    manager.onLoad = () => failures.length ? reject(Error("Mesh를 불러오지 못했습니다: " + failures[0])) : resolve();
+    manager.onLoad = () => failures.length ? reject(Error("Could not load mesh: " + failures[0])) : resolve();
     manager.itemStart("urdf-parse");
     try { robot = loader.parse(document, urdfURL.href.slice(0, urdfURL.href.lastIndexOf("/")+1)); }
     catch (error) { reject(error); }
@@ -73,13 +73,13 @@ export async function loadURDFModel(manifestURL, mode = "visual") {
 }
 
 export function applyRecordedPose(robot, data, value) {
-  if (!Array.isArray(data.joint_names) || data.joint_names.length !== data.dof) throw Error("관절 이름이 기록되지 않은 결과입니다.");
+  if (!Array.isArray(data.joint_names) || data.joint_names.length !== data.dof) throw Error("Joint names are missing from the recording.");
   const lo = Math.floor(value), hi = Math.min(lo+1, data.q.length-1), f = value-lo;
   const offset = data.floating_base ? 7 : 0;
   const joints = { ...(data.locked_joints || {}) };
   for (let i = 0; i < data.joint_names.length; i++) {
     const name = data.joint_names[i];
-    if (!robot.joints[name]) throw Error("URDF에 기록된 관절이 없습니다: " + name);
+    if (!robot.joints[name]) throw Error("Recorded joint is missing from the URDF: " + name);
     // Replay measured soft-limit overshoot faithfully; validation owns limits.
     robot.joints[name].ignoreLimits = true;
     joints[name] = THREE.MathUtils.lerp(data.q[lo][offset+i], data.q[hi][offset+i], f);

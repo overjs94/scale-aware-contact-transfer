@@ -1,42 +1,43 @@
 import { categories, experimentPresets, libraryEntry } from './library.js';
 import { renderFullResults } from './full-results.js';
 import { showAlgorithmComparisons } from './algorithm-comparisons.js';
+import { englishRecording } from './presentation-en.js';
 const $=id=>document.getElementById(id);
 let preset,job,timer,connected=false,presetId,presetToken=0;
 const state=text=>{$('experiment-state').textContent=text;};
-const stages={queued:'대기',source_refinement_and_optimization:'소형 접촉점 refinement · target 하중/토크 최적화',optimization:'SE(3) IK 경로 · IPOPT 접촉력/토크 최적화',simulation:'MuJoCo 동역학 실행',validation:'접촉 · 삽입 · 해제 검증',export:'기록 내보내기',complete:'계산 완료',failed:'실패',cancelled:'취소됨'};
+const stages={queued:'Queued',source_refinement_and_optimization:'Source contact refinement · target load and torque optimization',optimization:'SE(3) IK path · IPOPT reaction/torque optimization',simulation:'MuJoCo dynamic execution',validation:'Contact, insertion, and release checks',export:'Exporting recording',complete:'Computation complete',failed:'Failed',cancelled:'Cancelled'};
 const articulated=()=>['hinged_door','folding_panel','drawer','free_box_lid','free_folding_object','free_portable_drawer'].includes(preset?.id);
 const assembly=()=>preset?.id==='table_assembly';
 const panel=()=>['panel_fixture','mobile_panel'].includes(preset?.id);
 const mobile=()=>preset?.id==='mobile_panel';
-const names={grip_and_support:'상판 파지·구형 지지',grasp_settled:'파지 유지',lift_tabletop:'상판·다리 들어 올리기',reorient_tabletop:'상판 12° 재정렬',approach_socket:'다리 접근',align_leg:'peg / socket 정렬',insert_leg:'다리 삽입',assembled_and_released:'gripper 해제·조립 유지'};
+const names={grip_and_support:'Tabletop grasp and spherical support',grasp_settled:'Maintain grasp',lift_tabletop:'Lift tabletop and leg',reorient_tabletop:'Reorient tabletop by 12°',approach_socket:'Approach socket',align_leg:'Align peg and socket',insert_leg:'Insert leg',assembled_and_released:'Release gripper and retain assembly'};
 function articulatedFields(){
   const free=preset.id.startsWith('free_');const angular=!preset.id.includes('drawer');$('keyframe-inputs').replaceChildren();
-  $('preset-tag').textContent=free?'PANDA × 3 · FREE ARTICULATED':'COMPONENT · SINGLE ARM';$('builder-title').textContent={hinged_door:'문 열기',folding_panel:'접이식 상판 펼치기',drawer:'서랍 당기기',free_box_lid:'자유 박스 · grip/support + 뚜껑 열기',free_folding_object:'자유 접이식 패널 · 지지 + 날개 펼치기',free_portable_drawer:'자유 수납함 · 지지 + 서랍 당기기'}[preset.id];
-  $('builder-note').textContent=free?'세계에 고정되지 않은 본체 + 내부 관절 · G / P / G · dense contact → contraction → 3-arm realization':`수동 ${angular?'hinge':'rail'} · 물체 actuator 0 · ${preset.tool==='G'?'native gripper':'spherical point tool'}`;
-  $('tool-chips').replaceChildren();const chip=document.createElement('span');chip.textContent=free?'⋈ 본체 파지 · ● 본체 지지 · ⋈ 내부 링크 조작':preset.tool==='G'?'⋈ Gripper handle grasp':'● Spherical point contact';$('tool-chips').append(chip);
+  $('preset-tag').textContent=free?'PANDA × 3 · FREE ARTICULATED':'COMPONENT · SINGLE ARM';$('builder-title').textContent={hinged_door:'Door opening',folding_panel:'Hinged-panel unfolding',drawer:'Drawer opening',free_box_lid:'Free box · base grasp/support and lid opening',free_folding_object:'Free folding panel · support and unfolding',free_portable_drawer:'Free cabinet · support and drawer opening'}[preset.id];
+  $('builder-note').textContent=free?'Free base and internal joint · G / P / G · dense contacts → representative contacts → three-arm realization':`Passive ${angular?'hinge':'rail'} · no object actuators · ${preset.tool==='G'?'native gripper':'spherical point tool'}`;
+  $('tool-chips').replaceChildren();const chip=document.createElement('span');chip.textContent=free?'⋈ Base grasp · ● Base support · ⋈ Internal-link manipulation':preset.tool==='G'?'⋈ Gripper handle grasp':'● Spherical point contact';$('tool-chips').append(chip);
   $('mass-control').hidden=true;$('panel-mass').disabled=true;$('source-refinement-control').hidden=true;$('duration-control').hidden=false;$('assembly-duration').disabled=false;$('assembly-duration').min=12;
-  $('planner-description').textContent=free?'소형 입력의 링크·기능별 dense contact를 대표 접촉으로 contraction합니다. 위치만 4배 전달하고 세 팔의 자세·접촉력·토크와 자유 본체+내부 관절의 동역학을 공동으로 맞춥니다. 본체는 공중에서 로봇 접촉으로 지지하며 world 고정 관절·물체 actuator·weld가 없습니다. Group ID와 assignment/path는 supplied synthetic 입력입니다.':'물체의 수동 관절 관성·중력·스프링·마찰과 접촉력·팔 토크를 최적화합니다. 물체 pose를 강제하거나 actuator로 움직이지 않습니다. 접촉점·초기 파지·관절 경로는 주어진 조건이며, articulated contraction 학습은 아직 포함하지 않습니다.';
+  $('planner-description').textContent=free?'Supplied link/functional groups of dense small-scale contacts are contracted into representative contacts. Positions alone are transferred at scale four; arm poses, reactions, torques, and free-base/internal-joint dynamics are matched. Robot contacts support the free body without a world-fixed joint, object actuator, or weld. Group IDs, assignment, and path are synthetic inputs.':'Optimize reactions and arm torques with passive-joint inertia, gravity, spring, and friction. Object poses are not prescribed and object joints are unactuated. Contacts, initial grasps, and joint paths are supplied; learned articulated contact contraction is not executed.';
   const scale=Number($('assembly-duration').value)/preset.duration;
-  for(const [label,time,q] of [['접촉',0,preset.initial_coordinate],...(free?[['본체 lift',preset.lift_end,preset.initial_coordinate]]:[]),['시작',preset.motion_start,preset.initial_coordinate],['중간',(preset.motion_start+preset.motion_end)/2,(preset.initial_coordinate+preset.target_coordinate)/2],['목표',preset.motion_end,preset.target_coordinate],['유지',preset.duration,preset.target_coordinate]]){
+  for(const [label,time,q] of [['Contact',0,preset.initial_coordinate],...(free?[['Base lift',preset.lift_end,preset.initial_coordinate]]:[]),['Start',preset.motion_start,preset.initial_coordinate],['Intermediate',(preset.motion_start+preset.motion_end)/2,(preset.initial_coordinate+preset.target_coordinate)/2],['Target',preset.motion_end,preset.target_coordinate],['Retained',preset.duration,preset.target_coordinate]]){
     const row=document.createElement('div');row.className='assembly-key';for(const text of [label,`${(time*scale).toFixed(1)} s`,`${(q*(angular?180/Math.PI:1000)).toFixed(1)} ${angular?'deg':'mm'}`]){const el=document.createElement('span');el.textContent=text;row.append(el);}$('keyframe-inputs').append(row);
   }
-  $('keyframe-help').textContent='초기 접촉 → 이동 → 유지 · 물체 관절의 측정값을 재생합니다.';
+  $('keyframe-help').textContent='Initial contact → motion → hold · measured object-joint coordinates are replayed.';
   if(!free||$('contacts-json').dataset.preset!==preset.id){$('contacts-json').dataset.preset=preset.id;$('contacts-json').value=JSON.stringify(free?preset.dense_source_groups:{kind:preset.tool,link:'moving',point_link:preset.contact_object,inward_link:preset.inward_object},null,2);}$('contacts-json').readOnly=!free;$('contacts-file').disabled=!free;
 }
 function fields(){
   if(articulated())return articulatedFields();
   const isAssembly=assembly();const isPanel=panel();const detailed=isAssembly||isPanel;$('keyframe-inputs').replaceChildren();
   $('preset-tag').textContent=mobile()?'RBY1 + PANDA':'PANDA × 3';
-  $('builder-title').textContent=mobile()?'작업영역 확장 · RBY1 + Panda':isPanel?'본 실험 · 패널 → 지그 → 릴리스':isAssembly?'책상 상판·다리 조립':'Three Franka · 패널 운반';
-  $('builder-note').textContent=mobile()?'차동구동 모바일 듀얼암 + 고정 Panda · 실제 베이스·물체 동역학':isPanel?'Panda × 3 · G / P / P · 자유 패널 1개 · 고정 지그':isAssembly?'실제 Panda × 3 · arm 21 + finger 4 DoF · 자유 물체 2개':'실제 Panda × 3 · arm 21 + finger 2 DoF · 자유 물체 1개';
-  $('tool-chips').replaceChildren();for(const title of mobile()?['⋈ RBY1 gripper','● RBY1 sphere support','● Fixed Panda support']:isPanel?['⋈ Edge gripper','● Left sphere support','● Right sphere support']:isAssembly?['⋈ 상판 gripper','● Sphere support','⋈ 다리 gripper']:['● Sphere · point','⋈ Panda hand','⊙ Vacuum seal']){const chip=document.createElement('span');chip.textContent=title;$('tool-chips').append(chip);}
+  $('builder-title').textContent=mobile()?'Workspace extension · RBY1 + Panda':isPanel?'Panel transport, fixture placement, and release':isAssembly?'Tabletop–leg assembly':'Three Panda arms · panel transport';
+  $('builder-note').textContent=mobile()?'Differential-drive mobile dual arm + fixed Panda · native base/object dynamics':isPanel?'Panda × 3 · G / P / P · one free panel and a fixed fixture':isAssembly?'Panda × 3 · 21 arm + 4 finger coordinates · two free objects':'Panda × 3 · 21 arm + 2 finger coordinates · one free object';
+  $('tool-chips').replaceChildren();for(const title of mobile()?['⋈ RBY1 gripper','● RBY1 sphere support','● Fixed Panda support']:isPanel?['⋈ Edge gripper','● Left sphere support','● Right sphere support']:isAssembly?['⋈ Tabletop gripper','● Sphere support','⋈ Leg gripper']:['● Sphere · point','⋈ Panda hand','⊙ Vacuum seal']){const chip=document.createElement('span');chip.textContent=title;$('tool-chips').append(chip);}
   $('mass-control').hidden=detailed;$('panel-mass').disabled=detailed;
   $('source-refinement-control').hidden=!isPanel;
   $('duration-control').hidden=!detailed;$('assembly-duration').disabled=!detailed;
   $('assembly-duration').min=mobile()?30:24;
-  $('planner-description').textContent=mobile()?'고정 Panda가 초기 지지를 넘긴 뒤 통로 밖으로 물러납니다. RBY1은 바퀴를 구동해 1.4 m 이동하고 고정 베이스의 도달 범위 밖에서 패널을 지그에 안착·해제합니다. 베이스와 패널은 자유 강체이며 위치를 강제하지 않습니다. 직선 경로·모드와 초기 파지는 주어집니다.':isPanel?'1/4 스케일의 synthetic contracted contact 위치를 먼저 최적화합니다. 위치만 4배 전달하고 2 kg 패널의 접촉력·토크를 다시 풉니다. 초기 파지와 SE(3) 경로는 주어집니다. 22 s 지그 안착 → 하중 전달 → 26 s 전체 공구 해제. 학습 추론·실제 로봇 실행은 포함하지 않습니다.':isAssembly?'2 kg 상판을 grip & support해 자세를 바꾸고 0.4 kg 다리를 삽입합니다. 28 s에 다리 gripper를 열어 자유 물체의 socket 접촉 유지를 검사합니다. 시간 변경 시 전체 경로와 제어 모드를 함께 재계산합니다.':'고정 자세의 IK 접촉 경로에서 접촉력·토크를 최적화합니다. 전체 CITO 탐색은 별도 Cartesian 예제입니다.';
-  $('keyframe-help').textContent=isPanel?`${preset.keyframes.length}개 keyframe · 소형 source refinement와 target 검증을 따로 기록`:isAssembly?'기본 8개 keyframe · 상판의 z / pitch와 다리 z 표시 · 입력 시간에 비례해 재계산':'위치 m · 시간 s · 고정 자세 xyzw = [0, 0, 0, 1]';
+  $('planner-description').textContent=mobile()?'The fixed Panda transfers initial support and retreats. RBY1 drives 1.4 m and places/releases the panel on a fixture beyond fixed-base reach. Base and panel move through native dynamics. The straight path, modes, and initial grasp are supplied.':isPanel?'First refine synthetic contracted contacts at one-quarter scale. Transfer positions alone at scale four, then recompute reactions and torques for the 2 kg panel. Initial grasps and the SE(3) path are supplied. Fixture placement at 22 s → load transfer → all interfaces released at 26 s. No learned inference or hardware execution is claimed.':isAssembly?'Grasp/support and reorient a 2 kg tabletop, then insert a 0.4 kg leg. At 28 s the leg gripper opens and socket-contact retention is checked. Changing duration recomputes the path and control schedule together.':'Optimize reactions and torques on an IK contact path with fixed orientations. A separate Cartesian example evaluates restricted CITO.';
+  $('keyframe-help').textContent=isPanel?`${preset.keyframes.length} keyframes · source refinement and target validation are recorded separately`:isAssembly?'Eight default keyframes · tabletop height/pitch and leg height · retimed with the requested duration':'Position in meters · time in seconds · fixed orientation xyzw = [0, 0, 0, 1]';
   if(detailed){
     const scale=Number($('assembly-duration').value)/(preset.simulation?.duration||preset.duration);
     for(const [i,k] of preset.keyframes.entries()){
@@ -58,6 +59,7 @@ function fields(){
   $('contacts-json').readOnly=isAssembly;$('contacts-file').disabled=isAssembly;
 }
 function report(data){
+  data=englishRecording(data);
   const r=data.report;if(!r)return;$('experiment-results').hidden=false;
   showAlgorithmComparisons(data);
   let comparison=$('ablation-results');
@@ -68,13 +70,13 @@ function report(data){
     $('result-forces').textContent=r.sampled_interface_wrench_capability.passed&&Object.values(r.jaw_force).every(j=>j.passed)&&r.minimum_actuator_margin_Nm>=-1e-8?'PASS':'FAIL';
     $('result-seal-label').textContent='STABILITY / CONTACT';const fractions=Object.values(r.maintained_contact_fraction).filter(v=>v!==null);$('result-seal').textContent=`${r.execution_passed?'PASS':'FAIL'} · ${(100*Math.min(...fractions)).toFixed(1)}% contact`;
     $('result-residual').textContent=r.source?`ρ ${r.source.source_rho_after.toFixed(3)}`:r.selection.selected_types.join(' / ');
-    $('source-result').hidden=false;$('source-result').textContent=r.source?`Source polytope ${r.source.robustness_enabled?'ON · 8 vertices':'OFF · nominal only'} · 공통 polytope 독립 검산 ρ ${r.source.source_rho_after.toFixed(3)} · target ρ ${r.source.target_rho.toFixed(3)} · 고정 접촉점에서 자세·반력·토크 재계산`:`강제 유형 ${r.selection.selected_types.join(' / ')} · 전체 계획 비용 ${r.selection.objective.toFixed(3)} · native 실행 ${r.execution_passed?'PASS':'FAIL'}`;
+    $('source-result').hidden=false;$('source-result').textContent=r.source?`Source polytope ${r.source.robustness_enabled?'ON · 8 box vertices':'OFF · nominal equilibrium only'} · independent common-box margin ρ ${r.source.source_rho_after.toFixed(3)} · target ρ ${r.source.target_rho.toFixed(3)} · target posture, reactions, and torques recomputed at fixed contact sites`:`Forced contact type ${r.selection.selected_types.join(' / ')} · sequence objective ${r.selection.objective.toFixed(3)} · native execution ${r.execution_passed?'PASS':'FAIL'}`;
     for(const id of ['workspace-result','robustness-result'])$(id).hidden=true;$('report-json').textContent=JSON.stringify(r,null,2);return;
   }
   if(data.full_task_recording){
     const errors=Object.values(r.object_tracking);$('result-tracking').textContent=`${r.tracking_passed?'PASS':'FAIL'} · ${(1000*Math.max(...errors.map(e=>e.maximum_position_error_m))).toFixed(2)} mm`;
     $('result-forces').textContent=r.sampled_interface_wrench_capability.passed&&Object.values(r.jaw_force).every(j=>j.passed)&&r.minimum_actuator_margin_Nm>=-1e-8?'PASS':'FAIL';$('result-seal-label').textContent='TASK / LOADED CONTACT';$('result-seal').textContent=`${r.task_passed&&r.contact_retention_passed?'PASS':'FAIL'} · ${(100*Math.min(...Object.values(r.maintained_contact_fraction).filter(v=>v!==null))).toFixed(1)}% contact`;
-    $('result-residual').textContent=r.selection.selected_types.join(' / ');$('source-result').hidden=false;$('source-result').textContent=`SELECTION · ${r.selection.accepted_candidates.length} accepted / ${r.selection.candidate_count} 후보 · ${(r.selection.pruned_candidates||[]).length} 비용 가지치기 · physical arms ${r.selection.selected_assignment.join(', ')} · ${r.selection.keyframes} keyframes / ${r.selection.intervals} 전이 / ${(r.selection.interval_methods||[]).filter(m=>m==='motion_cost').length} 이동 CITO · source certificates ${r.selection.source_certificates.filter(s=>s.source_certificate??s.source_refinement_passed??false).length}/${r.selection.keyframes}`;
+    $('result-residual').textContent=r.selection.selected_types.join(' / ');$('source-result').hidden=false;$('source-result').textContent=`SELECTION · ${r.selection.accepted_candidates.length} accepted / ${r.selection.candidate_count} candidates · ${(r.selection.pruned_candidates||[]).length} cost-bound pruned · physical arms ${r.selection.selected_assignment.join(', ')} · ${r.selection.keyframes} keyframes / ${r.selection.intervals} transitions / ${(r.selection.interval_methods||[]).filter(m=>m==='motion_cost').length} moving-object CITO · source certificates ${r.selection.source_certificates.filter(s=>s.source_certificate??s.source_refinement_passed??false).length}/${r.selection.keyframes}`;
     for(const id of ['workspace-result','robustness-result'])$(id).hidden=true;
     renderFullResults(data,comparison);
     $('report-json').textContent=JSON.stringify(r,null,2);return;
@@ -95,22 +97,22 @@ function report(data){
     $('result-forces').textContent=`${(r.peak_contact_force_N||Math.max(...r.peak_contact_force_per_arm_N)).toFixed(2)} N · peak`;
     $('result-seal-label').textContent=r.free_articulated_object?'FREE BODY / 3-ARM CONTACT':'PASSIVE JOINT / CONTACT';$('result-seal').textContent=`0 actuators · ${(100*(Array.isArray(r.contact_fraction)?Math.min(...r.contact_fraction):r.contact_fraction)).toFixed(1)}% contact`;
     for(const id of ['source-result','workspace-result','robustness-result'])$(id).hidden=true;
-    if(r.contraction){$('source-result').hidden=false;$('source-result').textContent=(r.full_paper_pipeline_executed?'FULL PIPELINE · ':'NOMINAL BASELINE · Sec. III-B–IV full pipeline 미실행 · ')+`CONTRACTION · ${r.contraction.dense_sample_count} dense samples → ${r.contraction.contracted_contact_count} link-aware anchors → ${r.arm_count} arms · ×${r.contraction.source_to_target_scale} geometry transfer · synthetic group IDs`;}$('result-residual').textContent=r.primal_residual.toExponential(2);$('report-json').textContent=JSON.stringify(r,null,2);return;
+    if(r.contraction){$('source-result').hidden=false;$('source-result').textContent=(r.full_paper_pipeline_executed?'FULL PIPELINE · ':'NOMINAL BASELINE · Complete Sec. III-B–IV pipeline not executed · ')+`CONTRACTION · ${r.contraction.dense_sample_count} dense samples → ${r.contraction.contracted_contact_count} link-aware anchors → ${r.arm_count} arms · ×${r.contraction.source_to_target_scale} geometry transfer · synthetic group IDs`;}$('result-residual').textContent=r.primal_residual.toExponential(2);$('report-json').textContent=JSON.stringify(r,null,2);return;
   }
   const isAssembly=r.scenario==='table_assembly';const isPanel=r.scenario==='panel_fixture';const isMobile=r.scenario==='mobile_panel';const errors=isPanel?r.keyframe_errors.map(k=>k.panel.translation_m):isAssembly?r.keyframe_errors.flatMap(k=>[k.tabletop.translation_m,...(k.time<=(r.leg_release_time_s||28)?[k.leg.translation_m]:[])]):r.keyframe_errors.map(k=>k.translation_m);
   $('result-tracking').textContent=(r.tracking_passed?'PASS':'FAIL')+' · '+Math.max(...errors.map(v=>v*1000)).toFixed(2)+' mm';
   $('result-forces').textContent=isMobile?(r.force_envelopes_passed?'PASS':'FAIL'):r.force_envelopes_passed?'PASS':'FAIL';
   $('result-seal-label').textContent=isPanel||isMobile?'JIG SUPPORT / RELEASE':isAssembly?'ASSEMBLY / RELEASE':'SUCTION SEAL';
-  $('result-seal').textContent=isPanel||isMobile?(r.fixture_supported&&r.all_tools_released?`SUPPORTED · ${r.jig_support_final_N.toFixed(2)} N`:'FAIL'):isAssembly?(r.assembly_seated&&r.leg_released?`SEATED · ${(r.insertion_depth_m*1000).toFixed(1)} mm`:'FAIL / 미조립'):(r.seal_retained_before_vent?'유지':'이탈');
+  $('result-seal').textContent=isPanel||isMobile?(r.fixture_supported&&r.all_tools_released?`SUPPORTED · ${r.jig_support_final_N.toFixed(2)} N`:'FAIL'):isAssembly?(r.assembly_seated&&r.leg_released?`SEATED · ${(r.insertion_depth_m*1000).toFixed(1)} mm`:'FAIL / not seated'):(r.seal_retained_before_vent?'Retained':'Lost');
   $('workspace-result').hidden=!isMobile;
-  if(isMobile){const p=r.workspace_comparison.panda,g=r.workspace_comparison.tip_right;$('workspace-result').textContent=`WORKSPACE · 목적 접촉점: 고정 Panda ${p.fixed_base_target_distance_m.toFixed(3)} m > 도달 상한 ${p.URDF_chain_radius_bound_m.toFixed(3)} m · RBY1 (동일 torso) ${g.fixed_base_target_distance_m.toFixed(3)} m > ${g.URDF_chain_radius_bound_m.toFixed(3)} m · 실제 베이스 이동 ${r.base_travel_m.toFixed(3)} m`;}
+  if(isMobile){const p=r.workspace_comparison.panda,g=r.workspace_comparison.tip_right;$('workspace-result').textContent=`WORKSPACE · Target contact: fixed Panda ${p.fixed_base_target_distance_m.toFixed(3)} m > URDF reach bound ${p.URDF_chain_radius_bound_m.toFixed(3)} m · RBY1 (same torso) ${g.fixed_base_target_distance_m.toFixed(3)} m > ${g.URDF_chain_radius_bound_m.toFixed(3)} m · measured base travel ${r.base_travel_m.toFixed(3)} m`;}
   $('source-result').hidden=!(isPanel||isMobile);
-  if(isPanel||isMobile)$('source-result').textContent=`SOURCE · ${r.source.synthetic_input?'synthetic 입력':'외부 contracted 입력'} · refinement ${r.source.source_refinement_enabled?'ON':'OFF'} · ρ ${r.source.source_rho_before.toFixed(3)} → ${r.source.source_rho_after.toFixed(3)} · target ${r.target_validation?.length?'최소 ρ '+Math.min(...r.target_validation.map(v=>v.rho)).toFixed(3):'nominal 공동 토크 검증'} · 학습 추론 미실행`;
+  if(isPanel||isMobile)$('source-result').textContent=`SOURCE · ${r.source.synthetic_input?'Synthetic input':'Supplied contracted contacts'} · refinement ${r.source.source_refinement_enabled?'ON':'OFF'} · ρ ${r.source.source_rho_before.toFixed(3)} → ${r.source.source_rho_after.toFixed(3)} · target ${r.target_validation?.length?'minimum ρ '+Math.min(...r.target_validation.map(v=>v.rho)).toFixed(3):'nominal coupled-torque check'} · learned inference not executed`;
   $('robustness-result').hidden=!r.robustness;
-  if(r.robustness)$('robustness-result').textContent=`외력 ${r.robustness.force_peak_N} N · 자세 회복 ${r.robustness.recovery_passed?'PASS':'FAIL'} · 접촉 허용영역 포함 전체 검사 ${r.robustness.all_task_checks_passed?'PASS':'FAIL'} · 최대 오차 ${(r.robustness.peak_pose_error_m*1000).toFixed(2)} mm`;
+  if(r.robustness)$('robustness-result').textContent=`External force ${r.robustness.force_peak_N} N · pose recovery ${r.robustness.recovery_passed?'PASS':'FAIL'} · complete checks including interface admissibility ${r.robustness.all_task_checks_passed?'PASS':'FAIL'} · maximum error ${(r.robustness.peak_pose_error_m*1000).toFixed(2)} mm`;
   $('result-residual').textContent=r.primal_residual.toExponential(2);$('report-json').textContent=JSON.stringify(r,null,2);
 }
-async function request(path,options={}){const target=path.startsWith('/api/')?new URL('.'+path,document.baseURI):path;const response=await fetch(target,options);const body=await response.json();if(!response.ok)throw Error(body.error||'계산 서버 오류');return body;}
+async function request(path,options={}){const target=path.startsWith('/api/')?new URL('.'+path,document.baseURI):path;const response=await fetch(target,options);const body=await response.json();if(!response.ok)throw Error(body.error||'Computation-backend error');return body;}
 function finish(){clearTimeout(timer);job=null;$('experiment-run').disabled=!connected;$('experiment-cancel').disabled=true;$('scenario-preset').disabled=false;}
 async function poll(){const active=job;if(!active)return;try{
   const result=await request('/api/experiments/'+active);if(job!==active)return;
@@ -124,17 +126,17 @@ $('experiment-form').onsubmit=async event=>{event.preventDefault();try{
   else if(panel())payload={preset:mobile()?'mobile_panel':'panel_fixture',duration:Number($('assembly-duration').value),refine_source:$('source-refinement').checked,contracted_source:JSON.parse($('contacts-json').value)};
   else if(assembly())payload={preset:'table_assembly',duration:Number($('assembly-duration').value)};
   else{const keyframes=structuredClone(preset.keyframes);document.querySelectorAll('#keyframe-inputs input').forEach(input=>{const k=keyframes[Number(input.dataset.key)],v=Number(input.value);if(input.dataset.field==='time')k.time=v;else k.object_pose[['x','y','z'].indexOf(input.dataset.field)]=v;});payload={preset:'three_franka',mass:Number($('panel-mass').value),keyframes,contacts:JSON.parse($('contacts-json').value)};}
-  $('experiment-run').disabled=true;$('scenario-preset').disabled=true;state('작업 제출 중…');const result=await request('/api/experiments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});job=result.id;$('experiment-cancel').disabled=false;await poll();
+  $('experiment-run').disabled=true;$('scenario-preset').disabled=true;state('Submitting computation…');const result=await request('/api/experiments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});job=result.id;$('experiment-cancel').disabled=false;await poll();
 }catch(error){state(error.message);finish();}};
-$('experiment-cancel').onclick=async()=>{if(job){try{await request('/api/experiments/'+job+'/cancel',{method:'POST'});state('취소됨');finish();}catch(error){state(error.message);}}};
+$('experiment-cancel').onclick=async()=>{if(job){try{await request('/api/experiments/'+job+'/cancel',{method:'POST'});state('Cancelled');finish();}catch(error){state(error.message);}}};
 $('experiment-reset').onclick=()=>{$('contacts-json').dataset.preset='';$('assembly-duration').value=articulated()?preset.duration:mobile()?36:30;if(panel())$('contacts-json').value=JSON.stringify(preset.contracted_source,null,2);fields();};
 $('assembly-duration').oninput=()=>{if((articulated()||assembly()||panel())&&$('assembly-duration').checkValidity())fields();};
-$('contacts-file').onchange=async event=>{try{const file=event.target.files[0];if(!file)return;if(file.size>32768)throw Error('32 KB 이하 JSON을 사용하세요.');const body=JSON.parse(await file.text());$('contacts-json').value=JSON.stringify(body.dense_source_groups||body.contracted_contacts||body,null,2);state('접촉 JSON을 불러왔습니다. 실행 시 표면·법선을 검사합니다.');}catch(error){state(error.message);}};
+$('contacts-file').onchange=async event=>{try{const file=event.target.files[0];if(!file)return;if(file.size>32768)throw Error('Use a JSON file no larger than 32 KB.');const body=JSON.parse(await file.text());$('contacts-json').value=JSON.stringify(body.dense_source_groups||body.contracted_contacts||body,null,2);state('Contact JSON loaded. Surface and normal constraints are checked during computation.');}catch(error){state(error.message);}};
 function showRecordingExperiment(data){
   const id=libraryEntry(data).preset;
   document.querySelector('.experiment-builder').hidden=!id&&!data.full_task_recording&&!data.comparison_recording;
   $('experiment-form').hidden=!id;
-  if(data.full_task_recording||data.comparison_recording){$('builder-title').textContent=data.title;$('builder-note').textContent='계획·실행과 통제 비교의 측정 결과';$('preset-tag').textContent=data.report.selection?.selected_types.join(' / ')||'SOURCE ROBUSTNESS';$('source-refinement-control').hidden=true;}
+  if(data.full_task_recording||data.comparison_recording){$('builder-title').textContent=data.title;$('builder-note').textContent='Measured planning/execution outcomes and controlled comparisons';$('preset-tag').textContent=data.report.selection?.selected_types.join(' / ')||'SOURCE ROBUSTNESS';$('source-refinement-control').hidden=true;}
   $('experiment-results').hidden=!data.report;
   if(id){$('scenario-preset').value=id;if(presetId!==id)selectPreset(id).catch(error=>state(error.message));}
   report(data);
@@ -164,6 +166,6 @@ export async function initializeExperiment(){
   const model=new URLSearchParams(location.search).get('model')||'free_box_lid';const id=libraryEntry({id:model}).preset;
   document.querySelector('.experiment-builder').hidden=!id;
   if(id){$('scenario-preset').value=id;await selectPreset(id);}
-  try{const health=await request('/api/health');if(health.ready){if(health.experiments_ready===false){state('Panda 충돌 mesh 준비 필요 · python tools/fetch_panda_meshes.py');return;}connected=true;$('experiment-run').disabled=false;state('Python 연결됨 · source/target 최적화와 접촉 동역학 실행 가능');return;}}catch{}
-  state('GitHub Pages: 실제 실행 기록 재생 · 새 계산은 Python 백엔드에서 실행합니다. 서버: .venv/bin/python web/server.py');
+  try{const health=await request('/api/health');if(health.ready){if(health.experiments_ready===false){state('Panda collision meshes required · python tools/fetch_panda_meshes.py');return;}connected=true;$('experiment-run').disabled=false;state('Python connected · source/target optimization and contact-dynamics execution available');return;}}catch{}
+  state('GitHub Pages replays measured execution records. New computations require the Python backend: .venv/bin/python web/server.py');
 }
