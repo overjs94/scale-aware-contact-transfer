@@ -2,7 +2,17 @@
   "name": "contact-transfer-viewer",
   "private": true,
   "type": "module",
-  "scripts": {"build": "node build.mjs"},
-  "dependencies": {"three": "0.180.0"},
-  "devDependencies": {"esbuild": "0.25.10"}
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node tests/presentation.mjs && node tests/disturbance.mjs && npm run build && node tests/build.mjs && playwright test",
+    "test:presentation": "node tests/presentation.mjs"
+  },
+  "dependencies": {
+    "three": "0.180.0",
+    "urdf-loader": "0.13.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.0",
+    "esbuild": "0.25.10"
+  }
 }

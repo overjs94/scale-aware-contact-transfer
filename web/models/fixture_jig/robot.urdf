@@ -1,0 +1,125 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="jig">
+  <link name="jig">
+    <visual name="jig_visual_0">
+      <origin xyz="-0.18 -0.1 0.455" />
+      <geometry>
+        <box size="0.045 0.045 0.01" />
+      </geometry>
+      <material name="jig_color">
+        <color rgba=".22 .32 .43 1" />
+      </material>
+    </visual>
+    <collision name="jig_collision_0">
+      <origin xyz="-0.18 -0.1 0.455" />
+      <geometry>
+        <box size="0.045 0.045 0.01" />
+      </geometry>
+    </collision>
+    <visual name="jig_visual_1">
+      <origin xyz="-0.18 -0.1 0.225" />
+      <geometry>
+        <box size="0.018 0.018 0.45" />
+      </geometry>
+      <material name="jig_color">
+        <color rgba=".22 .32 .43 1" />
+      </material>
+    </visual>
+    <collision name="jig_collision_1">
+      <origin xyz="-0.18 -0.1 0.225" />
+      <geometry>
+        <box size="0.018 0.018 0.45" />
+      </geometry>
+    </collision>
+    <visual name="jig_visual_2">
+      <origin xyz="-0.18 0.18000000000000002 0.455" />
+      <geometry>
+        <box size="0.045 0.045 0.01" />
+      </geometry>
+      <material name="jig_color">
+        <color rgba=".22 .32 .43 1" />
+      </material>
+    </visual>
+    <collision name="jig_collision_2">
+      <origin xyz="-0.18 0.18000000000000002 0.455" />
+      <geometry>
+        <box size="0.045 0.045 0.01" />
+      </geometry>
+    </collision>
+    <visual name="jig_visual_3">
+      <origin xyz="-0.18 0.18000000000000002 0.225" />
+      <geometry>
+        <box size="0.018 0.018 0.45" />
+      </geometry>
+      <material name="jig_color">
+        <color rgba=".22 .32 .43 1" />
+      </material>
+    </visual>
+    <collision name="jig_collision_3">
+      <origin xyz="-0.18 0.18000000000000002 0.225" />
+      <geometry>
+        <box size="0.018 0.018 0.45" />
+      </geometry>
+    </collision>
+    <visual name="jig_visual_4">
+      <origin xyz="0.26 -0.1 0.455" />
+      <geometry>
+        <box size="0.045 0.045 0.01" />
+      </geometry>
+      <material name="jig_color">
+        <color rgba=".22 .32 .43 1" />
+      </material>
+    </visual>
+    <collision name="jig_collision_4">
+      <origin xyz="0.26 -0.1 0.455" />
+      <geometry>
+        <box size="0.045 0.045 0.01" />
+      </geometry>
+    </collision>
+    <visual name="jig_visual_5">
+      <origin xyz="0.26 -0.1 0.225" />
+      <geometry>
+        <box size="0.018 0.018 0.45" />
+      </geometry>
+      <material name="jig_color">
+        <color rgba=".22 .32 .43 1" />
+      </material>
+    </visual>
+    <collision name="jig_collision_5">
+      <origin xyz="0.26 -0.1 0.225" />
+      <geometry>
+        <box size="0.018 0.018 0.45" />
+      </geometry>
+    </collision>
+    <visual name="jig_visual_6">
+      <origin xyz="0.26 0.18000000000000002 0.455" />
+      <geometry>
+        <box size="0.045 0.045 0.01" />
+      </geometry>
+      <material name="jig_color">
+        <color rgba=".22 .32 .43 1" />
+      </material>
+    </visual>
+    <collision name="jig_collision_6">
+      <origin xyz="0.26 0.18000000000000002 0.455" />
+      <geometry>
+        <box size="0.045 0.045 0.01" />
+      </geometry>
+    </collision>
+    <visual name="jig_visual_7">
+      <origin xyz="0.26 0.18000000000000002 0.225" />
+      <geometry>
+        <box size="0.018 0.018 0.45" />
+      </geometry>
+      <material name="jig_color">
+        <color rgba=".22 .32 .43 1" />
+      </material>
+    </visual>
+    <collision name="jig_collision_7">
+      <origin xyz="0.26 0.18000000000000002 0.225" />
+      <geometry>
+        <box size="0.018 0.018 0.45" />
+      </geometry>
+    </collision>
+  </link>
+</robot>

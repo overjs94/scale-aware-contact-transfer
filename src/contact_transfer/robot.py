@@ -126,7 +126,7 @@ class Robot:
     def jacobian(self, q, frame, convention="mixed"):
         qp = self._qpin(q)
         J = np.array(pin.computeFrameJacobian(self.model, self.data, qp,
-                    self._frame(frame), pin.LOCAL_WORLD_ALIGNED)) @ self.B
+                    self._frame(frame), pin.LOCAL_WORLD_ALIGNED)).reshape(6,self.model.nv) @ self.B
         if not self.floating_base:
             J = np.vstack((self.base_pose[:3, :3] @ J[:3],
                            self.base_pose[:3, :3] @ J[3:]))

@@ -58,16 +58,23 @@ class SurfacePatch:
 
 @dataclass(frozen=True)
 class Capability:
-    """P: Coulomb point contact; G: calibrated bounded resultant H*zeta."""
+    """P: Coulomb point; G: bounded gripper; S: sealed adhesive point.
+
+    S uses -adhesion_max <= f_n <= normal_max and
+    ||f_t|| <= mu*(f_n+adhesion_max), with zero resultant moment.
+    """
     kind: str = "P"
     mu: float = .5
     normal_max: float = 100.
     H: object = None
     bounds: object = None
+    adhesion_max: float = 0.
 
     def __post_init__(self):
-        if self.kind not in {"P", "G"} or self.mu < 0 or self.normal_max <= 0:
+        if self.kind not in {"P", "G", "S"} or not np.isfinite([self.mu, self.normal_max, self.adhesion_max]).all() or self.mu < 0 or self.normal_max <= 0:
             raise ValueError("invalid contact capability")
+        if self.adhesion_max < 0 or (self.kind == "S" and self.adhesion_max <= 0):
+            raise ValueError("suction needs a positive finite adhesion limit")
         if self.kind == "G":
             H, b = np.asarray(self.H, float), np.asarray(self.bounds, float)
             if H.ndim != 2 or H.shape[0] != 6 or b.shape != (H.shape[1],):
@@ -81,15 +88,24 @@ class Capability:
     def force_gripper(cls, force_bounds):
         return cls("G", H=np.vstack((np.zeros((3, 3)), np.eye(3))), bounds=np.array(force_bounds))
 
-    def reaction(self, opti):
-        if self.kind == "P":
+    @property
+    def has_moment(self):
+        return self.kind == "G" and np.linalg.norm(np.asarray(self.H)[:3]) > 1e-12
+
+    def reaction(self, opti, scale=1., initial=None, aperture=None):
+        """Return a wrench, or an impulse when scale is the interval duration."""
+        if self.kind in {"P", "S"}:
             f = opti.variable(3)
-            opti.subject_to(opti.bounded(0, f[2], self.normal_max))
-            opti.subject_to(ca.sumsqr(f[:2]) <= (self.mu*f[2])**2)
-            opti.set_initial(f, [0, 0, min(10, self.normal_max/2)])
+            adhesion = self.adhesion_max if self.kind == "S" else 0.
+            opti.subject_to(opti.bounded(-scale*adhesion, f[2], scale*self.normal_max))
+            opti.subject_to(ca.sumsqr(f[:2]) <= (self.mu*(f[2]+scale*adhesion))**2)
+            opti.set_initial(f, np.asarray(initial)[3:] if initial is not None else
+                             [0, 0, min(10, self.normal_max/2)] if self.kind == "P" else 0)
             return ca.vertcat(ca.DM.zeros(3), f)
         z = opti.variable(len(self.bounds))
-        opti.subject_to(opti.bounded(-np.asarray(self.bounds), z, self.bounds))
+        opti.subject_to(opti.bounded(-scale*np.asarray(self.bounds), z, scale*np.asarray(self.bounds)))
+        if initial is not None:
+            opti.set_initial(z, np.linalg.lstsq(np.asarray(self.H), np.asarray(initial), rcond=None)[0])
         return ca.DM(self.H) @ z
 
 

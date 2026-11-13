@@ -1,0 +1,111 @@
+{
+  "task": "panel",
+  "native_robot_urdf_sha256": {
+    "gripper_0_interface.urdf": "b966b200127d45fc9c337b751cf840e1061ffe37f8db7b51091dfbe400235d48",
+    "point_1.urdf": "d1e9dffae1ee1e61d037c7188a3a321696d967f4b243a440c216b5d21ad158f4",
+    "point_2.urdf": "d1e9dffae1ee1e61d037c7188a3a321696d967f4b243a440c216b5d21ad158f4"
+  },
+  "canonical_point_tool": {
+    "id": "shared_spherical_tip",
+    "urdf_sha256": "199eb9de0509ebe10a39f69b77d3acc3e92f9a06911bf8def3e29b45ca554eab",
+    "radius_m": 0.025,
+    "ee_to_tip": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.165
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "ee_to_sphere_center": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.14
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "mass_kg": 0.1,
+    "contact_point": "leading sphere surface, local +Z",
+    "license": "MIT",
+    "ee_frame": "panda_link8",
+    "prepared_urdf_sha256": "d1e9dffae1ee1e61d037c7188a3a321696d967f4b243a440c216b5d21ad158f4"
+  },
+  "source_trial": "outputs/full_scenarios_v22/panel/full",
+  "source_execution_sha256": "7d76082206557a0ecc24d2adfe2c161a6dff89c736e114512014dba2b6a2e579",
+  "source_native_execution_passed": true,
+  "native_trace_included": false,
+  "optimization_reexecuted_by_replay": false,
+  "fresh_native_replay_required": true,
+  "controller_jaw_force_fraction": 0.45,
+  "files": {
+    "full/planning/GPP_012/gripper_0_interface.urdf": "b966b200127d45fc9c337b751cf840e1061ffe37f8db7b51091dfbe400235d48",
+    "full/planning/GPP_012/interval0.npz": "d169a20204d4d0d4d15d5a1de6e7b19b4db8a72c43b3ccf78b330c7bb94336d0",
+    "full/planning/GPP_012/interval1.npz": "5c405265ed24f04c806bd542c8f0b2c148dbb4850cd978c3ffd29935b9d91674",
+    "full/planning/GPP_012/interval2.npz": "16f3953a0c1f2f540eac5a80fbe8c7b0fbdd57a10f68dc5b798cab1373f7e85b",
+    "full/planning/GPP_012/interval3.npz": "4e5b880cb5cdb00c6c9f801a9bfef8aaf0aed70f522efa2889db94e6df1dccac",
+    "full/planning/GPP_012/interval4.npz": "371ef05f250614b4fbbd6dc62081b86e15e9ffdc8cf4da5e5b92d9f824777e1d",
+    "full/planning/GPP_012/interval5.npz": "a2588054017cbce79fbe96be08abc2cfe1bb0d2f623c3842026daf7e71705668",
+    "full/planning/GPP_012/interval6.npz": "080ae55aca781d72232da6cd8a15913aeeb8c4e353049b495697e1df4e3d93b9",
+    "full/planning/GPP_012/interval7.npz": "e53d507a5d6c4a5742cecb644e7f895f959632c357420dd428045fc69bc83c36",
+    "full/planning/GPP_012/key0.npz": "d9d9b036f9ca3a7252830a766b8197bb7b1dded9a3ea0dcc984bb71fc2ea1965",
+    "full/planning/GPP_012/key1.npz": "39b8b045bd88d0274fcf66df87bc77a7bda76d5cb4361373b49d93b2b513f7ef",
+    "full/planning/GPP_012/key2.npz": "94c00259e041a043fb01bccbb1812dc22121ead2a02a9f63b1f8d8212b58424d",
+    "full/planning/GPP_012/key3.npz": "754a233acc4cbc6e07ecf60ba8470f6b4c3672894e2ad2a5fc85ce0f0e63c846",
+    "full/planning/GPP_012/key4.npz": "f278df356c1a6eb6567120626660fcbec2689d720cc473505eeab0abbbf931f0",
+    "full/planning/GPP_012/key5.npz": "e96b195f98454f436356894a23d4048ce936a836088755474de98c0e313265b3",
+    "full/planning/GPP_012/key6.npz": "f2169711b491f402db1a523c692682cecd4b935266f2514f295874ba642bcefd",
+    "full/planning/GPP_012/key7.npz": "3b7332e09d0796408c67d8f81a50c3cc5322d7249bc2d0027eab0a8667c1bf64",
+    "full/planning/GPP_012/key8.npz": "7c7fb3a8ca7f3f2624217ab0e9fef63cf1828665254aeccd2e3eb0b3a9821c22",
+    "full/planning/GPP_012/point_1.urdf": "d1e9dffae1ee1e61d037c7188a3a321696d967f4b243a440c216b5d21ad158f4",
+    "full/planning/GPP_012/point_2.urdf": "d1e9dffae1ee1e61d037c7188a3a321696d967f4b243a440c216b5d21ad158f4",
+    "full/planning/selection.json": "20268ff3b7edd3228bf76fa8d2d0ffd0bc0b0fcf592fd8658c2f86112fdf6252",
+    "full/result.json": "a6ac32ff2c2f7308d3d0e0386c21eb2028901615a77cce71914fe2d1f845021d",
+    "provenance/LICENSE.authored": "19988bdb56d65874276c47b24d5ac4d1498630955d39a4d53c02a692c8ceeb22",
+    "provenance/LICENSE.panda": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9",
+    "provenance/LICENSE.rb5": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1",
+    "provenance/LICENSE.robotiq": "3d5edd18d1e22a17666e9bb84270171ed5ac90b192d24e0177fd171708ea2316",
+    "provenance/franka_panda_provenance.json": "e41e762324caa8ada8f053e7a811fca8bfb8556cf16e1d0b55b26494e980cfc4",
+    "provenance/rb5_provenance.json": "b5bd8f44119824b4cf1639859fa15ebe439ddfb9cf19032d13510e3492e5a4ca",
+    "provenance/robotiq-provenance.json": "91388a795f3875bd147dfbccdc956253ea0f0fa09283df4aa5d1850ad1549538",
+    "provenance/robotiq-simulation-settings.json": "2e542fdcb25a09d594279ccde8d803fd38df183389136ab745a1f5e598f7fe46",
+    "provenance/spherical-tool-LICENSE": "19988bdb56d65874276c47b24d5ac4d1498630955d39a4d53c02a692c8ceeb22",
+    "provenance/spherical-tool-spherical_tip.urdf": "199eb9de0509ebe10a39f69b77d3acc3e92f9a06911bf8def3e29b45ca554eab"
+  }
+}

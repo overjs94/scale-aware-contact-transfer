@@ -1,0 +1,52 @@
+{
+  "id": "drawer",
+  "schema_version": 1,
+  "units": "SI",
+  "object_urdf": "drawer.urdf",
+  "robot_urdf": "gripper_arm.urdf",
+  "tool": "G",
+  "contact_object": [
+    -0.06,
+    0,
+    0.15
+  ],
+  "inward_object": [
+    -1,
+    0,
+    0
+  ],
+  "tool_rotation_object_xyzw": [
+    0.0,
+    0.7071067811865475,
+    0.0,
+    0.7071067811865477
+  ],
+  "initial_coordinate": 0,
+  "target_coordinate": 0.22,
+  "duration": 14.0,
+  "motion_start": 2.0,
+  "motion_end": 11.0,
+  "timestep": 0.001,
+  "sample_dt": 0.25,
+  "robot_base": [
+    -0.65,
+    -0.35,
+    0.3
+  ],
+  "robot_yaw": 0.39060704369768673,
+  "q_seed": [
+    0.12990672921140337,
+    0.025898164951581724,
+    0.11882220139763586,
+    -1.9923541958764388,
+    -2.099762369007134,
+    2.378612689559752,
+    -0.10918577798641559
+  ],
+  "stiffness": 0,
+  "damping": 8.0,
+  "frictionloss": 2.0,
+  "normal_max_N": 40.0,
+  "force_mu": 0.8,
+  "contact_preload_m": 0.0
+}

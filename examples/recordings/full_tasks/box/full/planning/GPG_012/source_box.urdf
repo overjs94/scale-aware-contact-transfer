@@ -1,0 +1,158 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="box_lid">
+  <link name="base">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" />
+      <mass value="0.03125" />
+      <inertia ixx="2.3177083333333335e-05" iyy="4.720052083333334e-05" izz="5.735677083333333e-05" ixy="0.0" ixz="0.0" iyz="0.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0.0 0.0 -0.0225" />
+      <geometry>
+        <box size="0.125 0.08 0.005" />
+      </geometry>
+      <material name="wood">
+        <color rgba=".65 .39 .18 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.0 0.0 -0.0225" />
+      <geometry>
+        <box size="0.125 0.08 0.005" />
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="-0.06 0.0 0.0" />
+      <geometry>
+        <box size="0.005 0.08 0.045" />
+      </geometry>
+      <material name="wood">
+        <color rgba=".65 .39 .18 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-0.06 0.0 0.0" />
+      <geometry>
+        <box size="0.005 0.08 0.045" />
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.06 0.0 0.0" />
+      <geometry>
+        <box size="0.005 0.08 0.045" />
+      </geometry>
+      <material name="wood">
+        <color rgba=".65 .39 .18 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.06 0.0 0.0" />
+      <geometry>
+        <box size="0.005 0.08 0.045" />
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.0 -0.0375 0.0" />
+      <geometry>
+        <box size="0.115 0.005 0.045" />
+      </geometry>
+      <material name="wood">
+        <color rgba=".65 .39 .18 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.0 -0.0375 0.0" />
+      <geometry>
+        <box size="0.115 0.005 0.045" />
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.0 0.0375 0.0" />
+      <geometry>
+        <box size="0.115 0.005 0.045" />
+      </geometry>
+      <material name="wood">
+        <color rgba=".65 .39 .18 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.0 0.0375 0.0" />
+      <geometry>
+        <box size="0.115 0.005 0.045" />
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="-0.07999999999999999 0.0 0.0" />
+      <geometry>
+        <box size="0.01 0.01 0.015" />
+      </geometry>
+      <material name="base_handle_metal">
+        <color rgba=".3 .33 .36 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-0.07999999999999999 0.0 0.0" />
+      <geometry>
+        <box size="0.01 0.01 0.015" />
+      </geometry>
+    </collision>
+    <visual name="base_handle_connector">
+      <origin xyz="-0.06775 0.0 0.0" />
+      <geometry>
+        <box size="0.0155 0.004 0.0045" />
+      </geometry>
+      <material name="base_handle_metal" />
+    </visual>
+    <collision name="base_handle_connector">
+      <origin xyz="-0.06775 0.0 0.0" />
+      <geometry>
+        <box size="0.0155 0.004 0.0045" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="moving">
+    <inertial>
+      <origin xyz="0.0625 0.0 0.0" />
+      <mass value="0.0078125" />
+      <inertia ixx="4.1829427083333334e-06" iyy="1.0188802083333333e-05" izz="1.4339192708333333e-05" ixy="0.0" ixz="0.0" iyz="0.0" />
+    </inertial>
+    <visual>
+      <origin xyz="0.0625 0.0 0.0" />
+      <geometry>
+        <box size="0.125 0.08 0.005" />
+      </geometry>
+      <material name="wood">
+        <color rgba=".65 .39 .18 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.0625 0.0 0.0" />
+      <geometry>
+        <box size="0.125 0.08 0.005" />
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.1 0.0 0.01" />
+      <geometry>
+        <box size="0.01 0.01 0.015" />
+      </geometry>
+      <material name="lid_handle_metal">
+        <color rgba=".3 .33 .36 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.1 0.0 0.01" />
+      <geometry>
+        <box size="0.01 0.01 0.015" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="articulation" type="revolute">
+    <parent link="base" />
+    <child link="moving" />
+    <origin xyz="-0.0625 0.0 0.025" />
+    <axis xyz="0 -1 0" />
+    <limit lower="0" upper="1.5" effort="0" velocity="2" />
+    <dynamics damping="0.05" friction="0.02" />
+  </joint>
+</robot>

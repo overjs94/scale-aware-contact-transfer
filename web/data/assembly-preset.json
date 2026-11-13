@@ -1,0 +1,407 @@
+{
+  "schema_version": 1,
+  "id": "table_assembly",
+  "units": "SI",
+  "model_family": "franka_panda",
+  "quaternion_order": "xyzw",
+  "prediction_source": "assumed_contracted_contacts",
+  "arms": [
+    {
+      "id": "top_gripper",
+      "kind": "G",
+      "object": "tabletop",
+      "urdf": "gripper_arm.urdf",
+      "base_position": [
+        -0.65,
+        -0.18,
+        0
+      ],
+      "base_rpy": [
+        0,
+        0,
+        0.270153199711405
+      ],
+      "tool_frame": "tip",
+      "point_object": [
+        -0.3,
+        -0.18,
+        0
+      ],
+      "normal_object": [
+        -1,
+        0,
+        0
+      ],
+      "tool_quaternion_xyzw": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "q_initial": [
+        -1.667831620090543,
+        -1.6573449083966243,
+        0.4570275607287626,
+        -2.637140081595379,
+        1.7005780913406474,
+        1.8137464527685168,
+        -1.7282222576960609
+      ],
+      "locked_joints": {
+        "panda_finger_joint1": 0.02,
+        "panda_finger_joint2": 0.02
+      },
+      "tool_collision_links": [
+        "panda_hand",
+        "panda_leftfinger",
+        "panda_rightfinger"
+      ]
+    },
+    {
+      "id": "point_support",
+      "kind": "P",
+      "object": "tabletop",
+      "urdf": "point_arm.urdf",
+      "base_position": [
+        0.05,
+        -0.7,
+        0
+      ],
+      "base_rpy": [
+        0,
+        0,
+        1.642103791580187
+      ],
+      "tool_frame": "tip",
+      "point_object": [
+        0.1,
+        0.06,
+        -0.02
+      ],
+      "normal_object": [
+        0,
+        0,
+        -1
+      ],
+      "tool_quaternion_xyzw": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "q_initial": [
+        0.576876339159994,
+        1.4159858959605311,
+        -1.4663335530661248,
+        -1.10969205520421,
+        -1.567182016871449,
+        1.63833904599225,
+        -1.1237483620713007
+      ],
+      "locked_joints": {},
+      "tool_collision_links": [
+        "tool"
+      ]
+    },
+    {
+      "id": "leg_gripper",
+      "kind": "G",
+      "object": "leg",
+      "urdf": "gripper_arm.urdf",
+      "base_position": [
+        0.55,
+        0.5,
+        0
+      ],
+      "base_rpy": [
+        0,
+        0,
+        -2.4037775934693286
+      ],
+      "tool_frame": "tip",
+      "point_object": [
+        0,
+        0,
+        -0.04
+      ],
+      "normal_object": [
+        0,
+        1,
+        0
+      ],
+      "tool_quaternion_xyzw": [
+        0.5,
+        -0.5,
+        0.5,
+        0.5
+      ],
+      "q_initial": [
+        -0.3360499509989835,
+        -0.6032024296750556,
+        -0.34893314513706286,
+        -2.0760936440051587,
+        1.3685357825765838,
+        1.6677912192272961,
+        -0.7171895839599065
+      ],
+      "locked_joints": {
+        "panda_finger_joint1": 0.02,
+        "panda_finger_joint2": 0.02
+      },
+      "tool_collision_links": [
+        "panda_hand",
+        "panda_leftfinger",
+        "panda_rightfinger"
+      ]
+    }
+  ],
+  "objects": [
+    {
+      "id": "tabletop",
+      "urdf": "tabletop.urdf"
+    },
+    {
+      "id": "leg",
+      "urdf": "leg.urdf"
+    }
+  ],
+  "keyframes": [
+    {
+      "id": "grip_and_support",
+      "time": 0,
+      "tabletop": [
+        0,
+        0,
+        0.58,
+        0.0,
+        0.10452846326765347,
+        0.0,
+        0.9945218953682733
+      ],
+      "leg": [
+        0.18,
+        0.34,
+        0.79,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "grasp_settled",
+      "time": 2,
+      "tabletop": [
+        0,
+        0,
+        0.58,
+        0.0,
+        0.10452846326765347,
+        0.0,
+        0.9945218953682733
+      ],
+      "leg": [
+        0.18,
+        0.34,
+        0.79,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "lift_tabletop",
+      "time": 6,
+      "tabletop": [
+        0,
+        0,
+        0.66,
+        0.0,
+        0.10452846326765347,
+        0.0,
+        0.9945218953682733
+      ],
+      "leg": [
+        0.18,
+        0.34,
+        0.9,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "reorient_tabletop",
+      "time": 12,
+      "tabletop": [
+        0,
+        0,
+        0.66,
+        0,
+        0,
+        0,
+        1
+      ],
+      "leg": [
+        0.18,
+        0.34,
+        0.9,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "approach_socket",
+      "time": 18,
+      "tabletop": [
+        0,
+        0,
+        0.66,
+        0,
+        0,
+        0,
+        1
+      ],
+      "leg": [
+        0.18,
+        0.158,
+        0.9,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "align_leg",
+      "time": 22,
+      "tabletop": [
+        0,
+        0,
+        0.66,
+        0,
+        0,
+        0,
+        1
+      ],
+      "leg": [
+        0.18,
+        0.108,
+        0.89,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "insert_leg",
+      "time": 27,
+      "tabletop": [
+        0,
+        0,
+        0.66,
+        0,
+        0,
+        0,
+        1
+      ],
+      "leg": [
+        0.18,
+        0.108,
+        0.82,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "assembled_and_released",
+      "time": 30,
+      "tabletop": [
+        0,
+        0,
+        0.66,
+        0,
+        0,
+        0,
+        1
+      ],
+      "leg": [
+        0.18,
+        0.108,
+        0.82,
+        0,
+        0,
+        0,
+        1
+      ]
+    }
+  ],
+  "socket": {
+    "center_object": [
+      0.18,
+      0.108,
+      0.02
+    ],
+    "width": 0.021,
+    "depth": 0.03,
+    "peg_width": 0.018,
+    "peg_length": 0.025,
+    "peg_tip_object": [
+      0,
+      0,
+      -0.165
+    ],
+    "leg_shoulder_object": [
+      0,
+      0,
+      -0.14
+    ]
+  },
+  "optimization": {
+    "sample_dt": 0.25,
+    "gripper_moment_bounds": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "gripper_force_bounds": [
+      20,
+      20,
+      30
+    ],
+    "point_mu": 0.8,
+    "point_normal_max": 40
+  },
+  "simulation": {
+    "timestep": 0.001,
+    "duration": 30,
+    "grasp_seconds": 1.2,
+    "release_time": 28,
+    "release_seconds": 0.6,
+    "retract_distance": 0.08,
+    "seat_time": 27,
+    "arm_kp": 900,
+    "arm_kd": 60,
+    "finger_kp": 3000,
+    "finger_kd": 10,
+    "finger_open": 0.035,
+    "finger_closed": 0.017,
+    "tracking_tolerance_m": 0.008,
+    "tracking_tolerance_rad": 0.06,
+    "insertion_tolerance_m": 0.002,
+    "cartesian_kp": 3000,
+    "cartesian_kd": 40,
+    "orientation_kp": 40,
+    "orientation_kd": 2,
+    "pad_friction": 0.9,
+    "pad_torsional_friction_m": 0.008,
+    "friction_impratio": 100
+  }
+}

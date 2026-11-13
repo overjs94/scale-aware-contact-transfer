@@ -1,0 +1,55 @@
+/workspace/scale-aware-contact-transfer/src/contact_transfer/full_scenario.py:260: UserWarning: Gimbal lock detected. Setting third angle to zero since it is not possible to uniquely determine all angles.
+  tree=ET.parse(r.path);ET.SubElement(tree.getroot(),'link',name='paper_interface');j=ET.SubElement(tree.getroot(),'joint',name='paper_interface_mount',type='fixed');ET.SubElement(j,'parent',link='tip');ET.SubElement(j,'child',link='paper_interface');ET.SubElement(j,'origin',xyz=' '.join(map(str,Tti[:3,3])),rpy=' '.join(map(str,Rotation.from_matrix(Tti[:3,:3]).as_euler('xyz'))));path=out/f'gripper_{i}_interface.urdf';ET.indent(tree);tree.write(path,encoding='utf-8',xml_declaration=True);r=Robot(path,base_pose=arm.base_pose);full.append(r)
+/workspace/scale-aware-contact-transfer/src/contact_transfer/full_scenario.py:260: UserWarning: Gimbal lock detected. Setting third angle to zero since it is not possible to uniquely determine all angles.
+  tree=ET.parse(r.path);ET.SubElement(tree.getroot(),'link',name='paper_interface');j=ET.SubElement(tree.getroot(),'joint',name='paper_interface_mount',type='fixed');ET.SubElement(j,'parent',link='tip');ET.SubElement(j,'child',link='paper_interface');ET.SubElement(j,'origin',xyz=' '.join(map(str,Tti[:3,3])),rpy=' '.join(map(str,Rotation.from_matrix(Tti[:3,:3]).as_euler('xyz'))));path=out/f'gripper_{i}_interface.urdf';ET.indent(tree);tree.write(path,encoding='utf-8',xml_declaration=True);r=Robot(path,base_pose=arm.base_pose);full.append(r)
+/workspace/scale-aware-contact-transfer/src/contact_transfer/full_scenario.py:260: UserWarning: Gimbal lock detected. Setting third angle to zero since it is not possible to uniquely determine all angles.
+  tree=ET.parse(r.path);ET.SubElement(tree.getroot(),'link',name='paper_interface');j=ET.SubElement(tree.getroot(),'joint',name='paper_interface_mount',type='fixed');ET.SubElement(j,'parent',link='tip');ET.SubElement(j,'child',link='paper_interface');ET.SubElement(j,'origin',xyz=' '.join(map(str,Tti[:3,3])),rpy=' '.join(map(str,Rotation.from_matrix(Tti[:3,:3]).as_euler('xyz'))));path=out/f'gripper_{i}_interface.urdf';ET.indent(tree);tree.write(path,encoding='utf-8',xml_declaration=True);r=Robot(path,base_pose=arm.base_pose);full.append(r)
+/workspace/scale-aware-contact-transfer/src/contact_transfer/full_scenario.py:260: UserWarning: Gimbal lock detected. Setting third angle to zero since it is not possible to uniquely determine all angles.
+  tree=ET.parse(r.path);ET.SubElement(tree.getroot(),'link',name='paper_interface');j=ET.SubElement(tree.getroot(),'joint',name='paper_interface_mount',type='fixed');ET.SubElement(j,'parent',link='tip');ET.SubElement(j,'child',link='paper_interface');ET.SubElement(j,'origin',xyz=' '.join(map(str,Tti[:3,3])),rpy=' '.join(map(str,Rotation.from_matrix(Tti[:3,:3]).as_euler('xyz'))));path=out/f'gripper_{i}_interface.urdf';ET.indent(tree);tree.write(path,encoding='utf-8',xml_declaration=True);r=Robot(path,base_pose=arm.base_pose);full.append(r)
+/workspace/scale-aware-contact-transfer/src/contact_transfer/full_scenario.py:260: UserWarning: Gimbal lock detected. Setting third angle to zero since it is not possible to uniquely determine all angles.
+  tree=ET.parse(r.path);ET.SubElement(tree.getroot(),'link',name='paper_interface');j=ET.SubElement(tree.getroot(),'joint',name='paper_interface_mount',type='fixed');ET.SubElement(j,'parent',link='tip');ET.SubElement(j,'child',link='paper_interface');ET.SubElement(j,'origin',xyz=' '.join(map(str,Tti[:3,3])),rpy=' '.join(map(str,Rotation.from_matrix(Tti[:3,:3]).as_euler('xyz'))));path=out/f'gripper_{i}_interface.urdf';ET.indent(tree);tree.write(path,encoding='utf-8',xml_declaration=True);r=Robot(path,base_pose=arm.base_pose);full.append(r)
+/workspace/scale-aware-contact-transfer/src/contact_transfer/full_scenario.py:260: UserWarning: Gimbal lock detected. Setting third angle to zero since it is not possible to uniquely determine all angles.
+  tree=ET.parse(r.path);ET.SubElement(tree.getroot(),'link',name='paper_interface');j=ET.SubElement(tree.getroot(),'joint',name='paper_interface_mount',type='fixed');ET.SubElement(j,'parent',link='tip');ET.SubElement(j,'child',link='paper_interface');ET.SubElement(j,'origin',xyz=' '.join(map(str,Tti[:3,3])),rpy=' '.join(map(str,Rotation.from_matrix(Tti[:3,:3]).as_euler('xyz'))));path=out/f'gripper_{i}_interface.urdf';ET.indent(tree);tree.write(path,encoding='utf-8',xml_declaration=True);r=Robot(path,base_pose=arm.base_pose);full.append(r)
+box/fixed_contact_types: native 0/20.0s
+box/no_arm_force_feedforward: native 0/20.0s
+box/external_push: native 0/20.0s
+box/contact_disabled: native 0/20.0s
+box/fixed_path: native 0/20.0s
+box/no_source_refinement: native 0/20.0s
+box/contact_disabled: native 5/20.0s
+box/no_arm_force_feedforward: native 5/20.0s
+box/fixed_contact_types: native 5/20.0s
+box/external_push: native 5/20.0s
+box/fixed_path: native 5/20.0s
+box/no_source_refinement: native 5/20.0s
+box/contact_disabled: native 10/20.0s
+box/external_push: native 10/20.0s
+box/external_push: native 15/20.0s
+box/fixed_path: native 10/20.0s
+box/no_arm_force_feedforward: native 10/20.0s
+box/contact_disabled: native 15/20.0s
+box/fixed_contact_types: native 10/20.0s
+box/no_source_refinement: native 10/20.0s
+box/fixed_path: native 15/20.0s
+box/fixed_path: native 20/20.0s
+box/fixed_path: native 20/20.0s
+box/external_push: native 20/20.0s
+box/external_push: native 20/20.0s
+box/no_arm_force_feedforward: native 15/20.0s
+box/contact_disabled: native 20/20.0s
+box/contact_disabled: native 20/20.0s
+box/no_source_refinement: native 15/20.0s
+{'full': True, 'fixed_path': False}
+box/fixed_contact_types: native 15/20.0s
+{'full': True, 'fixed_path': False, 'external_push': True}
+{'full': True, 'fixed_path': False, 'external_push': True, 'contact_disabled': False}
+box/no_arm_force_feedforward: native 20/20.0s
+box/no_arm_force_feedforward: native 20/20.0s
+box/no_source_refinement: native 20/20.0s
+box/no_source_refinement: native 20/20.0s
+{'full': True, 'fixed_path': False, 'external_push': True, 'contact_disabled': False, 'no_arm_force_feedforward': True}
+box/fixed_contact_types: native 20/20.0s
+box/fixed_contact_types: native 20/20.0s
+{'full': True, 'fixed_path': False, 'external_push': True, 'contact_disabled': False, 'no_arm_force_feedforward': True, 'no_source_refinement': True}
+{'full': True, 'fixed_path': False, 'external_push': True, 'contact_disabled': False, 'no_arm_force_feedforward': True, 'no_source_refinement': True, 'fixed_contact_types': True}
+{'full': True, 'fixed_path': False, 'external_push': True, 'contact_disabled': False, 'no_arm_force_feedforward': True, 'no_source_refinement': True, 'fixed_contact_types': True}

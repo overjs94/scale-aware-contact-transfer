@@ -1,0 +1,50 @@
+{
+  "assembly": [
+    {
+      "name": "desktop",
+      "errors": [],
+      "loaded_real_assets": 16,
+      "overflow": false,
+      "status": "\uc804\uccb4 \uad6c\uac04 \u00b7 \uac80\uc99d \ud1b5\uacfc"
+    },
+    {
+      "name": "mobile",
+      "errors": [],
+      "loaded_real_assets": 16,
+      "overflow": false,
+      "status": "\uc804\uccb4 \uad6c\uac04 \u00b7 \uac80\uc99d \ud1b5\uacfc"
+    }
+  ],
+  "box": [
+    {
+      "name": "desktop",
+      "errors": [],
+      "loaded_real_assets": 16,
+      "overflow": false,
+      "status": "\uc804\uccb4 \uad6c\uac04 \u00b7 \uac80\uc99d \ud1b5\uacfc"
+    },
+    {
+      "name": "mobile",
+      "errors": [],
+      "loaded_real_assets": 16,
+      "overflow": false,
+      "status": "\uc804\uccb4 \uad6c\uac04 \u00b7 \uac80\uc99d \ud1b5\uacfc"
+    }
+  ],
+  "panel": [
+    {
+      "name": "desktop",
+      "errors": [],
+      "loaded_real_assets": 16,
+      "overflow": false,
+      "status": "\uc804\uccb4 \uad6c\uac04 \u00b7 \uac80\uc99d \ud1b5\uacfc"
+    },
+    {
+      "name": "mobile",
+      "errors": [],
+      "loaded_real_assets": 16,
+      "overflow": false,
+      "status": "\uc804\uccb4 \uad6c\uac04 \u00b7 \uac80\uc99d \ud1b5\uacfc"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": ".venv/bin/python web/server.py",
+    "build": "npm --prefix web run build"
+  }
+}

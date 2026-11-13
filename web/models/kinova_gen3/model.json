@@ -1,0 +1,33 @@
+{
+  "id": "kinova_gen3",
+  "urdf": "robot.urdf",
+  "packages": {
+    "upstream": "https://raw.githubusercontent.com/Kinovarobotics/ros_kortex/c3280d8a6a6b5d96590d51538e3f265710a6c77d"
+  },
+  "source_repository": "https://github.com/Kinovarobotics/ros_kortex.git",
+  "commit": "c3280d8a6a6b5d96590d51538e3f265710a6c77d",
+  "source_path": "kortex_description/arms/gen3/7dof/urdf/GEN3-7DOF-VISION_ARM_URDF_V12.urdf",
+  "source_file_sha256": "262a15a7c86fc484b99087be8d787d00d442241421fcc274c8da26117d03a9bf",
+  "urdf_sha256": "cff714b6dea79ffa8640ca05ca5324dc2c6da35815656764bb337b6ffebb2ac9",
+  "license": "BSD-3-Clause",
+  "license_file": "LICENSE.upstream",
+  "assets": [
+    "https://raw.githubusercontent.com/Kinovarobotics/ros_kortex/c3280d8a6a6b5d96590d51538e3f265710a6c77d/kortex_description/arms/gen3/7dof/meshes/base_link.STL",
+    "https://raw.githubusercontent.com/Kinovarobotics/ros_kortex/c3280d8a6a6b5d96590d51538e3f265710a6c77d/kortex_description/arms/gen3/7dof/meshes/bracelet_with_vision_link.STL",
+    "https://raw.githubusercontent.com/Kinovarobotics/ros_kortex/c3280d8a6a6b5d96590d51538e3f265710a6c77d/kortex_description/arms/gen3/7dof/meshes/forearm_link.STL",
+    "https://raw.githubusercontent.com/Kinovarobotics/ros_kortex/c3280d8a6a6b5d96590d51538e3f265710a6c77d/kortex_description/arms/gen3/7dof/meshes/half_arm_1_link.STL",
+    "https://raw.githubusercontent.com/Kinovarobotics/ros_kortex/c3280d8a6a6b5d96590d51538e3f265710a6c77d/kortex_description/arms/gen3/7dof/meshes/half_arm_2_link.STL",
+    "https://raw.githubusercontent.com/Kinovarobotics/ros_kortex/c3280d8a6a6b5d96590d51538e3f265710a6c77d/kortex_description/arms/gen3/7dof/meshes/shoulder_link.STL",
+    "https://raw.githubusercontent.com/Kinovarobotics/ros_kortex/c3280d8a6a6b5d96590d51538e3f265710a6c77d/kortex_description/arms/gen3/7dof/meshes/spherical_wrist_1_link.STL",
+    "https://raw.githubusercontent.com/Kinovarobotics/ros_kortex/c3280d8a6a6b5d96590d51538e3f265710a6c77d/kortex_description/arms/gen3/7dof/meshes/spherical_wrist_2_link.STL"
+  ],
+  "geometry": "upstream_visual_and_collision",
+  "asset_transport": "pinned_upstream_https",
+  "modifications": [
+    "xacro expanded where applicable",
+    "mesh/texture URIs rewritten to pinned upstream package",
+    "controller tags omitted",
+    "upstream comments retained in header"
+  ],
+  "mechanics_verified": true
+}

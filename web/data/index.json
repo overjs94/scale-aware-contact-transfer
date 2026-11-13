@@ -1,6 +1,461 @@
 {
   "models": [
     {
+      "id": "margin_platform_on_common_up1",
+      "title": "Tall payload \u00b7 Common interior \u00b7 1 N with slow rise \u00b7 robustness ON",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_platform_off_common_up1",
+      "title": "Tall payload \u00b7 Common interior \u00b7 1 N with slow rise \u00b7 robustness OFF",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_platform_off_repeated_up4",
+      "title": "Tall payload \u00b7 4 N upward \u00b7 four repeated pulses \u00b7 robustness OFF",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_platform_on_repeated_up4",
+      "title": "Tall payload \u00b7 4 N upward \u00b7 four repeated pulses \u00b7 robustness ON",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_platform_on_common_up2",
+      "title": "Tall payload \u00b7 Common interior \u00b7 2 N upward hold \u00b7 robustness ON",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_platform_off_common_up2",
+      "title": "Tall payload \u00b7 Common interior \u00b7 2 N upward hold \u00b7 robustness OFF",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_platform_on_nominal",
+      "title": "Tall payload \u00b7 No external load \u00b7 robustness ON",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_platform_off_nominal",
+      "title": "Tall payload \u00b7 No external load \u00b7 robustness OFF",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_compact_on_diagonal",
+      "title": "Compact payload \u00b7 Diagonal hold \u00b7 4.5 N up, 1.4 N in x/y \u00b7 robustness ON",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_compact_off_diagonal",
+      "title": "Compact payload \u00b7 Diagonal hold \u00b7 4.5 N up, 1.4 N in x/y \u00b7 robustness OFF",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_platform_on_slow_up4",
+      "title": "Tall payload \u00b7 4 N upward \u00b7 slow 2 s rise and fall \u00b7 robustness ON",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_platform_off_slow_up4",
+      "title": "Tall payload \u00b7 4 N upward \u00b7 slow 2 s rise and fall \u00b7 robustness OFF",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_compact_off_sustained_up4",
+      "title": "Compact payload \u00b7 4 N upward \u00b7 sustained load \u00b7 robustness OFF",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_compact_on_sustained_up4",
+      "title": "Compact payload \u00b7 4 N upward \u00b7 sustained load \u00b7 robustness ON",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_platform_off_sustained_up4",
+      "title": "Tall payload \u00b7 4 N upward \u00b7 sustained load \u00b7 robustness OFF",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_platform_on_sustained_up4",
+      "title": "Tall payload \u00b7 4 N upward \u00b7 sustained load \u00b7 robustness ON",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_hold_on_sustained_up4",
+      "title": "Flat panel \u00b7 4 N upward \u00b7 sustained load \u00b7 robustness ON",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_hold_off_sustained_up4",
+      "title": "Flat panel \u00b7 4 N upward \u00b7 sustained load \u00b7 robustness OFF",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_nominal_12N",
+      "title": "Source polytope OFF \u00b7 \uc678\ub825 12 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_nominal_-12N",
+      "title": "Source polytope OFF \u00b7 \uc678\ub825 -12 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_polytope_12N",
+      "title": "Source polytope ON \u00b7 \uc678\ub825 12 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "counterfactual_box_PPG",
+      "title": "box \u00b7 \uac15\uc81c \uc720\ud615 P / P / G",
+      "engine": "mujoco_contact_recording",
+      "dof": 29,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_nominal_8N",
+      "title": "Source polytope OFF \u00b7 \uc678\ub825 8 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_polytope_-12N",
+      "title": "Source polytope ON \u00b7 \uc678\ub825 -12 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "counterfactual_panel_PPP",
+      "title": "panel \u00b7 \uac15\uc81c \uc720\ud615 P / P / P",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_nominal_-8N",
+      "title": "Source polytope OFF \u00b7 \uc678\ub825 -8 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_polytope_8N",
+      "title": "Source polytope ON \u00b7 \uc678\ub825 8 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_polytope_-8N",
+      "title": "Source polytope ON \u00b7 \uc678\ub825 -8 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_nominal_4N",
+      "title": "Source polytope OFF \u00b7 \uc678\ub825 4 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_polytope_4N",
+      "title": "Source polytope ON \u00b7 \uc678\ub825 4 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_nominal_-4N",
+      "title": "Source polytope OFF \u00b7 \uc678\ub825 -4 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_polytope_-4N",
+      "title": "Source polytope ON \u00b7 \uc678\ub825 -4 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_nominal_0N",
+      "title": "Source polytope OFF \u00b7 \uc678\ub825 0 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "robust_refinement_polytope_0N",
+      "title": "Source polytope ON \u00b7 \uc678\ub825 0 N",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "full_box_fixed_contact_types",
+      "title": "\uc790\uc720 \ubc15\uc2a4 \u00b7 \ubcf8\uccb4 \uc9c0\uc9c0\u00b7\ub69c\uaed1 \uc5f4\uae30 \u00b7 fixed_contact_types",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_box_no_source_refinement",
+      "title": "\uc790\uc720 \ubc15\uc2a4 \u00b7 \ubcf8\uccb4 \uc9c0\uc9c0\u00b7\ub69c\uaed1 \uc5f4\uae30 \u00b7 no_source_refinement",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_assembly_external_push",
+      "title": "\uac00\uad6c \uc870\ub9bd \u00b7 \uc0c1\ud310 \uc9c0\uc9c0\u00b7\ub2e4\ub9ac \uc0bd\uc785\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 external_push",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_box_no_arm_force_feedforward",
+      "title": "\uc790\uc720 \ubc15\uc2a4 \u00b7 \ubcf8\uccb4 \uc9c0\uc9c0\u00b7\ub69c\uaed1 \uc5f4\uae30 \u00b7 no_arm_force_feedforward",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_assembly_contact_disabled",
+      "title": "\uac00\uad6c \uc870\ub9bd \u00b7 \uc0c1\ud310 \uc9c0\uc9c0\u00b7\ub2e4\ub9ac \uc0bd\uc785\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 contact_disabled",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_box_contact_disabled",
+      "title": "\uc790\uc720 \ubc15\uc2a4 \u00b7 \ubcf8\uccb4 \uc9c0\uc9c0\u00b7\ub69c\uaed1 \uc5f4\uae30 \u00b7 contact_disabled",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_assembly_no_arm_force_feedforward",
+      "title": "\uac00\uad6c \uc870\ub9bd \u00b7 \uc0c1\ud310 \uc9c0\uc9c0\u00b7\ub2e4\ub9ac \uc0bd\uc785\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 no_arm_force_feedforward",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_box_external_push",
+      "title": "\uc790\uc720 \ubc15\uc2a4 \u00b7 \ubcf8\uccb4 \uc9c0\uc9c0\u00b7\ub69c\uaed1 \uc5f4\uae30 \u00b7 external_push",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_assembly_fixed_path",
+      "title": "\uac00\uad6c \uc870\ub9bd \u00b7 \uc0c1\ud310 \uc9c0\uc9c0\u00b7\ub2e4\ub9ac \uc0bd\uc785\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 fixed_path",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_box_fixed_path",
+      "title": "\uc790\uc720 \ubc15\uc2a4 \u00b7 \ubcf8\uccb4 \uc9c0\uc9c0\u00b7\ub69c\uaed1 \uc5f4\uae30 \u00b7 fixed_path",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_panel_external_push",
+      "title": "\ud328\ub110 \u00b7 \uc6b4\ubc18\u00b7\uc7ac\ubc30\ud5a5\u00b7\uc548\ucc29\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 external_push",
+      "engine": "mujoco_contact_recording",
+      "dof": 29,
+      "floating_base": false
+    },
+    {
+      "id": "full_panel_contact_disabled",
+      "title": "\ud328\ub110 \u00b7 \uc6b4\ubc18\u00b7\uc7ac\ubc30\ud5a5\u00b7\uc548\ucc29\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 contact_disabled",
+      "engine": "mujoco_contact_recording",
+      "dof": 29,
+      "floating_base": false
+    },
+    {
+      "id": "full_panel_no_arm_force_feedforward",
+      "title": "\ud328\ub110 \u00b7 \uc6b4\ubc18\u00b7\uc7ac\ubc30\ud5a5\u00b7\uc548\ucc29\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 no_arm_force_feedforward",
+      "engine": "mujoco_contact_recording",
+      "dof": 29,
+      "floating_base": false
+    },
+    {
+      "id": "full_panel_fixed_path",
+      "title": "\ud328\ub110 \u00b7 \uc6b4\ubc18\u00b7\uc7ac\ubc30\ud5a5\u00b7\uc548\ucc29\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 fixed_path",
+      "engine": "mujoco_contact_recording",
+      "dof": 29,
+      "floating_base": false
+    },
+    {
+      "id": "full_assembly_fixed_contact_types",
+      "title": "\uac00\uad6c \uc870\ub9bd \u00b7 \uc0c1\ud310 \uc9c0\uc9c0\u00b7\ub2e4\ub9ac \uc0bd\uc785\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 fixed_contact_types",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_assembly_no_source_refinement",
+      "title": "\uac00\uad6c \uc870\ub9bd \u00b7 \uc0c1\ud310 \uc9c0\uc9c0\u00b7\ub2e4\ub9ac \uc0bd\uc785\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 no_source_refinement",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_panel_fixed_contact_types",
+      "title": "\ud328\ub110 \u00b7 \uc6b4\ubc18\u00b7\uc7ac\ubc30\ud5a5\u00b7\uc548\ucc29\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 fixed_contact_types",
+      "engine": "mujoco_contact_recording",
+      "dof": 29,
+      "floating_base": false
+    },
+    {
+      "id": "full_panel_no_source_refinement",
+      "title": "\ud328\ub110 \u00b7 \uc6b4\ubc18\u00b7\uc7ac\ubc30\ud5a5\u00b7\uc548\ucc29\u00b7\ub9b4\ub9ac\uc2a4 \u00b7 no_source_refinement",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "full_box",
+      "title": "\uc790\uc720 \ubc15\uc2a4 \u00b7 \ubcf8\uccb4 \uc9c0\uc9c0\u00b7\ub69c\uaed1 \uc5f4\uae30",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_assembly",
+      "title": "\uac00\uad6c \uc870\ub9bd \u00b7 \uc0c1\ud310 \uc9c0\uc9c0\u00b7\ub2e4\ub9ac \uc0bd\uc785\u00b7\ub9b4\ub9ac\uc2a4",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "full_panel",
+      "title": "\ud328\ub110 \u00b7 \uc6b4\ubc18\u00b7\uc7ac\ubc30\ud5a5\u00b7\uc548\ucc29\u00b7\ub9b4\ub9ac\uc2a4",
+      "engine": "mujoco_contact_recording",
+      "dof": 29,
+      "floating_base": false
+    },
+    {
+      "id": "robotiq_2f85",
+      "title": "Robotiq 2F-85 \u00b7 \uc591 jaw 40 N \u00b7 native mechanism",
+      "engine": "mujoco_contact_recording",
+      "dof": 8,
+      "floating_base": false
+    },
+    {
+      "id": "panda_robotiq_lift",
+      "title": "Panda \u00d7 3 \u00b7 Robotiq 2F-85 \u00b7 \ucd5c\uc801\ud654\ub41c \uccab lift",
+      "engine": "mujoco_contact_recording",
+      "dof": 29,
+      "floating_base": false
+    },
+    {
+      "id": "free_portable_drawer",
+      "title": "\uc790\uc720 \uc218\ub0a9\ud568 \u00b7 \ubcf8\uccb4 \uc9c0\uc9c0 + \uc11c\ub78d \ub2f9\uae30\uae30",
+      "engine": "mujoco_contact_recording",
+      "dof": 25,
+      "floating_base": false
+    },
+    {
+      "id": "free_folding_object",
+      "title": "\uc790\uc720 \uc811\uc774\uc2dd \ud328\ub110 \u00b7 \ubcf8\uccb4 \uc9c0\uc9c0 + \ub0a0\uac1c \ud3bc\uce58\uae30",
+      "engine": "mujoco_contact_recording",
+      "dof": 25,
+      "floating_base": false
+    },
+    {
+      "id": "free_box_lid",
+      "title": "\uc790\uc720 \ubc15\uc2a4 \u00b7 \ubcf8\uccb4 grip/support + \ub69c\uaed1 \uc5f4\uae30",
+      "engine": "mujoco_contact_recording",
+      "dof": 25,
+      "floating_base": false
+    },
+    {
+      "id": "drawer",
+      "title": "Component \u00b7 \ub2e8\uc77c \ud314 \u00b7 \uc11c\ub78d \ub2f9\uae30\uae30 \u00b7 14 s",
+      "engine": "mujoco_contact_recording",
+      "dof": 9,
+      "floating_base": false
+    },
+    {
+      "id": "folding_panel",
+      "title": "Component \u00b7 \ub2e8\uc77c \ud314 \u00b7 \uc811\uc774\uc2dd \uc0c1\ud310 \ud3bc\uce58\uae30 \u00b7 14 s",
+      "engine": "mujoco_contact_recording",
+      "dof": 7,
+      "floating_base": false
+    },
+    {
+      "id": "hinged_door",
+      "title": "Component \u00b7 \ub2e8\uc77c \ud314 \u00b7 \uc218\ub3d9 \ud78c\uc9c0 \u00b7 \ubb38 \uc5f4\uae30 \u00b7 14 s",
+      "engine": "mujoco_contact_recording",
+      "dof": 7,
+      "floating_base": false
+    },
+    {
+      "id": "mobile_panel",
+      "title": "\uc791\uc5c5\uc601\uc5ed \ud655\uc7a5 \u00b7 RBY1 + Panda \u00b7 36 s",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "panel_fixture",
+      "title": "\ud328\ub110 \u2192 \uc9c0\uadf8 \u00b7 Franka \u00d7 3 \u00b7 30 s",
+      "engine": "mujoco_contact_recording",
+      "dof": 23,
+      "floating_base": false
+    },
+    {
       "id": "franka_panda",
       "title": "Franka Panda",
       "engine": "mujoco_recording",
@@ -62,8 +517,57 @@
       "engine": "cito_trajectory",
       "dof": 6,
       "floating_base": false
+    },
+    {
+      "id": "three_arm",
+      "title": "Three-arm contracted contacts",
+      "engine": "mujoco_contact_recording",
+      "dof": 11,
+      "floating_base": false
+    },
+    {
+      "id": "three_franka",
+      "title": "Franka Panda \u00d7 3 \u00b7 contracted contacts",
+      "engine": "mujoco_contact_recording",
+      "dof": 23,
+      "floating_base": false
+    },
+    {
+      "id": "table_assembly",
+      "title": "\ucc45\uc0c1 \uc870\ub9bd \u00b7 Franka \u00d7 3 \u00b7 30 s",
+      "engine": "mujoco_contact_recording",
+      "dof": 25,
+      "floating_base": false
+    },
+    {
+      "id": "mobile_push_2",
+      "title": "\uc678\ub825 2 N \u00b7 RBY1 + Panda",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "mobile_push_8",
+      "title": "\uc678\ub825 8 N \u00b7 RBY1 + Panda",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "mobile_push_25",
+      "title": "\uc678\ub825 25 N \u00b7 RBY1 + Panda",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "free_box_push",
+      "title": "\uc678\ub825 5 N \u00b7 \uc790\uc720 articulated \ubc15\uc2a4 \u00b7 G/P/G",
+      "engine": "mujoco_contact_recording",
+      "dof": 25,
+      "floating_base": false
     }
   ],
-  "tests_passed": 30,
+  "tests_passed": 120,
   "draft_version": "12"
 }

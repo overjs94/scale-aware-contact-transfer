@@ -1,67 +1,88 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#0b1220">
-  <title>Contact Transfer Lab</title>
+  <title>Scale-Aware Functional Contact Transfer from Human Hands to Multi-Arm Robots</title>
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="./"><span class="brand-icon">⌘</span><span>Contact Transfer <b>Lab</b></span></a>
-    <span class="workspace"><i></i> RESEARCH WORKSPACE</span>
+    <a class="brand" href="./"><span class="brand-icon">⌘</span><span>Functional Contact <b>Transfer</b></span></a>
+    <span class="workspace"><i></i> SUPPLEMENTARY SIMULATIONS</span>
     <nav><a href="https://github.com/overjs94/scale-aware-contact-transfer" target="_blank" rel="noreferrer">GitHub ↗</a>
-      <a href="https://github.com/overjs94/scale-aware-contact-transfer/blob/main/docs/draft_v12_code_check.md" target="_blank" rel="noreferrer">논문·코드 대조 ↗</a></nav>
+      <a href="https://github.com/overjs94/scale-aware-contact-transfer/blob/feat/conic-contact-validation/docs/paper-viewer-terminology.md" target="_blank" rel="noreferrer">Implementation scope ↗</a></nav>
   </header>
   <div class="layout">
     <aside class="sidebar">
-      <div class="section-label">EXPERIMENT LIBRARY <span>09</span></div>
-      <h1>Embodiments</h1><p class="subtle">같은 모델 규약, 다른 로봇 구조.</p>
-      <div id="model-list" class="model-list" aria-label="로봇 모델 선택"></div>
-      <div class="side-note"><span class="tiny-icon">◇</span><div><b>URDF에서 직접 계산</b><p>링크 기하·질량·관성으로<br>동역학과 기구학을 생성합니다.</p></div></div>
-      <a class="source-link" href="https://github.com/overjs94/scale-aware-contact-transfer/blob/main/docs/models.md" target="_blank" rel="noreferrer">모델 출처와 라이선스 ↗</a>
+      <div class="section-label">EXPERIMENT LIBRARY <span id="model-count">10</span></div>
+      <h2>Experiment library</h2><p class="subtle">Primary tasks, embodiment checks, and controlled diagnostics.</p>
+      <nav id="library-categories" class="library-categories" aria-label="Experiment categories"></nav>
+      <p id="library-description" class="library-description"></p>
+      <div id="model-list" class="model-list" aria-label="Select a task or embodiment"></div>
+      <div class="side-note"><span class="tiny-icon">◇</span><div><b>URDF-based mechanics</b><p>Kinematics and dynamics from<br>link geometry, masses, and inertias.</p></div></div>
+      <a class="source-link" href="https://github.com/overjs94/scale-aware-contact-transfer/blob/feat/conic-contact-validation/docs/models.md" target="_blank" rel="noreferrer">Model provenance and licenses ↗</a>
     </aside>
     <main>
+      <section class="paper-heading" aria-label="Paper title"><p class="eyebrow">SUPPLEMENTARY SIMULATIONS</p><h1>Scale-Aware Functional Contact Transfer<br><span>from Human Hands to Multi-Arm Robots</span></h1><p>Recorded multi-arm simulations and controlled diagnostics for supplied contracted contacts. Validation scope is reported per recording.</p><p><a href="./robustness-comparison.html">Inside-margin loading · synchronized ON/OFF comparison ↗</a></p></section>
       <section class="heading-row">
-        <div><div class="eyebrow">MODEL-BASED MANIPULATION</div><h2 id="model-title">Loading simulation…</h2><p id="model-description" class="subtle">검증된 모델의 계산 결과를 불러오고 있습니다.</p></div>
+        <div><div class="eyebrow">MODEL-BASED MANIPULATION</div><h2 id="model-title">Loading simulation…</h2><p id="model-description" class="subtle">Loading recorded model-based results.</p></div>
         <div id="engine-badge" class="engine-badge"><span></span>Loading</div>
+      </section>
+      <section class="scenario-context" aria-label="Task purpose and validation scope">
+        <div><span id="scenario-category"></span><strong id="scenario-status"></strong></div>
+        <p id="scenario-scope"></p>
       </section>
       <div class="experiment-grid">
         <section class="viewer-card">
-          <div class="viewport" id="viewport" aria-label="로봇 3D 시뮬레이션 뷰어">
-            <div class="viewport-top"><span class="scene-label"><i></i><span id="scene-label">URDF KINEMATICS</span></span><button id="reset-camera" class="small-button" aria-label="카메라 초기화">↗ Reset view</button></div>
-            <div id="loading" class="loading"><span class="spinner"></span><span>모델을 준비하고 있습니다</span></div>
+          <div class="viewport" id="viewport" aria-label="3D robot simulation viewer">
+            <div class="viewport-top"><span class="scene-label"><i></i><span id="scene-label">URDF KINEMATICS</span></span><button id="reset-camera" class="small-button" aria-label="Reset camera">↗ Reset view</button></div>
+            <div id="loading" class="loading"><span class="spinner"></span><span>Preparing URDF geometry</span></div>
             <div class="viewport-bottom"><span class="axis-key"><b class="x-axis">X</b><b class="y-axis">Y</b><b class="z-axis">Z</b><span>WORLD FRAME · m</span></span><span>Drag to orbit · Scroll to zoom</span></div>
           </div>
           <div class="playback">
-            <button id="play" class="play-button" aria-label="일시 정지">Ⅱ</button>
-            <div class="timeline"><input id="timeline" aria-label="시뮬레이션 시간" type="range" min="0" max="1" step="0.001" value="0"><div class="timeline-labels"><span id="time-now">0.00 s</span><span id="time-total">—</span></div></div>
-            <select id="speed" aria-label="재생 속도"><option value=".5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
-            <button id="loop" class="loop-button active" aria-label="반복 재생" aria-pressed="true">↻</button>
+            <button id="play" class="play-button" aria-label="Pause">Ⅱ</button>
+            <div class="timeline"><input id="timeline" aria-label="Playback time" type="range" min="0" max="1" step="0.001" value="0"><div class="timeline-labels"><span id="time-now">0.00 s</span><span id="time-total">—</span></div></div>
+            <select id="speed" aria-label="Playback speed"><option value=".5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
+            <button id="loop" class="loop-button active" aria-label="Loop playback" aria-pressed="true">↻</button>
           </div>
-          <div class="geometry-note"><span>◈</span><p><b>기구학 좌표를 표시하는 형상입니다.</b> 링크·관절은 시각화 proxy이며, 실제 mesh 접촉·충돌 검증을 나타내지 않습니다.</p></div>
+          <div class="geometry-note"><span>◈</span><p id="geometry-status" role="status">Preparing URDF visual geometry and meshes.</p><label class="geometry-control">Lighting <select id="scene-style" aria-label="Rendering style"><option value="studio">Studio · PBR</option><option value="analysis">Analysis · grid</option></select></label><label class="geometry-control">Geometry <select id="geometry-mode" aria-label="Geometry"><option value="visual">URDF visual</option><option value="collision">URDF collision</option><option value="skeleton">Link frames</option></select></label></div>
+          <div id="keyframe-list" class="keyframe-list" aria-label="Keyframes and interface events"></div>
+          <div class="tool-state"><label>Contact display <select id="contact-display"><option value="both">Dense → contracted</option><option value="dense">Dense patches</option><option value="contracted">Representative contacts</option><option value="off">Off</option></select></label><span id="contraction-state"></span></div><p id="disturbance-state" class="tool-state" hidden></p><div id="tool-state" class="tool-state" aria-label="Measured contact-interface state"></div>
+          <div id="native-contact-controls" class="tool-state" hidden><label><input id="native-contact-visible" type="checkbox" checked> White markers: measured pad/tool contact-patch centers</label><label>Inspect contact <select id="contact-focus" aria-label="Inspect contact"><option value="">Choose a contact</option></select></label><span id="native-contact-state"></span></div>
+          <p id="native-contact-note" class="tool-state" hidden></p>
+          <nav id="full-result-links" class="result-links" hidden aria-label="Jump to validation results"><a href="#ablation-results" data-baseline-link>Seven-condition ablation · failed checks ↓</a><a href="#selection-results" data-baseline-link>Contact types · candidate objectives ↓</a><a href="#algorithm-comparison-results">Alternative types · source robustness ON/OFF ↓</a></nav>
         </section>
         <aside class="details">
           <section class="panel"><div class="section-label">MODEL SNAPSHOT</div><div class="stat-grid">
-            <div><span>Actuated DoF</span><strong id="dof">—</strong></div><div><span>Base</span><strong id="base">—</strong></div>
+            <div><span>Joint coordinates</span><strong id="dof">—</strong></div><div><span>Base</span><strong id="base">—</strong></div>
             <div><span>Physics step</span><strong id="physics-step">—</strong></div><div><span>Duration</span><strong id="duration">—</strong></div>
           </div><div class="tool-frame"><span>Reference frame</span><code id="tool-frame">—</code></div></section>
           <section class="panel chart-panel"><div class="panel-heading"><div><div class="section-label" id="chart-label">JOINT TRACKING ERROR</div><strong id="error-now">—</strong><span class="unit" id="error-unit">rad</span></div><span class="live-dot"></span></div>
-            <svg id="chart" viewBox="0 0 260 95" role="img" aria-label="시뮬레이션 추종 오차 그래프"><defs><linearGradient id="fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2dd4bf" stop-opacity=".25"/><stop offset="100%" stop-color="#2dd4bf" stop-opacity="0"/></linearGradient></defs><path class="chart-grid" d="M0 15H260M0 48H260M0 80H260"/><path id="chart-area" fill="url(#fill)"/><polyline id="chart-line" fill="none" stroke="#2dd4bf" stroke-width="2"/><line id="chart-cursor" y1="4" y2="85" stroke="#cbd5e1" stroke-dasharray="3 3"/></svg>
-            <div class="chart-footer"><span>0 s</span><span id="chart-end">—</span></div><p id="chart-note" class="fine">관절 위치 오차의 2-norm</p>
+            <svg id="chart" viewBox="0 0 260 95" role="img" aria-label="Recorded tracking quantity"><defs><linearGradient id="fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2dd4bf" stop-opacity=".25"/><stop offset="100%" stop-color="#2dd4bf" stop-opacity="0"/></linearGradient></defs><path class="chart-grid" d="M0 15H260M0 48H260M0 80H260"/><path id="chart-area" fill="url(#fill)"/><polyline id="chart-line" fill="none" stroke="#2dd4bf" stroke-width="2"/><line id="chart-cursor" y1="4" y2="85" stroke="#cbd5e1" stroke-dasharray="3 3"/></svg>
+            <div class="chart-footer"><span>0 s</span><span id="chart-end">—</span></div><p id="chart-note" class="fine">Euclidean norm of joint-position error</p>
           </section>
           <section class="panel torque-panel"><div class="section-label">ACTUATION UTILIZATION</div><div class="torque-value"><strong id="torque-now">—</strong><span>of URDF effort limit</span></div><div class="meter"><span id="torque-meter"></span></div><div class="meter-label"><span>0%</span><span>100%</span></div></section>
-          <div class="validation"><span class="checkmark">✓</span><div><b><span id="test-count">30</span> automated tests passed</b><p>Mechanics · Jacobians · Contact · Control</p></div></div>
+          <div class="validation"><span class="checkmark">◇</span><div><b>Per-recording execution checks</b><p>Tracking, contact, and force limits · see the report</p></div></div>
         </aside>
       </div>
+      <section class="experiment-builder" aria-label="Cooperative contact experiment settings">
+        <div class="builder-heading"><div><div class="eyebrow">CONTRACTED CONTACT → OPTIMIZATION → DYNAMICS</div><h3 id="builder-title">Tabletop–leg assembly</h3><p id="builder-note">Panda × 3 · gripper × 2 + point × 1 · 8 keyframes · 30 s</p></div><span id="preset-tag" class="preset-tag">RBY1 + PANDA</span></div>
+        <form id="experiment-form"><label class="scenario-control">Scenario <select id="scenario-preset" aria-label="Experiment preset"></select></label>
+          <div class="builder-columns"><div><div class="section-label">01 / TOOLS & OBJECT</div><div class="tool-chips" id="tool-chips"><span>● Sphere · point</span><span>⋈ Panda hand</span><span>⊙ Vacuum seal</span></div><label class="mass-label" id="mass-control">Panel mass <input id="panel-mass" type="number" min=".1" max="2" step=".1" value="1" required> kg</label><label class="mass-label" id="duration-control" hidden>Total motion duration <input id="assembly-duration" type="number" min="24" max="60" step="1" value="30"> s</label><p class="fine" id="planner-description">Optimize dynamics, reactions, and joint torques for the supplied SE(3) path and contact modes.</p><details><summary>Edit or import contracted-contact JSON</summary><label class="file-label">JSON file <input id="contacts-file" type="file" accept=".json,application/json"></label><textarea id="contacts-json" aria-label="Contracted contact JSON" spellcheck="false"></textarea><p class="fine">SI units · object frame · assigned by group ID. Defaults are synthetic inputs; learned inference is not executed.</p></details></div><div><div class="section-label">02 / OBJECT KEYFRAMES</div><div id="keyframe-inputs"></div><p class="fine" id="keyframe-help">Position in meters · time in seconds · poses in each part’s URDF frame.</p></div></div>
+          <div class="experiment-actions"><p id="experiment-state" role="status" aria-live="polite">Checking the computation backend…</p><button id="experiment-reset" type="button" class="small-button">Reset preset</button><button id="experiment-cancel" type="button" class="small-button" disabled>Cancel</button><button id="experiment-run" type="submit" disabled>Optimize & simulate ↗</button></div>
+        </form>
+        <label id="source-refinement-control" hidden><input id="source-refinement" type="checkbox" checked> Small-scale source contact refinement · synthetic input</label>
+        <div id="experiment-results" hidden><div class="result-grid"><div><span>KEYFRAME TRACKING</span><strong id="result-tracking">—</strong></div><div><span>FORCE ENVELOPES</span><strong id="result-forces">—</strong></div><div><span id="result-seal-label">ASSEMBLY / RELEASE</span><strong id="result-seal">—</strong></div><div><span>NLP RESIDUAL</span><strong id="result-residual">—</strong></div></div><p id="source-result" hidden></p><p id="workspace-result" hidden></p><p id="robustness-result" hidden></p><details><summary>Execution report</summary><pre id="report-json"></pre></details><p class="fine">The report refers to the currently selected recording. It is not a continuous-time collision certificate or a hardware-performance claim.</p></div>
+      </section>
       <section class="run-panel">
-        <div class="run-intro"><span class="tiny-icon">⌁</span><div><h3>새 조건으로 시뮬레이션</h3><p id="backend-state">계산 서버 연결을 확인하고 있습니다.</p></div></div>
-        <label>Amplitude <span><input id="amplitude" type="number" min="0" max=".3" step=".02" value=".12" aria-label="명령 진폭"> rad</span></label>
-        <label>Duration <span><input id="run-duration" type="number" min=".5" max="10" step=".5" value="3" aria-label="시뮬레이션 계산 시간"> s</span></label>
+        <div class="run-intro"><span class="tiny-icon">⌁</span><div><h3>Compute a new trial</h3><p id="backend-state">Checking connection to the computation backend.</p></div></div>
+        <label>Amplitude <span><input id="amplitude" type="number" min="0" max=".3" step=".02" value=".12" aria-label="Command amplitude"> rad</span></label>
+        <label>Duration <span><input id="run-duration" type="number" min=".5" max="10" step=".5" value="3" aria-label="Simulation duration"> s</span></label>
         <button id="run" disabled>Run simulation <span>↗</span></button>
       </section>
-      <section class="scope"><div><span class="section-label">WHAT YOU ARE VIEWING</span><p id="scope-description"></p></div><a id="download-data" href="#" download>결과 데이터 다운로드 ↓</a></section>
-      <footer><span>ANGULAR-FIRST · POWER-CONSISTENT · URDF-DRIVEN</span><span id="draft-note">Draft v12 alignment checked · prototype solver: IPOPT</span></footer>
+      <section class="scope"><div><span class="section-label">WHAT YOU ARE VIEWING</span><p id="scope-description"></p></div><a id="download-data" href="#" download>Download original recording ↓</a></section>
+      <footer><span>ANGULAR-FIRST · POWER-CONSISTENT · URDF-DRIVEN</span><span id="draft-note">Per-recording purpose and validation scope · CasADi / IPOPT</span></footer>
     </main>
   </div>
   <div id="toast" role="status"></div>

@@ -1,0 +1,39 @@
+{
+  "id": "ur5e",
+  "urdf": "robot.urdf",
+  "packages": {
+    "upstream": "https://raw.githubusercontent.com/UniversalRobots/Universal_Robots_ROS2_Description/0eb1a861f7772fceb38510d90fa2f98ec668070c"
+  },
+  "source_repository": "https://github.com/UniversalRobots/Universal_Robots_ROS2_Description.git",
+  "commit": "0eb1a861f7772fceb38510d90fa2f98ec668070c",
+  "source_path": "urdf/ur.urdf.xacro",
+  "source_file_sha256": "f5a9d09b8962401fd57f11eccdd18311b7b4da761ba5cbe576791f7ba9c1ea3e",
+  "urdf_sha256": "4d37d221b8296d8972715f726958d6c1ec881632056a9b429a089083e5dcb2bc",
+  "license": "BSD-3-Clause",
+  "license_file": "LICENSE.upstream",
+  "assets": [
+    "https://raw.githubusercontent.com/UniversalRobots/Universal_Robots_ROS2_Description/0eb1a861f7772fceb38510d90fa2f98ec668070c/meshes/ur5e/collision/base.stl",
+    "https://raw.githubusercontent.com/UniversalRobots/Universal_Robots_ROS2_Description/0eb1a861f7772fceb38510d90fa2f98ec668070c/meshes/ur5e/collision/forearm.stl",
+    "https://raw.githubusercontent.com/UniversalRobots/Universal_Robots_ROS2_Description/0eb1a861f7772fceb38510d90fa2f98ec668070c/meshes/ur5e/collision/shoulder.stl",
+    "https://raw.githubusercontent.com/UniversalRobots/Universal_Robots_ROS2_Description/0eb1a861f7772fceb38510d90fa2f98ec668070c/meshes/ur5e/collision/upperarm.stl",
+    "https://raw.githubusercontent.com/UniversalRobots/Universal_Robots_ROS2_Description/0eb1a861f7772fceb38510d90fa2f98ec668070c/meshes/ur5e/collision/wrist1.stl",
+    "https://raw.githubusercontent.com/UniversalRobots/Universal_Robots_ROS2_Description/0eb1a861f7772fceb38510d90fa2f98ec668070c/meshes/ur5e/collision/wrist2.stl",
+    "https://raw.githubusercontent.com/UniversalRobots/Universal_Robots_ROS2_Description/0eb1a861f7772fceb38510d90fa2f98ec668070c/meshes/ur5e/collision/wrist3.stl",
+    "https://raw.githubusercontent.com/UniversalRobots/Universal_Robots_ROS2_Description/0eb1a861f7772fceb38510d90fa2f98ec668070c/meshes/ur5e/visual/base.dae",
+    "https://raw.githubusercontent.com/UniversalRobots/Universal_Robots_ROS2_Description/0eb1a861f7772fceb38510d90fa2f98ec668070c/meshes/ur5e/visual/forearm.dae",
+    "https://raw.githubusercontent.com/UniversalRobots/Universal_Robots_ROS2_Description/0eb1a861f7772fceb38510d90fa2f98ec668070c/meshes/ur5e/visual/shoulder.dae",
+    "https://raw.githubusercontent.com/UniversalRobots/Universal_Robots_ROS2_Description/0eb1a861f7772fceb38510d90fa2f98ec668070c/meshes/ur5e/visual/upperarm.dae",
+    "https://raw.githubusercontent.com/UniversalRobots/Universal_Robots_ROS2_Description/0eb1a861f7772fceb38510d90fa2f98ec668070c/meshes/ur5e/visual/wrist1.dae",
+    "https://raw.githubusercontent.com/UniversalRobots/Universal_Robots_ROS2_Description/0eb1a861f7772fceb38510d90fa2f98ec668070c/meshes/ur5e/visual/wrist2.dae",
+    "https://raw.githubusercontent.com/UniversalRobots/Universal_Robots_ROS2_Description/0eb1a861f7772fceb38510d90fa2f98ec668070c/meshes/ur5e/visual/wrist3.dae"
+  ],
+  "geometry": "upstream_visual_and_collision",
+  "asset_transport": "pinned_upstream_https",
+  "modifications": [
+    "xacro expanded where applicable",
+    "mesh/texture URIs rewritten to pinned upstream package",
+    "controller tags omitted",
+    "upstream comments retained in header"
+  ],
+  "mechanics_verified": true
+}
