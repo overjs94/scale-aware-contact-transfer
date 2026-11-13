@@ -44,11 +44,11 @@ PROTOCOL=dict(version=2,source_to_target_scale=4.,source_mass_kg=.03125,
     statistical_success_rate_claimed=False)
 
 
-def source_refinement(robustness_enabled):
+def source_refinement(robustness_enabled,*,com_object=(0.,0.,0.)):
     cfg=PROTOCOL;scale=cfg['source_to_target_scale'];points=np.array(cfg['target_initial_sites_m'])/scale
     patches=[planar_patch(p,[0,0,-1],np.array([[1,0,0],[0,1,0]]).T,[cfg['source_patch_half_size_m']]*2) for p in points]
     point=np.array(cfg['force_application_point_body_m'])/scale;E=np.vstack([cross(point),np.eye(3)])
-    task=TaskWrench(gravity_wrench(cfg['source_mass_kg'],[0,0,0],np.eye(3)),E,np.diag(np.array(cfg['target_force_box_scales_N'])/scale**3))
+    task=TaskWrench(gravity_wrench(cfg['source_mass_kg'],com_object,np.eye(3)),E,np.diag(np.array(cfg['target_force_box_scales_N'])/scale**3))
     caps=[Capability(mu=cfg['mu'],normal_max=cfg['target_normal_limit_N']/scale**3) for _ in points]
     result=refine_contacts(patches,task,caps,position_radius=cfg['source_position_radius_m'],normal_radius=0.,geometry_weight=cfg['geometry_weight'],robustness_enabled=robustness_enabled,settings=scenario_solver_settings())
     rotations=np.array([contact_basis([0,0,-1])]*3);before=fixed_wrench_margin(points,rotations,task,caps);after=fixed_wrench_margin(result.positions,result.rotations,task,caps)
@@ -62,9 +62,18 @@ class RobustHoldProblem(FullProblem):
         return GeneralizedTaskLoad(-obj.gravity(qobj),Jp.T,np.diag(PROTOCOL['target_force_box_scales_N']))
 
 
-def make_plan(directory,robustness_enabled):
-    out=Path(directory);out.mkdir(parents=True,exist_ok=True);refined,source=source_refinement(robustness_enabled);positions=refined.positions*PROTOCOL['source_to_target_scale'];normals=np.array([[0,0,-1.]]*3)
-    task=FullTask.load('panel',out/'task');qo=np.array([0.,0.,.52,0,0,0,1.]);size=nearest_box(task.object,'panel',[0,0,0])
+def make_plan(directory,robustness_enabled,*,hold_duration_s=None,object_urdf=None):
+    out=Path(directory);out.mkdir(parents=True,exist_ok=True);task=FullTask.load('panel',out/'task')
+    if object_urdf is not None:task=replace(task,object=Robot(object_urdf,floating_base=True))
+    if len(task.object.tree.links)!=1:raise ValueError('Controlled source refinement expects one rigid object link')
+    target_com=task.object.tree.links['panel'].com
+    refined,source=source_refinement(robustness_enabled,com_object=target_com/PROTOCOL['source_to_target_scale']);positions=refined.positions*PROTOCOL['source_to_target_scale'];normals=np.array([[0,0,-1.]]*3)
+    qo=np.array([0.,0.,.52,0,0,0,1.]);size=nearest_box(task.object,'panel',[0,0,0])
+    source.update(source_com_object_m=(target_com/task.scale).tolist(),target_com_object_m=target_com.tolist(),target_urdf_sha256=hashlib.sha256(task.object.path.read_bytes()).hexdigest())
+    if object_urdf is not None:
+        from types import SimpleNamespace
+        from .paper_free import source_urdf
+        source_urdf(SimpleNamespace(object=task.object),out/'source-object.urdf',task.scale,{'panel':PROTOCOL['source_mass_kg']})
     if not np.isclose(sum(link.mass for link in task.object.tree.links.values()),PROTOCOL['target_mass_kg']):raise ValueError('Protocol mass differs from authoritative target URDF')
     if not np.isclose(PROTOCOL['source_mass_kg'],PROTOCOL['target_mass_kg']/task.scale**3):raise ValueError('Source mass scale differs from protocol')
     if np.any(abs(positions)>size/2+1e-9) or not np.allclose(positions[:,2],-size[2]/2):raise ValueError('Source transfer leaves the actual target support surface')
@@ -72,7 +81,9 @@ def make_plan(directory,robustness_enabled):
     arms=[]
     for x,y,yaw in [(-.75,-.25,0.),(0.,.65,-np.pi/2),(.75,-.25,np.pi)]:
         T=np.eye(4);T[:3,:3]=Rotation.from_euler('z',yaw).as_matrix();T[:3,3]=[x,y,0.];arms.append(Robot(task.arms[0].path,base_pose=T))
-    keys=tuple(dict(id=name,time=t,object_q=qo.copy(),phase='hold') for name,t in [('settled',0.),('before_push',2.5),('hold_final',5.)])
+    duration=PROTOCOL['hold_duration_s'] if hold_duration_s is None else float(hold_duration_s)
+    if not np.isfinite(duration) or duration<=2.5:raise ValueError('Hold duration must exceed the settled keyframe')
+    keys=tuple(dict(id=name,time=t,object_q=qo.copy(),phase='hold') for name,t in [('settled',0.),('before_push',2.5),('hold_final',duration)])
     seeds=tuple(np.array([0.,-.4,0.,-1.8,0.,1.5,0.]) for _ in arms)
     task=replace(task,features=features,keyframes=keys,arms=tuple(arms),seeds=seeds,include_fixtures=False,posture_reference_rule='hardware_seed',posture_trust_radius_rad=None)
     p=RobustHoldProblem.create(task,out/'planning','PPP');q=[];interfaces=[]

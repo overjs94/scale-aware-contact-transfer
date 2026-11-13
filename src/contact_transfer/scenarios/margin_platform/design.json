@@ -1,0 +1,74 @@
+{
+  "description": "Three rigidly joined boxes treated as one free rigid body; no internal actuator or weld",
+  "components": [
+    {
+      "name": "platform",
+      "mass_kg": 0.4,
+      "size_m": [
+        0.6,
+        0.4,
+        0.04
+      ],
+      "center_m": [
+        0,
+        0,
+        0
+      ],
+      "color": ".69 .48 .29 1"
+    },
+    {
+      "name": "rigid_riser",
+      "mass_kg": 0.1,
+      "size_m": [
+        0.04,
+        0.04,
+        0.18
+      ],
+      "center_m": [
+        0,
+        0,
+        0.11
+      ],
+      "color": ".3 .35 .4 1"
+    },
+    {
+      "name": "fixed_payload",
+      "mass_kg": 1.5,
+      "size_m": [
+        0.12,
+        0.12,
+        0.12
+      ],
+      "center_m": [
+        0,
+        0,
+        0.26
+      ],
+      "color": ".94 .48 .18 1"
+    }
+  ],
+  "total_mass_kg": 2.0,
+  "com_object_m": [
+    0.0,
+    0.0,
+    0.2005
+  ],
+  "inertia_at_com_kg_m2": [
+    [
+      0.03147950000000001,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.03814616666666667,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.02096
+    ]
+  ],
+  "hardware_calibration": false
+}

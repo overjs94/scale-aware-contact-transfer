@@ -1,6 +1,132 @@
 {
   "models": [
     {
+      "id": "margin_platform_on_common_up1",
+      "title": "Tall payload \u00b7 Common interior \u00b7 1 N with slow rise \u00b7 robustness ON",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_platform_off_common_up1",
+      "title": "Tall payload \u00b7 Common interior \u00b7 1 N with slow rise \u00b7 robustness OFF",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_platform_off_repeated_up4",
+      "title": "Tall payload \u00b7 4 N upward \u00b7 four repeated pulses \u00b7 robustness OFF",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_platform_on_repeated_up4",
+      "title": "Tall payload \u00b7 4 N upward \u00b7 four repeated pulses \u00b7 robustness ON",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_platform_on_common_up2",
+      "title": "Tall payload \u00b7 Common interior \u00b7 2 N upward hold \u00b7 robustness ON",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_platform_off_common_up2",
+      "title": "Tall payload \u00b7 Common interior \u00b7 2 N upward hold \u00b7 robustness OFF",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_platform_on_nominal",
+      "title": "Tall payload \u00b7 No external load \u00b7 robustness ON",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_platform_off_nominal",
+      "title": "Tall payload \u00b7 No external load \u00b7 robustness OFF",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_compact_on_diagonal",
+      "title": "Compact payload \u00b7 Diagonal hold \u00b7 4.5 N up, 1.4 N in x/y \u00b7 robustness ON",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_compact_off_diagonal",
+      "title": "Compact payload \u00b7 Diagonal hold \u00b7 4.5 N up, 1.4 N in x/y \u00b7 robustness OFF",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_platform_on_slow_up4",
+      "title": "Tall payload \u00b7 4 N upward \u00b7 slow 2 s rise and fall \u00b7 robustness ON",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_platform_off_slow_up4",
+      "title": "Tall payload \u00b7 4 N upward \u00b7 slow 2 s rise and fall \u00b7 robustness OFF",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_compact_off_sustained_up4",
+      "title": "Compact payload \u00b7 4 N upward \u00b7 sustained load \u00b7 robustness OFF",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_compact_on_sustained_up4",
+      "title": "Compact payload \u00b7 4 N upward \u00b7 sustained load \u00b7 robustness ON",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_platform_off_sustained_up4",
+      "title": "Tall payload \u00b7 4 N upward \u00b7 sustained load \u00b7 robustness OFF",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_platform_on_sustained_up4",
+      "title": "Tall payload \u00b7 4 N upward \u00b7 sustained load \u00b7 robustness ON",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_hold_on_sustained_up4",
+      "title": "Flat panel \u00b7 4 N upward \u00b7 sustained load \u00b7 robustness ON",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
+      "id": "margin_hold_off_sustained_up4",
+      "title": "Flat panel \u00b7 4 N upward \u00b7 sustained load \u00b7 robustness OFF",
+      "engine": "mujoco_contact_recording",
+      "dof": 21,
+      "floating_base": false
+    },
+    {
       "id": "robust_refinement_nominal_12N",
       "title": "Source polytope OFF \u00b7 \uc678\ub825 12 N",
       "engine": "mujoco_contact_recording",

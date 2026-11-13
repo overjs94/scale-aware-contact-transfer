@@ -5,6 +5,18 @@ function row(t,values){const r=node('tr');values.forEach(v=>{const d=node('td');
 function note(parent,text){const p=node('p',text);p.className='fine';parent.append(p);}
 function link(id,text){const a=node('a',text+' ↗');a.href='?model='+id+'#algorithm-comparison-results';return a;}
 const number=(v,digits=3)=>v===null||v===undefined?'—':Number(v).toFixed(digits);
+let marginRequest;
+async function marginComparison(root){
+ try{
+  marginRequest??=fetch('./data/margin-hold-comparison.json').then(r=>r.ok?r.json():null);const study=await marginRequest;if(!study||!root.isConnected)return;
+  const section=node('section');section.id='margin-hold-results';section.append(node('h4','Inside-margin loading · matched support and recovery'));
+  const a=node('a','Open synchronized ON/OFF simulations ↗');a.href='./robustness-comparison.html';section.append(a);
+  note(section,'All ON loads are checked against the optimized initial static certificate before execution. The same loads, native physical case, and controller are used in OFF. Recovered transients and shared failures remain available; mathematical divergence is not claimed.');
+  const t=table(section,['Condition','Refinement','Peak / margin','Initial box','Native checks','Measured outcome']);
+  for(const r of study.trials){const tr=row(t,[link(r.recording_id,study.protocol.protocol.cases[r.case].title),r.robustness_enabled?'ON':'OFF',number(r.initial_certificate.load_to_margin_ratio),r.initial_certificate.inside_initial_static_box?'IN':'OUT',r.execution_passed?'PASS':'FAIL',r.outcome.replaceAll('_',' ')]);tr.dataset.passed=String(r.execution_passed);}
+  const img=node('img');img.src='./data/margin-hold-response.svg';img.alt='Matched native force, orientation, height, and support histories';img.className='comparison-figure';section.append(img);root.prepend(section);
+ }catch{marginRequest=undefined;}
+}
 
 export async function showAlgorithmComparisons(data){
  const current=++token;let root=document.getElementById('algorithm-comparison-results');
@@ -36,5 +48,6 @@ export async function showAlgorithmComparisons(data){
    note(root,`The evaluation set comprises three-axis forces at the declared application point. Common force-box D = ${group.protocol.target_force_box_scales_N.join(', ')} N · application point = [${group.protocol.force_application_point_body_m.join(', ')}] m · shared source geometry weight = ${group.protocol.geometry_weight}. Fixed E, D, controller settings, and plan IDs are recorded; the controller is not retuned across force conditions.`);
   }
   note(root,'Implementation scope: contracted groups are supplied; learned inference is not executed. Complete-motion records use restricted contact candidates and midpoint variants. These controlled diagnostics do not establish literal execution of every manuscript equation.');
+  marginComparison(root);
  }catch{if(current===token)root.hidden=true;request=undefined;}
 }

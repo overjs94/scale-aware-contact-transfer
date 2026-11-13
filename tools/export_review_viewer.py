@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 IDENTIFIERS = ('overjs94', 'Jeongseob Lee', 'Jeongseob', 'snu.ac.kr',
                'scale-aware-contact-transfer', 'Contact_contraction',
                'feat/conic-contact-validation')
-PREFIXES = ('full_', 'robust_refinement_', 'counterfactual_')
+PREFIXES = ('full_', 'robust_refinement_', 'counterfactual_', 'margin_hold_', 'margin_platform_', 'margin_compact_')
 NO_LICENSE = 'No redistribution license selected; see LICENSE.authored'
 
 
@@ -59,14 +59,14 @@ def main():
     source = ROOT / 'web/dist'
     if not (source / 'index.html').is_file():
         parser.error('Run npm --prefix web run build first.')
-    for name in ('index.html', 'app.js', 'style.css', 'THREE-LICENSE.txt', 'URDF-LOADER-LICENSE.txt'):
+    for name in ('index.html', 'app.js', 'style.css', 'comparison.js', 'comparison.css', 'robustness-comparison.html', 'THREE-LICENSE.txt', 'URDF-LOADER-LICENSE.txt'):
         shutil.copy2(source / name, destination / name)
     shutil.copy2(ROOT / 'LICENSE', destination / 'LICENSE.original-notice.txt')
     data_out = destination / 'data'
     data_out.mkdir()
     index = json.loads((source / 'data/index.json').read_text())
     models = [m for m in index['models'] if m['id'].startswith(PREFIXES)]
-    assert len(models) == 37, 'Review cohort changed; inspect scope before exporting.'
+    assert len(models) >= 37, 'The original 37-record review cohort must remain included.'
     # Use the same tested English presentation layer as the normal application.
     subprocess.run(['node', '--input-type=module', '-e', '''
 import fs from 'node:fs';
@@ -107,7 +107,7 @@ fs.writeFileSync(`${dest}/index.json`,JSON.stringify({models}));
             assert url in cached and Path(cached[url]).is_file(), f'Missing real mesh cache: {url}'
         meta['packages'] = {key: f'../../assets/vendor-{roots.index(value)}' for key, value in meta.get('packages', {}).items()}
         path.write_text(json.dumps(meta))
-    for name in ('algorithm-comparisons.json', 'source-robustness-comparison.svg', 'type-counterfactual-comparison.svg'):
+    for name in ('algorithm-comparisons.json', 'source-robustness-comparison.svg', 'type-counterfactual-comparison.svg', 'margin-hold-comparison.json', 'margin-hold-response.svg', 'margin-hold-exploratory.svg'):
         shutil.copy2(source / 'data' / name, data_out / name)
 
     # Match comparisons after redaction, without publishing original trace/plan
@@ -178,6 +178,7 @@ fs.writeFileSync(`${dest}/index.json`,JSON.stringify({models}));
 <p>P denotes unilateral point contact with a common spherical tool; G denotes bounded gripper-mediated contact. The robustness test enforces separate reactions at all vertices of a prescribed task-wrench disturbance box. This box-vertex certificate is distinct from a general dynamic stability guarantee.</p>
 <p>Six-vectors are angular/moment first. Reactions are object-on-robot; opposite reactions act on the object. Only source contact geometry is scaled. Target mass, friction, reaction forces and robot torques are recomputed.</p>
 <h2>Included evidence</h2><p>Panel reorientation/placement, free articulated box opening, and tabletop–leg assembly: seven conditions each, including all failed checks (21 recordings). Matched stationary source-robustness ON/OFF tests: 14 recordings. Alternative contact types: two executed recordings plus the assembly planning rejection in the comparison table. External forces are visualized with arrows.</p>
+<p>The additional <a href="robustness-comparison.html">synchronized margin comparison</a> uses a rigid platform with an upper payload. Matched native ON/OFF trials include no load, a common interior load, slow loading, fast loading, and repeated pulses. The flat-panel and compact-payload explorations are retained. The clear slow-load comparison separates bounded tracking from persistent loss of support after removal; mathematical divergence is not claimed.</p>
 <p>Playback uses saved native simulation states; it does not run optimization or dynamics in the browser. Numeric arrays, result values, and pass/fail criteria are unchanged. Original trace/plan fingerprints are consistently pseudonymized; <a href="review-integrity.json">review-integrity.json</a> provides hashes of the distributed files.</p>
 <h2>Validation limits</h2><ul><li>Contracted groups are supplied synthetic inputs; learned contraction is not executed.</li><li>Box/assembly source geometric fallback is reported and is not a successful source robustness certificate.</li><li>CITO uses restricted candidates and midpoint configuration-update variants; literal execution of every manuscript equation is not claimed.</li><li>The native arm controller uses joint impedance and planned reaction feedforward with force selection set to zero. These records do not establish measured-normal-force hybrid control.</li><li>The stationary force study fixes target material contacts to isolate source refinement. Static feasibility is not a closed-loop stability proof; failures outside the certified range are retained.</li><li>CRISP, hardware experiments, and general collision completeness are not validated here.</li></ul>
 <h2>Licensing</h2><p>No new reuse license is granted for original research material. Earlier authored-model MIT metadata is corrected in this copy to match its bundled redistribution notice; no numerical data are changed. Third-party copyright, licenses, and vendor revision pins remain intact. See <a href="model-licenses.html">model licenses</a>.</p>'''
@@ -204,7 +205,7 @@ fs.writeFileSync(`${dest}/index.json`,JSON.stringify({models}));
             assert not re.search(r'/(?:workspace|home|tmp|mnt)/', content), path
             if path.suffix != '.stl':  # Binary float bytes are not UI text.
                 assert not re.search(r'[\uac00-\ud7a3]', content), ('Untranslated text', path)
-    assert checked == 37
+    assert checked == len(models)
     integrity = {p.relative_to(destination).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
                  for p in sorted(destination.rglob('*')) if p.is_file()}
     (destination / 'review-integrity.json').write_text(json.dumps(dict(

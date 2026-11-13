@@ -2,12 +2,15 @@ import { createStudio } from "./studio.js";
 import { initializeExperiment } from "./experiment.js";
 import { categories, libraryEntry, recordingScope } from "./library.js";
 import { englishRecording } from './presentation-en.js';
+import { disturbanceScale } from './disturbance.js';
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { applyRecordedPose, disposeModel, loadURDFModel } from "./urdf-view.js";
 
 const $ = (id) => document.getElementById(id);
 let dataset, frameFloat = 0, playing = true, loop = true, speed = 1, loadToken = 0;
+const embeddedComparison=new URLSearchParams(location.search).get('embed')==='comparison';
+if(embeddedComparison){document.documentElement.classList.add('comparison-embed');playing=false;}
 let backend = false, geometry = [], objectMesh, chartValues = [], downloadUrl, displayedPositions = [];
 let urdfModels = [], geometryToken = 0;
 const scene = new THREE.Scene();
@@ -64,6 +67,7 @@ function engineLabel(data) {
   return data.engine === "kinematic_preview" ? "Kinematic preview" : data.engine === "cito_trajectory" ? "CITO · optimized trajectory" : data.live ? "MuJoCo · new execution" : "MuJoCo · recorded execution";
 }
 function resetCamera() {
+  if(embeddedComparison){controls.target.set(0,0,.45);camera.position.set(2.3,-3.5,2.4);controls.update();return;}
   controls.target.copy(center);
   camera.position.copy(center).add(new THREE.Vector3(1.6, -2.4, 1.6).multiplyScalar(extent));
   controls.update();
@@ -174,6 +178,7 @@ async function loadGeometry() {
     $("geometry-status").dataset.state = "ready";
     $("geometry-status").dataset.model = data.id;
     updateGeometry(frameFloat);
+    if(embeddedComparison)parent.postMessage({type:'contact-transfer-ready',id:data.id,duration:data.times.at(-1)},location.origin);
   } catch (error) {
     if (token !== geometryToken) return;
     $("geometry-status").textContent = error.message + " Select link coordinates or check network access.";
@@ -208,9 +213,9 @@ function updateGeometry(value) {
   $('native-contact-state').dataset.count=String(patches.length);
   $('native-contact-state').textContent=dataset.native_contact_samples?`native ${dataset.times[sample].toFixed(3)} s · ${patches.length} contact patches · no contact interpolation${patches.length?' · minimum signed gap '+(1000*Math.min(...patches.map(p=>p.minimum_gap_m))).toFixed(3)+' mm':''}`:'';
   const time=dataset.times[lo]*(1-f)+dataset.times[hi]*f;const pulses=dataset.external_disturbances||[];const pulse=pulses.find(p=>time>=p.start&&time<=p.start+p.duration);forceArrow.visible=false;
-  if(pulse&&dataset.objects?.[0]?.poses){const object=dataset.objects.find(o=>o.native_body===pulse.body)||dataset.objects[0],pose=object.poses[lo],next=object.poses[hi],quat=new THREE.Quaternion().fromArray(pose,3).slerp(new THREE.Quaternion().fromArray(next,3),f);const origin=new THREE.Vector3(...pose.slice(0,3)).lerp(new THREE.Vector3(...next.slice(0,3)),f).add(new THREE.Vector3(...pulse.point_body_m).applyQuaternion(quat));const magnitude=Math.sin(Math.PI*(time-pulse.start)/pulse.duration)**2;const force=new THREE.Vector3(...pulse.force_world_N).multiplyScalar(magnitude);if(force.length()>.01){forceArrow.position.copy(origin);forceArrow.setDirection(force.clone().normalize());forceArrow.setLength(.12+force.length()*.015,.08,.04);forceArrow.visible=true;}}
+  if(pulse&&dataset.objects?.[0]?.poses){const object=dataset.objects.find(o=>o.native_body===pulse.body)||dataset.objects[0],pose=object.poses[lo],next=object.poses[hi],quat=new THREE.Quaternion().fromArray(pose,3).slerp(new THREE.Quaternion().fromArray(next,3),f);const origin=new THREE.Vector3(...pose.slice(0,3)).lerp(new THREE.Vector3(...next.slice(0,3)),f).add(new THREE.Vector3(...pulse.point_body_m).applyQuaternion(quat));const magnitude=disturbanceScale(pulse,time);const force=new THREE.Vector3(...pulse.force_world_N).multiplyScalar(magnitude);if(force.length()>.01){forceArrow.position.copy(origin);forceArrow.setDirection(force.clone().normalize());forceArrow.setLength(.12+force.length()*.015,.08,.04);forceArrow.visible=true;}}
   $('disturbance-state').hidden=!pulses.length;$('disturbance-state').dataset.active=String(forceArrow.visible);
-  $('disturbance-state').textContent=pulse?`Applied external force · ${(Math.sin(Math.PI*(time-pulse.start)/pulse.duration)**2*Math.hypot(...pulse.force_world_N)).toFixed(2)} N · world frame` : pulses.length?`External disturbance: ${pulses.map(p=>`${p.start}–${p.start+p.duration} s / peak ${Math.hypot(...p.force_world_N)} N`).join(', ')}`:'';
+  $('disturbance-state').textContent=pulse?`Applied external force · ${(disturbanceScale(pulse,time)*Math.hypot(...pulse.force_world_N)).toFixed(2)} N · world frame` : pulses.length?`External disturbance: ${pulses.map(p=>`${p.start}–${p.start+p.duration} s / peak ${Math.hypot(...p.force_world_N)} N`).join(', ')}`:'';
   displayedPositions = positions;
 }
 // Preserve orbit/zoom and real URDF coordinates when WebGL is unavailable.
@@ -346,6 +351,7 @@ function showData(original) {
   $("toast").classList.remove("visible");
   if (dataset?.id === "dual_cito" && data.id !== "dual_cito") $("geometry-mode").value = "visual";
   dataset = data; frameFloat = 0;
+  if(embeddedComparison)playing=false;
   document.querySelector(".run-panel").hidden = !!data.instances;
   window.dispatchEvent(new CustomEvent("recording-selected", {detail:data}));
   $("geometry-mode").disabled = data.id === "dual_cito";
@@ -491,3 +497,12 @@ window.addEventListener("experiment-result", event => showData(event.detail));
 initializeExperiment().catch(error => { document.getElementById("experiment-state").textContent=error.message; });
 
 window.addEventListener("experiment-preview", event => selectModel(event.detail));
+
+window.addEventListener('message',event=>{
+  if(!embeddedComparison||event.origin!==location.origin||event.source!==parent||event.data?.type!=='contact-transfer-seek'||!dataset)return;
+  const time=Number(event.data.time_s);if(!Number.isFinite(time))return;
+  let low=0,high=dataset.times.length-1;
+  while(high-low>1){const mid=Math.floor((low+high)/2);if(dataset.times[mid]<=time)low=mid;else high=mid;}
+  frameFloat=Math.min(dataset.times.length-1,Math.max(0,low+(time-dataset.times[low])/(dataset.times[high]-dataset.times[low])));
+  playing=false;$('play').textContent='▶';$('play').setAttribute('aria-label','Play');updateFrame();
+});

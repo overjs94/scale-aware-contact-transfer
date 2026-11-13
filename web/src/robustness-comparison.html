@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<title>Inside-margin disturbance · matched ON/OFF</title>
+<link rel="stylesheet" href="./comparison.css"></head>
+<body><main>
+<header><a href="./">← Experiment library</a><p class="eyebrow">SAME OBJECT · CONTROLLER · EXTERNAL LOAD</p>
+<h1>Does contact refinement preserve support?</h1>
+<p>A free loaded platform supported by three Panda arms with identical spherical tools. Only source box-vertex contact refinement is ablated.</p></header>
+<section class="protocol"><label>Matched condition <select id="condition" aria-label="Matched condition"></select></label><p id="protocol">Loading verified recordings…</p></section>
+<section class="pair" aria-label="Synchronized native recordings">
+<article class="on"><div class="card-heading"><h2>Robustness ON</h2><strong id="on-outcome">Loading</strong></div><p id="on-certificate"></p><iframe id="on-view" title="Robustness ON native simulation" src="about:blank"></iframe><p id="on-measured" class="measured"></p></article>
+<article class="off"><div class="card-heading"><h2>Robustness OFF</h2><strong id="off-outcome">Loading</strong></div><p id="off-certificate"></p><iframe id="off-view" title="Robustness OFF native simulation" src="about:blank"></iframe><p id="off-measured" class="measured"></p></article>
+</section>
+<section class="playback" aria-label="Synchronized playback controls"><button id="play" disabled>Play both</button><input id="time" type="range" min="0" max="16" step=".02" value="0" aria-label="Comparison playback time"><output id="time-label">0.00 s</output><button id="load-event">Load plateau</button><button id="recovery-event">After load removal</button><span id="force">No applied force</span></section>
+<p class="note">Orange arrows show the actual applied external force, including the smooth rise, constant hold, and removal. Both views use the same clock and camera initialization. Drag either view to inspect geometry.</p>
+<img id="response-figure" src="./data/margin-hold-response.svg" alt="Matched force, orientation, object height and contact histories" class="figure">
+<section><h2>All conditions and failures are retained</h2><div class="table-wrap"><table><thead><tr><th>Condition</th><th>Refinement</th><th>Peak / certified margin</th><th>Initial box</th><th>Native checks</th><th>After removal</th></tr></thead><tbody id="results"></tbody></table></div></section>
+<p class="note">“Persistent loss of support” means measured task deviation and missing three-point support remain during the final observation window. A recovered transient is reported separately. These finite-time simulations do not prove mathematical divergence or closed-loop asymptotic stability. The margin certifies static feasibility at the nominal pose; its validity is not automatically extended to a body that has tipped.</p>
+<section><h2>Exploratory conditions remain visible</h2><p class="note" id="exploratory-note"></p><div class="table-wrap"><table><thead><tr><th>Object / condition</th><th>Refinement</th><th>Native checks</th><th>Measured outcome</th><th>Replay</th></tr></thead><tbody id="exploratory-results"></tbody></table></div><img src="./data/margin-hold-exploratory.svg" alt="Recovered flat-panel transients and shared tall-payload failures under faster loading" class="figure"></section>
+<p class="note">One trial per condition; this scene and loading-rate study is exploratory. Contracted groups are supplied synthetic inputs. Source positions alone are transferred at scale four; target reactions and robot torques are recomputed. The native controller uses joint impedance and planned reaction feedforward (force selection zero). <a href="./?model=margin_platform_on_slow_up4">Full recording, scope, and contact report ↗</a></p>
+<p id="error" role="alert"></p>
+</main><script type="module" src="./comparison.js"></script></body></html>

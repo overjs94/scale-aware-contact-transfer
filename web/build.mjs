@@ -8,7 +8,8 @@ await build({
   bundle: true, minify: true, format: "esm",
   outfile: new URL("dist/app.js", here).pathname,
 });
-for (const file of ["index.html", "style.css"])
+await build({entryPoints:[new URL('src/comparison.js',here).pathname],bundle:true,minify:true,format:'esm',outfile:new URL('dist/comparison.js',here).pathname});
+for (const file of ["index.html", "style.css", "robustness-comparison.html", "comparison.css"])
   await cp(new URL("src/" + file, here), new URL("dist/" + file, here));
 await cp(new URL("data", here), new URL("dist/data", here), { recursive: true });
 await cp(new URL("models", here), new URL("dist/models", here), { recursive: true });

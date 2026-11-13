@@ -179,7 +179,7 @@ test("library deep links retain failed force tests and distinguish G1 preview on
 });
 
 test('three Panda arms use actual articulated URDF recordings', async ({page}) => {
-  await expect(page.locator('#model-title')).toContainText('Franka Panda × 3');
+  await expect(page.locator('#model-title')).toContainText('Panda × 3 · contact interfaces');
   await expect(page.locator('#dof')).toHaveText('23');
   await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
   await expect(page.locator('#result-tracking')).toContainText('PASS');
@@ -599,4 +599,27 @@ for(const [task,types] of [['panel','PPP'],['box','PPG']])test(`forced ${task} $
  await expect(page.locator('#algorithm-comparison-results')).toContainText('Sequence objective');
  const d=await page.evaluate(async id=>await(await fetch('/data/'+id+'.json')).json(),`counterfactual_${task}_${types}`);
  expect(d.report.selection.source_refinement_enabled).toBe(true);expect(d.report.object_pose_prescribed).toBe(false);expect(d.report.object_equality_constraints_used).toBe(0);
+});
+
+test('inside-margin comparison synchronizes both native views and holds the force arrow',async({page})=>{
+ await page.goto('/robustness-comparison.html');
+ await expect(page.locator('#play')).toBeEnabled();
+ await expect(page.locator('#condition')).toHaveValue('slow_up4');
+ await expect(page.locator('#on-outcome')).toHaveText('Bounded tracking');
+ await expect(page.locator('#off-outcome')).toHaveText('Persistent loss of support');
+ await expect(page.locator('#results tr')).toHaveCount(12);
+ const on=page.frameLocator('#on-view'),off=page.frameLocator('#off-view');
+ await page.locator('#load-event').click();
+ for(const view of [on,off]){
+  await expect(view.locator('#time-now')).toHaveText('6.00 s');
+  await expect(view.locator('#disturbance-state')).toHaveAttribute('data-active','true');
+  await expect(view.locator('#disturbance-state')).toContainText('4.00 N');
+ }
+ await expect(page.locator('#force')).toContainText('4.00 N');
+ await page.locator('#recovery-event').click();
+ for(const view of [on,off]){
+  await expect(view.locator('#time-now')).toHaveText('13.00 s');
+  await expect(view.locator('#disturbance-state')).toHaveAttribute('data-active','false');
+ }
+ await expect(page.locator('#off-measured')).toContainText('0 / 3 tool contacts');
 });

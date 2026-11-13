@@ -44,6 +44,7 @@ const catalog = new Map(entries.map(([id, category, group, title, detail, preset
   [id, { id, category, group, title, detail, preset: preset === true ? id : preset, order }]));
 
 export function libraryEntry(model) {
+  if(/^margin_(hold|platform|compact)_/.test(model.id))return {id:model.id,category:'diagnostic',group:0,title:model.title,detail:'Inside-margin load · matched ON/OFF · recovery observed',order:entries.length-1};
   if(model.id.startsWith('robust_refinement_'))return {id:model.id,category:'diagnostic',group:0,title:recordingTitle(model.id,model.title),detail:'Three arms · box-vertex source robustness · matched disturbances',order:entries.length};
   if(model.id.startsWith('counterfactual_'))return {id:model.id,category:'diagnostic',group:1,title:recordingTitle(model.id,model.title),detail:'Alternative contact type · complete-sequence comparison',order:entries.length};
   const ablation = model.id.match(/^full_(panel|box|assembly)_(.+)$/);
@@ -71,6 +72,11 @@ export function recordingScope(data) {
   } else if(data.comparison_recording){
     status=(data.study_kind==='source_robustness'?'Source robustness · ':'Forced contact type · ')+(report.execution_passed?'PASS':'FAIL');
     detail=data.study_kind==='source_robustness'?'A controlled source-refinement diagnostic with box-vertex robustness enabled or disabled. Controller, mechanics, and disturbances are matched; transferred target contact sites are fixed during stationary support. This is not a moving-object CITO test or a closed-loop stability proof.':'Complete-sequence planning and native execution with a forced alternative contact type. Objective values, planning rejection, and execution-criterion violations are reported separately.';
+    if(report.margin_hold){
+      const check=report.margin_hold.certificate;
+      status=`Margin validation · ${report.margin_hold.outcome.replaceAll('_',' ')}`;
+      detail=`Same controller and applied load in ON/OFF. Initial static certificate: ${check.inside_initial_static_box?'inside':'outside'} this condition’s box · peak / margin = ${check.load_to_margin_ratio.toFixed(3)}. Recovery after load removal is measured. Finite-time loss of support is distinct from mathematical divergence.`;
+    }
   } else if (data.full_task_recording) {
     status = "Complete sequence · " + (report.execution_passed ? "execution checks passed" : "failed checks retained");
     detail = "Recorded contact-type/arm-assignment selection, moving-object CITO, load-transfer QPs, release dynamics, and native contact execution. The implementation uses midpoint variants; source geometric fallback and ablation results are stated explicitly.";

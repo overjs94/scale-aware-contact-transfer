@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "test": "node tests/presentation.mjs && npm run build && node tests/build.mjs && playwright test",
+    "test": "node tests/presentation.mjs && node tests/disturbance.mjs && npm run build && node tests/build.mjs && playwright test",
     "test:presentation": "node tests/presentation.mjs"
   },
   "dependencies": {

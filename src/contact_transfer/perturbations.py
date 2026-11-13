@@ -18,6 +18,28 @@ class WrenchPulse:
         return float(np.sin(np.pi*s)**2) if 0<=s<=1 else 0.
     def to_dict(self):return {**asdict(self),'profile':'sin_squared','linear_impulse_Ns':(np.asarray(self.force_world_N)*self.duration/2).tolist(),'frame':'force/moment world; application point body'}
 
+
+@dataclass(frozen=True)
+class WrenchHold(WrenchPulse):
+    """A finite hold with smooth sin-squared rise/fall, no step discontinuity."""
+    ramp_duration_s: float=.5
+
+    def __post_init__(self):
+        super().__post_init__()
+        if not np.isfinite(self.ramp_duration_s) or not 0<self.ramp_duration_s<=self.duration/2:
+            raise ValueError('Hold ramps must fit inside the disturbance duration')
+
+    def scale(self,t):
+        elapsed=t-self.start
+        if elapsed<0 or elapsed>self.duration:return 0.
+        edge=min(elapsed,self.duration-elapsed)
+        return float(np.sin(.5*np.pi*edge/self.ramp_duration_s)**2) if edge<self.ramp_duration_s else 1.
+
+    def to_dict(self):
+        return {**asdict(self),'profile':'smooth_hold',
+                'linear_impulse_Ns':(np.asarray(self.force_world_N)*(self.duration-self.ramp_duration_s)).tolist(),
+                'frame':'force/moment world; application point body'}
+
 class WrenchSchedule:
     def __init__(self,pulses=()):self.pulses=tuple(pulses);self.ids={}
     def __call__(self,mj,model,data,t):

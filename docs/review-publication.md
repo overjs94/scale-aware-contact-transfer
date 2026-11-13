@@ -9,7 +9,7 @@ repository remains private; its root redistribution notice is unchanged.
 This document belongs in the private repository and must not be copied into the
 review bundle.
 
-The snapshot contains 37 recordings (21 complete-task conditions, 14 matched
+The original version 1 snapshot contains 37 recordings (21 complete-task conditions, 14 matched
 source-robustness conditions, two executed forced-type comparisons), the assembly
 alternative-type planning rejection, both scientific comparison plots, original
 meshes, all required vendor notices, and an explicit implementation-scope page.
@@ -45,3 +45,10 @@ collaborator and use branches/pull requests. Private forks depend on repository
 and account policy. Public visibility permits GitHub forks and pull requests;
 MIT is a separate decision granting broader original-code reuse, modification,
 and redistribution rights. No license change is needed merely to collaborate.
+
+The margin-loading update adds 18 native recordings: 12 tall-payload trials,
+two flat-panel explorations and four compact-payload explorations. The review
+cohort is now 55 recordings. `robustness-comparison.html` provides synchronized
+ON/OFF playback and the actual smooth-hold/repeated-pulse force profiles. See
+[inside-margin-hold.md](inside-margin-hold.md) for complete results, shared
+failures, certificate scope, and reproduction commands.
