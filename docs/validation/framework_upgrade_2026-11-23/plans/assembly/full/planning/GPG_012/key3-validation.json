@@ -1,0 +1,77 @@
+{
+  "independent": {
+    "passed": true,
+    "residuals": {
+      "equilibrium": 1.9824142327706795e-12,
+      "capability": 2.7125052426413276e-08,
+      "torque": 0.0,
+      "closure": 3.3306690738754696e-16,
+      "rotation_closure": 1.631259553204539e-14,
+      "rho_margin": 5.26306417114597e-07
+    },
+    "frozen_conic": {
+      "rho": 8.013595504834356,
+      "certificate": true,
+      "residual": 3.821273419218896e-11,
+      "status": "AlmostSolved",
+      "maximum_margin_status": "AlmostSolved",
+      "fixed_rho_feasibility": false,
+      "solver_attempts": [
+        {
+          "status": "AlmostSolved",
+          "witness_regularization": 0.0,
+          "backend": "clarabel",
+          "solver_tolerance": 1e-09,
+          "iterations": 14,
+          "wall_time_s": 0.09650223500011634
+        }
+      ]
+    },
+    "independent": "native Pinocchio, NumPy and frozen Clarabel"
+  },
+  "geometry_violations": [],
+  "source": {
+    "synthetic_input": true,
+    "network_inference_executed": false,
+    "source_refinement_enabled": true,
+    "source_status": "structurally_infeasible",
+    "source_certificate": false,
+    "source_rho": null,
+    "source_failure": "Source unilateral-point wrench span is insufficient: [{'body': 'tabletop', 'maximum_rank': 5, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}, {'body': 'leg', 'maximum_rank': 3, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}]",
+    "source_failure_kind": "structural_infeasibility",
+    "source_diagnostics": {
+      "span_failures": [
+        {
+          "body": "tabletop",
+          "maximum_rank": 5,
+          "required_rank": 6,
+          "scope": "necessary span bound for an initially independent free rigid body"
+        },
+        {
+          "body": "leg",
+          "maximum_rank": 3,
+          "required_rank": 6,
+          "scope": "necessary span bound for an initially independent free rigid body"
+        }
+      ]
+    },
+    "source_geometry_fallback": true,
+    "source_forces_transferred": false,
+    "source_to_target_scale": 4.0,
+    "source_problem_identity": "ct-source-v2:5e6061737ad8d4a257124126ca6072be9e5c3aa58266c85d463b47b9f9c1e09f",
+    "source_cache_hit": false,
+    "new_source_solver_executed": false
+  },
+  "target_provenance": {
+    "method": "coupled_target_NLP",
+    "static_torques_eliminated": true,
+    "posture_reference_rule": "hardware_seed",
+    "same_rho_force_polish": {
+      "witness_applied": true,
+      "status": "AlmostSolved",
+      "rho": 8.013596031140773,
+      "primal_residual": 2.7125052426413276e-08
+    }
+  },
+  "endpoint_polish_max_rad": 2.233698942233353e-05
+}

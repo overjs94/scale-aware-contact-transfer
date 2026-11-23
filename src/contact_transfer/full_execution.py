@@ -12,24 +12,28 @@ from .contracted import numerical_pose_ik
 from .contact_simulation import MujocoContactScene
 from .perturbations import WrenchSchedule
 from .multi_object import RigidCollection
+from .configuration import task_configuration
+from .reference import subdivide_reference_times,conditioned_joint_spline
 
 
 class FullEpisode(CoupledEpisode):
-    def __init__(self,problem,keyframes,trajectories,contacts_by_interval,*,reference_dt=.02,force_feedforward=True,jaw_force_fraction=None):
-        fraction=({'box':.6,'panel':.45}.get(problem.task_definition.id,.7)) if jaw_force_fraction is None else jaw_force_fraction
-        super().__init__(problem,tuple(keyframes),tuple(trajectories),contacts_by_interval=tuple(contacts_by_interval),control_mode='impedance_feedforward',jaw_force_fraction=fraction)
+    def __init__(self,problem,keyframes,trajectories,contacts_by_interval,*,reference_dt=None,force_feedforward=True,jaw_force_fraction=None):
+        policy=task_configuration(problem.task_definition).execution;reference_dt=policy.reference_dt_s if reference_dt is None else reference_dt;fraction=policy.jaw_force_fraction if jaw_force_fraction is None else jaw_force_fraction
+        super().__init__(problem,tuple(keyframes),tuple(trajectories),contacts_by_interval=tuple(contacts_by_interval),control_mode=policy.control_mode,jaw_force_fraction=fraction)
         self.force_feedforward=force_feedforward;self.nodal_spline=self.spline;self.reference_dt=reference_dt
         # Only interpolation is cached. Model/plan/code identity must match;
         # velocity bounds and native geometry remain fresh execution gates.
         cache=problem.directory/'dense-reference.npz';digest=hashlib.sha256()
-        for name in ['full_execution.py','full_trajectory.py','contracted.py']:digest.update(Path(__file__).with_name(name).read_bytes())
+        for name in ['full_execution.py','full_trajectory.py','contracted.py','reference.py']:digest.update(Path(__file__).with_name(name).read_bytes())
         for part in self.identity():digest.update(part.encode())
         digest.update(str(reference_dt).encode());identity=digest.hexdigest();loaded=False
         if cache.exists():
             with np.load(cache,allow_pickle=False) as a:
                 if str(a['identity'])==identity:
                     times=a['times'].copy();Q=a['q'].copy();objects=a['object_q'].copy();largest=float(a['projection_max_rad']);loaded=True
-        if not loaded:times=np.unique(np.r_[self.time,np.arange(0,self.time[-1],reference_dt),self.time[-1]]);Q=[];objects=[];largest=0.
+        mesh,node_indices=subdivide_reference_times(self.time,reference_dt)
+        if loaded and not np.array_equal(times,mesh):raise ValueError('Dense reference cache mesh differs from the optimized nodes')
+        if not loaded:times=mesh;Q=[];objects=[];largest=0.
         for t in (() if loaded else times):
             i,k,_=self.phase(t+self.preparation);qo=self.object_reference_local(t);seed=self.nodal_spline(t);q=seed.copy()
             for j,(f,r,frame,c,qs) in enumerate(zip(problem.task_definition.features,problem.robots,problem.frames,contacts_by_interval[i],problem.system.q_slices)):
@@ -40,12 +44,13 @@ class FullEpisode(CoupledEpisode):
                     current=r.fk(seed[qs],frame)[:3,:3];target[:3,:3]=Rotation.align_vectors(np.array([-To[:3,:3]@R[:,2]]),np.array([current[:,2]]))[0].as_matrix()@current
                 q[qs]=numerical_pose_ik(r,frame,target,seed[qs])
             largest=max(largest,float(np.max(abs(q-seed))));Q.append(q);objects.append(qo)
-        self.reference_times=times;self.reference_q=np.array(Q);self.reference_objects=np.array(objects);velocity=np.gradient(self.reference_q,times,axis=0,edge_order=2);velocity[[0,-1]]=0
+        self.reference_times=times;self.reference_q=np.array(Q);self.reference_objects=np.array(objects)
+        self.spline,velocity,self.reference_mesh_diagnostics=conditioned_joint_spline(times,self.reference_q,node_indices,self.v[:,:problem.system.object_v.start])
+        self.reference_identity=identity
         self.reference_projection_max_rad=largest
-        if largest>.02:raise RuntimeError(f'Reference IK projection {largest:.4g} rad exceeds 0.02 rad; refine trajectory grid')
+        if largest>policy.reference_projection_limit_rad:raise RuntimeError(f'Reference IK projection {largest:.4g} rad exceeds {policy.reference_projection_limit_rad} rad; refine trajectory grid')
         for r,qs in zip(problem.robots,problem.system.q_slices):
             if np.max(abs(velocity[:,qs])-r.velocity)>1e-4:raise RuntimeError('Projected reference exceeds robot velocity limits')
-        self.spline=CubicHermiteSpline(times,self.reference_q,velocity)
         if not loaded:np.savez_compressed(cache,identity=identity,times=times,q=self.reference_q,object_q=self.reference_objects,projection_max_rad=largest)
         self.reference_cache_hit=loaded
     def object_reference_local(self,t):
@@ -56,7 +61,7 @@ class FullEpisode(CoupledEpisode):
     def reactions(self,t):
         return super().reactions(t) if self.force_feedforward else np.zeros((len(self.problem.robots),6))
     def identity(self):
-        p=self.problem;data=dict(task=p.task_definition.id,types=p.types,assignment=p.assignment,specs=[{k:v for k,v in spec.items() if k!='allowed_object_geoms'} for spec in p.specs],source_refinement=p.refine_enabled);h=hashlib.sha256(json.dumps(data,sort_keys=True).encode())
+        p=self.problem;data=dict(task=p.task_definition.id,configuration=task_configuration(p.task_definition).to_dict(),types=p.types,assignment=p.assignment,specs=[{k:v for k,v in spec.items() if k!='allowed_object_geoms'} for spec in p.specs],source_refinement=p.refine_enabled);h=hashlib.sha256(json.dumps(data,sort_keys=True).encode())
         objects=p.task_definition.object.bodies.values() if isinstance(p.task_definition.object,RigidCollection) else [p.task_definition.object]
         for r in [*p.full_robots,*objects]:h.update(r.path.read_bytes());h.update(np.asarray(r.base_pose,dtype='<f8').tobytes())
         from .full_recording import jsonable
@@ -87,7 +92,7 @@ class FullContactController(CoupledContactController):
 
 def reference_geometry(episode,scene):
     p=episode.problem;geometry=Geometry(p,scene);states=np.c_[episode.reference_q,episode.reference_objects];opened=[tuple(f.id for i,(f,c) in enumerate(zip(p.task_definition.features,p.capabilities)) if c.kind=='G' and not episode.attached(i,t+episode.preparation)) for t in episode.reference_times];failures=geometry.discover(states,open_grippers=opened)
-    return dict(passed=not failures,samples=len(states),continuous_certificate=False,reference_interpolation='object_SE3_and_joint_Hermite_with_dense_robot_IK',released_gripper_reference='native URDF open configuration after stationary opening dwell',projection_limit_rad=.02,projection_max_rad=episode.reference_projection_max_rad,compliant_pad_allowance_m=geometry.pad_compliance_allowance,unintended_clearance_m=geometry.clearance,violations=failures)
+    return dict(passed=not failures,samples=len(states),continuous_certificate=False,reference_interpolation='object_SE3_and_conditioned_joint_Hermite_with_dense_IK',reference_id=episode.reference_identity,reference_mesh=episode.reference_mesh_diagnostics,released_gripper_reference='native URDF open configuration after stationary opening dwell',projection_limit_rad=task_configuration(p.task_definition).execution.reference_projection_limit_rad,projection_max_rad=episode.reference_projection_max_rad,compliant_pad_allowance_m=geometry.pad_compliance_allowance,unintended_clearance_m=geometry.clearance,violations=failures)
 
 
 def run_full_episode(episode,output,*,contacts_enabled=True,disturbances=(),progress=None,allow_reduced_baseline=False):
@@ -107,7 +112,8 @@ def run_full_episode(episode,output,*,contacts_enabled=True,disturbances=(),prog
     if p.task_definition.id=='box':objects.append(scene.object_frames['moving']);articulated[scene.object_frames['moving']]=scene.object_joints['articulation']
     simulator=MujocoContactScene(scene.path,names,actuators,objects,actuator_modes=modes,articulated_object_joints=articulated);case_id,plan_id=episode.identity();schedule=WrenchSchedule(disturbances)
     trace=simulator.run(controller,controller.reference,episode.duration,initial_q=controller.reference(0)[0],case_id=case_id,plan_id=plan_id,external_forces=schedule,progress=progress);trace.metadata.update(object_pose_prescribed=False,object_equality_constraints_used=0,internal_gripper_equalities=int(simulator.model.neq),external_disturbances=schedule.to_list(),reference_interpolation=geometry['reference_interpolation'],contacts_enabled=contacts_enabled)
-    trace.metadata['controller_configuration']=dict(mode=episode.control_mode,arm_reaction_feedforward=episode.force_feedforward,jaw_force_fraction=episode.jaw_force_fraction,jaw_force_target_N={f.id:episode.jaw_force_fraction*c.closing_force_per_finger for f,c in zip(p.task_definition.features,p.capabilities) if c.kind=='G'},joint_nullspace_stiffness=40.,joint_nullspace_damping=8.)
+    trace.metadata['controller_configuration']=dict(mode=episode.control_mode,arm_reaction_feedforward=episode.force_feedforward,jaw_force_fraction=episode.jaw_force_fraction,jaw_force_target_N={f.id:episode.jaw_force_fraction*c.closing_force_per_finger for f,c in zip(p.task_definition.features,p.capabilities) if c.kind=='G'},joint_nullspace_stiffness=task_configuration(p.task_definition).execution.joint_k,joint_nullspace_damping=task_configuration(p.task_definition).execution.joint_d)
+    trace.metadata.update(reference_id=episode.reference_identity,reference_mesh=episode.reference_mesh_diagnostics)
     trace.save(out/'execution.npz');(out/'control.json').write_text(json.dumps(controller.logs,separators=(',',':')))
     # Task/capability assessment is provided separately; a trace alone is not a pass.
     return trace,controller,scene,geometry

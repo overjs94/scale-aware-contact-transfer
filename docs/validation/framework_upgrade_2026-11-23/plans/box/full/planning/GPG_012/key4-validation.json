@@ -1,0 +1,70 @@
+{
+  "independent": {
+    "passed": true,
+    "residuals": {
+      "equilibrium": 2.0324364413681906e-10,
+      "capability": 1.1012909029665954e-10,
+      "torque": 0.0,
+      "closure": 2.7833211267442454e-14,
+      "rotation_closure": 4.812809365227808e-16,
+      "rho_margin": 0.0
+    },
+    "frozen_conic": {
+      "rho": 15.150593333058021,
+      "certificate": true,
+      "residual": 4.086579963313852e-10,
+      "status": "Solved",
+      "maximum_margin_status": "Solved",
+      "fixed_rho_feasibility": false,
+      "solver_attempts": [
+        {
+          "status": "Solved",
+          "witness_regularization": 0.0,
+          "backend": "clarabel",
+          "solver_tolerance": 1e-09,
+          "iterations": 17,
+          "wall_time_s": 0.04104428000027838
+        }
+      ]
+    },
+    "independent": "native Pinocchio, NumPy and frozen Clarabel"
+  },
+  "geometry_violations": [],
+  "source": {
+    "synthetic_input": true,
+    "network_inference_executed": false,
+    "source_refinement_enabled": true,
+    "source_status": "failed_source_solve",
+    "source_certificate": false,
+    "source_rho": null,
+    "source_failure": "NLP rejected [ipopt]: Maximum_Iterations_Exceeded",
+    "source_failure_kind": "numerical_failure",
+    "source_diagnostics": {
+      "frozen_anchor_status": "PrimalInfeasible",
+      "frozen_anchor_certificate": false,
+      "frozen_anchor_rho": 4.868089380377295e-12,
+      "scope": "fixed anchors only; not global surface-refinement feasibility"
+    },
+    "source_geometry_fallback": true,
+    "source_forces_transferred": false,
+    "source_to_target_scale": 4.0,
+    "source_problem_identity": "ct-source-v2:92c86157ef058a8202f0a56d72f5d6391b6fd5bd644cf5a157df9f50ef9df64c",
+    "source_cache_hit": false,
+    "new_source_solver_executed": true
+  },
+  "target_provenance": {
+    "method": "fixed_geometry_separable_target",
+    "posture_solver": "Solve_Succeeded",
+    "torque_free_rho_upper_bound": 15.150593332866379,
+    "same_rho_torque_feasibility": true,
+    "posture_global_optimality_claimed": false,
+    "posture_reference_rule": "hardware_seed",
+    "same_rho_force_polish": {
+      "witness_applied": true,
+      "status": "AlmostSolved",
+      "rho": 15.150593332866379,
+      "primal_residual": 8.528980544042497e-08
+    }
+  },
+  "endpoint_polish_max_rad": 9.682702040159086e-08
+}

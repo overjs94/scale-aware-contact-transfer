@@ -1,0 +1,77 @@
+{
+  "independent": {
+    "passed": true,
+    "residuals": {
+      "equilibrium": 1.5198953207118393e-13,
+      "capability": 6.327871648892369e-08,
+      "torque": 0.0,
+      "closure": 1.6653345369377348e-15,
+      "rotation_closure": 4.1602178161078316e-14,
+      "rho_margin": 0.0
+    },
+    "frozen_conic": {
+      "rho": 8.013596031140882,
+      "certificate": true,
+      "residual": 6.327871648892369e-08,
+      "status": "AlmostSolved",
+      "maximum_margin_status": "NumericalError",
+      "fixed_rho_feasibility": true,
+      "solver_attempts": [
+        {
+          "status": "AlmostSolved",
+          "witness_regularization": 2e-06,
+          "backend": "clarabel",
+          "solver_tolerance": 1e-09,
+          "iterations": 23,
+          "wall_time_s": 0.2082215410000572
+        }
+      ]
+    },
+    "independent": "native Pinocchio, NumPy and frozen Clarabel"
+  },
+  "geometry_violations": [],
+  "source": {
+    "synthetic_input": true,
+    "network_inference_executed": false,
+    "source_refinement_enabled": true,
+    "source_status": "structurally_infeasible",
+    "source_certificate": false,
+    "source_rho": null,
+    "source_failure": "Source unilateral-point wrench span is insufficient: [{'body': 'tabletop', 'maximum_rank': 5, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}, {'body': 'leg', 'maximum_rank': 3, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}]",
+    "source_failure_kind": "structural_infeasibility",
+    "source_diagnostics": {
+      "span_failures": [
+        {
+          "body": "tabletop",
+          "maximum_rank": 5,
+          "required_rank": 6,
+          "scope": "necessary span bound for an initially independent free rigid body"
+        },
+        {
+          "body": "leg",
+          "maximum_rank": 3,
+          "required_rank": 6,
+          "scope": "necessary span bound for an initially independent free rigid body"
+        }
+      ]
+    },
+    "source_geometry_fallback": true,
+    "source_forces_transferred": false,
+    "source_to_target_scale": 4.0,
+    "source_problem_identity": "ct-source-v2:ee4eb46af20709b9697a646866eaa7b3046e759f6ec000184922e476c68361d1",
+    "source_cache_hit": false,
+    "new_source_solver_executed": false
+  },
+  "target_provenance": {
+    "method": "coupled_target_NLP",
+    "static_torques_eliminated": true,
+    "posture_reference_rule": "hardware_seed",
+    "same_rho_force_polish": {
+      "witness_applied": true,
+      "status": "AlmostSolved",
+      "rho": 8.013596031140864,
+      "primal_residual": 6.327871648892369e-08
+    }
+  },
+  "endpoint_polish_max_rad": 6.133709012923205e-08
+}

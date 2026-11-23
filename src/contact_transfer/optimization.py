@@ -1,9 +1,30 @@
 """Shared NLP configuration and independent primal-residual acceptance."""
 
 from dataclasses import dataclass, field
+from functools import lru_cache
 
 import casadi as ca
 import numpy as np
+
+NLP_BACKENDS = ('ipopt', 'snopt')
+EXPERIMENTAL_NLP_BACKENDS = ('fatrop',)
+
+
+class SolverUnavailableError(RuntimeError):
+    """A selected backend must never silently switch to a different solver."""
+
+
+class NLPRejectedError(RuntimeError):
+    def __init__(self, backend, status):
+        self.backend, self.status = backend, status
+        super().__init__(f'NLP rejected [{backend}]: {status}')
+
+
+@lru_cache(maxsize=None)
+def backend_available(backend):
+    if backend not in NLP_BACKENDS+EXPERIMENTAL_NLP_BACKENDS:
+        return False
+    return bool(ca.has_nlpsol(backend))
 
 
 @dataclass
@@ -15,10 +36,16 @@ class SolverSettings:
     backend: str = "ipopt"
     options: dict = field(default_factory=dict)
     diagnostics_path: str | None = None
+    allow_experimental: bool = False
 
     def __post_init__(self):
-        if self.backend not in {"ipopt", "snopt"}:
-            raise ValueError("backend must be ipopt or snopt")
+        if self.backend not in NLP_BACKENDS+EXPERIMENTAL_NLP_BACKENDS:
+            raise ValueError(f'backend must be one of {NLP_BACKENDS}')
+        if self.backend in EXPERIMENTAL_NLP_BACKENDS and not self.allow_experimental:
+            raise ValueError('FATROP is experimental and failed CITO native qualification; use an isolated process and explicitly allow_experimental')
+        if (self.max_iterations <= 0 or not np.isfinite([self.tolerance,self.acceptance_tolerance]).all()
+                or self.tolerance <= 0 or self.acceptance_tolerance <= 0):
+            raise ValueError('Positive iteration budget and finite positive tolerances required')
 
 
 def equality(opti, expression):
@@ -44,6 +71,8 @@ def equality(opti, expression):
 
 def solve(opti, settings=None):
     settings = settings or SolverSettings()
+    if not backend_available(settings.backend):
+        raise SolverUnavailableError(f'Selected NLP backend {settings.backend} is unavailable; install its CasADi plugin and required runtime/license')
     options = {
         "expand": True, "print_time": settings.verbose,
         "ipopt.print_level": 5 if settings.verbose else 0,
@@ -52,6 +81,10 @@ def solve(opti, settings=None):
         "ipopt.acceptable_tol": settings.tolerance*10,
         "ipopt.bound_relax_factor": 0,
     } if settings.backend == "ipopt" else {
+        'expand': True, 'print_time': settings.verbose, 'structure_detection': 'none',
+        'fatrop': {'tol': settings.tolerance, 'max_iter': settings.max_iterations,
+                   'print_level': 1 if settings.verbose else 0},
+    } if settings.backend == 'fatrop' else {
         "expand": True, "print_time": settings.verbose,
         "snopt": {"Major_iterations_limit": settings.max_iterations,
                   "Major_feasibility_tolerance": settings.tolerance,
@@ -82,8 +115,7 @@ def solve(opti, settings=None):
                 rows=[dict(index=int(i),violation=finite(violation[i]),value=finite(values[i]),lower=finite(lower[i]),upper=finite(upper[i]),source=opti.debug.g_describe(int(i))) for i in indices]
                 path.write_text(json.dumps(dict(status=status,accepted=False,constraints=rows),indent=2)+'\n')
             except RuntimeError:path.write_text(json.dumps(dict(status=status,accepted=False,diagnostics='unavailable'))+'\n')
-        suffix = "; SNOPT requires a working CasADi plugin and solver installation/license" if settings.backend == "snopt" else ""
-        raise RuntimeError(f"NLP rejected [{settings.backend}]: {status}{suffix}") from error
+        raise NLPRejectedError(settings.backend, status) from error
     g = np.asarray(solution.value(opti.g)).reshape(-1)
     lo = np.asarray(solution.value(opti.lbg)).reshape(-1)
     hi = np.asarray(solution.value(opti.ubg)).reshape(-1)

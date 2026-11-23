@@ -51,10 +51,11 @@ class HybridTorqueImpedance:
  force-integrator windup under actuator clipping. No passivity guarantee is
  claimed for arbitrary moving frames, saturation or estimated force signals.
  """
- def __init__(self,robot,frame,selection=None,*,motion_k=(40,40,40,3000,3000,3000),motion_d=(2,2,2,40,40,40),force_k=.25,force_i=1.,joint_k=40.,joint_d=8.,feedback_limit=(2,2,2,20,20,20),integral_limit=(.2,.2,.2,5,5,5)):
+ def __init__(self,robot,frame,selection=None,*,motion_k=(40,40,40,3000,3000,3000),motion_d=(2,2,2,40,40,40),force_k=.25,force_i=1.,force_d=None,joint_k=40.,joint_d=8.,feedback_limit=(2,2,2,20,20,20),integral_limit=(.2,.2,.2,5,5,5)):
   if robot.floating_base:raise ValueError('Floating-base torque control needs a constrained whole-body controller')
   self.robot=robot;self.frame=frame;self.selection=selection or HybridSelection.normal();self.motion_k=vector(motion_k,6);self.motion_d=vector(motion_d,6);self.force_k=vector(force_k,6);self.force_i=vector(force_i,6);self.joint_k=vector(joint_k,robot.nv);self.joint_d=vector(joint_d,robot.nv);self.feedback_limit=vector(feedback_limit,6);self.integral_limit=vector(integral_limit,6)
-  if any(np.any(v<0) for v in [self.motion_k,self.motion_d,self.force_k,self.force_i,self.joint_k,self.joint_d,self.feedback_limit,self.integral_limit]):raise ValueError('Controller gains/limits must be nonnegative')
+  self.force_d=vector(motion_d if force_d is None else force_d,6)
+  if any(np.any(v<0) for v in [self.motion_k,self.motion_d,self.force_k,self.force_i,self.force_d,self.joint_k,self.joint_d,self.feedback_limit,self.integral_limit]):raise ValueError('Controller gains/limits must be nonnegative')
   self.reset()
  def reset(self):self.integral=np.zeros(6);self.last={}
  def command(self,q,v,qd,vd,ad,*,reaction_desired,reaction_measured,contact_rotation_world,dt):
@@ -63,9 +64,9 @@ class HybridTorqueImpedance:
   if not all(np.isfinite(a).all() for a in [q,v,qd,vd,ad,ld,lm]):raise ValueError('Finite control inputs required')
   T,Td=r.fk(q,self.frame),r.fk(qd,self.frame);J,Jd=r.jacobian(q,self.frame),r.jacobian(qd,self.frame);H=contact_coordinates(T[:3,:3],contact_rotation_world);Hd=contact_coordinates(Td[:3,:3],contact_rotation_world);Jc=H@J
   error=np.r_[H[:3,:3]@Rotation.from_matrix(T[:3,:3].T@Td[:3,:3]).as_rotvec(),np.asarray(contact_rotation_world).T@(Td[:3,3]-T[:3,3])];velocity=Hd@Jd@vd-Jc@v;ef=self.selection.force@(H@(lm-ld));previous=self.integral.copy();self.integral=np.clip(self.integral+dt*ef,-self.integral_limit,self.integral_limit)
-  force_feedback=self.selection.force@np.clip(self.force_k*ef+self.force_i*self.integral,-self.feedback_limit,self.feedback_limit);motion_feedback=self.selection.motion@(self.motion_k*error+self.motion_d*velocity);N=torque_nullspace(r.mass(q),Jc);posture=N.T@(self.joint_k*(qd-q)+self.joint_d*(vd-v));raw=r.inverse_dynamics(q,v,ad)-J.T@ld+Jc.T@(motion_feedback+force_feedback)+posture;command=np.clip(raw,-r.effort,r.effort);saturated=bool(np.any(abs(command-raw)>1e-9))
+  force_feedback=self.selection.force@np.clip(self.force_k*ef+self.force_i*self.integral+self.force_d*velocity,-self.feedback_limit,self.feedback_limit);motion_feedback=self.selection.motion@(self.motion_k*error+self.motion_d*velocity);N=torque_nullspace(r.mass(q),Jc);posture=N.T@(self.joint_k*(qd-q)+self.joint_d*(vd-v));raw=r.inverse_dynamics(q,v,ad)-J.T@ld+Jc.T@(motion_feedback+force_feedback)+posture;command=np.clip(raw,-r.effort,r.effort);saturated=bool(np.any(abs(command-raw)[r.effort>0]>1e-9))
   if saturated:self.integral=previous
-  self.last=dict(force_error_contact=ef.copy(),motion_error_contact=self.selection.motion@error,motion_feedback_contact=motion_feedback,force_feedback_contact=force_feedback,joint_impedance_torque=posture,unclipped_torque=raw,saturated=saturated,task_leakage=float(np.linalg.norm(Jc@np.linalg.solve(r.mass(q),posture))))
+  self.last=dict(force_error_contact=ef.copy(),motion_error_contact=self.selection.motion@error,motion_feedback_contact=motion_feedback,force_feedback_contact=force_feedback,force_damping_contact=self.selection.force@(self.force_d*velocity),joint_impedance_torque=posture,unclipped_torque=raw,saturated=saturated,task_leakage=float(np.linalg.norm(Jc@np.linalg.solve(r.mass(q),posture))))
   return command
 
 

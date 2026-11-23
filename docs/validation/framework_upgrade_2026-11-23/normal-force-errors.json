@@ -1,0 +1,65 @@
+{
+  "raw_control_sha256": {
+    "panel-conditioned": "3a9753ef6bb69ad6abe03b639f3bd700169f8d3874c27c61d8873d483e4c956c",
+    "panel-hybrid-d160": "db6df61eab4ea15a7839668ec6c88e5e70f32d772fe7093d0072f448829273c6",
+    "box-conditioned": "64261837d332dbbccba9b4753d8310475274fd263b3a3f50f544ead281e27c4f",
+    "box-hybrid-d160": "70a0cf98d858dab76bd70aced819bb748ed16707bf88751a06c5bc45ef1448b7",
+    "assembly-conditioned": "04fd491614fe440c02e1dba38c2536ed9331c67a0f6aba0e718be3610552cd4f",
+    "assembly-hybrid-d160": "748b58a2400aed98e22cfeab5532198854f67f027bdf5e7585d421330ec52314"
+  },
+  "scope": "Postprocessing existing raw native contact force errors; P interfaces only; t>=preparation 2s + 0.1s, holding phase and planned normal load>0.1N; not an additional acceptance gate or physical trial",
+  "results": {
+    "panel-conditioned": {
+      "under_left": {
+        "samples": 19676,
+        "rmse_N": 0.08599458996771472,
+        "maximum_absolute_error_N": 0.12331265834842918
+      },
+      "under_right": {
+        "samples": 19676,
+        "rmse_N": 0.1824171956114767,
+        "maximum_absolute_error_N": 0.21760022201305523
+      }
+    },
+    "panel-hybrid-d160": {
+      "under_left": {
+        "samples": 19676,
+        "rmse_N": 0.0057106448131777595,
+        "maximum_absolute_error_N": 0.050067567552098034
+      },
+      "under_right": {
+        "samples": 19676,
+        "rmse_N": 0.006923088314906496,
+        "maximum_absolute_error_N": 0.06875794967780738
+      }
+    },
+    "box-conditioned": {
+      "base_support": {
+        "samples": 17901,
+        "rmse_N": 0.4139987664917307,
+        "maximum_absolute_error_N": 0.7400198675831358
+      }
+    },
+    "box-hybrid-d160": {
+      "base_support": {
+        "samples": 17901,
+        "rmse_N": 0.01685515957049011,
+        "maximum_absolute_error_N": 0.08520416947908899
+      }
+    },
+    "assembly-conditioned": {
+      "point_support": {
+        "samples": 28281,
+        "rmse_N": 0.1791276238037385,
+        "maximum_absolute_error_N": 3.043298568781647
+      }
+    },
+    "assembly-hybrid-d160": {
+      "point_support": {
+        "samples": 28281,
+        "rmse_N": 0.12174484080370312,
+        "maximum_absolute_error_N": 2.918755907607302
+      }
+    }
+  }
+}

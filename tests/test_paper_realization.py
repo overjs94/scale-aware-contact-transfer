@@ -1,6 +1,7 @@
 """Independent equilibrium, sign and closure checks for uploaded-paper adapters."""
 import casadi as ca
 import numpy as np
+import pytest
 from contact_transfer import Robot
 from contact_transfer.contacts import Capability,SurfacePatch,contact_basis
 from contact_transfer.generalized_load import GeneralizedTaskLoad
@@ -9,19 +10,23 @@ from contact_transfer.system import MechanicalSystem,RigidObject
 from contact_transfer.paper_keyframe import Interface,realize_system_keyframe,relative_interface
 
 
-def test_global_realization_matches_independent_point_socp_and_native_inverse_dynamics(slider_urdf):
+@pytest.mark.parametrize('eliminate',[True,False])
+@pytest.mark.parametrize('torque_limit,expected_margin',[(100.,9.81),(25.,5.38)])
+def test_global_realization_matches_independent_point_socp_and_native_inverse_dynamics(slider_urdf,eliminate,torque_limit,expected_margin):
     robot=Robot(slider_urdf);sys=MechanicalSystem([robot.symbolic()],RigidObject(1.,np.zeros(3),np.eye(3)*.02))
+    sys.effort[2]=torque_limit
     q=np.r_[0.,0.,.5,0.,0.,.5,0.,0.,0.,1.];p=np.zeros(3);n=np.array([0.,0.,-1.]);R=contact_basis(n)
     task=GeneralizedTaskLoad(np.r_[0.,0.,0.,0.,0.,-9.81],np.eye(6)[:,5:],np.eye(1));cap=Capability(mu=.8,normal_max=20.)
     interface=Interface('support',0,'link2',None,SurfacePatch.fixed(p,n),cap,p,R)
-    result=realize_system_keyframe(sys,q,q[sys.object_q],[interface],task,rho_min=.1)
-    np.testing.assert_allclose(result.rho,9.81,atol=1e-5)
+    result=realize_system_keyframe(sys,q,q[sys.object_q],[interface],task,rho_min=.1,eliminate_static_torques=eliminate)
+    assert result.target_provenance['static_torques_eliminated']==eliminate
+    np.testing.assert_allclose(result.rho,expected_margin,atol=1e-5)
     _,_,_,J=relative_interface(sys,ca.DM(result.q),interface,ca.DM(result.positions[0]),ca.DM(result.rotations[0]));J=np.array(ca.DM(J))
     for lam,tau in zip(result.reactions[:,0],result.torques):
         physical_robot=np.r_[R@lam[:3],R@lam[3:]]
         expected=robot.inverse_dynamics(result.q[:3],np.zeros(3),np.zeros(3))-robot.jacobian(result.q[:3],'link2','world_aligned').T@physical_robot
         np.testing.assert_allclose(tau,expected,atol=1e-7)
-    check=fixed_generalized_margin([-J.T[sys.object_v]],task,[cap]);assert check['certificate'];np.testing.assert_allclose(check['rho'],result.rho,atol=1e-5)
+    check=fixed_generalized_margin([-J.T[sys.object_v]],task,[cap],torque_gravity=robot.gravity(result.q[:3]),torque_maps=[J.T[:3]],effort=sys.effort);assert check['certificate'];np.testing.assert_allclose(check['rho'],result.rho,atol=1e-5)
 
 
 def test_failed_conic_balance_is_never_a_margin_certificate():
@@ -29,6 +34,20 @@ def test_failed_conic_balance_is_never_a_margin_certificate():
     # A top-facing unilateral contact cannot produce the required down reaction.
     check=fixed_generalized_margin([np.eye(6)],task,[Capability(mu=.8,normal_max=20.)])
     assert not check['certificate'] and check['status']=='PrimalInfeasible'
+
+
+def test_coupled_actuation_does_not_drop_unactuated_balance(slider_urdf):
+    from contact_transfer.optimization import NLPRejectedError
+    robot=Robot(slider_urdf);sys=MechanicalSystem([robot.symbolic()],RigidObject(1.,np.zeros(3),np.eye(3)*.02))
+    # One actuator drives x and z together. Its columns are orthonormal, but
+    # it cannot balance a pure vertical load without an external x reaction.
+    B=np.zeros((sys.nv,2));B[0,0]=B[2,0]=np.sqrt(.5);B[1,1]=1.
+    sys.B=ca.DM(B);sys.nu=2;sys.effort=np.full(2,100.)
+    q=np.r_[0.,0.,.5,0.,0.,.5,0.,0.,0.,1.];p=np.zeros(3);n=np.array([0.,0.,-1.]);R=contact_basis(n)
+    task=GeneralizedTaskLoad(np.r_[0.,0.,0.,0.,0.,-9.81],np.eye(6)[:,5:],np.eye(1))
+    interface=Interface('support',0,'link2',None,SurfacePatch.fixed(p,n),Capability(normal_max=20.),p,R)
+    with pytest.raises(NLPRejectedError):
+        realize_system_keyframe(sys,q,q[sys.object_q],[interface],task,rho_min=.1)
 
 
 def test_fixed_margin_feasibility_certifies_same_box_without_claiming_optimality():

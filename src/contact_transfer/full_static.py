@@ -11,6 +11,7 @@ from .generalized_conic import fixed_generalized_margin
 from .generalized_load import GeneralizedTaskLoad
 from .paper_keyframe import KeyframeCertificate
 from .trajectory import Contact, TrajectoryResult
+from .configuration import task_configuration
 from .full_validation import numeric_contact, support_patch_contains, validate_interval
 
 
@@ -33,10 +34,10 @@ def allocation(problem, q, contacts, task, *, step=None, rho=None, rho_min=0., w
         X=np.c_[np.zeros((sys.nv,3)),J.T] if c.capability.kind=='P' else J.T
         selected.append(c);maps.append(-X[sys.object_v]);tmaps.append(np.asarray(sys.B).T@X)
     gravity=np.concatenate([r.gravity(q[s]) for r,s in zip(problem.robots,sys.q_slices)])
-    check=fixed_generalized_margin(maps,task,[c.capability for c in selected],torque_gravity=gravity,torque_maps=tmaps,effort=sys.effort,fixed_rho=rho,rho_min=rho_min,torque_weight=np.diag(.01/sys.effort**2) if weighted else None)
+    check=fixed_generalized_margin(maps,task,[c.capability for c in selected],torque_gravity=gravity,torque_maps=tmaps,effort=sys.effort,fixed_rho=rho,rho_min=rho_min,torque_weight=np.diag(.01/sys.effort**2) if weighted else None,solver_settings=getattr(problem,'conic_settings',None))
     if not check['certificate'] and rho is None and np.isfinite(check['rho']) and check['rho']>=rho_min:
         maximum_status=check['status']; candidate=check['rho']
-        check=fixed_generalized_margin(maps,task,[c.capability for c in selected],torque_gravity=gravity,torque_maps=tmaps,effort=sys.effort,fixed_rho=candidate,rho_min=rho_min)
+        check=fixed_generalized_margin(maps,task,[c.capability for c in selected],torque_gravity=gravity,torque_maps=tmaps,effort=sys.effort,fixed_rho=candidate,rho_min=rho_min,solver_settings=getattr(problem,'conic_settings',None))
         check['maximum_margin_status']=maximum_status
     if not check['certificate']:raise RuntimeError('Condensed allocation rejected: '+check['status'])
     forces={c.name:np.zeros((len(task.vertices),6)) for c in contacts};torques=np.tile(gravity,(len(task.vertices),1))
@@ -49,7 +50,7 @@ def allocation(problem, q, contacts, task, *, step=None, rho=None, rho_min=0., w
 def fixed_posture_keyframe(problem,k,previous,environment,retreat):
     from .full_scenario import release_ik
     from .full_trajectory import phase_mode
-    sys=problem.system;goal=problem.task_definition.keyframes[k];q=previous.q.copy();qo=goal['object_q']
+    policy=task_configuration(problem.task_definition).target;sys=problem.system;goal=problem.task_definition.keyframes[k];q=previous.q.copy();qo=goal['object_q']
     if np.max(abs(q[sys.object_q]-qo))>1e-8:raise ValueError('Stationary keyframe changes object pose')
     contacts=[];interfaces=[];prior=problem.source(goal)
     for i,(f,r,frame,cap,qs,p,R) in enumerate(zip(problem.task_definition.features,problem.robots,problem.frames,problem.capabilities,sys.q_slices,previous.positions,previous.rotations)):
@@ -60,12 +61,12 @@ def fixed_posture_keyframe(problem,k,previous,environment,retreat):
             continue
         interfaces.append(SimpleNamespace(group_id=f.id,force_enabled=mode=='holding'))
         if mode=='holding':contacts.append(Contact(f.id,p,R[:,2],cap,robot_index=i,frame=frame,object_frame=f.frame,rotation_object=R))
-    forces,tau,check,_=allocation(problem,q,(*contacts,*environment),problem.task_load(qo),rho_min=.1)
+    forces,tau,check,_=allocation(problem,q,(*contacts,*environment),problem.task_load(qo),rho_min=policy.rho_min)
     reaction=np.stack([forces.get(f.id,np.zeros((len(tau),6))) for f in problem.task_definition.features],axis=1)
     objective=-check['rho']
     for i,(f,r,spec,qs) in enumerate(zip(problem.task_definition.features,problem.robots,problem.specs,sys.q_slices)):
         if phase_mode(goal['phase'],f)=='released':continue
-        reference=problem.branch_reference(k)[qs] if problem.task_definition.posture_reference_rule=='sequential_ik_branch' else previous.q[qs] if problem.task_definition.posture_reference_rule=='previous_keyframe' else spec['q_initial'];objective+=np.sum((previous.positions[i]-prior['positions'][i])**2)/.6**2+1-previous.rotations[i,:,2]@prior['normals'][i]+.01*np.sum(((q[qs]-reference)/np.maximum(r.upper-r.lower,1e-3))**2)
+        reference=problem.branch_reference(k)[qs] if problem.task_definition.posture_reference_rule=='sequential_ik_branch' else previous.q[qs] if problem.task_definition.posture_reference_rule=='previous_keyframe' else spec['q_initial'];objective+=np.sum((previous.positions[i]-prior['positions'][i])**2)/policy.characteristic_length_m**2+1-previous.rotations[i,:,2]@prior['normals'][i]+policy.posture_weight*np.sum(((q[qs]-reference)/np.maximum(r.upper-r.lower,1e-3))**2)
     result=KeyframeCertificate(q,previous.positions.copy(),previous.rotations.copy(),previous.apertures,check['rho'],reaction,tau,{c.name:forces[c.name][:,3:] for c in environment},float(objective),check['primal_residual'])
     result.source=prior['record'];result.phase=goal['phase'];result.retreat_m=retreat;result.interfaces=interfaces;result.fixed_posture_target=True;result.target_provenance=dict(method='declared_fixed_posture_robust_SOCP',posture_reference_rule=problem.task_definition.posture_reference_rule);result.posture_reference=problem.branch_reference(k)[:sys.object_q.start].copy() if problem.task_definition.posture_reference_rule=='sequential_ik_branch' else previous.q[:sys.object_q.start].copy() if problem.task_definition.posture_reference_rule=='previous_keyframe' else np.concatenate([s['q_initial'] for s in problem.specs])
     return result
@@ -82,14 +83,14 @@ def fixed_geometry_keyframe(problem,seed,interfaces,prior,environment,settings,*
     from .optimization import equality,solve
     from .paper_keyframe import relative_interface
     from .lie import rotation_error,rotation_cost
-    sys=problem.system;opti=ca.Opti();qr=opti.variable(sys.object_q.start);Q=ca.vertcat(qr,ca.DM(seed[sys.object_q]));opti.set_initial(qr,seed[:sys.object_q.start]);posture=0.;positions=[];rotations=[];geo=0.;contacts=[]
+    policy=task_configuration(problem.task_definition).target;sys=problem.system;opti=ca.Opti();qr=opti.variable(sys.object_q.start);Q=ca.vertcat(qr,ca.DM(seed[sys.object_q]));opti.set_initial(qr,seed[:sys.object_q.start]);posture=0.;positions=[];rotations=[];geo=0.;contacts=[]
     for r,spec,qs in zip(problem.robots,problem.specs,sys.q_slices):
-        reference=spec['q_initial'] if q_reference is None else q_reference[qs];lower=r.lower if robot_configuration_bounds is None else np.maximum(r.lower,robot_configuration_bounds[0][qs]);upper=r.upper if robot_configuration_bounds is None else np.minimum(r.upper,robot_configuration_bounds[1][qs]);opti.subject_to(opti.bounded(lower,qr[qs],upper));posture+=.01*ca.sumsqr((qr[qs]-reference)/np.maximum(r.upper-r.lower,1e-3))
+        reference=spec['q_initial'] if q_reference is None else q_reference[qs];lower=r.lower if robot_configuration_bounds is None else np.maximum(r.lower,robot_configuration_bounds[0][qs]);upper=r.upper if robot_configuration_bounds is None else np.minimum(r.upper,robot_configuration_bounds[1][qs]);opti.subject_to(opti.bounded(lower,qr[qs],upper));posture+=policy.posture_weight*ca.sumsqr((qr[qs]-reference)/np.maximum(r.upper-r.lower,1e-3))
     for interface in interfaces:
         if len(interface.patch.initial):return None
         p=np.asarray(interface.patch.position(interface.patch.initial)).ravel();R=np.asarray(interface.patch.rotation(interface.patch.initial));delta=p-interface.prior_position;normal=1-R[:,2]@interface.prior_rotation[:,2]
-        if np.linalg.norm(delta)>.015+1e-9 or normal>.1+1e-9:raise ValueError('Fixed material geometry leaves target trust region')
-        positions.append(p);rotations.append(R);geo+=delta@delta/.6**2+normal;T,pw,Rw,_=relative_interface(sys,Q,interface,ca.DM(p),ca.DM(R));equality(opti,T[:3,3]-pw)
+        if np.linalg.norm(delta)>policy.position_radius_m+1e-9 or normal>policy.normal_radius+1e-9:raise ValueError('Fixed material geometry leaves target trust region')
+        positions.append(p);rotations.append(R);geo+=delta@delta/policy.characteristic_length_m**2+normal;T,pw,Rw,_=relative_interface(sys,Q,interface,ca.DM(p),ca.DM(R));equality(opti,T[:3,3]-pw)
         if interface.capability.kind=='P':equality(opti,Rw[:,:2].T@T[:3,2]);opti.subject_to(ca.dot(T[:3,2],Rw[:,2])<=-.5)
         else:equality(opti,rotation_error(T[:3,:3],Rw@ca.diag(ca.DM([1.,-1.,-1.]))));opti.subject_to(rotation_cost(T[:3,:3],Rw@ca.diag(ca.DM([1.,-1.,-1.])))<=1.)
         if interface.force_enabled:contacts.append(Contact(interface.group_id,p,R[:,2],interface.capability,robot_index=interface.robot_index,frame=interface.robot_frame,object_frame=interface.object_frame,rotation_object=R))
@@ -98,9 +99,9 @@ def fixed_geometry_keyframe(problem,seed,interfaces,prior,environment,settings,*
         gap,J,_,_=numeric_contact(problem,c,q)
         if c.robot_index is None and (abs(gap)>2e-5 or not support_patch_contains(problem,c,q)):continue
         X=np.c_[np.zeros((sys.nv,3)),J.T] if c.capability.kind=='P' else J.T;maps.append(-X[sys.object_v]);caps.append(c.capability)
-    upper=fixed_generalized_margin(maps,problem.task_load(q[sys.object_q]),caps,rho_min=.1)
+    upper=fixed_generalized_margin(maps,problem.task_load(q[sys.object_q]),caps,rho_min=policy.rho_min,solver_settings=getattr(problem,'conic_settings',None))
     if not upper['certificate']:return None
-    try:forces,tau,check,_=allocation(problem,q,(*contacts,*environment),problem.task_load(q[sys.object_q]),rho=upper['rho'],rho_min=.1)
+    try:forces,tau,check,_=allocation(problem,q,(*contacts,*environment),problem.task_load(q[sys.object_q]),rho=upper['rho'],rho_min=policy.rho_min)
     except RuntimeError:return None
     count=len(tau);reaction=np.stack([forces.get(f.id,np.zeros((count,6))) for f in problem.task_definition.features],axis=1)
     result=KeyframeCertificate(q,np.array(positions),np.array(rotations),tuple(getattr(c,'aperture_required',None) for c in problem.capabilities),upper['rho'],reaction,tau,{c.name:forces[c.name][:,3:] for c in environment},float(sol.value(posture))+geo-upper['rho'],max(res,check['primal_residual']))

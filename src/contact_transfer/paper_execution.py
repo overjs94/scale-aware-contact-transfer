@@ -7,6 +7,7 @@ import numpy as np
 from scipy.interpolate import CubicHermiteSpline
 from scipy.spatial.transform import Rotation
 from .robot import Robot
+from .configuration import task_configuration
 from .hybrid_control import HybridTorqueImpedance,HybridPositionAdmittance,HybridSelection,contact_coordinates
 from .panel_fixture import build_panel_scene
 from .contact_simulation import MujocoContactScene
@@ -93,8 +94,9 @@ class CoupledContactController:
             self.reduced_indices.append([r.joint_names.index(n) for n in reduced.joint_names]);finger=[r.joint_names.index(n) for n in reduced.tree.locked];self.fingers.append(finger)
             selection=HybridSelection.normal() if cap.kind=='P' and episode.control_mode!='impedance_feedforward' else HybridSelection(np.zeros(6))
             cls=HybridPositionAdmittance if spec['controller']=='position' else HybridTorqueImpedance
-            joint_k=np.zeros(r.n);joint_d=np.zeros(r.n);joint_k[self.reduced_indices[-1]]=40.;joint_d[self.reduced_indices[-1]]=8.
-            kwargs={} if cls is HybridPositionAdmittance else dict(joint_k=joint_k,joint_d=joint_d,**(dict(force_k=0.,force_i=0.) if episode.control_mode!='hybrid_feedback' else {}))
+            policy=task_configuration(getattr(self.problem,'task_definition',None)).execution
+            joint_k=np.zeros(r.n);joint_d=np.zeros(r.n);joint_k[self.reduced_indices[-1]]=policy.joint_k;joint_d[self.reduced_indices[-1]]=policy.joint_d
+            kwargs=dict(mass=policy.admittance_mass,damping=policy.admittance_damping) if cls is HybridPositionAdmittance else dict(joint_k=joint_k,joint_d=joint_d,motion_k=policy.motion_k,motion_d=policy.motion_d,force_d=policy.force_d,force_k=policy.force_k if episode.control_mode=='hybrid_feedback' else 0.,force_i=policy.force_i if episode.control_mode=='hybrid_feedback' else 0.)
             self.servos.append(cls(r,frame,selection,**kwargs))
             if spec.get('gripper_profile'):
                 from .robotiq import RobotiqForceServo

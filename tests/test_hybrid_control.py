@@ -54,3 +54,20 @@ def test_feedforward_comparison_disables_force_feedback_and_keeps_motion_selecti
  c=HybridTorqueImpedance(r,'tip',HybridSelection(np.zeros(6)),force_k=0,force_i=0)
  command=c.command(q,q,qd,q,q,reaction_desired=desired,reaction_measured=np.zeros(6),contact_rotation_world=np.eye(3),dt=.001)
  assert command[5]==pytest.approx(40.,abs=1e-6)
+
+
+@pytest.mark.parametrize('angle',[0.,np.pi/2])
+def test_force_axes_have_damping_without_position_stiffness(angle):
+ r=CartesianRobot();R=Rotation.from_euler('y',angle).as_matrix();q=np.zeros(6);v=q.copy();v[3:]=.1*R[:,2]
+ c=HybridTorqueImpedance(r,'tip',force_k=0,force_i=0,joint_k=0,joint_d=0)
+ command=c.command(q,v,q,q,q,reaction_desired=q,reaction_measured=q,contact_rotation_world=R,dt=.001)
+ power=v@(command-r.inverse_dynamics(q,v,q))
+ assert power==pytest.approx(-.4,abs=1e-8)
+ assert np.linalg.norm(c.last['force_damping_contact'])==pytest.approx(4.)
+
+
+def test_passive_coordinate_reactions_are_not_reported_as_actuator_saturation():
+ r=CartesianRobot();r.effort=r.effort.copy();r.effort[0]=0.
+ c=HybridTorqueImpedance(r,'tip',HybridSelection(np.zeros(6)));q=np.zeros(6);a=q.copy();a[0]=1.
+ command=c.command(q,q,q,q,a,reaction_desired=q,reaction_measured=q,contact_rotation_world=np.eye(3),dt=.001)
+ assert command[0]==0. and not c.last['saturated']

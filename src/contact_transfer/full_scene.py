@@ -11,6 +11,7 @@ from .multi_object import RigidCollection,BodyContact
 from .urdf_scene import append_urdf_robot
 from .simulation import _text,_quat
 from .urdf import origin
+from .configuration import task_configuration
 
 
 def apply_gripper(root,world,actuators,contact,robot,prefix,profile):
@@ -45,8 +46,8 @@ class FullScene:
     fixtures: tuple
 
 
-def build_scene(problem,path,*,timestep=.001,contacts_enabled=True):
-    task=problem.task_definition;root=ET.Element('mujoco',model='full_'+task.id);ET.SubElement(root,'compiler',angle='radian',inertiafromgeom='false',fusestatic='false');ET.SubElement(root,'option',timestep=str(timestep),gravity='0 0 -9.81',integrator='implicitfast',cone='elliptic',impratio='100',iterations='100',tolerance='1e-10');assets=ET.SubElement(root,'asset');world=ET.SubElement(root,'worldbody');act=ET.SubElement(root,'actuator');contact=ET.SubElement(root,'contact')
+def build_scene(problem,path,*,timestep=None,contacts_enabled=True):
+    task=problem.task_definition;timestep=task_configuration(task).execution.physics_dt_s if timestep is None else timestep;root=ET.Element('mujoco',model='full_'+task.id);ET.SubElement(root,'compiler',angle='radian',inertiafromgeom='false',fusestatic='false');ET.SubElement(root,'option',timestep=str(timestep),gravity='0 0 -9.81',integrator='implicitfast',cone='elliptic',impratio='100',iterations='100',tolerance='1e-10');assets=ET.SubElement(root,'asset');world=ET.SubElement(root,'worldbody');act=ET.SubElement(root,'actuator');contact=ET.SubElement(root,'contact')
     meshes={p.name:p.resolve() for directory in ['.cache/panda_meshes','.cache/robotiq_2f85/assets'] for p in Path(directory).glob('*.stl')};robot_geoms=[]
     for robot,spec in zip(problem.full_robots,problem.specs):
         prefix=spec['id']+'_';robot_geoms.append(append_urdf_robot(world,act,robot,prefix,mesh_files=meshes,assets=assets,robot_collisions=True));apply_gripper(root,world,act,contact,robot,prefix,spec.get('gripper_profile'))

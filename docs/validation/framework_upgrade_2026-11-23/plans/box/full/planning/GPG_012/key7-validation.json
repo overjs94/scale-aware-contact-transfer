@@ -1,0 +1,67 @@
+{
+  "independent": {
+    "passed": true,
+    "residuals": {
+      "equilibrium": 2.284394895468722e-12,
+      "capability": 1.1265527199988412e-07,
+      "torque": 0.0,
+      "closure": 1.886579542760558e-16,
+      "rotation_closure": 6.294599904166035e-16,
+      "rho_margin": 0.0
+    },
+    "frozen_conic": {
+      "rho": 12.278455198002165,
+      "certificate": true,
+      "residual": 9.236487130692694e-10,
+      "status": "Solved",
+      "maximum_margin_status": "Solved",
+      "fixed_rho_feasibility": false,
+      "solver_attempts": [
+        {
+          "status": "Solved",
+          "witness_regularization": 0.0,
+          "backend": "clarabel",
+          "solver_tolerance": 1e-09,
+          "iterations": 16,
+          "wall_time_s": 0.03694990499934647
+        }
+      ]
+    },
+    "independent": "native Pinocchio, NumPy and frozen Clarabel"
+  },
+  "geometry_violations": [],
+  "source": {
+    "synthetic_input": true,
+    "network_inference_executed": false,
+    "source_refinement_enabled": true,
+    "source_status": "failed_source_solve",
+    "source_certificate": false,
+    "source_rho": null,
+    "source_failure": "NLP rejected [ipopt]: Infeasible_Problem_Detected",
+    "source_failure_kind": "local_infeasibility_or_numerical_failure",
+    "source_diagnostics": {
+      "frozen_anchor_status": "PrimalInfeasible",
+      "frozen_anchor_certificate": false,
+      "frozen_anchor_rho": 9.200366193163195e-11,
+      "scope": "fixed anchors only; not global surface-refinement feasibility"
+    },
+    "source_geometry_fallback": true,
+    "source_forces_transferred": false,
+    "source_to_target_scale": 4.0,
+    "source_problem_identity": "ct-source-v2:2c31f074d5d7ab83043a1193100c0785adb2e783f892d51b825998a5c3017f89",
+    "source_cache_hit": false,
+    "new_source_solver_executed": true
+  },
+  "target_provenance": {
+    "method": "coupled_target_NLP",
+    "static_torques_eliminated": true,
+    "posture_reference_rule": "hardware_seed",
+    "same_rho_force_polish": {
+      "witness_applied": true,
+      "status": "AlmostSolved",
+      "rho": 12.278455197704071,
+      "primal_residual": 7.133894612820768e-07
+    }
+  },
+  "endpoint_polish_max_rad": 0.0
+}

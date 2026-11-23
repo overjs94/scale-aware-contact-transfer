@@ -1,0 +1,114 @@
+{
+  "reviewed_commit": "4446273fa12645584a465969992db1a0e457da67",
+  "python": "3.12.14",
+  "versions": {
+    "casadi": "3.7.2",
+    "pin": "4.1.0",
+    "mujoco": "4.0.0",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "clarabel": "0.11.1"
+  },
+  "cache": {
+    "changed_input": "source JSON refinement.normal_max_N",
+    "before_N": 2.0,
+    "after_N": 0.01,
+    "hash_unchanged": true,
+    "before_fingerprint": "dd733ba37258a7e5c2179ae09a15143c5ea0e587270932413d7b58f03ebd915e",
+    "after_fingerprint": "dd733ba37258a7e5c2179ae09a15143c5ea0e587270932413d7b58f03ebd915e",
+    "fresh_source_before": {
+      "accepted": true,
+      "rho": 0.5320674446659238
+    },
+    "fresh_source_after": {
+      "accepted": false,
+      "reason": "SOCP rejected: PrimalInfeasible"
+    },
+    "scope": "Only temporary source JSON changed; no production cache was loaded or written."
+  },
+  "solvers": {
+    "case": "three fixed unilateral P contacts; 6D box, 64 vertices; no robot or geometry search",
+    "timing": "warm end-to-end calls, including graph/matrix assembly, solver setup and solve",
+    "repeats": 5,
+    "measurements": {
+      "ipopt_fixed_geometry": {
+        "rho": [
+          2.7947585546118643,
+          2.7947585546118643,
+          2.7947585546118643,
+          2.7947585546118643,
+          2.7947585546118643
+        ],
+        "residuals": [
+          1.7763568394002505e-15,
+          1.7763568394002505e-15,
+          1.7763568394002505e-15,
+          1.7763568394002505e-15,
+          1.7763568394002505e-15
+        ],
+        "wall_seconds": [
+          0.4188739239999677,
+          0.40243493100001615,
+          0.4173797960000911,
+          0.4135424889999513,
+          0.47032911899998453
+        ],
+        "median_seconds": 0.4173797960000911
+      },
+      "clarabel_rigid": {
+        "rho": [
+          2.7947585693115244,
+          2.7947585693115244,
+          2.7947585693115244,
+          2.7947585693115244,
+          2.7947585693115244
+        ],
+        "residuals": [
+          1.680877659282487e-12,
+          1.680877659282487e-12,
+          1.680877659282487e-12,
+          1.680877659282487e-12,
+          1.680877659282487e-12
+        ],
+        "wall_seconds": [
+          0.017129108000062843,
+          0.017606801000056294,
+          0.019589525000014874,
+          0.024595685000008416,
+          0.022709002999931727
+        ],
+        "median_seconds": 0.019589525000014874
+      },
+      "clarabel_generalized": {
+        "rho": [
+          2.7947585694800554,
+          2.7947585694800554,
+          2.7947585694800554,
+          2.7947585694800554,
+          2.7947585694800554
+        ],
+        "residuals": [
+          1.7763568394002505e-15,
+          1.7763568394002505e-15,
+          1.7763568394002505e-15,
+          1.7763568394002505e-15,
+          1.7763568394002505e-15
+        ],
+        "wall_seconds": [
+          0.04790844299998298,
+          0.048918866000008165,
+          0.053023513999960414,
+          0.045800144999930126,
+          0.04586415299991131
+        ],
+        "median_seconds": 0.04790844299998298
+      }
+    },
+    "profiles": {
+      "clarabel_rigid": "         22334 function calls in 0.022 seconds\n\n   Ordered by: cumulative time\n   List reduced from 181 to 12 due to restriction <12>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n        1    0.000    0.000    0.022    0.022 audit_framework_solvers.py:92(conic)\n        1    0.005    0.005    0.022    0.022 conic.py:26(fixed_wrench_margin)\n        1    0.003    0.003    0.003    0.003 {method 'solve' of 'builtins.DefaultSolver' objects}\n        2    0.000    0.000    0.003    0.002 _compressed.py:30(__init__)\n        1    0.000    0.000    0.003    0.003 _coo.py:32(__init__)\n        1    0.003    0.003    0.003    0.003 {method 'nonzero' of 'numpy.ndarray' objects}\n      385    0.000    0.000    0.002    0.000 conic.py:79(upper)\n      641    0.001    0.000    0.002    0.000 conic.py:74(rows)\n      196    0.001    0.000    0.002    0.000 shape_base.py:220(vstack)\n     1608    0.001    0.000    0.002    0.000 shape_base.py:80(atleast_2d)\n      256    0.000    0.000    0.001    0.000 fromnumeric.py:3052(max)\n        3    0.000    0.000    0.001    0.000 contacts.py:144(map_reaction)\n\n\n",
+      "clarabel_generalized": "         177905 function calls in 0.095 seconds\n\n   Ordered by: cumulative time\n   List reduced from 184 to 12 due to restriction <12>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n        1    0.000    0.000    0.095    0.095 audit_framework_solvers.py:96(sparse_conic)\n        1    0.005    0.005    0.095    0.095 generalized_conic.py:16(fixed_generalized_margin)\n      450    0.000    0.000    0.043    0.000 _base.py:1270(tocsc)\n      641    0.001    0.000    0.031    0.000 _lil.py:257(__setitem__)\n      640    0.004    0.000    0.029    0.000 _index.py:127(__setitem__)\n      908    0.003    0.000    0.025    0.000 _compressed.py:30(__init__)\n      450    0.002    0.000    0.022    0.000 _csr.py:73(tocsc)\n      449    0.004    0.000    0.020    0.000 _lil.py:395(tocsr)\n      640    0.001    0.000    0.011    0.000 _index.py:10(_broadcast_arrays)\n     1361    0.001    0.000    0.011    0.000 _base.py:1525(_get_index_dtype)\n      640    0.001    0.000    0.010    0.000 _stride_tricks_impl.py:481(broadcast_arrays)\n     1369    0.007    0.000    0.009    0.000 _sputils.py:264(get_index_dtype)\n\n\n"
+    },
+    "maximum_rho_difference": 1.4868191122729968e-08,
+    "geometry_or_native_execution_validated": false
+  }
+}

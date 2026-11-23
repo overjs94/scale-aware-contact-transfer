@@ -1,0 +1,31 @@
+{
+  "package_file": "/tmp/contact-transfer-wheel-check/site/contact_transfer/__init__.py",
+  "version": "0.2.0a1",
+  "aggregate_spdx": "Apache-2.0 AND BSD-3-Clause AND GPL-3.0-or-later",
+  "asset_files": {
+    "panda_meshes": 9,
+    "robotiq_2f85": 11
+  },
+  "cli_demo": {
+    "rho": 9.809999997530284,
+    "expected_rho": 9.81,
+    "primal_residual": 3.552713678800501e-15
+  },
+  "crisp": {
+    "bridge_implemented": true,
+    "binary_found": false,
+    "binary": null,
+    "sdk_bundled": false,
+    "supported_scope": "fixed-base torque Panda arms and one rigid panel; excludes native Robotiq closed loops",
+    "full_tasks_qualified": false
+  },
+  "hybrid_profile_loaded": true,
+  "panel_source_radius_m": 0.002,
+  "native_scene_built": true,
+  "native_full_robot_gravity_max_error": [
+    5.329070518200751e-15,
+    3.552713678800501e-15,
+    3.3306690738754696e-15
+  ],
+  "installed_without_checkout_import": true
+}

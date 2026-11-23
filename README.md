@@ -3,6 +3,26 @@
 URDF 기반 동역학·기구학과 논문의 Sec. III-B–IV를 위한 연구용 Python 패키지입니다.
 로봇별 System_Param의 질량·관성·축·링크 길이를 재작성하지 않고 URDF에서 읽습니다.
 
+`0.2.0a1` framework alpha는 원본 코드에 **Apache-2.0**을 적용하고, 공통 알고리즘과
+task/solver/controller 설정, schema 2 캐시 provenance를 분리합니다.
+[설치·설정·solver 선택·배포 범위](docs/framework-deployment.md)를 확인하십시오.
+번들 로봇 모델과 선택적 CRISP/SNOPT의 upstream 조건은 별도로 유지됩니다.
+[이번 개선·수치 비교·검증 보고](docs/framework-upgrade-validation-2026-11-23.md)에는
+세 과제의 새 MuJoCo 통과 결과와 실패한 비교 실행을 함께 기록했습니다.
+박스/조립의 source certificate와 원고 수식의 문자 그대로의 전체 검증은 아직 성립하지 않으며,
+CRISP는 선택적 bridge이고 이 세 과제의 실행 엔진은 MuJoCo입니다.
+
+```bash
+pip install 'dist/scale_aware_contact_transfer-0.2.0a1-py3-none-any.whl[full,alternative-solvers]'
+contact-transfer doctor
+contact-transfer assets
+contact-transfer config --task panel
+contact-transfer run --task panel --solver ipopt --conic-solver clarabel
+```
+
+Wheel은 `python -m build`로 생성합니다. 이 변경은 PyPI registry 공개를 의미하지 않습니다.
+이하의 실행 기록은 각각에 명시된 이전 revision과 검증 범위를 유지합니다.
+
 **현재 전체 구조·개선·solver 보고:** [코드 구조도와 진행 보고서](docs/system-architecture-and-progress.md).
 Source/target/CITO, 저수준 제어, MuJoCo/CRISP, Robotiq 기구·렌더링, 검증 결과와
 남은 논문 단계의 범위를 함께 정리했습니다.
@@ -277,6 +297,11 @@ URDF origin·mesh scale·material과 floating-base pose를 적용하며, mesh �
 있습니다. 이 원고의 수치 절차는 CasADi + IPOPT입니다. 이전 v12 대조 문서는
 과거 기록으로 유지합니다. SNOPT 비교 경로는 제공하지만 plugin/설치/라이선스가
 있는 환경에서의 실행 검증은 아직 수행하지 않았습니다.
+
+최신 작업 브랜치 `4446273`의 공통 프레임워크·시나리오 제한·solver 구성과 재현 검토는
+[2026-11-23 framework/solver review](docs/framework-solver-review-2026-11-23.md)에 정리했습니다.
+이 문서는 수정 전 검토입니다. Source 입력 누락 cache의 schema 2 수정과 후속 구조 변경은
+[framework 배포 문서](docs/framework-deployment.md)에 설명합니다.
 
 ## 계획과 접촉 실행 검증
 

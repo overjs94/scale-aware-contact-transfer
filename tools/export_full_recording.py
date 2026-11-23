@@ -19,10 +19,10 @@ def original_identity(path):
     with np.load(path,allow_pickle=False) as a:return json.loads(str(a['metadata_json']))['identity']
 
 
-def load_recorded_plan(root,task_id,variant='full'):
-    root=Path(root);folder=root/task_id/variant;report=json.loads((folder/'result.json').read_text());selection=report['selection'];task=FullTask.load(task_id,root/task_id/'task');planning=root/task_id/(variant if variant in {'full','no_source_refinement','fixed_contact_types'} else 'full')/'planning';candidate=planning/(''.join(selection['selected_types'])+'_'+''.join(map(str,selection['selected_assignment'])))
+def load_recorded_plan(root,task_id,variant='full',*,model_directory=None):
+    root=Path(root);folder=root/task_id/variant;report=json.loads((folder/'result.json').read_text());selection=report['selection'];config=root/task_id/'resolved-task-configuration.json';task=FullTask.load(task_id,root/task_id/'task' if model_directory is None else Path(model_directory).parent/'task',configuration=json.loads(config.read_text()) if config.exists() else None);planning=root/task_id/(variant if variant in {'full','no_source_refinement','fixed_contact_types'} else 'full')/'planning';candidate=planning/(''.join(selection['selected_types'])+'_'+''.join(map(str,selection['selected_assignment'])))
     if (folder/'plan-origin.json').exists():candidate=Path(json.loads((folder/'plan-origin.json').read_text())['planning_directory'])
-    p=FullProblem.create(task,candidate,selection['selected_types'],selection['selected_assignment'],refine_source=selection['source_refinement_enabled']);keys=[];rs=[];cs=[]
+    p=FullProblem.create(task,candidate if model_directory is None else model_directory,selection['selected_types'],selection['selected_assignment'],refine_source=selection['source_refinement_enabled']);keys=[];rs=[];cs=[]
     for k,goal in enumerate(task.keyframes):
         path=candidate/f'key{k}.npz';key=load_key(path,original_identity(path));env=tuple(c for c in support_contacts(p,goal['phase'],1) if c.name in key.environment_reactions)
         if np.max(abs(key.q[p.system.object_q]-goal['object_q']))>2e-5 or not validate_keyframe(p,key,env)['passed']:raise RuntimeError(f'Current task/independent keyframe gate rejected {k}')

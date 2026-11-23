@@ -1,0 +1,166 @@
+{
+  "status": "Maximum_Iterations_Exceeded",
+  "accepted": false,
+  "constraints": [
+    {
+      "index": 1255,
+      "violation": 0.0018916099594790126,
+      "value": 0.0018916099594790126,
+      "lower": null,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/contacts.py:101 in reaction\n  opti.subject_to(ca.sumsqr(f[:2]) <= (self.mu*(f[2]+scale*adhesion))**2)"
+    },
+    {
+      "index": 1230,
+      "violation": 0.0009024841723512811,
+      "value": 1.0009024841723513,
+      "lower": null,
+      "upper": 1.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/finger_grasp.py:80 in reaction_with_witness\n  normal=opti.variable();ratio=opti.variable(2);opti.subject_to(normal>=0);opti.subject_to(ca.sumsqr(ratio)<=1);f=ca.vertcat(self.mu*normal*ratio,normal);opti.set_initial(normal,seed[2]);opti.set_initial(ratio,seed[:2]/(self.mu*seed[2]) if seed[2]>1e-12 else np.zeros(2))"
+    },
+    {
+      "index": 1281,
+      "violation": 0.0007073790964557958,
+      "value": 0.0007073790964557958,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 1280,
+      "violation": 0.000419652497225087,
+      "value": -0.000419652497225087,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 1256,
+      "violation": 0.0003815080054504478,
+      "value": -0.0003815080054504478,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 1232,
+      "violation": 0.00031329691985026997,
+      "value": 1.0003132969198503,
+      "lower": null,
+      "upper": 1.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/finger_grasp.py:80 in reaction_with_witness\n  normal=opti.variable();ratio=opti.variable(2);opti.subject_to(normal>=0);opti.subject_to(ca.sumsqr(ratio)<=1);f=ca.vertcat(self.mu*normal*ratio,normal);opti.set_initial(normal,seed[2]);opti.set_initial(ratio,seed[:2]/(self.mu*seed[2]) if seed[2]>1e-12 else np.zeros(2))"
+    },
+    {
+      "index": 1259,
+      "violation": 0.0003074683573416337,
+      "value": -0.0003074683573416337,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 1257,
+      "violation": 0.00023385629677008524,
+      "value": 0.00023385629677008524,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 1261,
+      "violation": 0.00015862350773154787,
+      "value": 0.00015862350773154787,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 1279,
+      "violation": 0.00015579846892754823,
+      "value": -0.00015579846892754823,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 1258,
+      "violation": 0.00012779391681050356,
+      "value": 0.00012779391681050356,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 1260,
+      "violation": 9.628742805878332e-05,
+      "value": -9.628742805878332e-05,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 973,
+      "violation": 6.13055866622858e-05,
+      "value": -6.13055866622858e-05,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 972,
+      "violation": 5.508543164900459e-05,
+      "value": -5.508543164900459e-05,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 1242,
+      "violation": 5.48498948242937e-05,
+      "value": 1.0000548498948243,
+      "lower": null,
+      "upper": 1.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/finger_grasp.py:80 in reaction_with_witness\n  normal=opti.variable();ratio=opti.variable(2);opti.subject_to(normal>=0);opti.subject_to(ca.sumsqr(ratio)<=1);f=ca.vertcat(self.mu*normal*ratio,normal);opti.set_initial(normal,seed[2]);opti.set_initial(ratio,seed[:2]/(self.mu*seed[2]) if seed[2]>1e-12 else np.zeros(2))"
+    },
+    {
+      "index": 951,
+      "violation": 2.9103535991836793e-05,
+      "value": 2.9103535991836793e-05,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 948,
+      "violation": 2.616626138241034e-05,
+      "value": 2.616626138241034e-05,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 950,
+      "violation": 2.366109052687193e-05,
+      "value": 2.366109052687193e-05,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 2667,
+      "violation": 2.2912355198911882e-05,
+      "value": -2.2912355198911882e-05,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 1228,
+      "violation": 1.9833008217062797e-05,
+      "value": 1.000019833008217,
+      "lower": null,
+      "upper": 1.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/finger_grasp.py:80 in reaction_with_witness\n  normal=opti.variable();ratio=opti.variable(2);opti.subject_to(normal>=0);opti.subject_to(ca.sumsqr(ratio)<=1);f=ca.vertcat(self.mu*normal*ratio,normal);opti.set_initial(normal,seed[2]);opti.set_initial(ratio,seed[:2]/(self.mu*seed[2]) if seed[2]>1e-12 else np.zeros(2))"
+    }
+  ]
+}

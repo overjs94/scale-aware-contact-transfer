@@ -1,0 +1,503 @@
+{
+  "reference_revision": "4446273fa12645584a465969992db1a0e457da67",
+  "version": "0.2.0a1",
+  "python": "3.12.14",
+  "libraries": {
+    "casadi": "3.7.2",
+    "pin": "4.1.0",
+    "mujoco": "4.0.0",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "clarabel": "0.11.1",
+    "scs": "3.3.2"
+  },
+  "scope": "Cold plans plus independently revalidated new native executions; replay is not a fresh NLP solve; source and literal-paper certificates are reported separately",
+  "cold_plans": {
+    "panel": {
+      "selected_types": [
+        "G",
+        "P",
+        "P"
+      ],
+      "assignment": [
+        0,
+        1,
+        2
+      ],
+      "objective": -64.1038627616228,
+      "stage_cache_counts": {
+        "cached": 0,
+        "fresh": 26
+      },
+      "planning_wall_time_s": 354.6777964419998,
+      "source_certified": 9,
+      "keyframe_count": 9,
+      "source_failure_kinds": [],
+      "target_margins": [
+        8.081945385860276,
+        8.081945385860276,
+        8.081945385874754,
+        8.249982962631297,
+        8.24998296077558,
+        9.96751962792818,
+        5.443699421964488,
+        5.443699421964488,
+        5.443699421964381
+      ],
+      "actual_interval_nodes": [
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "interval_methods": [
+        "stationary_contact_conic_QP",
+        "motion_cost",
+        "motion_cost",
+        "motion_cost",
+        "motion_cost",
+        "stationary_contact_conic_QP",
+        "stationary_contact_conic_QP",
+        "stationary_objects_release_NLP"
+      ],
+      "all_moving_intervals_cito": true,
+      "manuscript_literal_equations_passed": false,
+      "full_paper_pipeline_executed": false,
+      "original_native_execution_passed": true,
+      "result_sha256": "c239e5e49aac06f6cc2a9e4173af7e1cace00ad70c293d6085fc1f1c92067f9b",
+      "plan_files_sha256": {
+        "key1.npz": "e2556e59a0652d88efdc43e9272d73638066fe8084e7526f6b0477773f704608",
+        "interval5-validation.json": "b90b8b9ddd5053ff0158fe7470c6464e485d0c4c73bffcb6f5f26c5b2066a638",
+        "interval0.npz": "d29f917dc25b5a11b0f45bf90d7bf003d4eb475425340f7fe99d85ef076b8b64",
+        "interval6-validation.json": "868b44578d766db67cdd262df6ead2f1734776c3e84c0007a9e7f4a9be1c9d91",
+        "interval3-mesh-attempts.json": "50f2ed6a068e1273e4b334f143351fe680aa78125419ebb896a65e7fb09e102d",
+        "interval0-validation.json": "12467a68e5671049ba4bf6a15eff53f34384233684a2e1cd4e9062146b7041e9",
+        "key1-validation.json": "5bdb564f4b503360301addc48653a35e6344c9a0d2c629f229329bbe1d79e4ac",
+        "planning-manifest.json": "96f84c6a00562f0a05c45fe8926a111d54c34b4d2e327b4023e59a88b271e3df",
+        "key8-validation.json": "4175c5f89e4b678437016fa57e82645c804a100e7f61cb95b310cf197f8f2299",
+        "key6.npz": "5aa045f7d01349ae2290a789beb8488ea913b1d2da653cb1057e756c02b1f711",
+        "interval5.npz": "8fc1efc0606311d19fede69ee4ef147b66bc227e6bb894760c8dc478932d2daf",
+        "interval3-validation.json": "fa7ece359790870daa0670a90f4e4d9fb35bce72814f24d9f1816f1b7b2d40c8",
+        "interval2-mesh-attempts.json": "64299faafaa36b2075cc173a53f6b5edac9cc3dd4205a4de2ce8ccdfef3aa7b8",
+        "interval0-mesh-attempts.json": "64dbc2560b9da027c18d7a14dce46ec0f4f9439f8c763e2b8ebb50d95cb78cca",
+        "key3.npz": "723d47418fcb4f3a3d3b314eab57f7f5c69a9d0ee99593c7d087f63b69ffd86f",
+        "key5.npz": "7ba7098f6d631481c5d7021475455501ff629a121ac9094f74d2d54ec0e943df",
+        "interval6-mesh-attempts.json": "ca797d5348aaa01efd48ba5e734e3ce9970c885f6cb47002e05903568e64057c",
+        "interval2.npz": "dbe29c16af2733255641a4c2a5eaead0ef82467e7eeb41736447edb83e6ae008",
+        "key7.npz": "d135d76cf2467f24b284df88beb310cc7ff7608668898e38e01cc647984ad4a5",
+        "interval2-validation.json": "9a71e94d4a3af58c3f285a45c4f341bc0d8cd1d7d2e96c4ed0683c3db0deee27",
+        "key3-validation.json": "58be733d9ef54146df1976e53b679f3e4c2914843facbee706904351628bcddb",
+        "interval4-mesh-attempts.json": "077304feed7d7f1afb4ca5816d3d8a3dbca40e47a76e78c061c5e84122873cb3",
+        "key8.npz": "3434842f0eaff654dfc341ad68c36bbdbeb7a8da99c5c436c4de5a1f8e75d53e",
+        "interval1-mesh-attempts.json": "5fecbc1e6b3013bf1e967516fe6bb374356dd73021c90d0e59addd5465f7006c",
+        "key4.npz": "839dc40713ea9e99e748b343b4decca10831743f5cd9b029a71c1da6f5baef69",
+        "key0-validation.json": "21f289a61731c6b8fcbcfd381c994baa0b80de701ff8703f9682065bbf2b27ab",
+        "interval7.npz": "425e664f7bbeb6a2c160c300fa0fa339a11e7bb08e08e6f18168d889e2773bbe",
+        "interval6.npz": "3abe73b39cbfe196941b8a1d7032cee95fef9fb95b997e1f717e34e513592e22",
+        "interval3.npz": "a41d0f047632ab39911a2879467ec0bbfd1f3ea979f54a513a2c32e9bc6283ed",
+        "key6-validation.json": "20002e4e4779460e3859dc8e243be17e9f92ed966d4ef05c86b21e8729bd7013",
+        "key2-validation.json": "0ccf0821b19d188b2ff8dfbc60ea16af3792bb31eeaf96df7993d0aadd84a086",
+        "interval4.npz": "e1f181504e0274c38656fec38016ad0ed82621a40f9fa6118d156755288cc37e",
+        "key4-validation.json": "434d8461e3bb47f5ebfd88177db9041f6b9a7e5fcd60d231c5cc97263f2b1f61",
+        "key7-validation.json": "1ee3052e5590f2625defe5ff435c600c4c430299082215619a14d875bcd6b5f2",
+        "interval5-mesh-attempts.json": "c470a920b96d811dbc0d2bc1e8dd5573a96a26ffcd84f22b59bfda691c4c2fe5",
+        "interval1-validation.json": "3a1cd569e8e9ebb3771b01c61bdbba0d4b27be3b88617ac738139bd2ec9ef520",
+        "interval1.npz": "3df56b54275fd786838e4dffd941516908a237f9ed07bd1bfcefe2bd10e8bdb3",
+        "key0.npz": "dbadc4de92a298a8c3368236fe815b8dc9c2ad80ed5c6b32cd801b38b5155078",
+        "key2.npz": "a6487b45627815f99ebce97d71dad977b4f272588df51e217a2aee73ed613633",
+        "key5-validation.json": "f496e2493c9006083a092131e0c414051224f5eb4a743202fe0eb216516ee716",
+        "interval7-validation.json": "a91fb30052ecf82d64623cba648b979a02f0e815e7b2be8d8b3ec78cf39db19b",
+        "interval7-mesh-attempts.json": "afb6102847e45ad153f2d7933a3730deb27c41d60cc665233aaf1aa4c2bed4a5",
+        "interval4-validation.json": "bbcbe028d6eafcdaa89b8463e13d095e52e54e00229e97400fa97d28bdf9e1bc"
+      },
+      "original_native_files_sha256": {
+        "control.json": "05aa11cf194951abed3097b7c44e3e1477efd36a48b183e9c6248904e75481a8",
+        "execution.npz": "6df2f668724de5c111de682a7b57edbadc13d2625f6c86fa97e3cd117bea02fa",
+        "scene.xml": "5c34e38677574da36139178b0e9cb6d2452c2145ce5cb8144ae707a6c042a77e"
+      }
+    },
+    "box": {
+      "selected_types": [
+        "G",
+        "P",
+        "G"
+      ],
+      "assignment": [
+        0,
+        1,
+        2
+      ],
+      "objective": -124.69726108903862,
+      "stage_cache_counts": {
+        "cached": 0,
+        "fresh": 23
+      },
+      "planning_wall_time_s": 285.4950591779998,
+      "source_certified": 0,
+      "keyframe_count": 8,
+      "source_failure_kinds": [
+        "local_infeasibility_or_numerical_failure",
+        "numerical_failure"
+      ],
+      "target_margins": [
+        18.708623147234288,
+        18.708623147234288,
+        18.443235659833558,
+        18.443235659833558,
+        15.150593332866379,
+        12.61193163535067,
+        12.278455197704071,
+        12.278455197704071
+      ],
+      "actual_interval_nodes": [
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "interval_methods": [
+        "stationary_contact_conic_QP",
+        "motion_cost",
+        "stationary_contact_conic_QP",
+        "motion_cost",
+        "motion_cost",
+        "motion_cost",
+        "stationary_contact_conic_QP"
+      ],
+      "all_moving_intervals_cito": true,
+      "manuscript_literal_equations_passed": false,
+      "full_paper_pipeline_executed": false,
+      "original_native_execution_passed": false,
+      "result_sha256": "d8e4c5f1710d88b8bd54fe080e934d719cfde147c8f6e82dc491a3e7d1aaa698",
+      "plan_files_sha256": {
+        "key1.npz": "67f67c69c4241dd2a0e7cdc6cf6b7ed9e2630169e9d7598e53b8cf7b2248e0ab",
+        "interval5-validation.json": "e225b4a4453beb3baececb64249bd272dcb3dd9c4f5f0d30d458459d3b83fdd2",
+        "interval0.npz": "ce2881eea6650732132ccd6d335400fbfc16144f03c423aec5dc38e6dc0b1565",
+        "interval6-validation.json": "f890a7100ee9c8f5919d6adc242592eb909cef780d167c6ed699f8cbbffdc07f",
+        "interval3-mesh-attempts.json": "27f7cb7abcded84fbce752c05e14b28895f46b73cbd92333a6f501cf5da0bad9",
+        "interval0-validation.json": "823dd996f7027d5e33892da2134f6001de3439f354ca26f2b7973b45f007572e",
+        "key1-validation.json": "8556ea594561d42bba7fdac17ed834169f34a354e1cdb432c24da16b8f9a5491",
+        "planning-manifest.json": "4d9dd2f05f7a06a460c364a0c39dac13c8030aed8edae6415925e67129b85ddb",
+        "key6.npz": "4962115ca3275919e0d270ba8a4930298c21e1bd680fb487ab97b0650f30d23b",
+        "interval5.npz": "81b456946bdb6c9952a6948b0a8f57a78fe1b9b16bda4b21696dfbbeae870209",
+        "interval3-validation.json": "6b54bcbc14f98513f4a6c1f601a70520600f000e2bc66ebcaefc8b46c470c1c9",
+        "interval2-mesh-attempts.json": "6177789be79cdd30f85d5a2ca4a1348e7934f8db3b50419e15c312cef30eef60",
+        "interval0-mesh-attempts.json": "b24d82b3e4120ea45a5104f692cb7c841b8228922aca39912ab0af80efed4d44",
+        "key3.npz": "7024f10958d78a5a122ccee0175467d072ac0cca1b1285ff7bf0eed5a09d9a17",
+        "key5.npz": "e30ec206115893081f42d0a62c488d532bd5ed7e76eddb5707fdeac424b7b160",
+        "interval6-mesh-attempts.json": "ba83e72cd9cb2e3b7962e501a217cfa1349b315346e936ce158a4b0e9bd93c5f",
+        "interval2.npz": "44a7c75af4dc363569065a97f6ad03f8aa7f7537875aebb3dd4a5db546158cc8",
+        "key7.npz": "c62e54afd5c1f29addbb9d4c82d60c252dbe21a9cca7d652b5bc303f362b88f5",
+        "interval2-validation.json": "56b00431375277f2bf7ef6d6ba111276a21d4a6bf96e65ad6ecdfb9c73aa5c45",
+        "key3-validation.json": "c740406e77e17a2ed3d80c517a04ce40d9299adacff1f861e2280141500fea80",
+        "interval4-mesh-attempts.json": "576f1e0d50e8e2d3cba66fc34754c1faae24076142a1537007b22263c0a662a4",
+        "interval1-mesh-attempts.json": "20021c10607824ccb351f731a32c24318993963cb59cbc196fab7b8c6583a3f1",
+        "key4.npz": "4118d36a4d2bb2a3c7dea7a8f5a786d208e00836c112ff8c638c546368160a3a",
+        "key0-validation.json": "4a98a98bb129f253429d043b1cc06643498fdfc095fcc99703e8eea2779af947",
+        "interval6.npz": "3a062340d04a0cacb16287c095e6956a48840b0ff23c8b22f3e36517a5404fae",
+        "interval3.npz": "8a0b8126befeeb3bf1c29b77adf0be89090ba6e17a664148dea46479044c001b",
+        "key6-validation.json": "ba908134a3d730610760c5e33402730f47831d88da6af223af31a80b96ce9992",
+        "key2-validation.json": "76b1d3ed4f045b5bea80b637a629f4de8a7416d6c50ade3ba3e908eb200bf37b",
+        "interval4.npz": "45f0c08f707a09a494f9ee3e5e7104a0d94d59781dcebbf8858a991a2dcc8ac5",
+        "key4-validation.json": "c9d0075e3b5102fed3c80e4f1187e6489bf99b15791a76fa293df3754c15a0c2",
+        "key7-validation.json": "942d68dcc39012d33994093e413277b94e2680ec7cf92f577965290ea9e48090",
+        "interval5-mesh-attempts.json": "f38c751d0b412a441afdd46e4ec3d35a938047f1caad05690c36b40bb0191575",
+        "interval1-validation.json": "ab31280520a041fef0da2c2269739cc7026d8a40a3e688a57cdef341d0f84d04",
+        "interval1.npz": "b840c72cdafa871a9eb8e8648c7953cd6b625fbcfc2b619c10681b934d2bfb48",
+        "key0.npz": "debe98f353eb0ccd3a20744cf035ce4865f82f29e3d0ec0636795ddb6f231edb",
+        "key2.npz": "9db56afa56a8f581e7a743e1cad998abeaa067b2fd4822b6d3cf0c87540b67fa",
+        "key5-validation.json": "8733488f46a9c96b223f1cd31ef5e79c99a5a914bb30e123ad12e06064318af6",
+        "interval4-validation.json": "e9d75e3f7417d6e796ec927df1fb3433d80d5c17c48b9db540d6a618207f3a84"
+      },
+      "original_native_files_sha256": {
+        "control.json": "217ee0d15c1deee8f798c363c46ba70052f4de6ea8a8ae604bf96385a0dd5b13",
+        "execution.npz": "ff05a4eea2aa783bf04b5191f5e432c3b993c9f3a8a676c0267e5f9b87345fd5",
+        "scene.xml": "912c0ef102fd0626b54b0605ec37d5019b5daaa43423b9428dba76a4cd591ad6"
+      }
+    },
+    "assembly": {
+      "selected_types": [
+        "G",
+        "P",
+        "G"
+      ],
+      "assignment": [
+        0,
+        1,
+        2
+      ],
+      "objective": -54.97883319328189,
+      "stage_cache_counts": {
+        "cached": 0,
+        "fresh": 19
+      },
+      "planning_wall_time_s": 950.1302167670001,
+      "source_certified": 0,
+      "keyframe_count": 10,
+      "source_failure_kinds": [
+        "structural_infeasibility"
+      ],
+      "target_margins": [
+        7.32182942161284,
+        7.32182942161284,
+        7.321829421460531,
+        8.013596031140773,
+        8.013596031140864,
+        8.013596031140864,
+        10.971066109466785,
+        0.3543114181290896,
+        0.3543114181290896,
+        0.35431096445942817
+      ],
+      "actual_interval_nodes": [
+        16,
+        16,
+        16,
+        32,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "interval_methods": [
+        "stationary_contact_conic_QP",
+        "motion_cost",
+        "motion_cost",
+        "motion_cost",
+        "motion_cost",
+        "motion_cost",
+        "stationary_contact_conic_QP",
+        "stationary_contact_conic_QP",
+        "stationary_objects_release_NLP"
+      ],
+      "all_moving_intervals_cito": true,
+      "manuscript_literal_equations_passed": false,
+      "full_paper_pipeline_executed": false,
+      "original_native_execution_passed": true,
+      "result_sha256": "ad0f7db9770fa64213fd16b358f892255749cce87814fda59e62232e6874349e",
+      "plan_files_sha256": {
+        "key1.npz": "e3aa91faa2a809a493c8ee298d0aeafe2769afab906477986d6822eea522fbb1",
+        "interval5-validation.json": "4bef3e260fb7b9c4eeb4f4add91ecf68fda352076f1c697e6c6d6289e4bd419c",
+        "interval0.npz": "070a20010e437ed54d8a0f5abc9945b3c28141493c9de7252bbdfc32ba53a55a",
+        "interval6-validation.json": "50f0dfa7ada80745d329dd8021e4c28f4a868df2ccceab0101b7bd4c79d48d49",
+        "interval3-mesh-attempts.json": "c8e43b9a163216086120b108748a75c16d0b7f6f1a57002bd990050b494eb669",
+        "interval3-failure.json": "138f7463b16987741c6baa3a01df221a4123e4ab8fae2e6018cf1aa382a6c553",
+        "interval0-validation.json": "d746b6dc590b5eeb0c8cf5459d059ff836a1f2ccddbf4296133d57ffd0c15fda",
+        "key1-validation.json": "89bd709c309fbb70db0977fcf521daada7a527709390d120526b34a3d8378543",
+        "planning-manifest.json": "010a8c09655905cacf6e9ed5146b6f0659d978f8d04879cff26a0c69299707ce",
+        "key8-validation.json": "3670d9fea07e12d1d9e9d3a9d57db0b8bba83451ee69f66fcdda1784a29c81f8",
+        "interval8.npz": "5d6128adfb316de5c7103c3ac2ec136c9668d1914b8162b2d58af8e7626712cd",
+        "key6.npz": "257ffa6a3d8ea166bc165bc96cfa080091d633a3a372d3793b2fc63b8968e9dc",
+        "interval5.npz": "557d265578501cc0e42fd26599f6390f29e45fe79a3db5a3cd34da800c7a3d06",
+        "key9.npz": "c4679050cac2fc7b64425826f0fe6ec6e037a875b49f161e8d3bb3661640a78e",
+        "interval3-validation.json": "1462cabb699e4951c80d024d458c936e2295737ebab4e55c2397fa013acab9e5",
+        "interval2-mesh-attempts.json": "5adcdfb9a4e69603ed920ba1f25cf905a64910217e997b0dcb3b56babde23ce4",
+        "interval0-mesh-attempts.json": "aa979d5566a474ebf20714bcff52e24f8c608992a228ba6e3853e3f59c1c074a",
+        "key3.npz": "931a17ee4f713febf0f418f82ba95cb663ee972add5b40fb1b38185a727e13f0",
+        "key5.npz": "bdb20d98c9119b6b74c911ed7c92e9b8abe0c97e4693bb3058c8946119da9112",
+        "interval6-mesh-attempts.json": "fe0ef5920c638ed8a42450d2fd88c5cd616a9863224f9c89dfa910b3df21b125",
+        "interval2.npz": "50eaf7716e4993e82f2e8ac38a707fd83acd3cb15d45a461bff3c2a43c6aab76",
+        "key7.npz": "641e71a10ef586c86de49e14c63e4c3b993ccb9721aab49b9f3e5f3211b02d8a",
+        "interval2-validation.json": "65a36a324f0b756ac2f48e7f88a799e51d22ca69d61a222cde7399d62071b921",
+        "key3-validation.json": "3d05ade481ae2eb8bf748ce648f6122edd97caaf86c71c02cf2aadaf8c0771c0",
+        "interval4-mesh-attempts.json": "f67b3dcd93faff923cb7d1aca4cbcbd1ced1f26bfd54475915e8d90ec2e576ec",
+        "key8.npz": "60f4a82ef5e8435129646a9823e4377405ab062cda1de05d61595107537edc68",
+        "interval1-mesh-attempts.json": "e5b0bfb1dcb35d237b9c0972bb8824c838dcb3ccbd59f99535efb91ba4df5f7e",
+        "key4.npz": "0aacd2fb868b23b4c91e2adcbbf28423c08e8e96bbf1bb73e833ac37537746fb",
+        "key9-validation.json": "53a81b1364ddfbd83914432ec21367367df4a0bf336a2cd9ce167812f13a6826",
+        "key0-validation.json": "5a79826a384d82dcefc4dfe2ab2f23372ee5d7977ef857eb301c5f75c432c5fe",
+        "interval7.npz": "e8a6663925603c90dd403f68616497e05a480ca9d8ad877030295e43ef86af5e",
+        "interval6.npz": "f8f8e7b54d6217d3a887d1777f5e0a6c2b944f4b685a2703d3b74bd99706ec6d",
+        "interval3.npz": "a4597e9a9d775fe2175a6b7cdf73388b7087cf0001260de435255abed9664388",
+        "key6-validation.json": "45a67b4acab6553d7df2755aa9afaa8c947ff3390ced7f2f385977db65eb1e92",
+        "key2-validation.json": "c736e3c599ba5544f09758d4644d1d332ea6f30216d40e165fe750e251895ca3",
+        "interval4.npz": "bdec4df806d359fba21f8b7ef19548f5ed9a89c5ef598185e96fbafd8ca9a956",
+        "key4-validation.json": "3e5e56e7a9af35c79beaf98dae901b190db91b5ea94d36661b900edcf02b737a",
+        "key7-validation.json": "739d8a183c729bc0580f34da13feffc5b416e575b87b500399bf90c9e8ff141a",
+        "interval5-mesh-attempts.json": "ac232f837ba2d9fe94548a4c274dfecafcf6cfcd6d6b50815ed1bc62ae64a200",
+        "interval1-validation.json": "9498702ed6331f828e9653b20525b20a2181063f72f7ba05ddee828784ff74c5",
+        "interval1.npz": "4b222175525d593c629b9901b1bf6c5a27b5df9c7be02db7ff383b3f634b6c51",
+        "key0.npz": "2933ba29504a98be8d5124174163002880d4291c653b98e5d648d0541f4a8f53",
+        "interval8-mesh-attempts.json": "d2e86dad6adb9eccfd240b5b6a8b36944a1d3b93bd7c8bf02ef278d209dbfa3c",
+        "key2.npz": "99c1a106cddfef406955c9867d88ee3ef5b5e11a9857425385b65190a4b5daa1",
+        "interval8-validation.json": "8b0ad213a18eac6a380fe53bc138956e4e11dc8f9712b19189fac9a84fbb17b1",
+        "key5-validation.json": "eed5747d4a746c10f889930b0386c121c7387025b2258edfa9c32efdf235f2bc",
+        "interval7-validation.json": "a893dee36c351a369f2fbf3f8b24f7c3df88a3bd42605e5f9c83809fd76bdce7",
+        "interval7-mesh-attempts.json": "816d6113001d8aa167736d98ea9226f20ec9cbcaac1d3c3390a49c4e41e7ce0a",
+        "interval4-validation.json": "e3651558c57e53800c5899bbfbd434b3fc01df4125503cf2e8e188a0525f084c"
+      },
+      "original_native_files_sha256": {
+        "control.json": "a5fdd949972bb642fe545eb8f8eedf41af643b0cb2bb0cc5d31aa5c408a99aba",
+        "execution.npz": "e28af9c8c9285a97d00a0bc17fd4aa06da9beaaa3433ba1afa73d44454531742",
+        "scene.xml": "8d16519296dae95c487e47a8dbf0d8c18fc9fd0e1433249f9790e54a4e779cc6"
+      }
+    }
+  },
+  "native_trials": {
+    "assembly-conditioned": {
+      "execution_passed": true,
+      "controller": "impedance_feedforward",
+      "physics_dt_s": 0.001,
+      "maximum_position_error_m": 0.0010550824395530766,
+      "maximum_all_time_jaw_N": 28.550222019368594,
+      "report_sha256": "257a72c4626b1e6414bf695e67b43dfe58735ae9fad107e7d9f7a53d011ec0f1",
+      "trace_sha256": "54e3a6a1d2d19acd6b42f4f25e85110d1672b1bae8f94fbe1fe550f2d0b543e5",
+      "new_target_solver_executed": false,
+      "new_cito_solver_executed": false
+    },
+    "assembly-hybrid-d160": {
+      "execution_passed": true,
+      "controller": "hybrid_feedback",
+      "physics_dt_s": 0.001,
+      "maximum_position_error_m": 0.0016651117800492005,
+      "maximum_all_time_jaw_N": 28.64049064041594,
+      "report_sha256": "5b192017512a24bfe661aa03ad8bbef35fd93341c86759ed2d9914cfb149191b",
+      "trace_sha256": "f6a117af9abced0331568c58f7bd7b00930b1ef2f745719c550396b5e1d239c2",
+      "new_target_solver_executed": false,
+      "new_cito_solver_executed": false
+    },
+    "box-conditioned": {
+      "execution_passed": true,
+      "controller": "impedance_feedforward",
+      "physics_dt_s": 0.001,
+      "maximum_position_error_m": 0.001606094430772177,
+      "maximum_all_time_jaw_N": 24.385102060239944,
+      "report_sha256": "7f5d690a73675ed6f4be8c04f3c3170a18edbdbb4e93bfc4d71d29073d59e97c",
+      "trace_sha256": "1d62fb7e3d1d8980b26ad7ef7be79661f35986a9f19219c58e9ba1cbc28b07b3",
+      "new_target_solver_executed": false,
+      "new_cito_solver_executed": false
+    },
+    "box-conditioned-half-step": {
+      "execution_passed": true,
+      "controller": "impedance_feedforward",
+      "physics_dt_s": 0.0005,
+      "maximum_position_error_m": 0.0015900433140295176,
+      "maximum_all_time_jaw_N": 24.394117171566272,
+      "report_sha256": "b51cfd6b674bb49db8ba56ffc181f17c5bd302c5e2e22d6db19732fb5a6582f5",
+      "trace_sha256": "d0fba76b4d6fc1ff18b606d080542b67b7c36e5f6f0acf4b7750f733e91eb1cf",
+      "new_target_solver_executed": false,
+      "new_cito_solver_executed": false
+    },
+    "box-half-step": {
+      "execution_passed": false,
+      "controller": "impedance_feedforward",
+      "physics_dt_s": 0.0005,
+      "maximum_position_error_m": 0.0022167850921977674,
+      "maximum_all_time_jaw_N": 66.89619764130339,
+      "report_sha256": "92a5c6e400f550ea7473adf59e004d3074a0680ecb783d072dc63a2c61ee8dd1",
+      "trace_sha256": "f151b534b2b064e443c062ba6754b4eeea71c7b56859313211bfb454d0646fe7",
+      "new_target_solver_executed": false,
+      "new_cito_solver_executed": false
+    },
+    "box-hybrid-d160": {
+      "execution_passed": true,
+      "controller": "hybrid_feedback",
+      "physics_dt_s": 0.001,
+      "maximum_position_error_m": 0.001828965766556382,
+      "maximum_all_time_jaw_N": 24.382019042302982,
+      "report_sha256": "c863e3dafab9d91a112730d1f52646c2d66f06fa644e0352f0f57471d52ca213",
+      "trace_sha256": "8047b1232ef7f5dc864e045f116b00b68f80eb8842dcaa0ad338e0a83e271b81",
+      "new_target_solver_executed": false,
+      "new_cito_solver_executed": false
+    },
+    "panel-conditioned": {
+      "execution_passed": true,
+      "controller": "impedance_feedforward",
+      "physics_dt_s": 0.001,
+      "maximum_position_error_m": 0.0010368500600794915,
+      "maximum_all_time_jaw_N": 28.2065222049221,
+      "report_sha256": "29f2e9e247743feb8f0e23b61f4aea80c02d7a0e5952b1d94cfa88ec7892e5f0",
+      "trace_sha256": "3133feae70508e4fcd7cd8d0bd30aa4ce49afa73501823d48f44639530a0b6c9",
+      "new_target_solver_executed": false,
+      "new_cito_solver_executed": false
+    },
+    "panel-conditioned-hybrid": {
+      "execution_passed": false,
+      "controller": "hybrid_feedback",
+      "physics_dt_s": 0.001,
+      "maximum_position_error_m": 0.01853842214745615,
+      "maximum_all_time_jaw_N": 38.44377959375093,
+      "report_sha256": "059dd45edd058fd041362a7b2dc57af08eb12d320d31a39648ca8ab18408ee6d",
+      "trace_sha256": "6a05a9d21fa95e01652675863da18a5dcf5f5bc2fb1483b44d819c64b14fc35a",
+      "new_target_solver_executed": false,
+      "new_cito_solver_executed": false
+    },
+    "panel-half-step": {
+      "execution_passed": true,
+      "controller": "impedance_feedforward",
+      "physics_dt_s": 0.0005,
+      "maximum_position_error_m": 0.001030747083403112,
+      "maximum_all_time_jaw_N": 28.32532106337752,
+      "report_sha256": "10a61778bb69c47ca26981fd621bdeb62b2ec146a5978bc0cadbf77254e0ec47",
+      "trace_sha256": "f5fe4ab9cb310114490c2b0d2fa462401efd0027effbc3c5cdd2e878a4715aae",
+      "new_target_solver_executed": false,
+      "new_cito_solver_executed": false
+    },
+    "panel-hybrid": {
+      "execution_passed": false,
+      "controller": "hybrid_feedback",
+      "physics_dt_s": 0.001,
+      "maximum_position_error_m": 0.09042891293616721,
+      "maximum_all_time_jaw_N": 37.40544106161154,
+      "report_sha256": "81589c41c41b04033faadc9503be734bef90e4881c30b6e3b840bb8864b098b3",
+      "trace_sha256": "b6b27a61a881747bb1fab02284ae798308425a354b8deb1ae8ba48f340e77187",
+      "new_target_solver_executed": false,
+      "new_cito_solver_executed": false
+    },
+    "panel-hybrid-d160": {
+      "execution_passed": true,
+      "controller": "hybrid_feedback",
+      "physics_dt_s": 0.001,
+      "maximum_position_error_m": 0.0033519157144007846,
+      "maximum_all_time_jaw_N": 34.54190793467135,
+      "report_sha256": "e390986b27a81e6d867b343c05b634ffd6f1cc91353bbe14f05692d522adccb1",
+      "trace_sha256": "ceaeef69b58da83b75c959ad995342a96d5586d6912a0a1491b405711ec6be83",
+      "new_target_solver_executed": false,
+      "new_cito_solver_executed": false
+    },
+    "panel-hybrid-d80": {
+      "execution_passed": true,
+      "controller": "hybrid_feedback",
+      "physics_dt_s": 0.001,
+      "maximum_position_error_m": 0.0069471509237715645,
+      "maximum_all_time_jaw_N": 35.878905559065736,
+      "report_sha256": "94f616fac8acd454347d2f5a2b03f6de2a7bb2902d35fd5e076b7f1c494d93cd",
+      "trace_sha256": "166e2e56fbca70703fca84772b0fa869aec608527fb3e2c8f97b4c16ad6fba70",
+      "new_target_solver_executed": false,
+      "new_cito_solver_executed": false
+    }
+  },
+  "release_source_snapshot_sha256": "d04f3e4d83c4ddbfcccef3446798a81361f7e59e6029bd5fa64155b6818a4944",
+  "notes": [
+    "Cold plan manifests capture the code/configuration used then; final source snapshot is separate. Later cache guards and reference/controller changes are covered by focused tests and new physical replay, not falsely labelled cold NLP solves.",
+    "Panel cold resolved source radius 0.0005 m was formerly ignored by the file-source adapter, which actually used the source JSON radius 0.002 m. The corrected default reports and applies 0.002 m; the new effective-parameter regression checks overrides. No source force limit or load image was changed.",
+    "Plans include final accepted key/interval NPZs only; large physical traces are hashed and retained in local outputs. Native result JSONs include failed trials.",
+    "The final full-suite result is copied only when complete; preceding full-suite logs are distinguished by filename.",
+    "The original box native report failed the old reference mesh. Corrected mesh execution is a separate trial and does not overwrite that failure."
+  ],
+  "tests": {
+    "final_full_suite": {
+      "passed": 224,
+      "seconds": 687.36
+    },
+    "additional_shared_profile_test": {
+      "passed": 1
+    },
+    "distinct_current_tests_passed": 225,
+    "final_focused_regressions": {
+      "passed": 59,
+      "seconds": 10.01
+    },
+    "native_trials_in_comparison": 12,
+    "native_comparison_passes": 9,
+    "native_comparison_failures_preserved": 3
+  }
+}

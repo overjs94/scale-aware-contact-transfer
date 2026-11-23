@@ -44,7 +44,7 @@ def load_source(path=None):
     return d
 
 
-def refine_source_and_transfer(path=None,*,enabled=True,settings=None,object_rotation=None,geometry_weight=None):
+def refine_source_and_transfer(path=None,*,enabled=True,settings=None,object_rotation=None,geometry_weight=None,position_radius=None,normal_radius=None):
     d=load_source(path);patches=[]
     for i,g in enumerate(d['groups']):
         u=ca.SX.sym('source_chart_'+str(i),len(g['half_size']));p=ca.DM(g['position'])+ca.DM(np.array(g['tangent_axes']).T)@u;R=ca.DM(contact_basis(g['normal']));half=np.array(g['half_size'])
@@ -55,13 +55,14 @@ def refine_source_and_transfer(path=None,*,enabled=True,settings=None,object_rot
     task=TaskWrench(gravity_wrench(d['object']['mass'],d['object']['com'],rotation),np.eye(6),np.diag(d['disturbance_scale']))
     before=np.array([g['position'] for g in d['groups']]);rotations=np.array([contact_basis(g['normal']) for g in d['groups']])
     baseline=fixed_wrench_margin(before,rotations,task,caps)
+    effective=dict(position_radius_m=cfg['radius_m'] if position_radius is None else position_radius,normal_radius=cfg['normal_radius'] if normal_radius is None else normal_radius,geometry_weight=cfg['geometry_weight'] if geometry_weight is None else geometry_weight,mu=cfg['mu'],normal_max_N=cfg['normal_max_N'])
     prior=source_prior(patches,task,caps,group_ids=[g['group_id'] for g in d['groups']],
-                       position_radius=cfg['radius_m'] if enabled else 0.,normal_radius=cfg['normal_radius'],geometry_weight=cfg['geometry_weight'] if geometry_weight is None else geometry_weight,settings=settings)
+                       position_radius=effective['position_radius_m'] if enabled else 0.,normal_radius=effective['normal_radius'],geometry_weight=effective['geometry_weight'],settings=settings)
     if not prior.source_certificate:raise RuntimeError('Source refinement failed: '+str(prior.failure_reason))
     validation=fixed_wrench_margin(prior.positions,rotations,task,caps)
     transferred=scale_prior(prior,d['source_to_target_scale'])
     return {'origin':d['origin'],'inference_executed':bool(d.get('inference_executed',False)),'synthetic_input':d['origin'].startswith('synthetic'),
-            'source_refinement_enabled':enabled,'source_contact_positions_optimized':bool(enabled),'source_group_ids':list(prior.group_ids),
+            'source_refinement_enabled':enabled,'source_contact_positions_optimized':bool(enabled),'source_group_ids':list(prior.group_ids),'effective_source_refinement':effective,
             'source_object':d['object'],'source_to_target_scale':d['source_to_target_scale'],
             'source_object_rotation_world':rotation.tolist(),
             'source_positions_before_m':before.tolist(),'source_positions_after_m':prior.positions.tolist(),

@@ -3,6 +3,8 @@
 import argparse
 from pathlib import Path
 from contact_transfer.full_pipeline import ABLATIONS,run_task,scenario_solver_settings
+from contact_transfer.optimization import NLP_BACKENDS
+from contact_transfer.conic_backends import CONIC_BACKENDS,ConicSettings
 
 
 def main():
@@ -18,9 +20,12 @@ def main():
     parser.add_argument('--keyframe-archive',type=Path,help='Explicitly revalidate earlier optimized target keyframes against current mechanics, task and source prior')
     parser.add_argument('--interval-archive',type=Path,help='Explicitly revalidate earlier sticking-only intervals with unchanged physical constraints')
     parser.add_argument('--verbose',action='store_true')
-    args=parser.parse_args();settings=scenario_solver_settings(args.iterations,args.verbose,args.solver_cpu_seconds);passed=True
+    parser.add_argument('--solver',choices=NLP_BACKENDS,default='ipopt')
+    parser.add_argument('--conic-solver',choices=CONIC_BACKENDS,default='clarabel')
+    parser.add_argument('--configuration',type=Path,help='Validated JSON task-policy overrides; resolved values recorded with every run')
+    args=parser.parse_args();settings=scenario_solver_settings(args.iterations,args.verbose,args.solver_cpu_seconds,args.solver);passed=True
     for task in args.tasks:
-        result=run_task(task,args.output/task,variants=args.variants,steps=args.steps,max_steps=args.max_steps,settings=settings,web_directory=args.web,keyframe_archive=args.keyframe_archive,interval_archive=args.interval_archive);passed=passed and all(r['execution_passed'] for v,r in result.items() if v=='full');print(task,{v:r['execution_passed'] for v,r in result.items()},flush=True)
+        result=run_task(task,args.output/task,variants=args.variants,steps=args.steps,max_steps=args.max_steps,settings=settings,web_directory=args.web,keyframe_archive=args.keyframe_archive,interval_archive=args.interval_archive,configuration=args.configuration,conic_settings=ConicSettings(backend=args.conic_solver));passed=passed and all(r['execution_passed'] for v,r in result.items() if v=='full');print(task,{v:r['execution_passed'] for v,r in result.items()},flush=True)
     return 0 if passed else 1
 
 

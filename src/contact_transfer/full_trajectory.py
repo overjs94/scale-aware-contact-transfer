@@ -12,6 +12,7 @@ from .contracted import numerical_pose_ik
 from .full_scenario import point_pose_ik
 from .full_scene import support_contacts
 from .full_validation import numeric_contact,numeric_object_point,bias_object,support_patch_contains,validate_interval
+from .configuration import task_configuration,contact_phase_mode
 
 
 def refine_kinematic_initialization(problem,initial,contacts,settings,*,minimize_band=False):
@@ -118,26 +119,24 @@ def constant_twist_object(obj,q0,q1,alpha):
 
 
 def phase_mode(phase,feature):
-    if phase=='released' or phase=='release_leg' and feature.id=='leg_gripper':return 'released'
-    if phase=='unload' or phase=='unload_leg' and feature.id=='leg_gripper':return 'unloaded'
-    return 'holding'
+    return contact_phase_mode(phase,feature)
 
 
 def interval_contacts(problem,k,left,steps):
-    keys=problem.task_definition.keyframes;now,later=keys[k]['phase'],keys[k+1]['phase'];contacts=[]
+    keys=problem.task_definition.keyframes;now,later=keys[k]['phase'],keys[k+1]['phase'];contacts=[];policy=task_configuration(problem.task_definition).transition
     for i,(f,cap,frame,p,R) in enumerate(zip(problem.task_definition.features,problem.capabilities,problem.frames,left.positions,left.rotations)):
         active=phase_mode(now,f)=='holding';unload=phase_mode(later,f)=='unloaded';attached=tuple(range(steps)) if active and cap.kind=='G' else ();nodes=tuple(range(steps-1 if unload else steps)) if active else ()
-        contacts.append(Contact(f.id,p,R[:,2],cap,robot_index=i,frame=frame,object_frame=f.frame,rotation_object=R,attached_steps=attached,nodes=nodes,maintained_steps=tuple(range(steps)) if active and cap.kind=='P' else (),sticking_steps=tuple(range(steps)) if active and cap.kind=='P' else (),released_steps=tuple(range(steps)) if not active and cap.kind=='P' else (),release_at_end=unload,project_to_surface=cap.kind=='P',align_normal=cap.kind=='P',tangent_bounds=(np.full(2,-.0002),np.full(2,.0002)) if active and cap.kind=='P' else None))
+        contacts.append(Contact(f.id,p,R[:,2],cap,robot_index=i,frame=frame,object_frame=f.frame,rotation_object=R,attached_steps=attached,nodes=nodes,maintained_steps=tuple(range(steps)) if active and cap.kind=='P' else (),sticking_steps=tuple(range(steps)) if active and cap.kind=='P' else (),released_steps=tuple(range(steps)) if not active and cap.kind=='P' else (),release_at_end=unload,project_to_surface=cap.kind=='P',align_normal=cap.kind=='P',tangent_bounds=(np.full(2,-policy.point_tangent_half_size_m),np.full(2,policy.point_tangent_half_size_m)) if active and cap.kind=='P' else None))
         if cap.kind=='G' and problem.task_definition.gripper_force_coordinates=='scaled_tangent':contacts[-1].force_coordinates='scaled_tangent';contacts[-1].tangent_ratio_regularization=1e-6
     # Restricted task candidates: jig/shoulder contact is introduced only in
     # the approach/seat intervals, not in a prescribed distant free-flight phase.
     for c in support_contacts(problem,now,steps):
         a=problem.task_definition.keyframes[k]['object_q'];b=problem.task_definition.keyframes[k+1]['object_q'];qa=np.r_[left.q[:problem.system.object_q.start],a];qb=np.r_[left.q[:problem.system.object_q.start],b]
-        if min(numeric_contact(problem,c,qa)[0],numeric_contact(problem,c,qb)[0])<=.03:
+        if min(numeric_contact(problem,c,qa)[0],numeric_contact(problem,c,qb)[0])<=policy.support_activation_distance_m:
             # Authored panel handoff: robots carry the approach, and fixture
             # reactions become available at its terminal seat. Gap/geometry
             # constraints remain at every node; native contacts are always on.
-            if problem.task_definition.id=='panel' and now=='above_jig' and later=='seat':c.nodes=(steps-1,)
+            if (now,later) in [tuple(pair) for pair in policy.terminal_support_transitions]:c.nodes=(steps-1,)
             contacts.append(c)
     return tuple(contacts)
 
@@ -155,7 +154,7 @@ def nominal_distribution(problem,q,v,a,contacts,step,steps,*,next_configuration=
             contact_q=q if next_configuration is None else next_configuration;active=(c.nodes is None or step in c.nodes) and abs(numeric_contact(problem,c,contact_q)[0])<=1e-9 and support_patch_contains(problem,c,contact_q)
         if not active:continue
         expanded=np.c_[np.zeros((sys.nv,3)),J.T] if c.capability.kind=='P' else J.T;maps.append(-expanded[sys.object_v]);tmaps.append(np.array(sys.B).T@expanded);caps.append(c.capability);selected.append(c)
-    load=problem.task_load(q[sys.object_q]);task=GeneralizedTaskLoad(required,load.E[:,[-1]],np.eye(1));check=fixed_generalized_margin(maps,task,caps,torque_gravity=robot_load,torque_maps=tmaps,effort=sys.effort,fixed_rho=0.)
+    load=problem.task_load(q[sys.object_q]);task=GeneralizedTaskLoad(required,load.E[:,[-1]],np.eye(1));check=fixed_generalized_margin(maps,task,caps,torque_gravity=robot_load,torque_maps=tmaps,effort=sys.effort,fixed_rho=0.,solver_settings=getattr(problem,'conic_settings',None))
     if not check['certificate']:raise RuntimeError('No feasible frozen dynamic initialization: '+check['status'])
     values={c.name:np.zeros(3 if c.capability.kind=='P' else 6) for c in contacts};tau=robot_load.copy()
     for c,w,Jmap in zip(selected,check['reactions'].mean(axis=0),tmaps):values[c.name]=w[3:] if c.capability.kind=='P' else w;tau-=Jmap@w
@@ -195,7 +194,7 @@ def panel_support_admissibility(problem,contacts):
     certificate. Independent dense native geometry remains mandatory.
     """
     supports=[c for c in contacts if c.robot_index is None]
-    if problem.task_definition.id!='panel' or not supports:return None
+    if not task_configuration(problem.task_definition).transition.support_gap_hermite_bounds or not supports:return None
     from .optimization import equality
     sys=problem.system
     def constraints(opti,Q,V,H,apertures):
@@ -213,7 +212,7 @@ def panel_support_admissibility(problem,contacts):
 def solve_interval(problem,k,left,right,settings,*,steps=16,configuration_update=None,configuration_defect_bounds=(2e-5,5e-5),collision_margins=None,initial_guess=None,force_coordinates='cartesian'):
     from .full_static import stationary_interval,released_arm_interval
     sys=problem.system;duration=problem.task_definition.keyframes[k+1]['time']-problem.task_definition.keyframes[k]['time'];contacts=interval_contacts(problem,k,left,steps)
-    if configuration_update is None:configuration_update='contact_coordinate_midpoint' if problem.task_definition.id in {'box','panel'} else 'independent_midpoint'
+    if configuration_update is None:configuration_update=task_configuration(problem.task_definition).transition.configuration_update
     if np.max(abs(left.q-right.q))<1e-8:
         return stationary_interval(problem,left,right,contacts,duration,steps)
     if left.phase in {'released','release_leg'} and np.max(abs(left.q[sys.object_q]-right.q[sys.object_q]))<1e-8:
@@ -245,7 +244,7 @@ def solve_interval(problem,k,left,right,settings,*,steps=16,configuration_update
         from .trajectory import contact_coordinate_charts
         initial.contact_coordinate_charts=contact_coordinate_charts(sys,contacts,initial.q)
     initial.configuration_update=configuration_update;initial.configuration_defect_bounds=configuration_defect_bounds if configuration_update=='grasp_consistent_midpoint' else ();feasible_initial=validate_interval(problem,initial,contacts)['passed'];direct_final=feasible_initial or configuration_update=='contact_coordinate_midpoint';gap_schedule=(1e-8,) if direct_final else (1e-3,1e-5,1e-8);friction_schedule=gap_schedule;velocity_schedule=(0.,) if direct_final else (1e-3,1e-5,0.)
-    result=solve_cito(sys,left.q,right.q,contacts,steps=steps,duration=duration,dt_bounds=(duration/steps*.9,duration/steps*1.1),fixed_dt=False,initial=initial,desired_object_poses=desired,characteristic_length=.6,Kp=np.eye(3)*500,kR=50.,configuration_update=configuration_update,configuration_defect_bounds=configuration_defect_bounds,contact_force_coordinates=force_coordinates,friction_speed_model='huber_norm',friction_speed_smoothing=1e-6,eliminate_endpoint_redundancy=True,exact_gripper_velocity=configuration_update=='grasp_consistent_midpoint',exact_sticking_velocity=True,kinematic_tolerance=1e-5,Q_tau=np.diag(.01/sys.effort**2),Q_v=np.diag(np.r_[np.concatenate([.1/r.velocity**2 for r in problem.robots]),np.full(sys.object_v.stop-sys.object_v.start,.1)]),duration_weight=.1,witness_regularization=1e-6,feasibility_warm_start=not feasible_initial,relaxations=gap_schedule,friction_relaxations=friction_schedule,velocity_relaxations=velocity_schedule,collision_margins=collision_margins,scene_constraints=panel_support_admissibility(problem,contacts),failure_recording_path=problem.directory/f'interval{k}-unaccepted.npz',settings=settings)
+    result=solve_cito(sys,left.q,right.q,contacts,steps=steps,duration=duration,dt_bounds=(duration/steps*.9,duration/steps*1.1),fixed_dt=False,initial=initial,desired_object_poses=desired,characteristic_length=task_configuration(problem.task_definition).target.characteristic_length_m,Kp=np.eye(3)*500,kR=50.,configuration_update=configuration_update,configuration_defect_bounds=configuration_defect_bounds,contact_force_coordinates=force_coordinates,friction_speed_model='huber_norm',friction_speed_smoothing=1e-6,eliminate_endpoint_redundancy=True,exact_gripper_velocity=configuration_update=='grasp_consistent_midpoint',exact_sticking_velocity=True,kinematic_tolerance=1e-5,Q_tau=np.diag(.01/sys.effort**2),Q_v=np.diag(np.r_[np.concatenate([.1/r.velocity**2 for r in problem.robots]),np.full(sys.object_v.stop-sys.object_v.start,.1)]),duration_weight=.1,witness_regularization=1e-6,feasibility_warm_start=not feasible_initial,relaxations=gap_schedule,friction_relaxations=friction_schedule,velocity_relaxations=velocity_schedule,collision_margins=collision_margins,scene_constraints=panel_support_admissibility(problem,contacts),failure_recording_path=problem.directory/f'interval{k}-unaccepted.npz',settings=settings)
     check=validate_interval(problem,result,contacts)
     if not check['passed']:raise RuntimeError('Independent interval validation rejected: '+str(check))
     if kinematic_report is not None:result.continuation['kinematic_initialization']=kinematic_report

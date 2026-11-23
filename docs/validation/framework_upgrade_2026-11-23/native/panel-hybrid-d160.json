@@ -1,0 +1,158 @@
+{
+  "execution_passed": true,
+  "engine": "mujoco",
+  "duration_s": 30.581,
+  "object_tracking": {
+    "panel": {
+      "maximum_position_error_m": 0.0033519157144007846,
+      "final_position_error_m": 0.0006463169336178543,
+      "maximum_rotation_error_rad": 0.013821724496075284,
+      "final_rotation_error_rad": 0.00032127966546454577
+    }
+  },
+  "task_metrics": {
+    "placed_on_jig": true,
+    "jig_support_final_N": [
+      -4.992867291653138e-16,
+      1.6267271588402603e-15,
+      19.619999999999937
+    ],
+    "object_weight_N": 19.62,
+    "all_tools_released": true,
+    "robot_release_planned": true,
+    "final_position_error_m": 0.0006463169336178543,
+    "final_rotation_error_rad": 0.00032127966546454577
+  },
+  "task_passed": true,
+  "tracking_passed": true,
+  "maintained_contact_fraction": {
+    "edge_grip": 1.0,
+    "under_left": 1.0,
+    "under_right": 1.0
+  },
+  "geometric_holding_contact_fraction": {
+    "edge_grip": 1.0,
+    "under_left": 0.8617964281035763,
+    "under_right": 0.8620584253962709
+  },
+  "required_loaded_contact_samples": {
+    "edge_grip": 22901,
+    "under_left": 19676,
+    "under_right": 19676
+  },
+  "contact_retention_definition": "P: stored planned normal reaction >0.1 N; G: attached holding gripper. Zero-force handoff remains in geometric_holding_contact_fraction.",
+  "contact_retention_passed": true,
+  "jaw_force": {
+    "edge_grip": {
+      "maximum_per_jaw_N": [
+        34.54190793467135,
+        19.462164023989835
+      ],
+      "all_time_maximum_per_jaw_N": [
+        34.54190793467135,
+        19.462164023989835
+      ],
+      "force_limit_window": "entire recorded execution including preparation and release",
+      "minimum_per_jaw_N": [
+        0.0,
+        0.0
+      ],
+      "positive_reaction_fraction": [
+        0.9998690013536526,
+        0.9999126675691018
+      ],
+      "limit_N": 40,
+      "limit_margin_N": 5.45809206532865,
+      "passed": true
+    }
+  },
+  "minimum_actuator_margin_Nm": 0.0,
+  "sampled_interface_wrench_capability": {
+    "sample_dt_s": 0.05,
+    "raw_native_contacts": true,
+    "continuous_certificate": false,
+    "interfaces": {
+      "edge_grip": {
+        "samples": 459,
+        "failed_samples": 0,
+        "maximum_residual": 8.547762497812528e-10,
+        "passed": true
+      },
+      "under_left": {
+        "samples": 459,
+        "failed_samples": 0,
+        "maximum_residual": 0.0,
+        "passed": true
+      },
+      "under_right": {
+        "samples": 459,
+        "failed_samples": 0,
+        "maximum_residual": 8.881784197001252e-16,
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  "unexpected_loaded_contact_penetrations_m": {},
+  "reference_geometry": {
+    "passed": true,
+    "samples": 1457,
+    "continuous_certificate": false,
+    "reference_interpolation": "object_SE3_and_conditioned_joint_Hermite_with_dense_IK",
+    "reference_id": "1544b7f4b514188c5202942494ec03563abc6e91702cc692c0056d9d93baecf2",
+    "reference_mesh": {
+      "minimum_spacing_s": 0.01666666666666572,
+      "maximum_joint_acceleration_rad_s2": 0.37976256532626396,
+      "optimized_node_velocities_preserved": true
+    },
+    "released_gripper_reference": "native URDF open configuration after stationary opening dwell",
+    "projection_limit_rad": 0.02,
+    "projection_max_rad": 2.4820817607906775e-06,
+    "compliant_pad_allowance_m": 0.001,
+    "unintended_clearance_m": 0.001,
+    "violations": []
+  },
+  "object_pose_prescribed": false,
+  "object_equality_constraints_used": 0,
+  "internal_gripper_equalities": 3,
+  "controller": "hybrid_feedback",
+  "arm_measured_force_feedback": true,
+  "arm_force_selection": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0
+  ],
+  "joint_nullspace_impedance": {
+    "stiffness": 40.0,
+    "damping": 8.0
+  },
+  "arm_reaction_feedforward": true,
+  "measured_jaw_force_feedback": true,
+  "jaw_force_fraction": 0.45,
+  "jaw_force_target_N": {
+    "edge_grip": 18.0
+  },
+  "contacts_enabled": true,
+  "full_paper_pipeline_executed": false,
+  "new_physical_trial_executed": true,
+  "task": "panel",
+  "baseline_execution_passed": true,
+  "plan_source": "outputs/framework-upgrade/fresh-eliminated/panel/full/result.json",
+  "plan_source_sha256": "c239e5e49aac06f6cc2a9e4173af7e1cace00ad70c293d6085fc1f1c92067f9b",
+  "new_target_solver_executed": false,
+  "new_cito_solver_executed": false,
+  "physics_dt_s": 0.001,
+  "force_damping_contact": [
+    2.0,
+    2.0,
+    2.0,
+    40.0,
+    40.0,
+    160.0
+  ],
+  "force_feedforward": true,
+  "trial_wall_time_s": 214.78535606999958
+}

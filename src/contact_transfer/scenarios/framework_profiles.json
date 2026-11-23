@@ -1,0 +1,40 @@
+{
+  "defaults": {
+    "schema_version": 1,
+    "source": {"failure_policy": "error"},
+    "transition": {"configuration_update": "independent_midpoint"},
+    "execution": {"control_mode": "impedance_feedforward", "jaw_force_fraction": 0.7},
+    "disturbance": {"kind": "rigid_wrench"}
+  },
+  "tasks": {
+    "panel": {
+      "default_types": ["G", "P", "P"],
+      "source": {"position_radius_m": 0.002},
+      "transition": {
+        "configuration_update": "contact_coordinate_midpoint",
+        "support_gap_hermite_bounds": true,
+        "terminal_support_transitions": [["above_jig", "seat"]]
+      },
+      "execution": {"jaw_force_fraction": 0.45}
+    },
+    "box": {
+      "default_types": ["G", "P", "G"],
+      "source": {"failure_policy": "geometric_prior"},
+      "transition": {"configuration_update": "contact_coordinate_midpoint"},
+      "execution": {"jaw_force_fraction": 0.6},
+      "disturbance": {
+        "kind": "base_force_joint_torque",
+        "source_scales": [0.05, 0.05, 0.05, 0.001],
+        "target_scales": [1.0, 1.0, 1.0, 0.15]
+      }
+    },
+    "assembly": {
+      "default_types": ["G", "P", "G"],
+      "source": {"failure_policy": "geometric_prior"},
+      "disturbance": {"kind": "body_weighted_wrench", "body_weights": [0.8, 0.2]},
+      "feature_phase_modes": {
+        "leg_gripper": {"unload_leg": "unloaded", "release_leg": "released"}
+      }
+    }
+  }
+}

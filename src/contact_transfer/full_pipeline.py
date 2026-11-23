@@ -10,31 +10,42 @@ from .full_validation import Geometry,numeric_contact,support_patch_contains,val
 from .full_trajectory import interval_contacts,solve_interval,initial_interval,phase_mode
 from .full_execution import FullEpisode,reference_geometry,run_full_episode
 from .full_assessment import assess
-from .full_recording import fingerprint,save_key,load_key,save_interval,load_interval,write_json
+from .full_recording import fingerprint,save_key,load_key,save_interval,load_interval,write_json,archive_manifest_matches
 from .contracted import numerical_pose_ik
-from .optimization import SolverSettings
+from .optimization import SolverSettings,SolverUnavailableError,backend_available
+from .provenance import planning_manifest,stage_identity
+from .configuration import task_configuration
+from .conic_backends import ConicSettings
 from .sequence import choose_sequence
 
 
 ABLATIONS=('full','no_source_refinement','fixed_contact_types','fixed_path','no_arm_force_feedforward','contact_disabled','external_push')
 
 
-def scenario_solver_settings(max_iterations=1000,verbose=False,solver_cpu_seconds=180.):
+def scenario_solver_settings(max_iterations=1000,verbose=False,solver_cpu_seconds=180.,backend='ipopt'):
     # Separate objective/KKT convergence from physical primal feasibility.
     # Degenerate contact witnesses can have nonunique dual multipliers; an
     # acceptable solve must still meet 1e-6 unscaled constraint violation and
     # every final independent unrelaxed dynamics/contact gate.
+    if backend!='ipopt':return SolverSettings(backend=backend,tolerance=1e-6,max_iterations=max_iterations,verbose=verbose,options={'expand':False})
     return SolverSettings(tolerance=1e-6,max_iterations=max_iterations,verbose=verbose,options={'expand':False,'ipopt.max_cpu_time':float(solver_cpu_seconds),'ipopt.mu_strategy':'adaptive','ipopt.mu_init':1e-5,'ipopt.bound_push':1e-8,'ipopt.bound_frac':1e-8,'ipopt.slack_bound_push':1e-8,'ipopt.slack_bound_frac':1e-8,'ipopt.acceptable_tol':1e-4,'ipopt.acceptable_constr_viol_tol':1e-6,'ipopt.acceptable_compl_inf_tol':1e-4,'ipopt.acceptable_dual_inf_tol':1e-3,'ipopt.acceptable_obj_change_tol':1e-6,'ipopt.acceptable_iter':8})
 
 
 class FullPlanner:
-    def __init__(self,task,directory,*,steps=16,max_steps=64,refine_source=True,settings=None,progress=print,keyframe_archive=None,interval_archive=None):
+    def __init__(self,task,directory,*,steps=16,max_steps=64,refine_source=True,settings=None,progress=print,keyframe_archive=None,interval_archive=None,conic_settings=None):
         self.task=task;self.directory=Path(directory);self.directory.mkdir(parents=True,exist_ok=True);self.steps=steps;self.refine_source=refine_source;self.settings=settings or scenario_solver_settings();self.progress=progress;self.problems={};self.identities={};self.scenes={};self.ledger=[];self.timings=[];self.keyframe_archive=None if keyframe_archive is None else Path(keyframe_archive)
-        self.max_steps=max_steps;self.interval_archive=None if interval_archive is None else Path(interval_archive)
+        self.max_steps=max_steps;self.interval_archive=None if interval_archive is None else Path(interval_archive);self.conic_settings=conic_settings or ConicSettings()
+        if not isinstance(steps,int) or steps<2 or max_steps<steps:raise ValueError('Require 2 <= steps <= max_steps')
+        if not backend_available(self.settings.backend):raise SolverUnavailableError(f'Selected NLP solver {self.settings.backend} is unavailable')
+    def current_identity(self,p):
+        identity=self.identities[(p.types,p.assignment)]
+        if fingerprint(p,self.settings,self.steps)!=identity:
+            raise ValueError('Planning inputs changed during this planner lifetime; reload the task and construct a new FullPlanner')
+        return identity
     def problem(self,types,assignment):
         index=(tuple(types),tuple(assignment))
         if index not in self.problems:
-            folder=self.directory/(''.join(types)+'_'+''.join(map(str,assignment)));p=FullProblem.create(self.task,folder,types,assignment,refine_source=self.refine_source);self.problems[index]=p;self.identities[index]=fingerprint(p,self.settings,self.steps);self.scenes[index]=build_scene(p,folder/'planning-scene.xml');self.preflight(p)
+            folder=self.directory/(''.join(types)+'_'+''.join(map(str,assignment)));p=FullProblem.create(self.task,folder,types,assignment,refine_source=self.refine_source,source_settings=SolverSettings(backend=self.settings.backend,max_iterations=400,options={'expand':False}),conic_settings=self.conic_settings);self.problems[index]=p;self.identities[index]=fingerprint(p,self.settings,self.steps);write_json(folder/'planning-manifest.json',planning_manifest(p,self.settings,self.steps));self.scenes[index]=build_scene(p,folder/'planning-scene.xml');self.preflight(p)
         return self.problems[index]
     def preflight(self,p):
         """Local IK screening only: retain numerical rejection, no global infeasibility claim."""
@@ -42,11 +53,9 @@ class FullPlanner:
         # six-dimensional task-load image. One/two unilateral point sites have
         # wrench-map rank at most three/five, for every choice of positions.
         # This structural rejection precedes the local numerical IK screen.
-        from .multi_object import RigidCollection
-        if isinstance(self.task.object,RigidCollection):
-            for name in self.task.object.names:
-                kinds=[kind for f,kind in zip(self.task.features,p.types) if f.frame==name];rank=6 if 'G' in kinds or len(kinds)>=3 else 5 if len(kinds)==2 else 3*len(kinds)
-                if rank<6:raise RuntimeError(f'Structurally insufficient contact-type wrench span on free {name}: maximum rank {rank}<6 before assembly')
+        from .structural import free_body_span_failures
+        for failure in free_body_span_failures(self.task.object,self.task.features,p.types,p.task_load(self.task.keyframes[0]['object_q'])):
+            raise RuntimeError(f'Structurally insufficient contact-type wrench span on free {failure["body"]}: maximum rank {failure["maximum_rank"]}<{failure["required_rank"]} before assembly')
         for key in self.task.keyframes:
             for i,(f,r,frame,spec) in enumerate(zip(self.task.features,p.robots,p.frames,p.specs)):
                 T=self.task.object.fk(key['object_q'],f.frame);goal=np.eye(4);goal[:3,3]=T[:3,3]+T[:3,:3]@f.surface
@@ -58,7 +67,7 @@ class FullPlanner:
         q=np.r_[np.zeros(p.system.object_q.start),self.task.keyframes[k]['object_q']]
         return tuple(c for c in support_contacts(p,self.task.keyframes[k]['phase'],self.steps) if abs(numeric_contact(p,c,q)[0])<=2e-5 and support_patch_contains(p,c,q))
     def keyframe(self,k,types,assignment,previous):
-        p=self.problem(types,assignment);identity=self.identities[(tuple(types),tuple(assignment))];env=self.environment(p,k);path=p.directory/f'key{k}.npz';start=perf_counter();cached=False
+        p=self.problem(types,assignment);identity=stage_identity(self.current_identity(p),'keyframe',k,previous=previous);env=self.environment(p,k);path=p.directory/f'key{k}.npz';start=perf_counter();cached=False
         try:key=load_key(path,identity);cached=True
         except (FileNotFoundError,ValueError):
             self.progress(f'{self.task.id} {types}/{assignment}: key {k} {self.task.keyframes[k]["id"]}',flush=True);self.settings.diagnostics_path=str(p.directory/f'key{k}-failure.json');key=self.archived_key(p,k,env,previous)
@@ -80,6 +89,7 @@ class FullPlanner:
         if self.keyframe_archive is None:return None
         import json,hashlib
         folder=self.keyframe_archive/p.directory.name;path=folder/f'key{k}.npz'
+        if not archive_manifest_matches(folder,self.current_identity(p)):return None
         goal=self.task.keyframes[k]
         if k>0 and self.task.posture_reference_rule=='previous_keyframe':return None
         if goal.get('freeze_posture') or goal.get('freeze_holding_posture'):return None
@@ -96,20 +106,22 @@ class FullPlanner:
         if key.phase!=goal['phase'] or np.max(abs(key.q[p.system.object_q]-goal['object_q']))>2e-5 or key.source.get('source_refinement_enabled')!=self.refine_source:return None
         if set(key.environment_reactions)!=set(c.name for c in environment):raise RuntimeError('Archive support-candidate mismatch')
         if previous is not None and goal['phase']==previous.phase and goal.get('retreat_m',.06 if goal['phase'] in {'released','release_leg'} else 0.)==getattr(previous,'retreat_m',.06 if previous.phase in {'released','release_leg'} else 0.) and np.array_equal(goal['object_q'],previous.q[p.system.object_q]) and set(c.name for c in environment)==set(previous.environment_reactions):return p.keyframe(k,previous,environment=environment,settings=self.settings)
+        policy=task_configuration(self.task).target
+        if key.rho<policy.rho_min:return None
         prior=p.source(goal);objective=-key.rho;active={s.group_id:s for s in key.interfaces}
         for i,(f,cap,spec,r,qs) in enumerate(zip(self.task.features,p.capabilities,p.specs,p.robots,p.system.q_slices)):
             mode=phase_mode(goal['phase'],f)
             if (f.id in active)!=(mode!='released') or f.id in active and active[f.id].force_enabled!=(mode=='holding'):raise RuntimeError('Archive contact force mode mismatch')
             if mode=='released':continue
             delta=key.positions[i]-prior['positions'][i];normal=1-key.rotations[i,:,2]@prior['normals'][i]
-            if np.linalg.norm(delta)>.015+1e-8 or normal>.1+1e-8:raise RuntimeError('Archive leaves current transferred-prior trust region')
+            if np.linalg.norm(delta)>policy.position_radius_m+1e-8 or normal>policy.normal_radius+1e-8:raise RuntimeError('Archive leaves current transferred-prior trust region')
             if previous is not None and np.max(abs(key.positions[i]-previous.positions[i]))>2e-5:raise RuntimeError('Archive changes held material contact')
-            reference=p.branch_reference(k)[qs] if self.task.posture_reference_rule=='sequential_ik_branch' else spec['q_initial'];span=np.maximum(r.upper-r.lower,1e-3);objective+=np.sum(delta**2)/.6**2+normal+.01*np.sum(((key.q[qs]-reference)/span)**2)
+            reference=p.branch_reference(k)[qs] if self.task.posture_reference_rule=='sequential_ik_branch' else spec['q_initial'];span=np.maximum(r.upper-r.lower,1e-3);objective+=np.sum(delta**2)/policy.characteristic_length_m**2+normal+policy.posture_weight*np.sum(((key.q[qs]-reference)/span)**2)
         key.objective=float(objective);key.source=prior['record'];key.archive_provenance=dict(path=str(path),sha256=hashlib.sha256(path.read_bytes()).hexdigest(),original_formulation_identity=old_identity,mechanical_URDFs_byte_identical=True,source_and_trust_region_rechecked=True);write_json(p.directory/f'key{k}-archive.json',key.archive_provenance);return key
     def transition(self,k,left,right,types,assignments):
         assignment=assignments[k]
         if any(tuple(a)!=tuple(assignment) for a in assignments):raise RuntimeError('Online physical arm/tool reassignment is not supported')
-        p=self.problem(types,assignment);identity=self.identities[(tuple(types),tuple(assignment))];path=p.directory/f'interval{k}.npz';contacts=interval_contacts(p,k,left,self.steps);start=perf_counter();cached=False
+        p=self.problem(types,assignment);identity=stage_identity(self.current_identity(p),'interval',k,left=left,right=right);path=p.directory/f'interval{k}.npz';contacts=interval_contacts(p,k,left,self.steps);start=perf_counter();cached=False
         try:r=load_interval(path,identity);cached=True
         except (FileNotFoundError,ValueError):
             r=self.archived_interval(p,k,left,right)
@@ -125,6 +137,7 @@ class FullPlanner:
                         nodes*=2;continue
                     attempts.append(dict(nodes=nodes,accepted=True,wall_time_s=perf_counter()-attempt_start));write_json(p.directory/f'interval{k}-mesh-attempts.json',attempts);break
         contacts=interval_contacts(p,k,left,len(r.dt))
+        if np.max(abs(r.q[[0,-1]]-np.array([left.q,right.q])))>2e-5:raise RuntimeError('Interval endpoints differ from current keyframes')
         independent=validate_interval(p,r,contacts)
         if not independent['passed']:raise RuntimeError('Cached/fresh CITO failed native independent checks')
         # Retain a successful mechanical solve even if dense geometry rejects
@@ -146,16 +159,20 @@ class FullPlanner:
         if self.interval_archive is None:return None
         import json,hashlib
         folder=self.interval_archive/p.directory.name;path=folder/f'interval{k}.npz'
+        if not archive_manifest_matches(folder,self.current_identity(p)):return None
         if not path.exists():return None
         with np.load(path,allow_pickle=False) as a:old_identity=json.loads(str(a['metadata_json']))['identity']
         r=load_interval(path,old_identity);contacts=interval_contacts(p,k,left,len(r.dt))
+        duration=self.task.keyframes[k+1]['time']-self.task.keyframes[k]['time'];h=duration/len(r.dt)
+        if not np.isfinite(r.dt).all() or min(r.dt)<.9*h-1e-8 or max(r.dt)>1.1*h+1e-8:return None
+        if r.objective_mode in {'stationary_contact_conic_QP','stationary_dwell_conic_QP'} and not np.allclose(r.dt,h,atol=1e-10,rtol=1e-8):return None
         for c in contacts:
             previous_coordinates=r.continuation.get('per_contact_force_coordinates',{}).get(c.name,dict(coordinates=r.contact_force_coordinates,tangent_ratio_regularization=0.))
             if previous_coordinates!=dict(coordinates=c.force_coordinates or r.contact_force_coordinates,tangent_ratio_regularization=c.tangent_ratio_regularization):return None
         same_friction_model=r.friction_speed_model=='huber_norm' and r.friction_speed_smoothing==1e-6
         sticking_only=all(c.robot_index is not None and (c.capability.kind!='P' or len(c.sticking_steps)==len(r.dt)) for c in contacts)
         moving_object=np.max(abs(left.q[p.system.object_q]-right.q[p.system.object_q]))>1e-8
-        expected_update='contact_coordinate_midpoint' if self.task.id in {'panel','box'} and moving_object else 'independent_midpoint'
+        expected_update=task_configuration(self.task).transition.configuration_update if moving_object else 'independent_midpoint'
         if r.configuration_update!=expected_update or not r.full_geometry_checked or not (same_friction_model or sticking_only):return None
         for robot in p.full_robots:
             other=folder/robot.path.name
@@ -165,7 +182,8 @@ class FullPlanner:
         if not check['passed']:return None
         write_json(p.directory/f'interval{k}-archive.json',dict(path=str(path),sha256=hashlib.sha256(path.read_bytes()).hexdigest(),original_formulation_identity=old_identity,sliding_norm_branch_absent=sticking_only,identical_friction_regularization=same_friction_model,mechanical_URDFs_byte_identical=True,current_independent=check));return r
     def search(self,*,fixed=False,forced_types=None,forced_assignment=None):
-        start=perf_counter();given=tuple(forced_types or ('GPP' if self.task.id=='panel' else 'GPG'))
+        start=perf_counter();given=tuple(forced_types or self.task.configuration.default_types)
+        if fixed and (len(given)!=len(self.task.features) or any(kind not in f.allowed_types for kind,f in zip(given,self.task.features))):raise ValueError('Fixed baseline types must be explicitly configured and hardware compatible')
         if forced_types is not None:
             if len(given)!=len(self.task.features) or any(kind not in f.allowed_types for kind,f in zip(given,self.task.features)):raise ValueError('Counterfactual types must be hardware-compatible task candidates')
             fixed=True
@@ -187,8 +205,8 @@ class FullPlanner:
         write_json(self.directory/'selection.json',report);return episode,report
 
 
-def run_task(task_id,directory,*,variants=ABLATIONS,steps=16,max_steps=64,settings=None,progress=print,web_directory=None,keyframe_archive=None,interval_archive=None,accepted_full=None):
-    out=Path(directory);task=FullTask.load(task_id,out/'task');results={};full_episode,full_selection=(None,None) if accepted_full is None else accepted_full;recordings=[]
+def run_task(task_id,directory,*,variants=ABLATIONS,steps=16,max_steps=64,settings=None,progress=print,web_directory=None,keyframe_archive=None,interval_archive=None,accepted_full=None,configuration=None,conic_settings=None):
+    out=Path(directory);task=FullTask.load(task_id,out/'task',configuration=configuration);write_json(out/'resolved-task-configuration.json',task.configuration.to_dict());results={};full_episode,full_selection=(None,None) if accepted_full is None else accepted_full;recordings=[]
     if accepted_full is not None and (out/'ablation-results.json').exists():results=__import__('json').loads((out/'ablation-results.json').read_text())['variants']
     for variant in variants:
         folder=out/variant;folder.mkdir(parents=True,exist_ok=True);start=perf_counter()
@@ -216,7 +234,7 @@ def run_task(task_id,directory,*,variants=ABLATIONS,steps=16,max_steps=64,settin
                         if re.fullmatch(r'(key|interval)\d+\.npz',cached.name):
                             target=folder/'planning'/cached.parent.name/cached.name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(cached,target)
                 if not reused:
-                    archive=None if keyframe_archive is None else Path(keyframe_archive)/task_id/variant/'planning';previous_intervals=None if interval_archive is None else Path(interval_archive)/task_id/variant/'planning';planner=FullPlanner(task,folder/'planning',steps=steps,max_steps=max_steps,settings=settings,refine_source=variant!='no_source_refinement',progress=progress,keyframe_archive=archive,interval_archive=previous_intervals);episode,selection=planner.search(fixed=variant=='fixed_contact_types')
+                    archive=None if keyframe_archive is None else Path(keyframe_archive)/task_id/variant/'planning';previous_intervals=None if interval_archive is None else Path(interval_archive)/task_id/variant/'planning';planner=FullPlanner(task,folder/'planning',steps=steps,max_steps=max_steps,settings=settings,refine_source=variant!='no_source_refinement',progress=progress,keyframe_archive=archive,interval_archive=previous_intervals,conic_settings=conic_settings);episode,selection=planner.search(fixed=variant=='fixed_contact_types')
                 if reused:write_json(folder/'plan-origin.json',dict(planning_directory=str(full_episode.problem.directory),independent_native_validation_required=True,reason=selection['reuse_reason']))
                 if variant=='full':full_episode,full_selection=episode,selection
             else:

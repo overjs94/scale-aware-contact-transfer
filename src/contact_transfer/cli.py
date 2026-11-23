@@ -20,6 +20,25 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("models", help="List offline URDF presets and source revisions")
+    doctor=sub.add_parser('doctor',help='Inspect installed solvers and simulation backend scope')
+    doctor.add_argument('--crisp-binary',type=Path)
+    assets=sub.add_parser('assets',help='Fetch and hash-verify pinned Panda/Robotiq native assets')
+    assets.add_argument('--root',type=Path,default=Path('.cache'))
+    assets.add_argument('--refresh',action='store_true')
+    config=sub.add_parser('config',help='Print resolved task policies, independently of robot mechanics')
+    config.add_argument('--task',choices=['panel','box','assembly'],required=True)
+    config.add_argument('--configuration',type=Path)
+    run=sub.add_parser('run',help='Optimize and execute a complete configured multi-arm task')
+    run.add_argument('--task',choices=['panel','box','assembly'],required=True)
+    run.add_argument('--configuration',type=Path)
+    run.add_argument('--output',type=Path,default=Path('outputs/framework'))
+    run.add_argument('--solver',choices=['ipopt','snopt'],default='ipopt')
+    run.add_argument('--conic-solver',choices=['clarabel','scs'],default='clarabel')
+    run.add_argument('--steps',type=int,default=16)
+    run.add_argument('--max-steps',type=int,default=64)
+    run.add_argument('--iterations',type=int,default=1000)
+    run.add_argument('--source-failure-policy',choices=['error','geometric_prior'])
+    run.add_argument('--variants',nargs='+',default=['full'],choices=['full','no_source_refinement','fixed_contact_types','fixed_path','no_arm_force_feedforward','contact_disabled','external_push'])
     inspect = sub.add_parser("inspect", help="Inspect a preset or a custom URDF")
     inspect.add_argument("model")
     inspect.add_argument("--fixed-base", action="store_true")
@@ -44,7 +63,26 @@ def main(argv=None):
     assembly.add_argument("--output", default="outputs/table_assembly")
     assembly.add_argument("--viewer")
     args = parser.parse_args(argv)
-    if args.command == "models":
+    if args.command=='doctor':
+        from .diagnostics import runtime_capabilities
+        print(json.dumps(runtime_capabilities(args.crisp_binary),indent=2))
+    elif args.command=='assets':
+        from .assets import fetch_native_assets
+        print(json.dumps(fetch_native_assets(args.root,refresh=args.refresh),indent=2))
+    elif args.command=='config':
+        from .configuration import load_task_configuration
+        print(json.dumps(load_task_configuration(args.task,args.configuration).to_dict(),indent=2))
+    elif args.command=='run':
+        from .full_pipeline import run_task,scenario_solver_settings
+        from .conic_backends import ConicSettings
+        overrides={} if args.configuration is None else json.loads(args.configuration.read_text())
+        if args.source_failure_policy is not None:overrides.setdefault('source',{})['failure_policy']=args.source_failure_policy
+        results=run_task(args.task,args.output/args.task,variants=args.variants,steps=args.steps,max_steps=args.max_steps,
+                         settings=scenario_solver_settings(args.iterations,backend=args.solver),configuration=overrides,
+                         conic_settings=ConicSettings(backend=args.conic_solver))
+        print(json.dumps({name:r['execution_passed'] for name,r in results.items()},indent=2))
+        if 'full' in results and not results['full']['execution_passed']:raise SystemExit(1)
+    elif args.command == "models":
         print(json.dumps(catalog(), indent=2))
     elif args.command == "demo-refinement":
         from .contacts import Capability, SurfacePatch, TaskWrench

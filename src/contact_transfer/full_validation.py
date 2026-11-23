@@ -148,7 +148,8 @@ def validate_interval(problem,r,contacts,tolerance=2e-5):
         res['integration']=max(res['integration'],np.max(abs(qn-pred)));res['limits']=max(res['limits'],np.max(abs(r.tau[k])-sys.effort))
         for sl in getattr(obj,'quaternion_slices',(slice(3,7),)):res['quaternion_norm']=max(res['quaternion_norm'],abs(np.linalg.norm(qn[sys.object_q][sl])-1))
         if obj.n:res['limits']=max(res['limits'],np.max(obj.lower-qn[sys.object_q][7:]),np.max(qn[sys.object_q][7:]-obj.upper),np.max(abs(vn[sys.object_v][6:])-obj.velocity))
-    if problem.task_definition.id=='panel' and any(c.robot_index is None for c in contacts):
+    from .configuration import task_configuration
+    if task_configuration(problem.task_definition).transition.support_gap_hermite_bounds and any(c.robot_index is None for c in contacts):
         res['support_Hermite_control_gap']=0.
         for k,h in enumerate(r.dt):
             for c in contacts:
