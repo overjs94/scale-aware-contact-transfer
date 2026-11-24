@@ -22,6 +22,32 @@ export async function showAlgorithmComparisons(data){
  const current=++token;let root=document.getElementById('algorithm-comparison-results');
  if(!root){root=node('div');root.id='algorithm-comparison-results';document.getElementById('experiment-results').append(root);}
  root.hidden=!data.full_task_recording&&!data.comparison_recording;if(root.hidden)return;
+ if(data.id.startsWith('research_')){
+  try{
+   const response=await fetch('./data/research-study-summary.json');if(!response.ok)throw Error('No current study summary');const study=await response.json();if(current!==token)return;root.replaceChildren();
+   root.append(node('h4','Current framework study · 24 November 2026'));
+   note(root,'Positive source certificates and native execution are checked separately from exact manuscript equations. Box and assembly use an explicit 19-site / three-group source extension. Learned inference is not executed. One trial per condition.');
+   const task=data.parent_task||(data.scenario?.startsWith('full_')?data.scenario.slice(5):null);
+   if(task&&study.contact_types[task]){
+    root.append(node('h4','Forced contact-type counterfactuals'));
+    const t=table(root,['Types','Stage','Native outcome','Objective','Evidence']);
+    for(const r of study.contact_types[task])row(t,[r.forced_types.join('/'),r.comparison_stage||'Incomplete diagnostic',r.new_physical_trial_executed?(r.execution_passed?'PASS':'FAIL'):'Not executed',number(r.selection?.objective),r.failure||(r.execution_passed?'Execution criteria passed':'See retained rejection and residuals')]);
+    note(root,'The assignment and full objective are fixed. Local IK, trust-region rejection and numerical failure do not prove global physical infeasibility. Nominal-only and fixed-path objectives are not compared to the full objective.');
+   }
+   const probe=study.target_probes?.[task];
+   if(probe){
+    root.append(node('h4','Matched probe of the optimized mid-task posture'));
+    note(root,`Certified static margin lower bounds: ON ${number(probe.protocol.rho_on_optimized_and_independently_checked)}, OFF ${number(probe.protocol.rho_off_independently_checked)}. The challenge is 80% of the ON box. If a maximum-margin solve fails, a zero feasible lower bound does not establish zero physical capacity; equivalent OFF responses are retained.`);
+    const t=table(root,['Condition','Robustness','Response','Peak position error']);
+    for(const r of probe.results)row(t,[r.recording_id?link(r.recording_id,r.case):r.case,r.mode.toUpperCase(),r.outcome.replaceAll('_',' '),number(1000*r.response.maximum_position_error_m,2)+' mm']);
+   }
+   root.append(node('h4','Source robustness · matched support and recovery'));
+   const a=node('a','Open current synchronized ON/OFF simulations ↗');a.href='./robustness-comparison.html?study=current';root.append(a);
+   note(root,'The separate stationary platform diagnostic uses identical joint impedance and planned reaction feedforward in ON/OFF. The 4 N challenge is inside the ON static box. Its source-refinement contrast is distinct from dynamic full-task certification. Historical exploratory trials remain available.');
+   const img=node('img');img.src='./data/research-source-margin-response.svg';img.alt='Current matched source-refinement load and measured support response';img.className='comparison-figure';root.append(img);
+  }catch{if(current===token)root.hidden=true;}
+  return;
+ }
  try{
   request??=fetch(new URL('./data/algorithm-comparisons.json',document.baseURI)).then(r=>{if(!r.ok)throw Error('No completed comparison evidence');return r.json();});
   const study=await request;if(current!==token)return;root.replaceChildren();

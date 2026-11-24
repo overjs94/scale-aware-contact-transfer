@@ -1,0 +1,551 @@
+{
+  "independent": {
+    "passed": true,
+    "residuals": {
+      "equilibrium": 8.526512829121202e-14,
+      "capability": 2.5415900097989292e-14,
+      "torque": 0.0,
+      "closure": 3.1780134079895106e-15,
+      "rotation_closure": 6.363824483960304e-16,
+      "rho_margin": 0.0
+    },
+    "frozen_conic": {
+      "rho": 18.708623151350963,
+      "certificate": true,
+      "residual": 5.957758730801288e-10,
+      "status": "Solved",
+      "maximum_margin_status": "Solved",
+      "fixed_rho_feasibility": false,
+      "solver_attempts": [
+        {
+          "status": "Solved",
+          "witness_regularization": 0.0,
+          "backend": "clarabel",
+          "solver_tolerance": 1e-09,
+          "iterations": 18,
+          "wall_time_s": 0.029843194999557454
+        }
+      ]
+    },
+    "independent": "native Pinocchio, NumPy and frozen Clarabel"
+  },
+  "geometry_violations": [],
+  "source": {
+    "synthetic_input": true,
+    "network_inference_executed": false,
+    "source_model": "functional_group_sites",
+    "source_model_extension": true,
+    "source_refinement_enabled": false,
+    "source_contact_positions_optimized": false,
+    "source_status": "positive_margin",
+    "source_certificate": true,
+    "source_rho": 14.001789299835277,
+    "source_nlp_primal_residual": 7.315475668885842e-14,
+    "source_group_ids": [
+      "base_grasp",
+      "base_support",
+      "moving_manipulation"
+    ],
+    "source_group_count": 3,
+    "source_site_count": 19,
+    "source_coordinate_groups": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "source_anchor_indices": [
+      0,
+      9,
+      10
+    ],
+    "source_positions_before_m": [
+      [
+        -0.08,
+        -0.005,
+        0.0
+      ],
+      [
+        -0.082,
+        -0.005,
+        -0.002
+      ],
+      [
+        -0.082,
+        -0.005,
+        0.002
+      ],
+      [
+        -0.078,
+        -0.005,
+        -0.002
+      ],
+      [
+        -0.078,
+        -0.005,
+        0.002
+      ],
+      [
+        -0.082,
+        0.005,
+        -0.002
+      ],
+      [
+        -0.082,
+        0.005,
+        0.002
+      ],
+      [
+        -0.078,
+        0.005,
+        -0.002
+      ],
+      [
+        -0.078,
+        0.005,
+        0.002
+      ],
+      [
+        0.025,
+        0.0,
+        -0.025
+      ],
+      [
+        0.1,
+        0.005,
+        0.01
+      ],
+      [
+        0.098,
+        -0.005,
+        0.008
+      ],
+      [
+        0.098,
+        -0.005,
+        0.012
+      ],
+      [
+        0.10200000000000001,
+        -0.005,
+        0.008
+      ],
+      [
+        0.10200000000000001,
+        -0.005,
+        0.012
+      ],
+      [
+        0.098,
+        0.005,
+        0.008
+      ],
+      [
+        0.098,
+        0.005,
+        0.012
+      ],
+      [
+        0.10200000000000001,
+        0.005,
+        0.008
+      ],
+      [
+        0.10200000000000001,
+        0.005,
+        0.012
+      ]
+    ],
+    "source_positions_after_m": [
+      [
+        -0.08,
+        -0.005,
+        0.0
+      ],
+      [
+        -0.082,
+        -0.005,
+        -0.002
+      ],
+      [
+        -0.082,
+        -0.005,
+        0.002
+      ],
+      [
+        -0.078,
+        -0.005,
+        -0.002
+      ],
+      [
+        -0.078,
+        -0.005,
+        0.002
+      ],
+      [
+        -0.082,
+        0.005,
+        -0.002
+      ],
+      [
+        -0.082,
+        0.005,
+        0.002
+      ],
+      [
+        -0.078,
+        0.005,
+        -0.002
+      ],
+      [
+        -0.078,
+        0.005,
+        0.002
+      ],
+      [
+        0.025,
+        0.0,
+        -0.025
+      ],
+      [
+        0.1,
+        0.005,
+        0.01
+      ],
+      [
+        0.098,
+        -0.005,
+        0.008
+      ],
+      [
+        0.098,
+        -0.005,
+        0.012
+      ],
+      [
+        0.10200000000000001,
+        -0.005,
+        0.008
+      ],
+      [
+        0.10200000000000001,
+        -0.005,
+        0.012
+      ],
+      [
+        0.098,
+        0.005,
+        0.008
+      ],
+      [
+        0.098,
+        0.005,
+        0.012
+      ],
+      [
+        0.10200000000000001,
+        0.005,
+        0.008
+      ],
+      [
+        0.10200000000000001,
+        0.005,
+        0.012
+      ]
+    ],
+    "source_site_frames": [
+      "base",
+      "base",
+      "base",
+      "base",
+      "base",
+      "base",
+      "base",
+      "base",
+      "base",
+      "base",
+      "moving",
+      "moving",
+      "moving",
+      "moving",
+      "moving",
+      "moving",
+      "moving",
+      "moving",
+      "moving"
+    ],
+    "source_normals": [
+      [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ]
+    ],
+    "source_normal_limits_N": [
+      0.4,
+      0.4,
+      0.4,
+      0.4,
+      0.4,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      2.0,
+      0.4,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.4,
+      0.4,
+      0.4,
+      0.4
+    ],
+    "source_friction": 0.8,
+    "source_E": [
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "source_D": [
+      [
+        0.05,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.05,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.05,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.001
+      ]
+    ],
+    "source_equilibrium_row_scale": [
+      0.0047900390625,
+      0.0047900390625,
+      0.0047900390625,
+      0.05,
+      0.05,
+      0.38320312500000003,
+      0.0047900390625
+    ],
+    "source_coordinates_normalized": true,
+    "source_initial_conic_status": "Solved",
+    "source_warm_start_used": true,
+    "source_point_force_coordinates": "scaled_tangent",
+    "source_native_vertex_witness": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 3.3861802251067274e-15,
+        "circular_friction": 0.0,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 16,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "source_normal_budgets_by_group_and_outward_normal_N": {
+      "base_grasp": {
+        "0.0,-1.0,0.0": 2.0,
+        "0.0,1.0,0.0": 2.0
+      },
+      "base_support": {
+        "0.0,0.0,-1.0": 2.0
+      },
+      "moving_manipulation": {
+        "0.0,1.0,0.0": 2.0,
+        "0.0,-1.0,0.0": 2.0
+      }
+    },
+    "source_independent_validation": {
+      "certificate": true,
+      "rho": 14.001789299835277,
+      "residual": 3.3861802251067274e-15,
+      "status": "VerifiedNLPVertexWitnesses",
+      "conic_solver_certificate": true,
+      "conic_solver_status": "Solved",
+      "conic_solver_rho": 14.00178929983536,
+      "mechanics": "native Pinocchio/NumPy verification of every successful NLP vertex witness; independent conic solve reported separately"
+    },
+    "source_geometry_fallback": false,
+    "source_forces_transferred": false,
+    "source_to_target_scale": 4.0,
+    "source_definition_origin": "authored_synthetic_functional_hand_sites",
+    "source_problem_identity": "ct-source-v2:f2b80878c61838ae267d74b47107bbb337b161abb63bfca01c6901a23663fe83",
+    "source_cache_hit": false,
+    "new_source_solver_executed": true
+  },
+  "target_provenance": {
+    "method": "coupled_target_NLP",
+    "static_torques_eliminated": true,
+    "robustness_enabled": true,
+    "optimization_vertex_count": 16,
+    "posture_reference_rule": "hardware_seed",
+    "same_rho_force_polish": {
+      "witness_applied": true,
+      "status": "Solved",
+      "rho": 18.70862315086422,
+      "primal_residual": 1.843343255814034e-09
+    }
+  },
+  "endpoint_polish_max_rad": 0.0
+}

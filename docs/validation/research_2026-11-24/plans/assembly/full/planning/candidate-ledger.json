@@ -1,0 +1,347 @@
+[
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      2,
+      1
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      1,
+      0,
+      2
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      1,
+      2,
+      0
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      2,
+      0,
+      1
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      2,
+      1,
+      0
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Structurally insufficient contact-type wrench span on free leg: maximum rank 3<6 before assembly"
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      0,
+      2,
+      1
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Structurally insufficient contact-type wrench span on free leg: maximum rank 3<6 before assembly"
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      1,
+      0,
+      2
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Structurally insufficient contact-type wrench span on free leg: maximum rank 3<6 before assembly"
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      1,
+      2,
+      0
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Structurally insufficient contact-type wrench span on free leg: maximum rank 3<6 before assembly"
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      2,
+      0,
+      1
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Structurally insufficient contact-type wrench span on free leg: maximum rank 3<6 before assembly"
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      2,
+      1,
+      0
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Structurally insufficient contact-type wrench span on free leg: maximum rank 3<6 before assembly"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      2,
+      1
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      1,
+      0,
+      2
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      1,
+      2,
+      0
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      2,
+      0,
+      1
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      2,
+      1,
+      0
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      0,
+      2,
+      1
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      1,
+      0,
+      2
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      1,
+      2,
+      0
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      2,
+      0,
+      1
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      2,
+      1,
+      0
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+  }
+]

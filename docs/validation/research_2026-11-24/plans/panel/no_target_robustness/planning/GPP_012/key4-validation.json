@@ -1,0 +1,193 @@
+{
+  "independent": {
+    "passed": true,
+    "residuals": {
+      "equilibrium": 3.552713678800501e-15,
+      "capability": 0.0,
+      "torque": 0.0,
+      "closure": 1.1102230246251565e-16,
+      "rotation_closure": 2.437502255006064e-16,
+      "rho_margin": 0.0
+    },
+    "frozen_conic": {
+      "rho": 8.134404583720498,
+      "certificate": true,
+      "residual": 3.7609737546517863e-10,
+      "status": "Solved",
+      "maximum_margin_status": "Solved",
+      "fixed_rho_feasibility": false,
+      "solver_attempts": [
+        {
+          "status": "Solved",
+          "witness_regularization": 0.0,
+          "backend": "clarabel",
+          "solver_tolerance": 1e-09,
+          "iterations": 17,
+          "wall_time_s": 0.0987698049939354
+        }
+      ]
+    },
+    "independent": "native Pinocchio, NumPy and frozen Clarabel"
+  },
+  "geometry_violations": [],
+  "source": {
+    "origin": "synthetic_contracted_fixture",
+    "inference_executed": false,
+    "synthetic_input": true,
+    "source_refinement_enabled": true,
+    "source_contact_positions_optimized": true,
+    "source_group_ids": [
+      "edge_grip",
+      "under_left",
+      "under_right"
+    ],
+    "effective_source_refinement": {
+      "position_radius_m": 0.002,
+      "normal_radius": 0.0,
+      "geometry_weight": 0.0,
+      "mu": 0.8,
+      "normal_max_N": 2.0
+    },
+    "source_object": {
+      "size": [
+        0.15,
+        0.1,
+        0.01
+      ],
+      "mass": 0.03125,
+      "com": [
+        0,
+        0,
+        0
+      ]
+    },
+    "source_to_target_scale": 4.0,
+    "source_object_rotation_world": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "source_positions_before_m": [
+      [
+        -0.075,
+        0.0,
+        0.0
+      ],
+      [
+        0.025,
+        -0.03,
+        -0.005
+      ],
+      [
+        0.025,
+        0.03,
+        -0.005
+      ]
+    ],
+    "source_positions_after_m": [
+      [
+        -0.075,
+        -7.890556159358519e-18,
+        0.0
+      ],
+      [
+        0.023000057954670156,
+        -0.030015224701079528,
+        -0.005
+      ],
+      [
+        0.023000057954670156,
+        0.030015224701079528,
+        -0.005
+      ]
+    ],
+    "source_normals": [
+      [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      [
+        0.0,
+        0.0,
+        -1.0
+      ]
+    ],
+    "source_rho_before": 1.0534115692717418,
+    "source_rho_after": 1.115643837008035,
+    "source_certificate": true,
+    "source_status": "positive_margin",
+    "source_validation_residual": 3.0421561103555206e-11,
+    "target_positions_m": [
+      [
+        -0.3,
+        -3.1562224637434075e-17,
+        0.0
+      ],
+      [
+        0.09200023181868063,
+        -0.12006089880431811,
+        -0.02
+      ],
+      [
+        0.09200023181868063,
+        0.12006089880431811,
+        -0.02
+      ]
+    ],
+    "target_normals": [
+      [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      [
+        0.0,
+        0.0,
+        -1.0
+      ]
+    ],
+    "source_forces_transferred": false,
+    "target_mass_reused_from_source": false,
+    "source_problem_identity": "ct-source-v2:afbdadf6599f0de435c478906aa76aa61db6d2917c9a3008c33b643ec05e6570",
+    "source_cache_hit": false,
+    "new_source_solver_executed": true
+  },
+  "target_provenance": {
+    "method": "fixed_geometry_separable_target",
+    "posture_solver": "Solve_Succeeded",
+    "torque_free_rho_upper_bound": 1.9596475542294254e-18,
+    "same_rho_torque_feasibility": true,
+    "posture_global_optimality_claimed": false,
+    "posture_reference_rule": "sequential_ik_branch",
+    "same_rho_force_polish": {
+      "witness_applied": true,
+      "status": "Solved",
+      "rho": 1.9596475542294254e-18,
+      "primal_residual": 3.552713678800501e-15
+    }
+  },
+  "endpoint_polish_max_rad": 1.204744193294971e-09
+}

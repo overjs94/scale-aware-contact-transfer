@@ -26,6 +26,8 @@ def enabled(c, step):
 
 
 def allocation(problem, q, contacts, task, *, step=None, rho=None, rho_min=0., weighted=False):
+    if not task_configuration(getattr(problem,'task_definition',None)).target.robustness_enabled:
+        rho=0.;rho_min=0.
     sys=problem.system; selected=[]; maps=[]; tmaps=[]
     for c in contacts:
         if step is not None and not enabled(c,step):continue
@@ -99,7 +101,7 @@ def fixed_geometry_keyframe(problem,seed,interfaces,prior,environment,settings,*
         gap,J,_,_=numeric_contact(problem,c,q)
         if c.robot_index is None and (abs(gap)>2e-5 or not support_patch_contains(problem,c,q)):continue
         X=np.c_[np.zeros((sys.nv,3)),J.T] if c.capability.kind=='P' else J.T;maps.append(-X[sys.object_v]);caps.append(c.capability)
-    upper=fixed_generalized_margin(maps,problem.task_load(q[sys.object_q]),caps,rho_min=policy.rho_min,solver_settings=getattr(problem,'conic_settings',None))
+    upper=fixed_generalized_margin(maps,problem.task_load(q[sys.object_q]),caps,rho_min=policy.rho_min,solver_settings=getattr(problem,'conic_settings',None),fixed_rho=None if policy.robustness_enabled else 0.)
     if not upper['certificate']:return None
     try:forces,tau,check,_=allocation(problem,q,(*contacts,*environment),problem.task_load(q[sys.object_q]),rho=upper['rho'],rho_min=policy.rho_min)
     except RuntimeError:return None

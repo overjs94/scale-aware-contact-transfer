@@ -1,0 +1,17 @@
+[
+  {
+    "types": [
+      "P",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "keyframe": 2,
+    "accepted": false,
+    "reason": "Fixed material geometry leaves target trust region"
+  }
+]

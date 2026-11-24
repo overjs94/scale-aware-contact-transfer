@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "scale-aware-contact-transfer"
-version = "0.2.0a1"
+version = "0.2.0a2"
 description = "URDF-driven rigid-body models and contact-transfer optimization"
 readme = "README.md"
 license = "Apache-2.0 AND BSD-3-Clause AND GPL-3.0-or-later"

@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="tabletop">
+  <link name="tabletop">
+    <inertial>
+      <origin xyz="-0.00024840483291034316 -0.00014904289974621273 -6.9001342475098525e-06" />
+      <mass value="2.0" />
+      <inertia ixx="0.026937886829995768" ixy="5.3729489861852505e-05" ixz="2.48747638249317e-06" iyy="0.060259909602459846" iyz="1.4924858294959023e-06" izz="0.08666427928598974" />
+    </inertial>
+    <visual name="tabletop_visual_0">
+      <origin xyz="-0.06525 0.0 0.0" />
+      <geometry>
+        <box size="0.4695 0.4 0.04" />
+      </geometry>
+      <material name="tabletop_material">
+        <color rgba=".72 .49 .27 1" />
+      </material>
+    </visual>
+    <collision name="tabletop_collision_0">
+      <origin xyz="-0.06525 0.0 0.0" />
+      <geometry>
+        <box size="0.4695 0.4 0.04" />
+      </geometry>
+    </collision>
+    <visual name="tabletop_visual_1">
+      <origin xyz="0.24525 0.0 0.0" />
+      <geometry>
+        <box size="0.10949999999999999 0.4 0.04" />
+      </geometry>
+      <material name="tabletop_material">
+        <color rgba=".72 .49 .27 1" />
+      </material>
+    </visual>
+    <collision name="tabletop_collision_1">
+      <origin xyz="0.24525 0.0 0.0" />
+      <geometry>
+        <box size="0.10949999999999999 0.4 0.04" />
+      </geometry>
+    </collision>
+    <visual name="tabletop_visual_2">
+      <origin xyz="0.18 -0.051250000000000004 0.0" />
+      <geometry>
+        <box size="0.02100000000000002 0.2975 0.04" />
+      </geometry>
+      <material name="tabletop_material">
+        <color rgba=".72 .49 .27 1" />
+      </material>
+    </visual>
+    <collision name="tabletop_collision_2">
+      <origin xyz="0.18 -0.051250000000000004 0.0" />
+      <geometry>
+        <box size="0.02100000000000002 0.2975 0.04" />
+      </geometry>
+    </collision>
+    <visual name="tabletop_visual_3">
+      <origin xyz="0.18 0.15925 0.0" />
+      <geometry>
+        <box size="0.02100000000000002 0.08150000000000002 0.04" />
+      </geometry>
+      <material name="tabletop_material">
+        <color rgba=".72 .49 .27 1" />
+      </material>
+    </visual>
+    <collision name="tabletop_collision_3">
+      <origin xyz="0.18 0.15925 0.0" />
+      <geometry>
+        <box size="0.02100000000000002 0.08150000000000002 0.04" />
+      </geometry>
+    </collision>
+    <visual name="tabletop_visual_4">
+      <origin xyz="0.18 0.108 -0.015" />
+      <geometry>
+        <box size="0.02100000000000002 0.02099999999999999 0.01" />
+      </geometry>
+      <material name="tabletop_material">
+        <color rgba=".72 .49 .27 1" />
+      </material>
+    </visual>
+    <collision name="tabletop_collision_4">
+      <origin xyz="0.18 0.108 -0.015" />
+      <geometry>
+        <box size="0.02100000000000002 0.02099999999999999 0.01" />
+      </geometry>
+    </collision>
+  </link>
+</robot>

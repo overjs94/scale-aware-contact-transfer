@@ -36,6 +36,18 @@ def test_failed_conic_balance_is_never_a_margin_certificate():
     assert not check['certificate'] and check['status']=='PrimalInfeasible'
 
 
+def test_nominal_target_ablates_robust_vertices_and_preserves_physical_balance(slider_urdf):
+    robot=Robot(slider_urdf);sys=MechanicalSystem([robot.symbolic()],RigidObject(1.,np.zeros(3),np.eye(3)*.02))
+    q=np.r_[0.,0.,.5,0.,0.,.5,0.,0.,0.,1.];p=np.zeros(3);n=np.array([0.,0.,-1.]);R=contact_basis(n)
+    task=GeneralizedTaskLoad(np.r_[0.,0.,0.,0.,0.,-9.81],np.eye(6)[:,5:],np.eye(1))
+    interface=Interface('support',0,'link2',None,SurfacePatch.fixed(p,n),Capability(normal_max=20.),p,R)
+    result=realize_system_keyframe(sys,q,q[sys.object_q],[interface],task,robustness_enabled=False)
+    assert result.rho==0. and result.reactions.shape==(1,1,6)
+    assert result.target_provenance['optimization_vertex_count']==1
+    np.testing.assert_allclose(result.reactions[0,0,5],9.81,atol=1e-7)
+    assert abs(result.torques[0,2])<robot.effort[2]
+
+
 def test_coupled_actuation_does_not_drop_unactuated_balance(slider_urdf):
     from contact_transfer.optimization import NLPRejectedError
     robot=Robot(slider_urdf);sys=MechanicalSystem([robot.symbolic()],RigidObject(1.,np.zeros(3),np.eye(3)*.02))

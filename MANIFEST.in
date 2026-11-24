@@ -2,6 +2,7 @@ include LICENSE NOTICE THIRD_PARTY_NOTICES.md README.md requirements-validated.t
 recursive-include backends/crisp *.cpp CMakeLists.txt
 recursive-include docs *.md
 recursive-include docs/validation/framework_upgrade_2026-11-23 *.json *.log *.npz *.py
+recursive-include docs/validation/research_2026-11-24 *.json *.log *.npz *.urdf *.py
 recursive-include tests *.py
 recursive-include tools *.py
 prune web/data

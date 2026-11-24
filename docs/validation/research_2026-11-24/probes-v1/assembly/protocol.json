@@ -1,0 +1,270 @@
+{
+  "schema_version": 1,
+  "task": "assembly",
+  "parent_full_plan": "outputs/research-study/full-common/assembly/full/result.json",
+  "optimized_keyframe_index": 2,
+  "optimized_keyframe_id": "lift_tabletop",
+  "parent_full_execution_passed": {
+    "on": true,
+    "off": true
+  },
+  "source": "accepted mid-task keyframe from independently validated complete plans",
+  "target_robustness_only_ablated": true,
+  "candidate_fixed": true,
+  "physical_scene_sha256": {
+    "on": "7382d6e61d70e4dc7295dceae2ce63ba54d11e2972f67f5e4b92311c7fc96b62",
+    "off": "7382d6e61d70e4dc7295dceae2ce63ba54d11e2972f67f5e4b92311c7fc96b62"
+  },
+  "controller": {
+    "control_mode": "hybrid_feedback",
+    "jaw_force_fraction": 0.7,
+    "reference_dt_s": 0.02,
+    "reference_projection_limit_rad": 0.02,
+    "physics_dt_s": 0.001,
+    "joint_k": 40.0,
+    "joint_d": 8.0,
+    "motion_k": [
+      40.0,
+      40.0,
+      40.0,
+      3000.0,
+      3000.0,
+      3000.0
+    ],
+    "motion_d": [
+      2.0,
+      2.0,
+      2.0,
+      40.0,
+      40.0,
+      40.0
+    ],
+    "force_k": 0.25,
+    "force_i": 1.0,
+    "force_d": [
+      2,
+      2,
+      2,
+      40,
+      40,
+      160
+    ],
+    "admittance_mass": [
+      0.2,
+      0.2,
+      0.2,
+      2.0,
+      2.0,
+      2.0
+    ],
+    "admittance_damping": [
+      4.0,
+      4.0,
+      4.0,
+      40.0,
+      40.0,
+      40.0
+    ]
+  },
+  "rho_on_optimized_and_independently_checked": 7.3197677078776895,
+  "rho_off_independently_checked": 5.829661868440029e-18,
+  "direction_selection": "maximum challenge/OFF certified directional bound over the six signed force axes before native trials; failed ray solves excluded",
+  "certified_direction_selection_available": true,
+  "nonzero_common_control_available": false,
+  "directional_candidates": [
+    {
+      "direction": [
+        0.0,
+        0.0,
+        0.0,
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "on": {
+        "certified": true,
+        "maximum_coefficient": 47.760558312817366,
+        "status": "Solved",
+        "residual": 1.766586876783549e-12
+      },
+      "off": {
+        "certified": true,
+        "maximum_coefficient": 48.59852206137175,
+        "status": "Solved",
+        "residual": 9.161471581364822e-11
+      },
+      "challenge_to_off_directional_bound": 0.12049366766559783
+    },
+    {
+      "direction": [
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      "on": {
+        "certified": true,
+        "maximum_coefficient": 40.111383737703214,
+        "status": "AlmostSolved",
+        "residual": 4.796163466380676e-13
+      },
+      "off": {
+        "certified": true,
+        "maximum_coefficient": 40.285497415329154,
+        "status": "AlmostSolved",
+        "residual": 1.938719407235112e-09
+      },
+      "challenge_to_off_directional_bound": 0.1453578717405619
+    },
+    {
+      "direction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "on": {
+        "certified": true,
+        "maximum_coefficient": 27.417845986882558,
+        "status": "AlmostSolved",
+        "residual": 3.377564894435636e-11
+      },
+      "off": {
+        "certified": true,
+        "maximum_coefficient": 27.49336524386473,
+        "status": "AlmostSolved",
+        "residual": 3.217759392271091e-12
+      },
+      "challenge_to_off_directional_bound": 0.21299008376607895
+    },
+    {
+      "direction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "on": {
+        "certified": true,
+        "maximum_coefficient": 35.07943688327781,
+        "status": "AlmostSolved",
+        "residual": 3.1357458851744013e-09
+      },
+      "off": {
+        "certified": true,
+        "maximum_coefficient": 34.729335320852655,
+        "status": "Solved",
+        "residual": 1.1603873417698196e-10
+      },
+      "challenge_to_off_directional_bound": 0.16861290641477164
+    },
+    {
+      "direction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1.0
+      ],
+      "on": {
+        "certified": true,
+        "maximum_coefficient": 47.89681882649305,
+        "status": "AlmostSolved",
+        "residual": 9.995808625262725e-10
+      },
+      "off": {
+        "certified": true,
+        "maximum_coefficient": 49.004178793565664,
+        "status": "Solved",
+        "residual": 1.7269741192649235e-11
+      },
+      "challenge_to_off_directional_bound": 0.1194962207400776
+    },
+    {
+      "direction": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "on": {
+        "certified": true,
+        "maximum_coefficient": 28.51700593089194,
+        "status": "AlmostSolved",
+        "residual": 1.8739135576595345e-08
+      },
+      "off": {
+        "certified": true,
+        "maximum_coefficient": 28.514209631890196,
+        "status": "AlmostSolved",
+        "residual": 4.814273979469874e-13
+      },
+      "challenge_to_off_directional_bound": 0.20536477222756436
+    }
+  ],
+  "selected_direction": {
+    "direction": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -1.0,
+      0.0
+    ],
+    "on": {
+      "certified": true,
+      "maximum_coefficient": 27.417845986882558,
+      "status": "AlmostSolved",
+      "residual": 3.377564894435636e-11
+    },
+    "off": {
+      "certified": true,
+      "maximum_coefficient": 27.49336524386473,
+      "status": "AlmostSolved",
+      "residual": 3.217759392271091e-12
+    },
+    "challenge_to_off_directional_bound": 0.21299008376607895
+  },
+  "cases": {
+    "nominal": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "on_interior": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -5.855814166302152,
+      0.0
+    ],
+    "opposite_interior": [
+      -0.0,
+      -0.0,
+      -0.0,
+      -0.0,
+      5.855814166302152,
+      -0.0
+    ]
+  },
+  "hold_duration_s": 6.0,
+  "load_start_s": 4.0,
+  "load_duration_s": 3.0,
+  "ramp_s": 0.5,
+  "certificate_scope": "fixed optimized reference pose; not a dynamic or closed-loop stability guarantee",
+  "nominal_trials_per_condition": 1,
+  "statistical_success_rate_claimed": false
+}

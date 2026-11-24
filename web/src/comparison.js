@@ -31,7 +31,9 @@ $('load-event').onclick=()=>{playing=false;const pulse=get('on').external_distur
 $('recovery-event').onclick=()=>{playing=false;time=get('on').response.force_end_s+1;$('play').textContent='Play both';seek();};
 function animate(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(playing){time=Math.min(Number($('time').max),time+dt);if(time>=Number($('time').max)){playing=false;$('play').textContent='Play both';}seek();}requestAnimationFrame(animate);}requestAnimationFrame(animate);
 async function init(){
- const response=await fetch('./data/margin-hold-comparison.json');if(!response.ok)throw Error('Matched simulation results are not available');study=await response.json();
+ const current=new URLSearchParams(location.search).get('study')==='current';
+ const response=await fetch(current?'./data/research-source-margin-comparison.json':'./data/margin-hold-comparison.json');if(!response.ok)throw Error('Matched simulation results are not available');study=await response.json();
+ if(current){$('response-figure').src='./data/research-source-margin-response.svg';document.querySelector('section:has(#exploratory-results)').hidden=true;$('recording-link').href='./?model=research_source_margin_on_slow_up4';}
  for(const [id,cfg] of Object.entries(study.protocol.protocol.cases))$('condition').append(new Option(cfg.title,id));
  for(const r of study.trials){const tr=document.createElement('tr');tr.dataset.passed=String(r.execution_passed);for(const value of [study.protocol.protocol.cases[r.case].title,r.robustness_enabled?'ON':'OFF',r.initial_certificate.load_to_margin_ratio.toFixed(3),r.initial_certificate.inside_initial_static_box?'IN':'OUT',r.execution_passed?'PASS':'FAIL',labels[r.outcome]||r.outcome]){const td=document.createElement('td');td.textContent=value;tr.append(td);}$('results').append(tr);}
  $('exploratory-note').textContent=study.design_history;

@@ -38,7 +38,7 @@ def main(argv=None):
     run.add_argument('--max-steps',type=int,default=64)
     run.add_argument('--iterations',type=int,default=1000)
     run.add_argument('--source-failure-policy',choices=['error','geometric_prior'])
-    run.add_argument('--variants',nargs='+',default=['full'],choices=['full','no_source_refinement','fixed_contact_types','fixed_path','no_arm_force_feedforward','contact_disabled','external_push'])
+    run.add_argument('--variants',nargs='+',default=['full'],choices=['full','no_source_refinement','fixed_contact_types','no_target_robustness','fixed_path','no_arm_force_feedforward','contact_disabled','external_push'])
     inspect = sub.add_parser("inspect", help="Inspect a preset or a custom URDF")
     inspect.add_argument("model")
     inspect.add_argument("--fixed-base", action="store_true")

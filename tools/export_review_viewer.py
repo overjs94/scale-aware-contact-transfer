@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 IDENTIFIERS = ('overjs94', 'Jeongseob Lee', 'Jeongseob', 'snu.ac.kr',
                'scale-aware-contact-transfer', 'Contact_contraction',
                'feat/conic-contact-validation')
-PREFIXES = ('full_', 'robust_refinement_', 'counterfactual_', 'margin_hold_', 'margin_platform_', 'margin_compact_')
+PREFIXES = ('full_', 'robust_refinement_', 'counterfactual_', 'margin_hold_', 'margin_platform_', 'margin_compact_', 'research_')
 NO_LICENSE = 'No redistribution license selected; see LICENSE.authored'
 
 
@@ -33,6 +33,22 @@ def numerical_leaves(value, path=()):
             yield from numerical_leaves(item, path + (index,))
     elif isinstance(value, (int, float, bool)):
         yield path, value
+
+
+def preserve_numeric_leaves(original,localized):
+    """Keep exact source numbers across JavaScript's JSON formatting round trip.
+
+    A large float can be emitted as an integer literal by JSON.stringify.
+    Restoring original numeric leaves avoids changing its Python JSON value,
+    without loosening the review export's exact numeric-equality assertion.
+    """
+    if isinstance(original,dict):
+        if not isinstance(localized,dict) or original.keys()!=localized.keys():raise ValueError('Localization changed record keys')
+        return {k:preserve_numeric_leaves(v,localized[k]) for k,v in original.items()}
+    if isinstance(original,list):
+        if not isinstance(localized,list) or len(original)!=len(localized):raise ValueError('Localization changed array shape')
+        return [preserve_numeric_leaves(a,b) for a,b in zip(original,localized)]
+    return original if isinstance(original,(int,float,bool)) else localized
 
 
 def page(title, content):
@@ -83,7 +99,8 @@ fs.writeFileSync(`${dest}/index.json`,JSON.stringify({models}));
                     str(data_out), json.dumps(models)], check=True)
     model_dirs = set()
     for model in models:
-        record = json.loads((data_out / (model['id'] + '.json')).read_text())
+        file=data_out/(model['id']+'.json');record=preserve_numeric_leaves(json.loads((source/'data'/file.name).read_text()),json.loads(file.read_text()))
+        file.write_text(json.dumps(record))
         for instance in record['instances']:
             model_dirs.add(Path(instance['manifest']).parent.name)
     for name in sorted(model_dirs):
@@ -107,7 +124,7 @@ fs.writeFileSync(`${dest}/index.json`,JSON.stringify({models}));
             assert url in cached and Path(cached[url]).is_file(), f'Missing real mesh cache: {url}'
         meta['packages'] = {key: f'../../assets/vendor-{roots.index(value)}' for key, value in meta.get('packages', {}).items()}
         path.write_text(json.dumps(meta))
-    for name in ('algorithm-comparisons.json', 'source-robustness-comparison.svg', 'type-counterfactual-comparison.svg', 'margin-hold-comparison.json', 'margin-hold-response.svg', 'margin-hold-exploratory.svg'):
+    for name in ('algorithm-comparisons.json', 'source-robustness-comparison.svg', 'type-counterfactual-comparison.svg', 'margin-hold-comparison.json', 'margin-hold-response.svg', 'margin-hold-exploratory.svg', 'research-study-summary.json', 'research-source-margin-comparison.json', 'research-source-margin-response.svg'):
         shutil.copy2(source / 'data' / name, data_out / name)
 
     # Match comparisons after redaction, without publishing original trace/plan
@@ -177,11 +194,11 @@ fs.writeFileSync(`${dest}/index.json`,JSON.stringify({models}));
 <h2>Method and terminology</h2><p>III-B: Task-Wrench-Robust Contact Refinement. III-C: Scale- and Embodiment-Aware Contact Realization. III-D: sequence-wide contact-type and arm-assignment selection. IV: Keyframe-Guided Contact-Implicit Trajectory Optimization.</p>
 <p>P denotes unilateral point contact with a common spherical tool; G denotes bounded gripper-mediated contact. The robustness test enforces separate reactions at all vertices of a prescribed task-wrench disturbance box. This box-vertex certificate is distinct from a general dynamic stability guarantee.</p>
 <p>Six-vectors are angular/moment first. Reactions are object-on-robot; opposite reactions act on the object. Only source contact geometry is scaled. Target mass, friction, reaction forces and robot torques are recomputed.</p>
-<h2>Included evidence</h2><p>Panel reorientation/placement, free articulated box opening, and tabletop–leg assembly: seven conditions each, including all failed checks (21 recordings). Matched stationary source-robustness ON/OFF tests: 14 recordings. Alternative contact types: two executed recordings plus the assembly planning rejection in the comparison table. External forces are visualized with arrows.</p>
+<h2>Included evidence</h2><p>The current framework cohort includes three complete hybrid-controlled multi-arm tasks, controlled source/target ablations, inside-margin mid-task probes, and a separate matched source-refinement support study. Box and assembly use 19 explicitly supplied physical source sites grouped into three functional contacts; this is a declared extension of representative-point refinement. Positive source certificates, native execution checks and literal manuscript equations have separate gates. Both passing and failing inside-margin responses remain visible.</p><p>The historical cohort includes panel reorientation/placement, free articulated box opening, and tabletop–leg assembly: seven conditions each, including all failed checks (21 recordings). Matched stationary source-robustness ON/OFF tests: 14 recordings. Alternative contact types: two executed recordings plus the assembly planning rejection in the comparison table. External forces and moments are visualized on their actual bodies.</p>
 <p>The additional <a href="robustness-comparison.html">synchronized margin comparison</a> uses a rigid platform with an upper payload. Matched native ON/OFF trials include no load, a common interior load, slow loading, fast loading, and repeated pulses. The flat-panel and compact-payload explorations are retained. The clear slow-load comparison separates bounded tracking from persistent loss of support after removal; mathematical divergence is not claimed.</p>
 <p>Playback uses saved native simulation states; it does not run optimization or dynamics in the browser. Numeric arrays, result values, and pass/fail criteria are unchanged. Original trace/plan fingerprints are consistently pseudonymized; <a href="review-integrity.json">review-integrity.json</a> provides hashes of the distributed files.</p>
-<h2>Validation limits</h2><ul><li>Contracted groups are supplied synthetic inputs; learned contraction is not executed.</li><li>Box/assembly source geometric fallback is reported and is not a successful source robustness certificate.</li><li>CITO uses restricted candidates and midpoint configuration-update variants; literal execution of every manuscript equation is not claimed.</li><li>The native arm controller uses joint impedance and planned reaction feedforward with force selection set to zero. These records do not establish measured-normal-force hybrid control.</li><li>The stationary force study fixes target material contacts to isolate source refinement. Static feasibility is not a closed-loop stability proof; failures outside the certified range are retained.</li><li>CRISP, hardware experiments, and general collision completeness are not validated here.</li></ul>
-<h2>Licensing</h2><p>No new reuse license is granted for original research material. Earlier authored-model MIT metadata is corrected in this copy to match its bundled redistribution notice; no numerical data are changed. Third-party copyright, licenses, and vendor revision pins remain intact. See <a href="model-licenses.html">model licenses</a>.</p>'''
+<h2>Validation limits</h2><ul><li>Contracted groups are supplied synthetic inputs; learned contraction is not executed.</li><li>Historical box/assembly source geometric fallback is distinct from the current explicit grouped-site source model and its certificates.</li><li>CITO uses restricted candidates and midpoint configuration-update variants; literal execution of every manuscript equation is not claimed. Exact post-step panel attempts did not pass within their budgets.</li><li>Current full tasks use P normal-force hybrid feedback, G pose/jaw control and projected joint impedance. Historical and stationary source-diagnostic records use planned reaction feedforward/impedance; each recording declares its controller.</li><li>The stationary source study fixes target material contacts to isolate refinement. Static feasibility is not a closed-loop stability proof; failed inside-margin tracking and unknown maximum-margin solves remain explicit.</li><li>CRISP, hardware experiments, and continuous collision completeness are not validated here.</li></ul>
+<h2>Licensing</h2><p>Original framework code is Apache-2.0. Per-file authored-model and third-party notices are preserved; earlier MIT metadata without a corresponding grant is corrected to its bundled notice. No numerical data are changed. Third-party copyright, licenses and vendor revision pins remain intact. See <a href="model-licenses.html">model licenses</a>.</p>'''
     (destination / 'review-scope.html').write_text(page('Implementation scope', scope))
     notices = []
     seen = set()

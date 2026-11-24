@@ -1,0 +1,53 @@
+{
+  "independent": {
+    "passed": true,
+    "residuals": {
+      "momentum": 1.689950627286013e-14,
+      "integration": 4.787836793695988e-16,
+      "complementarity": 9.817226971246528e-09,
+      "dissipation": 2.1734182705907775e-10,
+      "capability": 0.0,
+      "closure": 1.3655743202889425e-14,
+      "rotation_closure": 8.813047512887284e-13,
+      "grasp_velocity": 7.979727989493313e-17,
+      "point_alignment": 1.2409344146978641e-15,
+      "point_tangent_bounds": 0.0,
+      "limits": 0.0,
+      "endpoint_velocity": 1.3301285742450534e-25,
+      "quaternion_norm": 3.3306690738754696e-16,
+      "contact_chart_singularity": 0.0,
+      "support_Hermite_control_gap": 5.551115122175747e-17
+    },
+    "configuration_update": "contact_coordinate_midpoint",
+    "configuration_defect": {
+      "maximum_translation_component_m": 0.0,
+      "maximum_rotation_component_rad": 0.0,
+      "maximum_translation_norm_m": 0.0,
+      "maximum_rotation_norm_rad": 0.0,
+      "bounds": []
+    },
+    "contact_chart": {
+      "dependent_joint_midpoint_difference_rad": 3.6510055049010504e-05,
+      "minimum_native_singular_value": 0.15536885559801866
+    },
+    "independent": "native Pinocchio mass/bias/J and NumPy transforms"
+  },
+  "reference_geometry": {
+    "passed": true,
+    "samples": 193,
+    "continuous_certificate": false,
+    "reference_interpolation": "object_SE3_and_conditioned_joint_Hermite_with_dense_IK",
+    "reference_id": "2cd07e18d00604275841333f501b9841d502e0671ec90c16fff061e53da5ea41",
+    "reference_mesh": {
+      "minimum_spacing_s": 0.0187500000078904,
+      "maximum_joint_acceleration_rad_s2": 0.2333701469136138,
+      "optimized_node_velocities_preserved": true
+    },
+    "released_gripper_reference": "native URDF open configuration after stationary opening dwell",
+    "projection_limit_rad": 0.02,
+    "projection_max_rad": 2.1043691411648524e-06,
+    "compliant_pad_allowance_m": 0.001,
+    "unintended_clearance_m": 0.001,
+    "violations": []
+  }
+}

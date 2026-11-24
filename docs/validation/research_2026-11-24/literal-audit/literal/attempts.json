@@ -1,0 +1,16 @@
+[
+  {
+    "nodes": 16,
+    "accepted": false,
+    "failure": "NLP rejected [ipopt]: Maximum_CpuTime_Exceeded",
+    "global_infeasibility_claimed": false,
+    "wall_time_s": 256.78288882599736
+  },
+  {
+    "nodes": 32,
+    "accepted": false,
+    "failure": "NLP rejected [ipopt]: Maximum_CpuTime_Exceeded",
+    "global_infeasibility_claimed": false,
+    "wall_time_s": 286.3482115700026
+  }
+]

@@ -69,6 +69,13 @@ function report(data){
     const errors=Object.values(r.object_tracking);$('result-tracking').textContent=`${r.tracking_passed?'PASS':'FAIL'} · ${(1000*Math.max(...errors.map(e=>e.maximum_position_error_m))).toFixed(2)} mm`;
     $('result-forces').textContent=r.sampled_interface_wrench_capability.passed&&Object.values(r.jaw_force).every(j=>j.passed)&&r.minimum_actuator_margin_Nm>=-1e-8?'PASS':'FAIL';
     $('result-seal-label').textContent='STABILITY / CONTACT';const fractions=Object.values(r.maintained_contact_fraction).filter(v=>v!==null);$('result-seal').textContent=`${r.execution_passed?'PASS':'FAIL'} · ${(100*Math.min(...fractions)).toFixed(1)}% contact`;
+    const matched=r.robustness_probe||r.certified_full_disturbance;
+    if(matched){
+      const certificate=matched.inside_on_certificate||matched.inside_on_reference_certificate;
+      $('result-residual').textContent=`ρ ON ${certificate.rho_certified.toFixed(3)}`;
+      $('source-result').hidden=false;$('source-result').textContent=`Matched ${r.robustness_probe?'mid-task stationary probe':'full task with load interval'} · robustness ${matched.mode.toUpperCase()} · load / optimized ON margin ${certificate.load_to_margin_ratio.toFixed(3)} · static reference-pose certificate; closed-loop response measured separately`;
+      for(const id of ['workspace-result','robustness-result'])$(id).hidden=true;$('report-json').textContent=JSON.stringify(r,null,2);return;
+    }
     $('result-residual').textContent=r.source?`ρ ${r.source.source_rho_after.toFixed(3)}`:r.selection.selected_types.join(' / ');
     $('source-result').hidden=false;$('source-result').textContent=r.source?`Source polytope ${r.source.robustness_enabled?'ON · 8 box vertices':'OFF · nominal equilibrium only'} · independent common-box margin ρ ${r.source.source_rho_after.toFixed(3)} · target ρ ${r.source.target_rho.toFixed(3)} · target posture, reactions, and torques recomputed at fixed contact sites`:`Forced contact type ${r.selection.selected_types.join(' / ')} · sequence objective ${r.selection.objective.toFixed(3)} · native execution ${r.execution_passed?'PASS':'FAIL'}`;
     for(const id of ['workspace-result','robustness-result'])$(id).hidden=true;$('report-json').textContent=JSON.stringify(r,null,2);return;

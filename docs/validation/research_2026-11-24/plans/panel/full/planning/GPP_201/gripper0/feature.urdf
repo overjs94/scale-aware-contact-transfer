@@ -1,0 +1,1 @@
+<robot name="local_grasp_feature"><link name="feature"><collision><geometry><box size="0.6 0.4 0.04" /></geometry></collision></link></robot>

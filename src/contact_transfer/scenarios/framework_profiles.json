@@ -13,7 +13,7 @@
       "transition": {
         "configuration_update": "contact_coordinate_midpoint",
         "support_gap_hermite_bounds": true,
-        "terminal_support_transitions": [["above_jig", "seat"]]
+        "terminal_support_transitions": []
       },
       "execution": {"jaw_force_fraction": 0.45}
     },

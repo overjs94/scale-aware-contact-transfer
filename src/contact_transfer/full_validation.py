@@ -46,7 +46,12 @@ def validate_keyframe(problem,key,environment=(),tolerance=2e-5):
     residuals=dict(equilibrium=0.,capability=0.,torque=0.,closure=0.,rotation_closure=0.,rho_margin=0.)
     b=np.r_[*[r.gravity(key.q[qs]) for r,qs in zip(problem.robots,sys.q_slices)],bias_object(problem,key.q[sys.object_q],np.zeros(sys.object_v.stop-sys.object_v.start))]
     active={s.group_id for s in key.interfaces}
-    for k,(forces,tau,vertex) in enumerate(zip(key.reactions,key.torques,problem.task_load(key.q[sys.object_q]).vertices)):
+    load=problem.task_load(key.q[sys.object_q]);vertices=load.vertices
+    if len(key.reactions)==1 and abs(key.rho)<=1e-12:
+        vertices=np.zeros((1,load.E.shape[1]))
+    if len(key.reactions)!=len(vertices) or len(key.torques)!=len(vertices) or any(len(v)!=len(vertices) for v in key.environment_reactions.values()):
+        return dict(passed=False,residuals=dict(vertex_coverage=1.),frozen_conic=dict(certificate=False,status='IncompleteVertexCoverage'),independent='native gate rejected incomplete vertex witnesses')
+    for k,(forces,tau,vertex) in enumerate(zip(key.reactions,key.torques,vertices)):
         total=np.array(sys.B)@tau
         for c,w in zip(contacts,forces):
             _,J,closure,rotation=numeric_contact(problem,c,key.q);total+=J.T@(w[3:] if c.capability.kind=='P' else w)

@@ -1,0 +1,552 @@
+{
+  "independent": {
+    "passed": true,
+    "residuals": {
+      "equilibrium": 1.7763568394002505e-14,
+      "capability": 0.0,
+      "torque": 0.0,
+      "closure": 6.153247551922815e-16,
+      "rotation_closure": 3.8999628536074146e-16,
+      "rho_margin": 0.0
+    },
+    "frozen_conic": {
+      "rho": 18.443235660240752,
+      "certificate": true,
+      "residual": 7.998526285746266e-10,
+      "status": "Solved",
+      "maximum_margin_status": "Solved",
+      "fixed_rho_feasibility": false,
+      "solver_attempts": [
+        {
+          "status": "Solved",
+          "witness_regularization": 0.0,
+          "backend": "clarabel",
+          "solver_tolerance": 1e-09,
+          "iterations": 20,
+          "wall_time_s": 0.032858817001397256
+        }
+      ]
+    },
+    "independent": "native Pinocchio, NumPy and frozen Clarabel"
+  },
+  "geometry_violations": [],
+  "source": {
+    "synthetic_input": true,
+    "network_inference_executed": false,
+    "source_model": "functional_group_sites",
+    "source_model_extension": true,
+    "source_refinement_enabled": true,
+    "source_contact_positions_optimized": true,
+    "source_status": "positive_margin",
+    "source_certificate": true,
+    "source_rho": 14.194251556887412,
+    "source_nlp_primal_residual": 2.545079105162802e-13,
+    "source_group_ids": [
+      "base_grasp",
+      "base_support",
+      "moving_manipulation"
+    ],
+    "source_group_count": 3,
+    "source_site_count": 19,
+    "source_coordinate_groups": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "source_anchor_indices": [
+      0,
+      9,
+      10
+    ],
+    "source_positions_before_m": [
+      [
+        -0.08,
+        -0.005,
+        0.0
+      ],
+      [
+        -0.082,
+        -0.005,
+        -0.002
+      ],
+      [
+        -0.082,
+        -0.005,
+        0.002
+      ],
+      [
+        -0.078,
+        -0.005,
+        -0.002
+      ],
+      [
+        -0.078,
+        -0.005,
+        0.002
+      ],
+      [
+        -0.082,
+        0.005,
+        -0.002
+      ],
+      [
+        -0.082,
+        0.005,
+        0.002
+      ],
+      [
+        -0.078,
+        0.005,
+        -0.002
+      ],
+      [
+        -0.078,
+        0.005,
+        0.002
+      ],
+      [
+        0.025,
+        0.0,
+        -0.025
+      ],
+      [
+        0.1,
+        0.005,
+        0.01
+      ],
+      [
+        0.098,
+        -0.005,
+        0.008
+      ],
+      [
+        0.098,
+        -0.005,
+        0.012
+      ],
+      [
+        0.10200000000000001,
+        -0.005,
+        0.008
+      ],
+      [
+        0.10200000000000001,
+        -0.005,
+        0.012
+      ],
+      [
+        0.098,
+        0.005,
+        0.008
+      ],
+      [
+        0.098,
+        0.005,
+        0.012
+      ],
+      [
+        0.10200000000000001,
+        0.005,
+        0.008
+      ],
+      [
+        0.10200000000000001,
+        0.005,
+        0.012
+      ]
+    ],
+    "source_positions_after_m": [
+      [
+        -0.07987618455976997,
+        -0.005,
+        -0.00048442722521545474
+      ],
+      [
+        -0.08187618455976997,
+        -0.005,
+        -0.0024844272252154548
+      ],
+      [
+        -0.08187618455976997,
+        -0.005,
+        0.0015155727747845453
+      ],
+      [
+        -0.07787618455976997,
+        -0.005,
+        -0.0024844272252154548
+      ],
+      [
+        -0.07787618455976997,
+        -0.005,
+        0.0015155727747845453
+      ],
+      [
+        -0.08187618455976997,
+        0.005,
+        -0.0024844272252154548
+      ],
+      [
+        -0.08187618455976997,
+        0.005,
+        0.0015155727747845453
+      ],
+      [
+        -0.07787618455976997,
+        0.005,
+        -0.0024844272252154548
+      ],
+      [
+        -0.07787618455976997,
+        0.005,
+        0.0015155727747845453
+      ],
+      [
+        0.024977503338346762,
+        3.3760595812856443e-07,
+        -0.025
+      ],
+      [
+        0.10010104883059628,
+        0.005,
+        0.00951031731388373
+      ],
+      [
+        0.09810104883059628,
+        -0.005,
+        0.00751031731388373
+      ],
+      [
+        0.09810104883059628,
+        -0.005,
+        0.01151031731388373
+      ],
+      [
+        0.10210104883059629,
+        -0.005,
+        0.00751031731388373
+      ],
+      [
+        0.10210104883059629,
+        -0.005,
+        0.01151031731388373
+      ],
+      [
+        0.09810104883059628,
+        0.005,
+        0.00751031731388373
+      ],
+      [
+        0.09810104883059628,
+        0.005,
+        0.01151031731388373
+      ],
+      [
+        0.10210104883059629,
+        0.005,
+        0.00751031731388373
+      ],
+      [
+        0.10210104883059629,
+        0.005,
+        0.01151031731388373
+      ]
+    ],
+    "source_site_frames": [
+      "base",
+      "base",
+      "base",
+      "base",
+      "base",
+      "base",
+      "base",
+      "base",
+      "base",
+      "base",
+      "moving",
+      "moving",
+      "moving",
+      "moving",
+      "moving",
+      "moving",
+      "moving",
+      "moving",
+      "moving"
+    ],
+    "source_normals": [
+      [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      [
+        0.0,
+        -1.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ]
+    ],
+    "source_normal_limits_N": [
+      0.4,
+      0.4,
+      0.4,
+      0.4,
+      0.4,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      2.0,
+      0.4,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.4,
+      0.4,
+      0.4,
+      0.4
+    ],
+    "source_friction": 0.8,
+    "source_E": [
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        1.0,
+        0.0,
+        -2.245405449496085e-18,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        -2.245405449496085e-18,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "source_D": [
+      [
+        0.05,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.05,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.05,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.001
+      ]
+    ],
+    "source_equilibrium_row_scale": [
+      0.0001669917649129932,
+      0.0001669917649129932,
+      0.0001669917649129932,
+      0.05,
+      0.05,
+      0.3817449214171884,
+      0.004771811517714855
+    ],
+    "source_coordinates_normalized": true,
+    "source_initial_conic_status": "Solved",
+    "source_warm_start_used": true,
+    "source_point_force_coordinates": "scaled_tangent",
+    "source_native_vertex_witness": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 2.1649348980190553e-15,
+        "circular_friction": 0.0,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 16,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "source_normal_budgets_by_group_and_outward_normal_N": {
+      "base_grasp": {
+        "0.0,-1.0,0.0": 2.0,
+        "0.0,1.0,0.0": 2.0
+      },
+      "base_support": {
+        "0.0,0.0,-1.0": 2.0
+      },
+      "moving_manipulation": {
+        "0.0,1.0,0.0": 2.0,
+        "0.0,-1.0,0.0": 2.0
+      }
+    },
+    "source_independent_validation": {
+      "certificate": true,
+      "rho": 14.194251556887412,
+      "residual": 2.1649348980190553e-15,
+      "status": "VerifiedNLPVertexWitnesses",
+      "conic_solver_certificate": true,
+      "conic_solver_status": "Solved",
+      "conic_solver_rho": 14.19425155688744,
+      "mechanics": "native Pinocchio/NumPy verification of every successful NLP vertex witness; independent conic solve reported separately"
+    },
+    "source_geometry_fallback": false,
+    "source_forces_transferred": false,
+    "source_to_target_scale": 4.0,
+    "source_definition_origin": "authored_synthetic_functional_hand_sites",
+    "source_problem_identity": "ct-source-v2:41cb63f8ae3a7741e3d6c5bc89b515529cf0465f355fe821a4445401d8d231c8",
+    "source_cache_hit": false,
+    "new_source_solver_executed": true
+  },
+  "target_provenance": {
+    "method": "fixed_geometry_separable_target",
+    "posture_solver": "Solve_Succeeded",
+    "torque_free_rho_upper_bound": 1.5954794614813801e-15,
+    "same_rho_torque_feasibility": true,
+    "posture_global_optimality_claimed": false,
+    "posture_reference_rule": "hardware_seed",
+    "same_rho_force_polish": {
+      "witness_applied": true,
+      "status": "Solved",
+      "rho": 1.5954794614813801e-15,
+      "primal_residual": 1.7763568394002505e-14
+    }
+  },
+  "endpoint_polish_max_rad": 0.0
+}

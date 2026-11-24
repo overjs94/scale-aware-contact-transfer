@@ -1,0 +1,6 @@
+{
+  "execution": {
+    "control_mode": "hybrid_feedback",
+    "force_d": [2.0, 2.0, 2.0, 40.0, 40.0, 160.0]
+  }
+}

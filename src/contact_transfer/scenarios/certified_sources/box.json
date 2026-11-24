@@ -1,0 +1,306 @@
+{
+  "schema_version": 1,
+  "units": "SI",
+  "contact_frame": "source_link",
+  "origin": "authored_synthetic_functional_hand_sites",
+  "inference_executed": false,
+  "license": "Apache-2.0",
+  "model_extension": "Multiple physical unilateral sites per functional group; not one representative P per group",
+  "normal_budget_description": "2 N per opposed physical patch, divided across sites; tabletop edge additionally has a distinct 2 N palm site",
+  "groups": [
+    {
+      "group_id": "base_grasp",
+      "link_id": "base",
+      "anchor_m": [
+        -0.08,
+        -0.005,
+        0.0
+      ],
+      "normal": [
+        0,
+        -1,
+        0
+      ],
+      "translation_axes": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "anchor_normal_limit_N": 0.4,
+      "sites": [
+        {
+          "position_m": [
+            -0.082,
+            -0.005,
+            -0.002
+          ],
+          "normal": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "normal_limit_N": 0.4
+        },
+        {
+          "position_m": [
+            -0.082,
+            -0.005,
+            0.002
+          ],
+          "normal": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "normal_limit_N": 0.4
+        },
+        {
+          "position_m": [
+            -0.078,
+            -0.005,
+            -0.002
+          ],
+          "normal": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "normal_limit_N": 0.4
+        },
+        {
+          "position_m": [
+            -0.078,
+            -0.005,
+            0.002
+          ],
+          "normal": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "normal_limit_N": 0.4
+        },
+        {
+          "position_m": [
+            -0.082,
+            0.005,
+            -0.002
+          ],
+          "normal": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "normal_limit_N": 0.5
+        },
+        {
+          "position_m": [
+            -0.082,
+            0.005,
+            0.002
+          ],
+          "normal": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "normal_limit_N": 0.5
+        },
+        {
+          "position_m": [
+            -0.078,
+            0.005,
+            -0.002
+          ],
+          "normal": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "normal_limit_N": 0.5
+        },
+        {
+          "position_m": [
+            -0.078,
+            0.005,
+            0.002
+          ],
+          "normal": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "normal_limit_N": 0.5
+        }
+      ]
+    },
+    {
+      "group_id": "base_support",
+      "link_id": "base",
+      "anchor_m": [
+        0.025,
+        0,
+        -0.025
+      ],
+      "normal": [
+        0,
+        0,
+        -1
+      ],
+      "translation_axes": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ],
+      "anchor_normal_limit_N": 2.0,
+      "sites": []
+    },
+    {
+      "group_id": "moving_manipulation",
+      "link_id": "moving",
+      "anchor_m": [
+        0.1,
+        0.005,
+        0.01
+      ],
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "translation_axes": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "anchor_normal_limit_N": 0.4,
+      "sites": [
+        {
+          "position_m": [
+            0.098,
+            -0.005,
+            0.008
+          ],
+          "normal": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "normal_limit_N": 0.5
+        },
+        {
+          "position_m": [
+            0.098,
+            -0.005,
+            0.012
+          ],
+          "normal": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "normal_limit_N": 0.5
+        },
+        {
+          "position_m": [
+            0.10200000000000001,
+            -0.005,
+            0.008
+          ],
+          "normal": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "normal_limit_N": 0.5
+        },
+        {
+          "position_m": [
+            0.10200000000000001,
+            -0.005,
+            0.012
+          ],
+          "normal": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "normal_limit_N": 0.5
+        },
+        {
+          "position_m": [
+            0.098,
+            0.005,
+            0.008
+          ],
+          "normal": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "normal_limit_N": 0.4
+        },
+        {
+          "position_m": [
+            0.098,
+            0.005,
+            0.012
+          ],
+          "normal": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "normal_limit_N": 0.4
+        },
+        {
+          "position_m": [
+            0.10200000000000001,
+            0.005,
+            0.008
+          ],
+          "normal": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "normal_limit_N": 0.4
+        },
+        {
+          "position_m": [
+            0.10200000000000001,
+            0.005,
+            0.012
+          ],
+          "normal": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "normal_limit_N": 0.4
+        }
+      ]
+    }
+  ]
+}

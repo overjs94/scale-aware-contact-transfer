@@ -1,0 +1,347 @@
+[
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      2,
+      1
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Point position/axis IK failed at tip"
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      1,
+      0,
+      2
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      1,
+      2,
+      0
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      2,
+      0,
+      1
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      2,
+      1,
+      0
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Point position/axis IK failed at tip"
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      0,
+      2,
+      1
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Point position/axis IK failed at tip"
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      1,
+      0,
+      2
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      1,
+      2,
+      0
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      2,
+      0,
+      1
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      2,
+      1,
+      0
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "keyframe": 2,
+    "accepted": false,
+    "reason": "Fixed material geometry leaves target trust region"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      2,
+      1
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Point position/axis IK failed at tip"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      1,
+      0,
+      2
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Point position/axis IK failed at tip"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      1,
+      2,
+      0
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Point position/axis IK failed at tip"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      2,
+      0,
+      1
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Point position/axis IK failed at tip"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      2,
+      1,
+      0
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Point position/axis IK failed at tip"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Point position/axis IK failed at tip"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      0,
+      2,
+      1
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Point position/axis IK failed at tip"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      1,
+      0,
+      2
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Point position/axis IK failed at tip"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      1,
+      2,
+      0
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Point position/axis IK failed at tip"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      2,
+      0,
+      1
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Point position/axis IK failed at tip"
+  },
+  {
+    "types": [
+      "P",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      2,
+      1,
+      0
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Point position/axis IK failed at tip"
+  }
+]

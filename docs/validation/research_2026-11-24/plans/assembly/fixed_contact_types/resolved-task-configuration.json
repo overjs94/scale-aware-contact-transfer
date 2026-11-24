@@ -1,0 +1,123 @@
+{
+  "formulation_mode": "declared_extension",
+  "source": {
+    "representation": "functional_group_sites",
+    "site_file": "package:scenarios/certified_sources/assembly.json",
+    "mu": 0.8,
+    "normal_max_N": 2.0,
+    "patch_half_size_m": 0.001,
+    "position_radius_m": 0.0005,
+    "normal_radius": 0.0,
+    "geometry_weight": 0.0,
+    "failure_policy": "error"
+  },
+  "target": {
+    "robustness_enabled": true,
+    "gripper_geometry": "fixed_surface",
+    "point_geometry": "fixed_after_first",
+    "normal_geometry": "fixed_surface",
+    "position_radius_m": 0.015,
+    "first_point_patch_half_size_m": 0.012,
+    "normal_radius": 0.1,
+    "characteristic_length_m": 0.6,
+    "posture_weight": 0.01,
+    "rho_min": 0.1
+  },
+  "transition": {
+    "stationary_solver": "condensed",
+    "configuration_update": "contact_coordinate_midpoint",
+    "support_activation_distance_m": 0.03,
+    "point_tangent_half_size_m": 0.0002,
+    "support_gap_hermite_bounds": false,
+    "terminal_support_transitions": [],
+    "opening_dwell_s": 0.8
+  },
+  "execution": {
+    "control_mode": "hybrid_feedback",
+    "jaw_force_fraction": 0.7,
+    "reference_dt_s": 0.02,
+    "reference_projection_limit_rad": 0.02,
+    "physics_dt_s": 0.001,
+    "joint_k": 40.0,
+    "joint_d": 8.0,
+    "motion_k": [
+      40.0,
+      40.0,
+      40.0,
+      3000.0,
+      3000.0,
+      3000.0
+    ],
+    "motion_d": [
+      2.0,
+      2.0,
+      2.0,
+      40.0,
+      40.0,
+      40.0
+    ],
+    "force_k": 0.25,
+    "force_i": 1.0,
+    "force_d": [
+      2,
+      2,
+      2,
+      40,
+      40,
+      160
+    ],
+    "admittance_mass": [
+      0.2,
+      0.2,
+      0.2,
+      2.0,
+      2.0,
+      2.0
+    ],
+    "admittance_damping": [
+      4.0,
+      4.0,
+      4.0,
+      40.0,
+      40.0,
+      40.0
+    ]
+  },
+  "disturbance": {
+    "validation_fraction": 0.5,
+    "kind": "body_weighted_wrench",
+    "source_scales": [
+      0.001,
+      0.001,
+      0.001,
+      0.05,
+      0.05,
+      0.05
+    ],
+    "target_scales": [
+      0.15,
+      0.15,
+      0.15,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "body_weights": [
+      0.8,
+      0.2
+    ],
+    "base_frame": "base"
+  },
+  "feature_phase_modes": {
+    "leg_gripper": {
+      "unload_leg": "unloaded",
+      "release_leg": "released"
+    }
+  },
+  "default_types": [
+    "G",
+    "P",
+    "G"
+  ],
+  "schema_version": 1
+}

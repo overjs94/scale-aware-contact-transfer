@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { resolve, extname } from "node:path";
 const root = resolve("dist");
-const types = { ".html": "text/html", ".js": "text/javascript", ".json": "application/json", ".css": "text/css", ".urdf": "application/xml" };
+const types = { ".html": "text/html", ".js": "text/javascript", ".json": "application/json", ".css": "text/css", ".urdf": "application/xml", ".svg": "image/svg+xml", ".png": "image/png" };
 createServer(async (req, res) => {
   const path = new URL(req.url, "http://localhost").pathname;
   const file = path === "/test-module.js" ? resolve(".test/module.js") : resolve(root, "."+decodeURIComponent(path).replace(/\/$/, "/index.html"));

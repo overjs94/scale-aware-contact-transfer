@@ -1,5 +1,5 @@
 // Summaries of saved evidence. Never infer success from animation or solver status.
-const labels={full:'Selected method',no_source_refinement:'Without source refinement',fixed_contact_types:'Fixed contact types',fixed_path:'Fixed path',no_arm_force_feedforward:'Without arm reaction feedforward',contact_disabled:'Contact disabled · negative control',external_push:'External disturbance · peak 5 N'};
+const labels={full:'Selected method',no_source_refinement:'Without source refinement',fixed_contact_types:'Fixed contact types',no_target_robustness:'Nominal-only target realization',fixed_path:'Fixed path',no_arm_force_feedforward:'Without arm reaction feedforward',contact_disabled:'Contact disabled · negative control',external_push:'External disturbance'};
 const maxError=r=>Math.max(0,...Object.values(r.object_tracking||{}).map(e=>e.maximum_position_error_m));
 const minContact=r=>Object.values(r.maintained_contact_fraction||{}).filter(v=>v!==null);
 export function failureReasons(r){
@@ -30,7 +30,7 @@ export function renderFullResults(data,root){
  root.append(el('h4',`Ablation study · ${Object.keys(variants).length} conditions`));
  const t=table(['Condition / replay','Outcome','Maximum position error','Loaded-contact retention','Failed check / comparison scope']);root.append(t);
  for(const [name,r] of Object.entries(variants)){
-  const a=el('a',`${labels[name]||name} ↗`);a.href=`?model=full_${task}${name==='full'?'':'_'+name}#ablation-results`;a.title=name;
+  const a=el('a',`${labels[name]||name} ↗`);a.href=`?model=${data.study_recordings?.[name]||('full_'+task+(name==='full'?'':'_'+name))}#ablation-results`;a.title=name;
   const f=minContact(r),reasons=failureReasons(r),same=r.selection?.continuous_plan_reused;
   const detail=reasons.length?reasons.join(' · '):same?'Same continuous plan reused; fresh physical execution':name==='full'?'All execution criteria passed':'Execution criteria also passed in this condition';
   const tr=row(t,[a,r.execution_passed?'PASS':'FAIL',r.object_tracking?`${(1000*maxError(r)).toFixed(2)} mm`:'—',f.length?`${(100*Math.min(...f)).toFixed(1)}%`:'—',detail]);tr.dataset.variant=name;tr.dataset.passed=String(r.execution_passed);

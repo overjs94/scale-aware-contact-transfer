@@ -507,6 +507,72 @@ test('full assembly external push replays applied force and all controlled ablat
  await expect(page.locator('#ablation-results tr[data-variant="contact_disabled"]')).toContainText('negative control');
 });
 
+test('simultaneous forces and a moment retain their bodies and units',async({page})=>{
+ // Synthetic UI fixture only: it does not alter a saved physical experiment.
+ await page.route('**/data/full_assembly_external_push.json',async route=>{
+  const original=await route.fetch(),data=await original.json();
+  const pulse=data.external_disturbances[0],other=data.objects.find(o=>!pulse.body.endsWith('_'+o.id));
+  data.external_disturbances.push({...pulse,body:other.native_body||'object_urdf_'+other.id,force_world_N:[0,2,0],moment_world_Nm:[0,0,.2]});
+  await route.fulfill({json:data});
+ });
+ await page.goto('/?model=full_assembly_external_push');
+ await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+ await page.getByRole('button',{name:/Peak external force · arrow/}).click();
+ await expect(page.locator('#disturbance-state')).toHaveAttribute('data-force-count','2');
+ await expect(page.locator('#disturbance-state')).toHaveAttribute('data-moment-count','1');
+ await expect(page.locator('#disturbance-state')).toContainText('2.00 N');
+ await expect(page.locator('#disturbance-state')).toContainText('0.20 N·m');
+});
+
+test('current framework records expose source certificates and model extensions',async({page})=>{
+ for(const task of ['panel','box','assembly']){
+  const id='research_full_'+task;await page.goto('/?model='+id);
+  await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+  await expect(page.locator('#scenario-status')).toHaveText('Framework pipeline · execution checks passed');
+  const d=await(await page.request.get('/data/'+id+'.json')).json();
+  expect(d.report.full_framework_pipeline_certified).toBe(true);expect(d.report.full_paper_pipeline_executed).toBe(false);
+  expect(d.report.selection.source_certificates.every(s=>s.source_certificate)).toBe(true);
+  if(task!=='panel')await expect(page.locator('#contraction-state')).toContainText('19 physical source sites');
+ }
+ await page.goto('/?model=research_full_panel_fixed_path');
+ await expect(page.locator('#scenario-status')).not.toContainText('Framework pipeline');
+ await page.goto('/?model=research_full_assembly_external_push');
+ await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+ await page.getByRole('button',{name:/Peak external force · arrow/}).click();
+ await expect(page.locator('#disturbance-state')).toHaveAttribute('data-force-count','2');
+});
+
+test('current inside-margin box counterexample preserves the failed tracking and arrow',async({page})=>{
+ const id='research_probe_box_on_opposite';await page.goto('/?model='+id);
+ await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+ await expect(page.locator('#scenario-status')).toContainText('tracking failure');
+ const d=await(await page.request.get('/data/'+id+'.json')).json();
+ expect(d.report.robustness_probe.inside_on_certificate.load_to_margin_ratio).toBeCloseTo(.8,10);
+ expect(d.report.robustness_probe.inside_on_certificate.inside).toBe(true);
+ expect(d.report.execution_passed).toBe(false);
+ await page.getByRole('button',{name:/Peak external force · arrow/}).click();
+ await expect(page.locator('#disturbance-state')).toHaveAttribute('data-force-count','1');
+ await expect(page.locator('#disturbance-state')).toContainText('14.75 N');
+ await expect(page.locator('#result-tracking')).toContainText('FAIL');
+});
+
+test('current source-margin comparison retains the matched controls and recovery failure',async({page})=>{
+ await page.goto('/robustness-comparison.html?study=current');
+ await expect(page.locator('#on-outcome')).toHaveText('Bounded tracking');
+ await expect(page.locator('#off-outcome')).toHaveText('Persistent loss of support');
+ await expect(page.locator('#condition option')).toHaveCount(3);
+ await expect(page.locator('#on-certificate')).toContainText('83.6%');
+ await expect(page.locator('#response-figure')).toBeVisible();
+ await expect.poll(()=>page.locator('#response-figure').evaluate(img=>img.naturalWidth)).toBeGreaterThan(0);
+ await expect(page.locator('#play')).toBeEnabled();await page.locator('#load-event').click();
+ await expect(page.locator('#force')).toContainText('4.00 N');
+ await expect(page.frameLocator('#on-view').locator('#disturbance-state')).toContainText('4.00 N');
+ await expect(page.frameLocator('#off-view').locator('#disturbance-state')).toContainText('4.00 N');
+ await page.locator('#condition').selectOption('common_up1');
+ await expect(page.locator('#on-outcome')).toHaveText('Bounded tracking');
+ await expect(page.locator('#off-outcome')).toHaveText('Bounded tracking');
+});
+
 test('free-object form preserves edited dense groups while retiming',async({page})=>{
  await page.route('**/api/health',r=>r.fulfill({json:{ready:true,experiments_ready:true}}));let submitted;
  await page.route('**/api/experiments',async r=>{submitted=r.request().postDataJSON();await r.fulfill({status:202,json:{id:'dense'}});});

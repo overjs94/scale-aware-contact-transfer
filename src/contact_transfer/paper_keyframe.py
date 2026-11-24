@@ -40,7 +40,9 @@ def relative_interface(system,q,spec,point,rotation):
  i=spec.robot_index;r=system.robots[i];T=r.fk(q[system.q_slices[i]],spec.robot_frame);To=system.object_pose(q,spec.object_frame);p=To[:3,3]+To[:3,:3]@point;Rw=To[:3,:3]@rotation;Jr=r.jacobian(q[system.q_slices[i]],spec.robot_frame,'world_aligned');Jp=-system.point_jacobian_object(q,point,spec.object_frame);Jw=-system.angular_jacobian_object(q,spec.object_frame);Jp[:,system.v_slices[i]]+=Jr[3:,:];Jw[:,system.v_slices[i]]+=Jr[:3,:];return T,p,Rw,ca.vertcat(Rw.T@Jw,Rw.T@Jp)
 
 
-def realize_system_keyframe(system,q_initial,object_configuration,interfaces,task,*,environment=(),q_reference=None,robot_configuration_bounds=None,rho_min=0.,position_radius=.02,normal_radius=.1,characteristic_length=1.,normal_weight=1.,posture_weight=.01,robustness_weight=1.,geometry_constraints=None,base_constraints=None,settings=None,eliminate_static_torques=True):
+def realize_system_keyframe(system,q_initial,object_configuration,interfaces,task,*,environment=(),q_reference=None,robot_configuration_bounds=None,rho_min=0.,position_radius=.02,normal_radius=.1,characteristic_length=1.,normal_weight=1.,posture_weight=.01,robustness_weight=1.,geometry_constraints=None,base_constraints=None,settings=None,eliminate_static_torques=True,robustness_enabled=True):
+ if not robustness_enabled and rho_min!=0:raise ValueError('Nominal target requires rho_min=0')
+ vertices=task.vertices if robustness_enabled else np.zeros((1,task.E.shape[1]))
  if not (interfaces or environment) or characteristic_length<=0:raise ValueError('Object/robot or environmental contacts and positive object length required')
  q_initial=np.asarray(q_initial,float).reshape(system.nq);q_reference=q_initial.copy() if q_reference is None else np.asarray(q_reference,float).reshape(system.nq);qo=np.asarray(object_configuration,float).reshape(system.object_q.stop-system.object_q.start);opti=ca.Opti();qr=opti.variable(system.object_q.start);Q=ca.vertcat(qr,ca.DM(qo));opti.set_initial(qr,q_initial[:system.object_q.start]);objective=0.
  for r,qs in zip(system.robots,system.q_slices):
@@ -64,7 +66,7 @@ def realize_system_keyframe(system,q_initial,object_configuration,interfaces,tas
     point=np.array(ca.DM(system.point_world(ca.DM(q_initial),contact.point_object,contact.object_frame))).ravel();inside=inside and np.all(point[:2]>=contact.plane_bounds[0]-1e-10) and np.all(point[:2]<=contact.plane_bounds[1]+1e-10)
    enabled.append(abs(float(ca.evalf(gap)))<=1e-10 and inside)
   b0=np.asarray(ca.DM(system.bias(ca.DM(q_initial),ca.DM.zeros(system.nv)))).ravel()
-  selected=np.flatnonzero(enabled);trial=fixed_generalized_margin([maps[i] for i in selected],task,[caps[i] for i in selected],torque_gravity=np.asarray(system.B).T@b0,torque_maps=[torque_maps[i] for i in selected],effort=system.effort,rho_min=rho_min) if len(selected) else {'certificate':False}
+  selected=np.flatnonzero(enabled);trial=fixed_generalized_margin([maps[i] for i in selected],task,[caps[i] for i in selected],torque_gravity=np.asarray(system.B).T@b0,torque_maps=[torque_maps[i] for i in selected],effort=system.effort,rho_min=rho_min,fixed_rho=None if robustness_enabled else 0.) if len(selected) else {'certificate':False}
   if len(selected) and not trial['certificate'] and trial['status'] in {'NumericalError','InsufficientProgress','MaxIterations'} and np.isfinite(trial['rho']) and trial['rho']>=rho_min:
    trial=fixed_generalized_margin([maps[i] for i in selected],task,[caps[i] for i in selected],torque_gravity=np.asarray(system.B).T@b0,torque_maps=[torque_maps[i] for i in selected],effort=system.effort,rho_min=rho_min,fixed_rho=max(rho_min,.99*trial['rho']))
   if trial['certificate']:
@@ -84,6 +86,10 @@ def realize_system_keyframe(system,q_initial,object_configuration,interfaces,tas
    for c in range(warm_count):
     values=np.array([row[c] for row in warm['coordinates']]);nominal=values.mean(axis=0)
     for k in range(len(values)):warm['coordinates'][k][c]=nominal+scale*(values[k]-nominal)
+ if warm is not None and not robustness_enabled:
+  warm['reactions']=warm['reactions'].mean(axis=0,keepdims=True)
+  warm['coordinates']=[[np.array([row[c] for row in warm['coordinates']]).mean(axis=0) for c in range(warm_count)]]
+  warm['rho']=0.
  geom=[];apertures=[]
  for spec in interfaces:
   _,p,R=spec.patch.instantiate(opti);T,pw,Rw,J=relative_interface(system,Q,spec,p,R);equality(opti,T[:3,3]-pw)
@@ -104,14 +110,16 @@ def realize_system_keyframe(system,q_initial,object_configuration,interfaces,tas
   if not ca.symvar(gap):
    if float(ca.evalf(gap))< -1e-10:raise ValueError('Static object penetrates its environment plane')
   else:opti.subject_to(gap>=0)
- rho=opti.variable();opti.subject_to(rho>=rho_min);opti.set_initial(rho,rho_min if warm is None else warm['rho']);objective-=robustness_weight*rho;reactions=[];torques=[];environment_reactions={c.name:[] for c in environment}
+ rho=opti.variable() if robustness_enabled else ca.DM(0.)
+ if robustness_enabled:opti.subject_to(rho>=rho_min);opti.set_initial(rho,rho_min if warm is None else warm['rho']);objective-=robustness_weight*rho
+ reactions=[];torques=[];environment_reactions={c.name:[] for c in environment}
  nominal=system.bias(Q,ca.DM.zeros(system.nv));nominal0=np.asarray(system.bias(ca.DM(np.r_[q_initial[:system.object_q.start],qo]),ca.DM.zeros(system.nv))).ravel()[system.object_v]
  if not np.allclose(np.asarray(task.nominal),-nominal0,atol=1e-8):raise ValueError('Task nominal must match gravity/known-load model; do not count an environment load twice')
  # B is a coordinate selector for the common URDF systems. Static actuator
  # torques are unique and can be eliminated exactly: tau=B.T*(b-J.T*w).
  # Non-selector actuation retains the original explicit-torque formulation.
  B=np.asarray(system.B);eliminate=bool(eliminate_static_torques and np.allclose(B.T@B,np.eye(system.nu)) and np.all(np.count_nonzero(B,axis=1)<=1) and np.all(np.count_nonzero(B,axis=0)==1));unactuated=np.flatnonzero(np.all(B==0,axis=1))
- for vertex_index,vertex in enumerate(task.vertices):
+ for vertex_index,vertex in enumerate(vertices):
   if eliminate:tau=None;total=ca.MX.zeros(system.nv)
   else:tau=opti.variable(system.nu);opti.subject_to(opti.bounded(-system.effort,tau,system.effort));opti.set_initial(tau,0);total=system.B@tau
   lam=[]
@@ -144,5 +152,5 @@ def realize_system_keyframe(system,q_initial,object_configuration,interfaces,tas
   reactions.append(lam);torques.append(tau)
  opti.minimize(objective);sol,res=solve(opti,settings)
  result=KeyframeCertificate(np.r_[np.asarray(sol.value(qr)).ravel(),qo],np.array([np.asarray(sol.value(p)).ravel() for p,R,J in geom]),np.array([np.asarray(sol.value(R)) for p,R,J in geom]),tuple(None if a is None else float(sol.value(a)) for a in apertures),float(sol.value(rho)),np.array([[np.asarray(sol.value(w)).ravel() for w in row] for row in reactions]),np.array([np.asarray(sol.value(t)).ravel() for t in torques]),{name:np.array([np.asarray(sol.value(w)).ravel() for w in ws]) for name,ws in environment_reactions.items()},float(sol.value(objective)),res)
- result.target_provenance=dict(method='coupled_target_NLP',static_torques_eliminated=eliminate)
+ result.target_provenance=dict(method='coupled_target_NLP',static_torques_eliminated=eliminate,robustness_enabled=robustness_enabled,optimization_vertex_count=len(vertices))
  return result

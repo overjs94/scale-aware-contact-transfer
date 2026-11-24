@@ -19,7 +19,7 @@ from .conic_backends import ConicSettings
 from .sequence import choose_sequence
 
 
-ABLATIONS=('full','no_source_refinement','fixed_contact_types','fixed_path','no_arm_force_feedforward','contact_disabled','external_push')
+ABLATIONS=('full','no_source_refinement','fixed_contact_types','no_target_robustness','fixed_path','no_arm_force_feedforward','contact_disabled','external_push')
 
 
 def scenario_solver_settings(max_iterations=1000,verbose=False,solver_cpu_seconds=180.,backend='ipopt'):
@@ -31,10 +31,20 @@ def scenario_solver_settings(max_iterations=1000,verbose=False,solver_cpu_second
     return SolverSettings(tolerance=1e-6,max_iterations=max_iterations,verbose=verbose,options={'expand':False,'ipopt.max_cpu_time':float(solver_cpu_seconds),'ipopt.mu_strategy':'adaptive','ipopt.mu_init':1e-5,'ipopt.bound_push':1e-8,'ipopt.bound_frac':1e-8,'ipopt.slack_bound_push':1e-8,'ipopt.slack_bound_frac':1e-8,'ipopt.acceptable_tol':1e-4,'ipopt.acceptable_constr_viol_tol':1e-6,'ipopt.acceptable_compl_inf_tol':1e-4,'ipopt.acceptable_dual_inf_tol':1e-3,'ipopt.acceptable_obj_change_tol':1e-6,'ipopt.acceptable_iter':8})
 
 
+def source_solver_settings(max_iterations=1000,backend='ipopt'):
+    # Small source moments need stricter cone feasibility than a trajectory's
+    # global KKT acceptable-stop profile. Physical validation remains unscaled.
+    options={'expand':False}
+    if backend=='ipopt':options.update({'ipopt.constr_viol_tol':1e-10,'ipopt.compl_inf_tol':1e-9,'ipopt.acceptable_iter':0,'ipopt.max_cpu_time':180.})
+    return SolverSettings(tolerance=1e-9,acceptance_tolerance=2e-8,max_iterations=max_iterations,backend=backend,options=options)
+
+
 class FullPlanner:
-    def __init__(self,task,directory,*,steps=16,max_steps=64,refine_source=True,settings=None,progress=print,keyframe_archive=None,interval_archive=None,conic_settings=None):
+    def __init__(self,task,directory,*,steps=16,max_steps=64,refine_source=True,settings=None,progress=print,keyframe_archive=None,interval_archive=None,conic_settings=None,source_settings=None):
+        from .equation_contract import require_literal_task
+        require_literal_task(task)
         self.task=task;self.directory=Path(directory);self.directory.mkdir(parents=True,exist_ok=True);self.steps=steps;self.refine_source=refine_source;self.settings=settings or scenario_solver_settings();self.progress=progress;self.problems={};self.identities={};self.scenes={};self.ledger=[];self.timings=[];self.keyframe_archive=None if keyframe_archive is None else Path(keyframe_archive)
-        self.max_steps=max_steps;self.interval_archive=None if interval_archive is None else Path(interval_archive);self.conic_settings=conic_settings or ConicSettings()
+        self.max_steps=max_steps;self.interval_archive=None if interval_archive is None else Path(interval_archive);self.conic_settings=conic_settings or ConicSettings();self.source_settings=source_settings or source_solver_settings(backend=self.settings.backend)
         if not isinstance(steps,int) or steps<2 or max_steps<steps:raise ValueError('Require 2 <= steps <= max_steps')
         if not backend_available(self.settings.backend):raise SolverUnavailableError(f'Selected NLP solver {self.settings.backend} is unavailable')
     def current_identity(self,p):
@@ -45,7 +55,7 @@ class FullPlanner:
     def problem(self,types,assignment):
         index=(tuple(types),tuple(assignment))
         if index not in self.problems:
-            folder=self.directory/(''.join(types)+'_'+''.join(map(str,assignment)));p=FullProblem.create(self.task,folder,types,assignment,refine_source=self.refine_source,source_settings=SolverSettings(backend=self.settings.backend,max_iterations=400,options={'expand':False}),conic_settings=self.conic_settings);self.problems[index]=p;self.identities[index]=fingerprint(p,self.settings,self.steps);write_json(folder/'planning-manifest.json',planning_manifest(p,self.settings,self.steps));self.scenes[index]=build_scene(p,folder/'planning-scene.xml');self.preflight(p)
+            folder=self.directory/(''.join(types)+'_'+''.join(map(str,assignment)));p=FullProblem.create(self.task,folder,types,assignment,refine_source=self.refine_source,source_settings=self.source_settings,conic_settings=self.conic_settings);self.problems[index]=p;self.identities[index]=fingerprint(p,self.settings,self.steps);write_json(folder/'planning-manifest.json',planning_manifest(p,self.settings,self.steps));self.scenes[index]=build_scene(p,folder/'planning-scene.xml');self.preflight(p)
         return self.problems[index]
     def preflight(self,p):
         """Local IK screening only: retain numerical rejection, no global infeasibility claim."""
@@ -54,7 +64,11 @@ class FullPlanner:
         # wrench-map rank at most three/five, for every choice of positions.
         # This structural rejection precedes the local numerical IK screen.
         from .structural import free_body_span_failures
-        for failure in free_body_span_failures(self.task.object,self.task.features,p.types,p.task_load(self.task.keyframes[0]['object_q'])):
+        required=p.task_load(self.task.keyframes[0]['object_q'])
+        if not self.task.configuration.target.robustness_enabled or self.task.configuration.target.rho_min==0:
+            from types import SimpleNamespace
+            required=SimpleNamespace(nominal=required.nominal,E=np.zeros((len(required.nominal),0)))
+        for failure in free_body_span_failures(self.task.object,self.task.features,p.types,required):
             raise RuntimeError(f'Structurally insufficient contact-type wrench span on free {failure["body"]}: maximum rank {failure["maximum_rank"]}<{failure["required_rank"]} before assembly')
         for key in self.task.keyframes:
             for i,(f,r,frame,spec) in enumerate(zip(self.task.features,p.robots,p.frames,p.specs)):
@@ -200,6 +214,11 @@ class FullPlanner:
         try:result=choose_sequence(allowed,sequences,key,transition,transition_cost_lower_bound=0.)
         finally:write_json(self.directory/'stage-timings.json',self.timings)
         p=self.problem(result.best.types,result.best.assignments[0]);contacts=tuple(interval_contacts(p,k,left,len(r.dt)) for k,(left,r) in enumerate(zip(result.best.keyframes,result.best.transitions)));episode=FullEpisode(p,result.best.keyframes,result.best.transitions,contacts);report=dict(selection_executed=not fixed,selection_method='exhaustive configured hardware-compatible P/G and fixed-through-sequence injective assignment candidates',candidate_count=int(np.prod([len(a) for a in allowed]))*len(sequences),accepted_candidates=[dict(types=c.types,assignment=c.assignments[0],objective=c.objective) for c in result.candidates],rejections=result.failures,pruned_candidates=result.pruned,transition_cost_bound_scope='Nonnegative interval objective conditional on each realized keyframe sequence; not a global IK bound',selected_types=result.best.types,selected_assignment=result.best.assignments[0],objective=result.best.objective,objective_definition='sum keyframe geometry/posture minus robustness plus sum interval motion costs; no type penalty',planning_wall_time_s=perf_counter()-start,source_refinement_enabled=self.refine_source,source_certificates=[k.source for k in result.best.keyframes],target_keyframe_margins=[key.rho for key in episode.keyframes],target_methods=[getattr(key,'target_provenance',{}) for key in episode.keyframes],actual_interval_nodes=[len(r.dt) for r in episode.trajectories],solver_configuration={k:v for k,v in vars(self.settings).items() if k not in {'diagnostics_path','verbose'}},stage_cache_counts=dict(cached=sum(bool(t['cache_hit']) for t in self.timings),fresh=sum(not t['cache_hit'] for t in self.timings)),all_keyframes_optimized=True,all_intervals_cito_optimized=all(r.objective_mode=='motion_cost' for r in episode.trajectories),all_moving_object_intervals_cito_optimized=True,interval_methods=[r.objective_mode for r in episode.trajectories],keyframes=len(episode.keyframes),intervals=len(episode.trajectories),restricted_contact_candidates=True,sampled_geometry=True,continuous_certificate=False,configuration_update=[r.configuration_update for r in episode.trajectories],manuscript_literal_equations_passed=False,extension='free articulated object' if self.task.id=='box' else 'two independent floating bodies and equal/opposite inter-object contacts' if self.task.id=='assembly' else None,full_paper_pipeline_executed=False)
+        from .equation_contract import audit_episode
+        contract=audit_episode(episode);report.update(equation_contract=contract,manuscript_literal_equations_passed=contract['manuscript_literal_equations_passed'],full_paper_pipeline_executed=contract['full_paper_pipeline_executed'],source_solver_configuration={k:v for k,v in vars(self.source_settings).items() if k not in {'diagnostics_path','verbose'}})
+        if self.task.configuration.formulation_mode=='manuscript_literal' and not contract['manuscript_literal_equations_passed']:
+            write_json(self.directory/'equation-contract-rejection.json',contract)
+            raise RuntimeError('Independent manuscript literal equation gate rejected the plan')
         if forced_types is not None:report.update(selection_method='forced hardware-compatible counterfactual; continuous optimization executed',forced_types=list(given),forced_assignment=list(assignments[0]))
         elif fixed:report['selection_method']='supplied fixed type/assignment candidate'
         write_json(self.directory/'selection.json',report);return episode,report
@@ -211,7 +230,12 @@ def run_task(task_id,directory,*,variants=ABLATIONS,steps=16,max_steps=64,settin
     for variant in variants:
         folder=out/variant;folder.mkdir(parents=True,exist_ok=True);start=perf_counter()
         try:
-            if variant in {'full','no_source_refinement','fixed_contact_types'}:
+            if variant in {'full','no_source_refinement','fixed_contact_types','no_target_robustness'}:
+                variant_task=task
+                if variant=='no_target_robustness':
+                    from dataclasses import replace
+                    variant_task=replace(task,configuration=replace(task.configuration,target=replace(task.configuration.target,robustness_enabled=False,rho_min=0.)))
+                write_json(folder/'resolved-task-configuration.json',variant_task.configuration.to_dict())
                 reused=False;selection=None
                 if full_episode is not None and variant=='no_source_refinement':
                     from copy import copy,deepcopy
@@ -221,7 +245,7 @@ def run_task(task_id,directory,*,variants=ABLATIONS,steps=16,max_steps=64,settin
                     write_json(folder/'source-equivalence.json',dict(identical=identical,keyframes=comparison))
                     if identical:
                         episode=FullEpisode(other,full_episode.keyframes,full_episode.trajectories,full_episode.contacts_by_interval);selection=deepcopy(full_selection);selection.update(source_refinement_enabled=False,source_certificates=new_sources,continuous_plan_reused=True,reuse_reason='Identical transferred geometric priors at every keyframe; source forces are never transferred',new_target_solver_executed=False,solver_timing_comparison_valid=False);reused=True
-                if full_episode is not None and variant=='fixed_contact_types' and tuple(full_episode.problem.types)==tuple('GPP' if task_id=='panel' else 'GPG') and tuple(full_episode.problem.assignment)==(0,1,2):
+                if full_episode is not None and variant=='fixed_contact_types' and tuple(full_episode.problem.types)==tuple(task.configuration.default_types) and tuple(full_episode.problem.assignment)==tuple(range(len(task.features))):
                     from copy import deepcopy
                     episode=full_episode;selection=deepcopy(full_selection);selection.update(selection_executed=False,candidate_count=1,accepted_candidates=[dict(types=episode.problem.types,assignment=(0,1,2),objective=selection['objective'])],continuous_plan_reused=True,reuse_reason='The supplied fixed candidate is the same continuous problem as the selected full candidate',new_target_solver_executed=False,solver_timing_comparison_valid=False);reused=True
                 if variant=='fixed_contact_types':
@@ -234,7 +258,11 @@ def run_task(task_id,directory,*,variants=ABLATIONS,steps=16,max_steps=64,settin
                         if re.fullmatch(r'(key|interval)\d+\.npz',cached.name):
                             target=folder/'planning'/cached.parent.name/cached.name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(cached,target)
                 if not reused:
-                    archive=None if keyframe_archive is None else Path(keyframe_archive)/task_id/variant/'planning';previous_intervals=None if interval_archive is None else Path(interval_archive)/task_id/variant/'planning';planner=FullPlanner(task,folder/'planning',steps=steps,max_steps=max_steps,settings=settings,refine_source=variant!='no_source_refinement',progress=progress,keyframe_archive=archive,interval_archive=previous_intervals,conic_settings=conic_settings);episode,selection=planner.search(fixed=variant=='fixed_contact_types')
+                    archive=None if keyframe_archive is None else Path(keyframe_archive)/task_id/variant/'planning';previous_intervals=None if interval_archive is None else Path(interval_archive)/task_id/variant/'planning';planner=FullPlanner(variant_task,folder/'planning',steps=steps,max_steps=max_steps,settings=settings,refine_source=variant!='no_source_refinement',progress=progress,keyframe_archive=archive,interval_archive=previous_intervals,conic_settings=conic_settings)
+                    if variant in {'no_target_robustness','no_source_refinement'} and full_episode is not None:
+                        episode,selection=planner.search(forced_types=full_episode.problem.types,forced_assignment=full_episode.problem.assignment)
+                        selection.update(controlled_candidate_fixed_to_full=True,only_ablation=variant)
+                    else:episode,selection=planner.search(fixed=variant=='fixed_contact_types')
                 if reused:write_json(folder/'plan-origin.json',dict(planning_directory=str(full_episode.problem.directory),independent_native_validation_required=True,reason=selection['reuse_reason']))
                 if variant=='full':full_episode,full_selection=episode,selection
             else:
@@ -249,10 +277,23 @@ def run_task(task_id,directory,*,variants=ABLATIONS,steps=16,max_steps=64,settin
                     selection=deepcopy(full_selection);selection.update(interval_methods=[r.objective_mode for r in rs],all_intervals_cito_optimized=False,all_moving_object_intervals_cito_optimized=False,fixed_path_same_phase_durations=True,sequence_objective_comparable=False,objective=None)
                 elif variant=='no_arm_force_feedforward':episode=FullEpisode(episode.problem,episode.keyframes,episode.trajectories,episode.contacts_by_interval,force_feedforward=False)
             disturbances=()
+            load_certificate=None
             if variant=='external_push':
-                from .perturbations import WrenchPulse
-                roots=build_scene(episode.problem,folder/'force-target-scene.xml').object_roots;disturbances=(WrenchPulse(next(iter(roots.values())),episode.preparation+episode.time[-1]*.45,1.,(5.,0.,0.)),)
-            trace,controller,scene,geometry=run_full_episode(episode,folder/'native',contacts_enabled=variant!='contact_disabled',allow_reduced_baseline=variant=='fixed_path',disturbances=disturbances,progress=lambda t,total:progress(f'{task_id}/{variant}: native {t:.0f}/{total:.1f}s',flush=True) if int(t)%5==0 else None);report=assess(episode,trace,controller,scene,geometry=geometry);report.update(variant=variant,selection=selection,full_variant_pipeline_executed=variant=='full',all_intervals_cito_optimized=variant!='fixed_path' and all(r.objective_mode=='motion_cost' for r in episode.trajectories),interval_methods=[r.objective_mode for r in episode.trajectories],fixed_path_integration_residuals=[validate_interval(episode.problem,r,c) for r,c in zip(episode.trajectories,episode.contacts_by_interval)] if variant=='fixed_path' else None);recordings.append((episode,trace,report,scene,variant))
+                from .certified_disturbance import physical_hold,schedule_membership
+                first=episode.trajectories[0]
+                if np.max(abs(first.q-first.q[0]))>1e-8:raise ValueError('Inside-margin external_push requires a stationary optimized first interval; use the explicit keyframe probe for a moving task')
+                problem=episode.problem;key=episode.keyframes[0];check=validate_keyframe(problem,key);rho=min(key.rho,check['frozen_conic']['rho'])
+                if not check['passed'] or rho<=0:raise RuntimeError('No positive independently certified optimized margin for the external load')
+                scene=build_scene(problem,folder/'force-target-scene.xml');policy=problem.task_definition.configuration.disturbance
+                coefficient=np.zeros(problem.task_load(key.q[problem.system.object_q]).E.shape[1]);coefficient[2 if policy.kind=='base_force_joint_torque' else 5]=policy.validation_fraction*rho
+                duration=float(first.dt.sum());disturbances=physical_hold(problem,key,scene,coefficient,start=episode.preparation+.2*duration,duration=.6*duration,ramp=.1*duration)
+                load_certificate=schedule_membership(problem,key.q[problem.system.object_q],disturbances,rho,scene)
+                if not load_certificate['inside']:raise RuntimeError('Refusing external load outside the optimized reference-pose certificate')
+            trace,controller,scene,geometry=run_full_episode(episode,folder/'native',contacts_enabled=variant!='contact_disabled',allow_reduced_baseline=variant=='fixed_path',disturbances=disturbances,progress=lambda t,total:progress(f'{task_id}/{variant}: native {t:.0f}/{total:.1f}s',flush=True) if int(t)%5==0 else None);report=assess(episode,trace,controller,scene,geometry=geometry);report.update(variant=variant,selection=selection,full_variant_pipeline_executed=variant=='full',all_intervals_cito_optimized=variant!='fixed_path' and all(r.objective_mode=='motion_cost' for r in episode.trajectories),interval_methods=[r.objective_mode for r in episode.trajectories],fixed_path_integration_residuals=[validate_interval(episode.problem,r,c) for r,c in zip(episode.trajectories,episode.contacts_by_interval)] if variant=='fixed_path' else None)
+            from .equation_contract import audit_episode
+            contract=audit_episode(episode);report.update(equation_contract=contract,full_framework_pipeline_certified=contract['full_framework_stage_execution'] and bool(report['execution_passed']),full_paper_pipeline_executed=variant=='full' and contract['full_paper_pipeline_executed'])
+            report['external_disturbance_certificate']=load_certificate
+            recordings.append((episode,trace,report,scene,variant))
         except (RuntimeError,ValueError) as error:report=dict(variant=variant,execution_passed=False,full_variant_pipeline_executed=False,failure=str(error))
         report['trial_wall_time_s']=perf_counter()-start;report['new_physical_trial_executed']='engine' in report;write_json(folder/'result.json',report)
         # Independent controlled trials may run in separate Python workers.

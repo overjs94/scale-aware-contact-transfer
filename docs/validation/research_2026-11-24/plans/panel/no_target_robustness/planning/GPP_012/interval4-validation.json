@@ -1,0 +1,53 @@
+{
+  "independent": {
+    "passed": true,
+    "residuals": {
+      "momentum": 4.884981308350689e-15,
+      "integration": 1.4432899320127035e-15,
+      "complementarity": 9.811867773370235e-09,
+      "dissipation": 1.9083944856172866e-10,
+      "capability": 0.0,
+      "closure": 8.326672684688674e-16,
+      "rotation_closure": 2.5320418015639863e-15,
+      "grasp_velocity": 5.207792801882382e-17,
+      "point_alignment": 6.278339890477861e-16,
+      "point_tangent_bounds": 0.0,
+      "limits": 0.0,
+      "endpoint_velocity": 2.5151809597583705e-24,
+      "quaternion_norm": 1.1102230246251565e-16,
+      "contact_chart_singularity": 0.0,
+      "support_Hermite_control_gap": 5.551115123125784e-17
+    },
+    "configuration_update": "contact_coordinate_midpoint",
+    "configuration_defect": {
+      "maximum_translation_component_m": 0.0,
+      "maximum_rotation_component_rad": 0.0,
+      "maximum_translation_norm_m": 0.0,
+      "maximum_rotation_norm_rad": 0.0,
+      "bounds": []
+    },
+    "contact_chart": {
+      "dependent_joint_midpoint_difference_rad": 3.685552163590344e-05,
+      "minimum_native_singular_value": 0.15537132284847427
+    },
+    "independent": "native Pinocchio mass/bias/J and NumPy transforms"
+  },
+  "reference_geometry": {
+    "passed": true,
+    "samples": 193,
+    "continuous_certificate": false,
+    "reference_interpolation": "object_SE3_and_conditioned_joint_Hermite_with_dense_IK",
+    "reference_id": "918148098a001018c8a55ceaa6f9256852fa43f75677fde341557b1b758f5653",
+    "reference_mesh": {
+      "minimum_spacing_s": 0.018750000007883294,
+      "maximum_joint_acceleration_rad_s2": 0.23331124665605898,
+      "optimized_node_velocities_preserved": true
+    },
+    "released_gripper_reference": "native URDF open configuration after stationary opening dwell",
+    "projection_limit_rad": 0.02,
+    "projection_max_rad": 2.1248578558896725e-06,
+    "compliant_pad_allowance_m": 0.001,
+    "unintended_clearance_m": 0.001,
+    "violations": []
+  }
+}

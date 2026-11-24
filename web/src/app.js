@@ -2,7 +2,7 @@ import { createStudio } from "./studio.js";
 import { initializeExperiment } from "./experiment.js";
 import { categories, libraryEntry, recordingScope } from "./library.js";
 import { englishRecording } from './presentation-en.js';
-import { disturbanceScale } from './disturbance.js';
+import { disturbanceScale,activeWrenches,disturbedObject } from './disturbance.js';
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { applyRecordedPose, disposeModel, loadURDFModel } from "./urdf-view.js";
@@ -41,7 +41,11 @@ const sun = new THREE.DirectionalLight(0xddeaff, 3.5);
 sun.position.set(3, -2, 5); scene.add(sun);
 const rim = new THREE.DirectionalLight(0x4ac7ba, 1.8);
 rim.position.set(-2, 3, 2); scene.add(rim);
-const forceArrow=new THREE.ArrowHelper(new THREE.Vector3(0,1,0),new THREE.Vector3(),.5,0xef683c,.08,.04);forceArrow.visible=false;for(const mesh of [forceArrow.line,forceArrow.cone]){mesh.material.depthTest=false;mesh.renderOrder=1100;}scene.add(forceArrow);
+const forceArrows=[];
+function disturbanceArrow(index,color){
+ if(!forceArrows[index]){const arrow=new THREE.ArrowHelper(new THREE.Vector3(0,1,0),new THREE.Vector3(),.5,color,.08,.04);for(const mesh of [arrow.line,arrow.cone]){mesh.material.depthTest=false;mesh.renderOrder=1100;}scene.add(arrow);forceArrows[index]=arrow;}
+ const arrow=forceArrows[index];arrow.setColor(color);arrow.userData.color=color;return arrow;
+}
 let grid;let contactOverlay;let nativeContactOverlay;
 const contactColors=[0x25bfa3,0xf4a340,0xa788f5];
 const contactNames={base_grasp:'Base grasp',base_support:'Base support',moving_manipulation:'Lid grasp',edge_grip:'Panel-edge grasp',under_left:'Left panel support',under_right:'Right panel support',top_gripper:'Tabletop grasp',point_support:'Tabletop support',leg_gripper:'Leg grasp',support_0:'Left support',support_1:'Center support',support_2:'Right support'};
@@ -96,7 +100,7 @@ function buildGeometry(data) {
     const points=new THREE.Points(new THREE.BufferGeometry().setFromPoints(g.target_points_m.map(p=>new THREE.Vector3(...p))),new THREE.PointsMaterial({color,size:.007,depthTest:false}));points.userData.dense=true;points.renderOrder=1001;group.add(points);
     const anchor=new THREE.Mesh(new THREE.SphereGeometry(.006,14,10),new THREE.MeshBasicMaterial({color,depthTest:false}));anchor.position.fromArray(g.target_anchor_m);anchor.userData.anchor=true;anchor.renderOrder=1002;group.add(anchor);contactOverlay.add(group);
   }
-  $('contraction-state').replaceChildren();if(data.contact_contraction){const c=data.contact_contraction;$('contraction-state').append(c.input_type==='supplied_contracted_contacts'?` · Supplied ${c.contracted_contact_count} contracted contacts → 3 arms · `:` · ${c.dense_sample_count} samples → ${c.contracted_contact_count} anchors → 3 arms · `);for(const [i,g] of c.groups.entries()){const label=document.createElement('span');label.style.color='#'+contactColors[i%contactColors.length].toString(16).padStart(6,'0');label.textContent=` ${g.group_id}@${g.link_id} → ${c.assignment.find(a=>a.group_id===g.group_id).arm_id} `;$('contraction-state').append(label);}}
+  $('contraction-state').replaceChildren();if(data.contact_contraction){const c=data.contact_contraction;$('contraction-state').append(c.source_model_extension?` · ${c.physical_source_site_count} physical source sites → ${c.contracted_contact_count} supplied functional groups → 3 arms · declared extension · `:c.input_type==='supplied_contracted_contacts'?` · Supplied ${c.contracted_contact_count} contracted contacts → 3 arms · `:` · ${c.dense_sample_count} samples → ${c.contracted_contact_count} anchors → 3 arms · `);for(const [i,g] of c.groups.entries()){const label=document.createElement('span');label.style.color='#'+contactColors[i%contactColors.length].toString(16).padStart(6,'0');label.textContent=` ${g.group_id}@${g.link_id} → ${c.assignment.find(a=>a.group_id===g.group_id).arm_id} `;$('contraction-state').append(label);}}
   for (const item of (data.instances?.some(i=>["static_jig","articulated_object"].includes(i.role)) ? [] : data.environment) || []) {
     if (item.type !== "box") continue;
     const mesh = new THREE.Mesh(new THREE.BoxGeometry(...item.size), new THREE.MeshStandardMaterial({color:item.color, transparent:true, opacity:.6}));
@@ -212,10 +216,23 @@ function updateGeometry(value) {
   nativeContactOverlay?.children.forEach((marker,i)=>{marker.visible=!!patches[i]&&$('native-contact-visible').checked;if(patches[i])marker.position.fromArray(patches[i].position_world_m);});
   $('native-contact-state').dataset.count=String(patches.length);
   $('native-contact-state').textContent=dataset.native_contact_samples?`native ${dataset.times[sample].toFixed(3)} s · ${patches.length} contact patches · no contact interpolation${patches.length?' · minimum signed gap '+(1000*Math.min(...patches.map(p=>p.minimum_gap_m))).toFixed(3)+' mm':''}`:'';
-  const time=dataset.times[lo]*(1-f)+dataset.times[hi]*f;const pulses=dataset.external_disturbances||[];const pulse=pulses.find(p=>time>=p.start&&time<=p.start+p.duration);forceArrow.visible=false;
-  if(pulse&&dataset.objects?.[0]?.poses){const object=dataset.objects.find(o=>o.native_body===pulse.body)||dataset.objects[0],pose=object.poses[lo],next=object.poses[hi],quat=new THREE.Quaternion().fromArray(pose,3).slerp(new THREE.Quaternion().fromArray(next,3),f);const origin=new THREE.Vector3(...pose.slice(0,3)).lerp(new THREE.Vector3(...next.slice(0,3)),f).add(new THREE.Vector3(...pulse.point_body_m).applyQuaternion(quat));const magnitude=disturbanceScale(pulse,time);const force=new THREE.Vector3(...pulse.force_world_N).multiplyScalar(magnitude);if(force.length()>.01){forceArrow.position.copy(origin);forceArrow.setDirection(force.clone().normalize());forceArrow.setLength(.12+force.length()*.015,.08,.04);forceArrow.visible=true;}}
-  $('disturbance-state').hidden=!pulses.length;$('disturbance-state').dataset.active=String(forceArrow.visible);
-  $('disturbance-state').textContent=pulse?`Applied external force · ${(disturbanceScale(pulse,time)*Math.hypot(...pulse.force_world_N)).toFixed(2)} N · world frame` : pulses.length?`External disturbance: ${pulses.map(p=>`${p.start}–${p.start+p.duration} s / peak ${Math.hypot(...p.force_world_N)} N`).join(', ')}`:'';
+  const time=dataset.times[lo]*(1-f)+dataset.times[hi]*f,pulses=dataset.external_disturbances||[],active=activeWrenches(pulses,time);
+  forceArrows.forEach(arrow=>{arrow.visible=false;});let glyph=0,forces=0,moments=0;const labels=[];
+  for(const wrench of active){
+    const object=disturbedObject(dataset.objects||[],wrench.pulse.body);
+    if(!object?.poses)continue;
+    const pose=object.poses[lo],next=object.poses[hi],quat=new THREE.Quaternion().fromArray(pose,3).slerp(new THREE.Quaternion().fromArray(next,3),f);
+    const origin=new THREE.Vector3(...pose.slice(0,3)).lerp(new THREE.Vector3(...next.slice(0,3)),f).add(new THREE.Vector3(...(wrench.pulse.point_body_m||[0,0,0])).applyQuaternion(quat));
+    for(const [values,kind,color] of [[wrench.force,'force',0xef683c],[wrench.moment,'moment',0xa078f4]]){
+      const vector=new THREE.Vector3(...values),magnitude=vector.length();if(magnitude<=1e-6)continue;
+      const arrow=disturbanceArrow(glyph++,color),length=.12+magnitude*(kind==='force'?.015:.1);
+      arrow.position.copy(origin);arrow.setDirection(vector.normalize());arrow.setLength(length,.08,.04);arrow.userData.displayLength=length;arrow.visible=true;
+      if(kind==='force')forces++;else moments++;
+      labels.push(`${object.id}: ${magnitude.toFixed(2)} ${kind==='force'?'N':'N·m (moment axis)'}`);
+    }
+  }
+  const state=$('disturbance-state');state.hidden=!pulses.length;state.dataset.active=String(glyph>0);state.dataset.forceCount=String(forces);state.dataset.momentCount=String(moments);
+  state.textContent=glyph?`${forces?'Applied external force':'Applied external moment'} · ${labels.join(' · ')} · world frame`:pulses.length?`External disturbance: ${pulses.map(p=>{const F=Math.hypot(...(p.force_world_N||[0,0,0])),M=Math.hypot(...(p.moment_world_Nm||[0,0,0]));return `${p.start}–${p.start+p.duration} s / peak ${[F?F+' N':'',M?M+' N·m':''].filter(Boolean).join(' + ')||'0 N'}`;}).join(', ')}`:'';
   displayedPositions = positions;
 }
 // Preserve orbit/zoom and real URDF coordinates when WebGL is unavailable.
@@ -277,7 +294,7 @@ function drawCanvasScene() {
   }
   for(const group of contactOverlay?.children||[]){group.updateMatrixWorld(true);const g=group.userData.contactGroup,mode=$('contact-display').value;if(mode==='off')continue;ctx.fillStyle='#'+contactColors[contactOverlay.children.indexOf(group)%contactColors.length].toString(16).padStart(6,'0');for(const point of (mode==='dense'||mode==='both'?g.target_points_m:[])){const p=project(group.localToWorld(new THREE.Vector3(...point)));ctx.beginPath();ctx.arc(p[0],p[1],2*scale,0,Math.PI*2);ctx.fill();}if(mode==='contracted'||mode==='both'){const p=project(group.localToWorld(new THREE.Vector3(...g.target_anchor_m)));ctx.beginPath();ctx.arc(p[0],p[1],6*scale,0,Math.PI*2);ctx.fill();}}
   for(const marker of nativeContactOverlay?.children||[])if(marker.visible){const p=project(marker.position);ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(p[0],p[1],3*scale,0,Math.PI*2);ctx.fill();}
-  if(forceArrow.visible){const a=forceArrow.position,b=new THREE.Vector3(0,1,0).applyQuaternion(forceArrow.quaternion).multiplyScalar(forceArrow.line.scale.y+.08).add(a);line(a,b,"#ff482f",4);const tip=project(b),tail=project(a),angle=Math.atan2(tip[1]-tail[1],tip[0]-tail[0]);ctx.fillStyle="#ff482f";ctx.beginPath();ctx.moveTo(tip[0],tip[1]);for(const sign of [-1,1])ctx.lineTo(tip[0]-15*scale*Math.cos(angle+sign*.4),tip[1]-15*scale*Math.sin(angle+sign*.4));ctx.closePath();ctx.fill();}
+  for(const arrow of forceArrows)if(arrow.visible){const a=arrow.position,b=new THREE.Vector3(0,1,0).applyQuaternion(arrow.quaternion).multiplyScalar(arrow.userData.displayLength).add(a),color='#'+arrow.userData.color.toString(16).padStart(6,'0');line(a,b,color,4);const tip=project(b),tail=project(a),angle=Math.atan2(tip[1]-tail[1],tip[0]-tail[0]);ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(tip[0],tip[1]);for(const sign of [-1,1])ctx.lineTo(tip[0]-15*scale*Math.cos(angle+sign*.4),tip[1]-15*scale*Math.sin(angle+sign*.4));ctx.closePath();ctx.fill();}
   ctx.fillStyle = "#8fa6c3"; ctx.font = `${9 * scale}px sans-serif`;
   ctx.fillText("CPU 3D PROJECTION · WebGL unavailable", 18 * scale, h - 40 * scale);
 }
@@ -382,7 +399,8 @@ function showData(original) {
   $("tool-frame").textContent = data.frame;
   $("scope-description").textContent = data.description;
   $("keyframe-list").replaceChildren();
-  for (const keyframe of [...(data.keyframes || []), ...(data.events || [])].sort((a,b)=>a.time-b.time)) {
+  const events=[...(data.keyframes || []), ...(data.events || [])].sort((a,b)=>a.time-b.time);
+  for (const keyframe of events.filter((event,i)=>events.findIndex(other=>other.id===event.id&&Math.abs(other.time-event.time)<1e-9)===i)) {
     const button = document.createElement("button"); button.className = "keyframe-choice";
     button.textContent = keyframe.id + " · " + keyframe.time.toFixed(1) + " s";
     button.onclick = () => {
@@ -467,7 +485,7 @@ async function init() {
   $("model-count").textContent = String(index.models.length).padStart(2, "0");
   buildLibrary(index.models);
   const requestedModel = new URLSearchParams(location.search).get("model");
-  await selectModel(index.models.some(model => model.id === requestedModel) ? requestedModel : ["full_assembly","full_panel","full_box","free_box_lid"].find(id=>index.models.some(m=>m.id===id)));
+  await selectModel(index.models.some(model => model.id === requestedModel) ? requestedModel : ["research_full_assembly","research_full_panel","research_full_box","full_assembly","full_panel","full_box","free_box_lid"].find(id=>index.models.some(m=>m.id===id)));
   try {
     const health = await fetch("./api/health");
     if (health.ok) backend = (await health.json()).ready === true;

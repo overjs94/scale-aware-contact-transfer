@@ -1,0 +1,17 @@
+[
+  {
+    "task": "panel",
+    "exit_code": 0,
+    "log": "outputs/research-study/full-load-v1/panel.log"
+  },
+  {
+    "task": "box",
+    "exit_code": 0,
+    "log": "outputs/research-study/full-load-v1/box.log"
+  },
+  {
+    "task": "assembly",
+    "exit_code": 0,
+    "log": "outputs/research-study/full-load-v1/assembly.log"
+  }
+]

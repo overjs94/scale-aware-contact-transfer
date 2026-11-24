@@ -294,6 +294,9 @@ class FullProblem:
         from .provenance import content_identity,file_digest,model_manifest
         task=self.task_definition;objects=task.object.bodies.values() if isinstance(task.object,RigidCollection) else [task.object]
         source_file=task.original.data.get('source_file');source_hash=file_digest(task.original.path.parent/source_file) if source_file else None
+        if task.configuration.source.site_file:
+            from .grouped_source import fixture_path
+            source_hash=(source_hash,file_digest(fixture_path(task.configuration.source.site_file)))
         identity=content_identity(dict(configuration=task.configuration,source_settings=self.source_settings,source_file=source_hash,case=task.original.data,scale=task.scale,models=[model_manifest(o) for o in objects],features=[vars(f) for f in task.features],object_q=key['object_q'],enabled=self.refine_enabled,code={p.name:file_digest(p) for p in Path(__file__).parent.glob('*.py')}),namespace='source')
         if not hasattr(task,'_source_cache'):task._source_cache={}
         if identity in task._source_cache:
@@ -304,13 +307,18 @@ class FullProblem:
 
     def _compute_source(self,key):
         task=self.task_definition;qo=key['object_q'];obj=task.object
-        if 'source_file' in task.original.data:
+        if 'source_file' in task.original.data and task.configuration.source.representation=='single_point':
             cfg=task.configuration.source;result=refine_source_and_transfer(task.original.path.parent/task.original.data['source_file'],enabled=self.refine_enabled,geometry_weight=cfg.geometry_weight,position_radius=cfg.position_radius_m,normal_radius=cfg.normal_radius,object_rotation=Rotation.from_quat(qo[3:7]).as_matrix(),settings=self.source_settings);return dict(positions=np.array(result['target_positions_m']),normals=np.array(result['target_normals']),record=result)
         def scaled(part,name):
             masses={n:link.mass/task.scale**3 for n,link in part.tree.links.items() if link.mass>0}
             return source_urdf(SimpleNamespace(object=part),self.directory/f'source_{name}.urdf',task.scale,masses)
         if isinstance(obj,RigidCollection):src=RigidCollection({n:scaled(r,n) for n,r in obj.bodies.items()});qs=np.concatenate([np.r_[qo[s][:3]/task.scale,qo[s][3:]] for s in obj.q_slices.values()])
         else:src=scaled(obj,'box');qs=qo.copy();qs[:3]/=task.scale
+        if task.configuration.source.representation=='functional_group_sites':
+            from .grouped_source import refine_functional_groups
+            return refine_functional_groups(src,qs,self.task_load(qs,source_object=src),task.features,
+                scale=task.scale,policy=task.configuration.source,enabled=self.refine_enabled,
+                settings=self.source_settings,conic_settings=self.conic_settings)
         from .structural import free_body_span_failures
         cfg=task.configuration.source;load=self.task_load(qs,source_object=src);structural=free_body_span_failures(src,task.features,('P',)*len(task.features),load);patches=[SurfacePatch.plane(f.surface/task.scale,f.normal,(cfg.patch_half_size_m,)*2) for f in task.features];source_model=src.symbolic();maps=[link_reaction_map(source_model,qs,f.frame) for f in task.features];prior=source_prior(patches,load,[Capability(mu=cfg.mu,normal_max=cfg.normal_max_N) for _ in patches],group_ids=[f.id for f in task.features],reaction_maps=maps,position_radius=cfg.position_radius_m if self.refine_enabled else 0.,normal_radius=cfg.normal_radius,geometry_weight=cfg.geometry_weight,failure_policy=cfg.failure_policy,structural_failures=structural,settings=self.source_settings or SolverSettings(max_iterations=400,options={'expand':False}));transfer=scale_prior(prior,task.scale)
         return dict(positions=transfer['positions'],normals=transfer['normals'],record=dict(synthetic_input=True,network_inference_executed=False,source_refinement_enabled=self.refine_enabled,source_status=prior.source_status,source_certificate=prior.source_certificate,source_rho=prior.source_rho,source_failure=prior.failure_reason,source_failure_kind=prior.failure_kind,source_diagnostics=prior.diagnostics,source_geometry_fallback=not prior.source_certificate,source_forces_transferred=False,source_to_target_scale=task.scale))
@@ -356,7 +364,7 @@ class FullProblem:
         if previous is not None and len(interfaces)==len(self.task_definition.features):
             from .full_static import fixed_geometry_keyframe
             certificate=fixed_geometry_keyframe(self,seed,interfaces,prior,environment,target_settings,q_reference=reference,robot_configuration_bounds=bounds)
-        if certificate is None:certificate=realize_system_keyframe(self.system,seed,qo,interfaces,self.task_load(qo),environment=environment,rho_min=policy.rho_min,q_reference=reference,robot_configuration_bounds=bounds,position_radius=policy.position_radius_m,normal_radius=policy.normal_radius,characteristic_length=policy.characteristic_length_m,posture_weight=policy.posture_weight,settings=target_settings)
+        if certificate is None:certificate=realize_system_keyframe(self.system,seed,qo,interfaces,self.task_load(qo),environment=environment,rho_min=policy.rho_min,q_reference=reference,robot_configuration_bounds=bounds,position_radius=policy.position_radius_m,normal_radius=policy.normal_radius,characteristic_length=policy.characteristic_length_m,posture_weight=policy.posture_weight,settings=target_settings,robustness_enabled=policy.robustness_enabled)
         # Keep a stable group order, including unloaded/released zero reactions.
         M=len(self.task_definition.features);old=certificate.reactions;reactions=np.zeros((len(old),M,6));positions=np.array([f.surface for f in self.task_definition.features]);rotations=np.array([contact_basis(f.normal) for f in self.task_definition.features]);apertures=[getattr(c,'aperture_required',None) for c in self.capabilities]
         for i,s in enumerate(interfaces):j=next(j for j,f in enumerate(self.task_definition.features) if f.id==s.group_id);reactions[:,j]=old[:,i];positions[j]=certificate.positions[i];rotations[j]=certificate.rotations[i]

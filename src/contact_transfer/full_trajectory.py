@@ -213,9 +213,10 @@ def solve_interval(problem,k,left,right,settings,*,steps=16,configuration_update
     from .full_static import stationary_interval,released_arm_interval
     sys=problem.system;duration=problem.task_definition.keyframes[k+1]['time']-problem.task_definition.keyframes[k]['time'];contacts=interval_contacts(problem,k,left,steps)
     if configuration_update is None:configuration_update=task_configuration(problem.task_definition).transition.configuration_update
-    if np.max(abs(left.q-right.q))<1e-8:
+    condensed=task_configuration(problem.task_definition).transition.stationary_solver=='condensed'
+    if condensed and np.max(abs(left.q-right.q))<1e-8:
         return stationary_interval(problem,left,right,contacts,duration,steps)
-    if left.phase in {'released','release_leg'} and np.max(abs(left.q[sys.object_q]-right.q[sys.object_q]))<1e-8:
+    if condensed and left.phase in {'released','release_leg'} and np.max(abs(left.q[sys.object_q]-right.q[sys.object_q]))<1e-8:
         return released_arm_interval(problem,left,right,contacts,duration,steps,settings)
     initial=initial_interval(problem,k,left,right,steps,duration,contacts)
     obj=problem.task_definition.object;frames=list(obj.names) if isinstance(obj,RigidCollection) else list(obj.tree.links) if problem.task_definition.id=='box' else [obj.tree.root];desired={f:[] for f in frames}

@@ -55,6 +55,10 @@ def planning_manifest(problem, settings, steps):
     for key, value in original.data.items():
         if isinstance(value, str) and value.endswith(('.json', '.urdf', '.srdf')):
             inputs[key] = file_digest(Path(original.path).parent / value)
+    policy=getattr(getattr(task,'configuration',None),'source',None)
+    if policy is not None and policy.site_file:
+        from .grouped_source import fixture_path
+        inputs['source_site_file']=file_digest(fixture_path(policy.site_file))
     objects = task.object.bodies.values() if hasattr(task.object, 'bodies') else [task.object]
     package = Path(__file__).parent
     libraries = {}

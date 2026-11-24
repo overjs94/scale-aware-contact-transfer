@@ -1,0 +1,143 @@
+{
+  "model_family": "cartesian",
+  "planner": "cito",
+  "prediction_source": "assumed_contracted_network_output",
+  "network_inference_executed": false,
+  "arms": 3,
+  "keyframes": 3,
+  "solver_backend": "ipopt",
+  "unexpected_penetrations_m": {},
+  "sampled_collision_check_passed": true,
+  "complementarity_applicable": true,
+  "mujoco_version": "4.0.0",
+  "timestep": 0.001,
+  "tool_types": [
+    "P",
+    "G",
+    "S"
+  ],
+  "keyframe_rho": [
+    1.5994565067037019,
+    1.5994565067037019,
+    1.5994565067037019
+  ],
+  "primal_residual": 9.380256851977287e-11,
+  "complementarity_residual": 1.3482869177392611e-15,
+  "friction_residual": 9.380256851977287e-11,
+  "gripper_velocity_residual": 9.586330813206397e-08,
+  "keyframe_errors": [
+    {
+      "id": "support",
+      "time": 0.3,
+      "translation_m": 0.000939448294798423,
+      "rotation_rad": 0.008709177986194642
+    },
+    {
+      "id": "lift",
+      "time": 1.5,
+      "translation_m": 0.0011690639057671919,
+      "rotation_rad": 0.00843864699327505
+    },
+    {
+      "id": "transfer",
+      "time": 2.7,
+      "translation_m": 0.0011706288871353601,
+      "rotation_rad": 0.008383702446250191
+    }
+  ],
+  "tracking_passed": true,
+  "seal_events": [
+    {
+      "time": 0.0,
+      "event": "acquired"
+    },
+    {
+      "time": 3.0,
+      "event": "vented"
+    }
+  ],
+  "seal_retained_before_vent": true,
+  "vacuum_adhesion_limit_N": 15,
+  "contact_samples": 27837,
+  "tool_force_checks": [
+    {
+      "group_id": "support_sphere",
+      "kind": "P",
+      "window_seconds": [
+        0.3,
+        3.0
+      ],
+      "maximum_violation_N": 0.0,
+      "force_min_N": [
+        0.03897520857962509,
+        -0.23726541480690794,
+        3.3782430775010357
+      ],
+      "force_max_N": [
+        0.4646638753485251,
+        0.22504563552016793,
+        6.65604681492981
+      ],
+      "peak_resultant_moment_Nm": 0.003706974216407523,
+      "moment_capacity_certified": false
+    },
+    {
+      "group_id": "jaw_hold",
+      "kind": "G",
+      "window_seconds": [
+        0.3,
+        3.0
+      ],
+      "maximum_violation_N": 0.0,
+      "force_min_N": [
+        -2.0892581051210417,
+        -0.3549714705544694,
+        -2.5814138407671527
+      ],
+      "force_max_N": [
+        -0.4164946918523736,
+        -0.03186578812236964,
+        1.8167519543151707
+      ],
+      "peak_resultant_moment_Nm": 0.5026503073024379,
+      "moment_capacity_certified": false
+    },
+    {
+      "group_id": "vacuum_hold",
+      "kind": "S",
+      "window_seconds": [
+        0.3,
+        3.0
+      ],
+      "maximum_violation_N": 0.0,
+      "force_min_N": [
+        -0.00892590307298787,
+        -0.028566121908549773,
+        -4.245636830537722
+      ],
+      "force_max_N": [
+        0.09113876851627943,
+        0.35248903173821544,
+        -2.4686237401221245
+      ],
+      "peak_resultant_moment_Nm": 1.293864570420887e-15,
+      "moment_capacity_certified": false
+    }
+  ],
+  "force_envelopes_passed": true,
+  "final_object_position": [
+    0.013835320388866505,
+    -0.017534286562461605,
+    0.469953939233267
+  ],
+  "full_geometry_certified": false,
+  "equality_constraints_used": 0,
+  "limitations": [
+    "assumed network predictions; no learned model inference",
+    "translation-only Cartesian arm prototype",
+    "assumed synthetic gripper capability; no hardware calibration",
+    "force-only planning does not certify measured finite-gripper moments",
+    "pressure-limited point seal, not cup/fluid FEM",
+    "preparation and post-task release are scripted, not optimized placement"
+  ]
+}

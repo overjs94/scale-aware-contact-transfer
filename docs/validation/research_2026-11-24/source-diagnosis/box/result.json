@@ -1,0 +1,154 @@
+[
+  {
+    "status": "PrimalInfeasible",
+    "nominal_globally_infeasible_within_trust_region": true,
+    "dual_certificate": {
+      "verified": true,
+      "stationarity_residual": 8.526512829121202e-14,
+      "dual_cone_residual": 0.0,
+      "b_dot_z": -0.9999999999999999
+    },
+    "outer_feasible": false,
+    "normals_fixed": true,
+    "position_radius_m": 0.0005,
+    "relaxation": "independent generalized-moment error bounds containing all allowed point shifts",
+    "passing_outer_test_is_not_source_certificate": true,
+    "keyframe": "initial",
+    "frozen_anchor_status": "PrimalInfeasible",
+    "frozen_anchor_certificate": false,
+    "frozen_anchor_rho": 1.673961083481433e-10
+  },
+  {
+    "status": "PrimalInfeasible",
+    "nominal_globally_infeasible_within_trust_region": true,
+    "dual_certificate": {
+      "verified": true,
+      "stationarity_residual": 8.526512829121202e-14,
+      "dual_cone_residual": 0.0,
+      "b_dot_z": -0.9999999999999999
+    },
+    "outer_feasible": false,
+    "normals_fixed": true,
+    "position_radius_m": 0.0005,
+    "relaxation": "independent generalized-moment error bounds containing all allowed point shifts",
+    "passing_outer_test_is_not_source_certificate": true,
+    "keyframe": "lift_start",
+    "frozen_anchor_status": "PrimalInfeasible",
+    "frozen_anchor_certificate": false,
+    "frozen_anchor_rho": 1.673961083481433e-10
+  },
+  {
+    "status": "PrimalInfeasible",
+    "nominal_globally_infeasible_within_trust_region": true,
+    "dual_certificate": {
+      "verified": true,
+      "stationarity_residual": 1.432187701766452e-13,
+      "dual_cone_residual": 0.0,
+      "b_dot_z": -0.9999999999999998
+    },
+    "outer_feasible": false,
+    "normals_fixed": true,
+    "position_radius_m": 0.0005,
+    "relaxation": "independent generalized-moment error bounds containing all allowed point shifts",
+    "passing_outer_test_is_not_source_certificate": true,
+    "keyframe": "lift_done",
+    "frozen_anchor_status": "PrimalInfeasible",
+    "frozen_anchor_certificate": false,
+    "frozen_anchor_rho": 1.8606995912940534e-12
+  },
+  {
+    "status": "PrimalInfeasible",
+    "nominal_globally_infeasible_within_trust_region": true,
+    "dual_certificate": {
+      "verified": true,
+      "stationarity_residual": 1.432187701766452e-13,
+      "dual_cone_residual": 0.0,
+      "b_dot_z": -0.9999999999999998
+    },
+    "outer_feasible": false,
+    "normals_fixed": true,
+    "position_radius_m": 0.0005,
+    "relaxation": "independent generalized-moment error bounds containing all allowed point shifts",
+    "passing_outer_test_is_not_source_certificate": true,
+    "keyframe": "open_start",
+    "frozen_anchor_status": "PrimalInfeasible",
+    "frozen_anchor_certificate": false,
+    "frozen_anchor_rho": 1.8606995912940534e-12
+  },
+  {
+    "status": "PrimalInfeasible",
+    "nominal_globally_infeasible_within_trust_region": true,
+    "dual_certificate": {
+      "verified": true,
+      "stationarity_residual": 5.684341886080802e-14,
+      "dual_cone_residual": 0.0,
+      "b_dot_z": -0.9999999999999999
+    },
+    "outer_feasible": false,
+    "normals_fixed": true,
+    "position_radius_m": 0.0005,
+    "relaxation": "independent generalized-moment error bounds containing all allowed point shifts",
+    "passing_outer_test_is_not_source_certificate": true,
+    "keyframe": "opening",
+    "frozen_anchor_status": "PrimalInfeasible",
+    "frozen_anchor_certificate": false,
+    "frozen_anchor_rho": 4.868098017667838e-12
+  },
+  {
+    "status": "PrimalInfeasible",
+    "nominal_globally_infeasible_within_trust_region": true,
+    "dual_certificate": {
+      "verified": true,
+      "stationarity_residual": 9.734435479913373e-13,
+      "dual_cone_residual": 0.0,
+      "b_dot_z": -0.9999999999999999
+    },
+    "outer_feasible": false,
+    "normals_fixed": true,
+    "position_radius_m": 0.0005,
+    "relaxation": "independent generalized-moment error bounds containing all allowed point shifts",
+    "passing_outer_test_is_not_source_certificate": true,
+    "keyframe": "opening_late",
+    "frozen_anchor_status": "PrimalInfeasible",
+    "frozen_anchor_certificate": false,
+    "frozen_anchor_rho": 5.284464778372939e-11
+  },
+  {
+    "status": "PrimalInfeasible",
+    "nominal_globally_infeasible_within_trust_region": true,
+    "dual_certificate": {
+      "verified": true,
+      "stationarity_residual": 1.1368683772161603e-13,
+      "dual_cone_residual": 0.0,
+      "b_dot_z": -0.9999999999999996
+    },
+    "outer_feasible": false,
+    "normals_fixed": true,
+    "position_radius_m": 0.0005,
+    "relaxation": "independent generalized-moment error bounds containing all allowed point shifts",
+    "passing_outer_test_is_not_source_certificate": true,
+    "keyframe": "open_done",
+    "frozen_anchor_status": "PrimalInfeasible",
+    "frozen_anchor_certificate": false,
+    "frozen_anchor_rho": 9.200363845065708e-11
+  },
+  {
+    "status": "PrimalInfeasible",
+    "nominal_globally_infeasible_within_trust_region": true,
+    "dual_certificate": {
+      "verified": true,
+      "stationarity_residual": 1.1368683772161603e-13,
+      "dual_cone_residual": 0.0,
+      "b_dot_z": -0.9999999999999996
+    },
+    "outer_feasible": false,
+    "normals_fixed": true,
+    "position_radius_m": 0.0005,
+    "relaxation": "independent generalized-moment error bounds containing all allowed point shifts",
+    "passing_outer_test_is_not_source_certificate": true,
+    "keyframe": "hold_final",
+    "frozen_anchor_status": "PrimalInfeasible",
+    "frozen_anchor_certificate": false,
+    "frozen_anchor_rho": 9.200363845065708e-11
+  }
+]

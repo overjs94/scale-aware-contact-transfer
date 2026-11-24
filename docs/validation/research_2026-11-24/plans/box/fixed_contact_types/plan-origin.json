@@ -1,0 +1,6 @@
+{
+  "planning_directory": "outputs/research-study/full-common/box/analysis-models",
+  "independent_native_validation_required": true,
+  "reason": "The supplied fixed candidate is the same continuous problem as the selected full candidate",
+  "bundle_relative_planning_directory": "../full/planning/analysis-models"
+}

@@ -3,17 +3,19 @@
 URDF 기반 동역학·기구학과 논문의 Sec. III-B–IV를 위한 연구용 Python 패키지입니다.
 로봇별 System_Param의 질량·관성·축·링크 길이를 재작성하지 않고 URDF에서 읽습니다.
 
-`0.2.0a1` framework alpha는 원본 코드에 **Apache-2.0**을 적용하고, 공통 알고리즘과
+`0.2.0a2` framework alpha는 원본 코드에 **Apache-2.0**을 적용하고, 공통 알고리즘과
 task/solver/controller 설정, schema 2 캐시 provenance를 분리합니다.
 [설치·설정·solver 선택·배포 범위](docs/framework-deployment.md)를 확인하십시오.
 번들 로봇 모델과 선택적 CRISP/SNOPT의 upstream 조건은 별도로 유지됩니다.
-[이번 개선·수치 비교·검증 보고](docs/framework-upgrade-validation-2026-11-23.md)에는
-세 과제의 새 MuJoCo 통과 결과와 실패한 비교 실행을 함께 기록했습니다.
-박스/조립의 source certificate와 원고 수식의 문자 그대로의 전체 검증은 아직 성립하지 않으며,
+[현재 source·수식 대조·ablation·외란 검증 보고](docs/research-validation-2026-11-24.md)에는
+세 과제의 source 검산과 hybrid 제어 MuJoCo 통과 결과를 기록했습니다.
+박스/조립은 19개의 물리 P site를 3개 functional group으로 묶은 명시적 source 확장 모델입니다.
+기존 대표 P 세 개만의 문제는 infeasibility certificate와 함께 보존합니다.
+원고 수식의 문자 그대로의 전체 검증은 아직 성립하지 않으며,
 CRISP는 선택적 bridge이고 이 세 과제의 실행 엔진은 MuJoCo입니다.
 
 ```bash
-pip install 'dist/scale_aware_contact_transfer-0.2.0a1-py3-none-any.whl[full,alternative-solvers]'
+pip install 'dist/scale_aware_contact_transfer-0.2.0a2-py3-none-any.whl[full,alternative-solvers]'
 contact-transfer doctor
 contact-transfer assets
 contact-transfer config --task panel

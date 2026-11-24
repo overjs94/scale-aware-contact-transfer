@@ -1,0 +1,192 @@
+[
+  {
+    "status": "PrimalInfeasible",
+    "nominal_globally_infeasible_within_trust_region": true,
+    "dual_certificate": {
+      "verified": true,
+      "stationarity_residual": 8.540723683836404e-12,
+      "dual_cone_residual": 0.0,
+      "b_dot_z": -1.0000000000000018
+    },
+    "outer_feasible": false,
+    "normals_fixed": true,
+    "position_radius_m": 0.0005,
+    "relaxation": "independent generalized-moment error bounds containing all allowed point shifts",
+    "passing_outer_test_is_not_source_certificate": true,
+    "keyframe": "grip_and_support",
+    "frozen_anchor_status": "PrimalInfeasible",
+    "frozen_anchor_certificate": false,
+    "frozen_anchor_rho": -1.6514018919858042e-18
+  },
+  {
+    "status": "PrimalInfeasible",
+    "nominal_globally_infeasible_within_trust_region": true,
+    "dual_certificate": {
+      "verified": true,
+      "stationarity_residual": 8.540723683836404e-12,
+      "dual_cone_residual": 0.0,
+      "b_dot_z": -1.0000000000000018
+    },
+    "outer_feasible": false,
+    "normals_fixed": true,
+    "position_radius_m": 0.0005,
+    "relaxation": "independent generalized-moment error bounds containing all allowed point shifts",
+    "passing_outer_test_is_not_source_certificate": true,
+    "keyframe": "grasp_settled",
+    "frozen_anchor_status": "PrimalInfeasible",
+    "frozen_anchor_certificate": false,
+    "frozen_anchor_rho": -1.6514018919858042e-18
+  },
+  {
+    "status": "PrimalInfeasible",
+    "nominal_globally_infeasible_within_trust_region": true,
+    "dual_certificate": {
+      "verified": true,
+      "stationarity_residual": 8.540723683836404e-12,
+      "dual_cone_residual": 0.0,
+      "b_dot_z": -1.0000000000000018
+    },
+    "outer_feasible": false,
+    "normals_fixed": true,
+    "position_radius_m": 0.0005,
+    "relaxation": "independent generalized-moment error bounds containing all allowed point shifts",
+    "passing_outer_test_is_not_source_certificate": true,
+    "keyframe": "lift_tabletop",
+    "frozen_anchor_status": "PrimalInfeasible",
+    "frozen_anchor_certificate": false,
+    "frozen_anchor_rho": -1.6514018919858042e-18
+  },
+  {
+    "status": "PrimalInfeasible",
+    "nominal_globally_infeasible_within_trust_region": true,
+    "dual_certificate": {
+      "verified": true,
+      "stationarity_residual": 9.36140054363932e-12,
+      "dual_cone_residual": 0.0,
+      "b_dot_z": -0.9999999999999997
+    },
+    "outer_feasible": false,
+    "normals_fixed": true,
+    "position_radius_m": 0.0005,
+    "relaxation": "independent generalized-moment error bounds containing all allowed point shifts",
+    "passing_outer_test_is_not_source_certificate": true,
+    "keyframe": "reorient_tabletop",
+    "frozen_anchor_status": "PrimalInfeasible",
+    "frozen_anchor_certificate": false,
+    "frozen_anchor_rho": -1.6708116487672964e-18
+  },
+  {
+    "status": "PrimalInfeasible",
+    "nominal_globally_infeasible_within_trust_region": true,
+    "dual_certificate": {
+      "verified": true,
+      "stationarity_residual": 9.36140054363932e-12,
+      "dual_cone_residual": 0.0,
+      "b_dot_z": -0.9999999999999997
+    },
+    "outer_feasible": false,
+    "normals_fixed": true,
+    "position_radius_m": 0.0005,
+    "relaxation": "independent generalized-moment error bounds containing all allowed point shifts",
+    "passing_outer_test_is_not_source_certificate": true,
+    "keyframe": "approach_socket",
+    "frozen_anchor_status": "PrimalInfeasible",
+    "frozen_anchor_certificate": false,
+    "frozen_anchor_rho": -1.6708116487672964e-18
+  },
+  {
+    "status": "PrimalInfeasible",
+    "nominal_globally_infeasible_within_trust_region": true,
+    "dual_certificate": {
+      "verified": true,
+      "stationarity_residual": 9.36140054363932e-12,
+      "dual_cone_residual": 0.0,
+      "b_dot_z": -0.9999999999999997
+    },
+    "outer_feasible": false,
+    "normals_fixed": true,
+    "position_radius_m": 0.0005,
+    "relaxation": "independent generalized-moment error bounds containing all allowed point shifts",
+    "passing_outer_test_is_not_source_certificate": true,
+    "keyframe": "align_leg",
+    "frozen_anchor_status": "PrimalInfeasible",
+    "frozen_anchor_certificate": false,
+    "frozen_anchor_rho": -1.6708116487672964e-18
+  },
+  {
+    "status": "PrimalInfeasible",
+    "nominal_globally_infeasible_within_trust_region": true,
+    "dual_certificate": {
+      "verified": true,
+      "stationarity_residual": 9.36140054363932e-12,
+      "dual_cone_residual": 0.0,
+      "b_dot_z": -0.9999999999999997
+    },
+    "outer_feasible": false,
+    "normals_fixed": true,
+    "position_radius_m": 0.0005,
+    "relaxation": "independent generalized-moment error bounds containing all allowed point shifts",
+    "passing_outer_test_is_not_source_certificate": true,
+    "keyframe": "insert_leg",
+    "frozen_anchor_status": "PrimalInfeasible",
+    "frozen_anchor_certificate": false,
+    "frozen_anchor_rho": -1.6708116487672964e-18
+  },
+  {
+    "status": "PrimalInfeasible",
+    "nominal_globally_infeasible_within_trust_region": true,
+    "dual_certificate": {
+      "verified": true,
+      "stationarity_residual": 9.36140054363932e-12,
+      "dual_cone_residual": 0.0,
+      "b_dot_z": -0.9999999999999997
+    },
+    "outer_feasible": false,
+    "normals_fixed": true,
+    "position_radius_m": 0.0005,
+    "relaxation": "independent generalized-moment error bounds containing all allowed point shifts",
+    "passing_outer_test_is_not_source_certificate": true,
+    "keyframe": "unload_leg",
+    "frozen_anchor_status": "PrimalInfeasible",
+    "frozen_anchor_certificate": false,
+    "frozen_anchor_rho": -1.6708116487672964e-18
+  },
+  {
+    "status": "PrimalInfeasible",
+    "nominal_globally_infeasible_within_trust_region": true,
+    "dual_certificate": {
+      "verified": true,
+      "stationarity_residual": 9.36140054363932e-12,
+      "dual_cone_residual": 0.0,
+      "b_dot_z": -0.9999999999999997
+    },
+    "outer_feasible": false,
+    "normals_fixed": true,
+    "position_radius_m": 0.0005,
+    "relaxation": "independent generalized-moment error bounds containing all allowed point shifts",
+    "passing_outer_test_is_not_source_certificate": true,
+    "keyframe": "open_leg_gripper",
+    "frozen_anchor_status": "PrimalInfeasible",
+    "frozen_anchor_certificate": false,
+    "frozen_anchor_rho": -1.6708116487672964e-18
+  },
+  {
+    "status": "PrimalInfeasible",
+    "nominal_globally_infeasible_within_trust_region": true,
+    "dual_certificate": {
+      "verified": true,
+      "stationarity_residual": 9.36140054363932e-12,
+      "dual_cone_residual": 0.0,
+      "b_dot_z": -0.9999999999999997
+    },
+    "outer_feasible": false,
+    "normals_fixed": true,
+    "position_radius_m": 0.0005,
+    "relaxation": "independent generalized-moment error bounds containing all allowed point shifts",
+    "passing_outer_test_is_not_source_certificate": true,
+    "keyframe": "assembled_and_released",
+    "frozen_anchor_status": "PrimalInfeasible",
+    "frozen_anchor_certificate": false,
+    "frozen_anchor_rho": -1.6708116487672964e-18
+  }
+]

@@ -1,0 +1,339 @@
+{
+  "id": "robotiq_2f85",
+  "source_revision": "370c43965323c0944b433b202aac5058b5f907a9",
+  "hold": {
+    "right_driver_joint": 0.44056722931611453,
+    "right_coupler_joint": 0.0,
+    "right_spring_link_joint": 0.43972553562690314,
+    "right_follower_joint": -0.4222285544913421,
+    "left_driver_joint": 0.44056722931611453,
+    "left_coupler_joint": 0.0,
+    "left_spring_link_joint": 0.4397255356268784,
+    "left_follower_joint": -0.42222855449173036
+  },
+  "drivers": {
+    "right_driver_joint": 0.5,
+    "left_driver_joint": 0.5
+  },
+  "properties": {
+    "right_driver_joint": {
+      "armature": 0.005,
+      "damping": 0.1,
+      "stiffness": 0.0,
+      "springref": 0.0
+    },
+    "right_coupler_joint": {
+      "armature": 0.001,
+      "damping": 0.0,
+      "stiffness": 0.0,
+      "springref": 0.0
+    },
+    "right_spring_link_joint": {
+      "armature": 0.001,
+      "damping": 0.00125,
+      "stiffness": 0.05,
+      "springref": 2.62
+    },
+    "right_follower_joint": {
+      "armature": 0.001,
+      "damping": 0.0,
+      "stiffness": 0.0,
+      "springref": 0.0
+    },
+    "left_driver_joint": {
+      "armature": 0.005,
+      "damping": 0.1,
+      "stiffness": 0.0,
+      "springref": 0.0
+    },
+    "left_coupler_joint": {
+      "armature": 0.001,
+      "damping": 0.0,
+      "stiffness": 0.0,
+      "springref": 0.0
+    },
+    "left_spring_link_joint": {
+      "armature": 0.001,
+      "damping": 0.00125,
+      "stiffness": 0.05,
+      "springref": 2.62
+    },
+    "left_follower_joint": {
+      "armature": 0.001,
+      "damping": 0.0,
+      "stiffness": 0.0,
+      "springref": 0.0
+    }
+  },
+  "equalities": [
+    {
+      "type": "connect",
+      "attributes": {
+        "anchor": "-0 0.017999999999999999 -0.0064999999999999997",
+        "body1": "right_follower",
+        "body2": "right_coupler",
+        "solimp": "0.95 0.99 0.001",
+        "solref": "0.005 1"
+      }
+    },
+    {
+      "type": "connect",
+      "attributes": {
+        "anchor": "-0 0.017999999999999999 -0.0064999999999999997",
+        "body1": "left_follower",
+        "body2": "left_coupler",
+        "solimp": "0.95 0.99 0.001",
+        "solref": "0.005 1"
+      }
+    },
+    {
+      "type": "joint",
+      "attributes": {
+        "joint1": "right_driver_joint",
+        "joint2": "left_driver_joint",
+        "polycoef": "0 1 0 0 0",
+        "solimp": "0.95 0.99 0.001",
+        "solref": "0.005 1"
+      }
+    }
+  ],
+  "excludes": [
+    {
+      "body1": "base",
+      "body2": "left_driver"
+    },
+    {
+      "body1": "base",
+      "body2": "right_driver"
+    },
+    {
+      "body1": "base",
+      "body2": "left_spring_link"
+    },
+    {
+      "body1": "base",
+      "body2": "right_spring_link"
+    },
+    {
+      "body1": "right_coupler",
+      "body2": "right_follower"
+    },
+    {
+      "body1": "left_coupler",
+      "body2": "left_follower"
+    }
+  ],
+  "servo_kp": 100.0,
+  "servo_kd": 10.0,
+  "half_width": 0.009899999999999996,
+  "half_height": 0.015972416972955834,
+  "minimum_inset_m": 0.018747129969956516,
+  "grasp_center_tool": [
+    0.0,
+    0.0,
+    -5.587544316121296e-15
+  ],
+  "edge_pinch_geometry_checks": [
+    {
+      "inset_m": 0.001,
+      "minimum_nonpad_clearance_m": 0.00442165102704079
+    },
+    {
+      "inset_m": 0.0014550546146142695,
+      "minimum_nonpad_clearance_m": 0.004357082779804876
+    },
+    {
+      "inset_m": 0.0019101092292285393,
+      "minimum_nonpad_clearance_m": 0.004292514532568963
+    },
+    {
+      "inset_m": 0.002365163843842809,
+      "minimum_nonpad_clearance_m": 0.004227946285333041
+    },
+    {
+      "inset_m": 0.0028202184584570785,
+      "minimum_nonpad_clearance_m": 0.004163378038097129
+    },
+    {
+      "inset_m": 0.003275273073071348,
+      "minimum_nonpad_clearance_m": 0.004098809790861216
+    },
+    {
+      "inset_m": 0.003730327687685618,
+      "minimum_nonpad_clearance_m": 0.004034241543625302
+    },
+    {
+      "inset_m": 0.004185382302299888,
+      "minimum_nonpad_clearance_m": 0.003969673296389388
+    },
+    {
+      "inset_m": 0.004640436916914157,
+      "minimum_nonpad_clearance_m": 0.003905105049153466
+    },
+    {
+      "inset_m": 0.005095491531528427,
+      "minimum_nonpad_clearance_m": 0.0038405368019175526
+    },
+    {
+      "inset_m": 0.005550546146142696,
+      "minimum_nonpad_clearance_m": 0.0037759685546816376
+    },
+    {
+      "inset_m": 0.006005600760756966,
+      "minimum_nonpad_clearance_m": 0.003711400307445725
+    },
+    {
+      "inset_m": 0.006460655375371236,
+      "minimum_nonpad_clearance_m": 0.0036468320602098103
+    },
+    {
+      "inset_m": 0.006915709989985505,
+      "minimum_nonpad_clearance_m": 0.0035822638129738888
+    },
+    {
+      "inset_m": 0.007370764604599775,
+      "minimum_nonpad_clearance_m": 0.0035176955657379746
+    },
+    {
+      "inset_m": 0.007825819219214044,
+      "minimum_nonpad_clearance_m": 0.0034531273185020605
+    },
+    {
+      "inset_m": 0.008280873833828313,
+      "minimum_nonpad_clearance_m": 0.0033885590712661503
+    },
+    {
+      "inset_m": 0.008735928448442584,
+      "minimum_nonpad_clearance_m": 0.003323990824030236
+    },
+    {
+      "inset_m": 0.009190983063056855,
+      "minimum_nonpad_clearance_m": 0.0032594225767943142
+    },
+    {
+      "inset_m": 0.009646037677671124,
+      "minimum_nonpad_clearance_m": 0.003194854329558401
+    },
+    {
+      "inset_m": 0.010101092292285393,
+      "minimum_nonpad_clearance_m": 0.0031302860823224864
+    },
+    {
+      "inset_m": 0.010556146906899662,
+      "minimum_nonpad_clearance_m": 0.0030657178350865723
+    },
+    {
+      "inset_m": 0.011011201521513931,
+      "minimum_nonpad_clearance_m": 0.0030011495878506586
+    },
+    {
+      "inset_m": 0.0114662561361282,
+      "minimum_nonpad_clearance_m": 0.0029365813406147367
+    },
+    {
+      "inset_m": 0.011921310750742473,
+      "minimum_nonpad_clearance_m": 0.002872013093378823
+    },
+    {
+      "inset_m": 0.012376365365356742,
+      "minimum_nonpad_clearance_m": 0.002807444846142909
+    },
+    {
+      "inset_m": 0.01283141997997101,
+      "minimum_nonpad_clearance_m": 0.0027428765989069943
+    },
+    {
+      "inset_m": 0.01328647459458528,
+      "minimum_nonpad_clearance_m": 0.0026783083516710806
+    },
+    {
+      "inset_m": 0.013741529209199549,
+      "minimum_nonpad_clearance_m": 0.00261374010443517
+    },
+    {
+      "inset_m": 0.014196583823813818,
+      "minimum_nonpad_clearance_m": 0.0025491718571992485
+    },
+    {
+      "inset_m": 0.014651638438428087,
+      "minimum_nonpad_clearance_m": 0.0024846036099633348
+    },
+    {
+      "inset_m": 0.01510669305304236,
+      "minimum_nonpad_clearance_m": 0.0024200353627274207
+    },
+    {
+      "inset_m": 0.015561747667656629,
+      "minimum_nonpad_clearance_m": 0.0023554671154915065
+    },
+    {
+      "inset_m": 0.016016802282270898,
+      "minimum_nonpad_clearance_m": 0.002290898868255585
+    },
+    {
+      "inset_m": 0.016471856896885167,
+      "minimum_nonpad_clearance_m": 0.0022263306210196713
+    },
+    {
+      "inset_m": 0.016926911511499436,
+      "minimum_nonpad_clearance_m": 0.002161762373783757
+    },
+    {
+      "inset_m": 0.01738196612611371,
+      "minimum_nonpad_clearance_m": 0.0020971941265478427
+    },
+    {
+      "inset_m": 0.017837020740727978,
+      "minimum_nonpad_clearance_m": 0.002032625879311929
+    },
+    {
+      "inset_m": 0.018292075355342247,
+      "minimum_nonpad_clearance_m": 0.001968057632076015
+    },
+    {
+      "inset_m": 0.018747129969956516,
+      "minimum_nonpad_clearance_m": 0.0019261537198877671
+    }
+  ],
+  "mu": 0.6,
+  "closing_force_limit_N": 60,
+  "force_component_limit_N": 50,
+  "aperture_m": 0.04,
+  "aperture_max_m": 0.085,
+  "force_command_N": 40,
+  "settings": {
+    "id": "robotiq_2f85",
+    "native_repository": "https://github.com/google-deepmind/mujoco_menagerie",
+    "native_revision": "370c43965323c0944b433b202aac5058b5f907a9",
+    "native_path": "robotiq_2f85/2f85.xml",
+    "license": "BSD-2-Clause (ROS-Industrial)",
+    "manufacturer_product_sheet": "https://robotiq.com/hubfs/Product-sheets/Adaptive%20Grippers/Product-sheet-Adaptive-Grippers-EN.pdf",
+    "manufacturer_manual": "https://blog.robotiq.com/hubfs/support-files/2F-85_2F-140_UR_PDF_2026-03-17.pdf",
+    "manufacturer_stroke_m": 0.085,
+    "manufacturer_grip_force_range_N": [
+      20,
+      235
+    ],
+    "declared_simulation_force_limit_per_jaw_N": 60,
+    "nominal_force_command_per_jaw_N": 40,
+    "force_admittance_virtual_inertia": 0.02,
+    "force_admittance_virtual_damping": 30,
+    "external_force_component_limit_N": 50,
+    "external_moment_component_limits_Nm": [
+      5,
+      5,
+      3
+    ],
+    "velocity_limit_rad_s": 0.5,
+    "velocity_limit_source": "declared planning bound, consistent with PickNik 2F-85 URDF; not motor identification",
+    "calibration_fixture_size_grasp_xyz_m": [
+      0.06,
+      0.04,
+      0.028
+    ],
+    "calibration_object_mass_kg": 0.1,
+    "timestep_s": 0.0005,
+    "duration_s": 4,
+    "claim": "Manufacturer ranges are references. The smaller simulation capacity must pass native finite-actuator clamp tests; it is not hardware calibration."
+  }
+}

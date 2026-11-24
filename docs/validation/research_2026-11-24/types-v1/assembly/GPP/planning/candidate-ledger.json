@@ -1,0 +1,17 @@
+[
+  {
+    "types": [
+      "G",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Structurally insufficient contact-type wrench span on free leg: maximum rank 3<6 before assembly"
+  }
+]

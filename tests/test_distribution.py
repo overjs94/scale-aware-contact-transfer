@@ -34,3 +34,17 @@ def test_interrupted_cache_write_preserves_previous_complete_archive(tmp_path,mo
     with pytest.raises(OSError):atomic_npz(path,value=np.arange(4))
     assert path.read_bytes()==before
     assert list(tmp_path.iterdir())==[path]
+
+
+def test_review_localization_preserves_large_float_values_and_boolean_types():
+    import importlib.util
+    spec=importlib.util.spec_from_file_location('review_export',Path('tools/export_review_viewer.py'))
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    original={'value':1.0044860745704145e18,'flags':[True,0.],'title':'Original'}
+    localized={'value':1004486074570414500,'flags':[True,0],'title':'English'}
+    assert original['value']!=localized['value']
+    restored=module.preserve_numeric_leaves(original,localized)
+    assert restored['value']==original['value'] and type(restored['value']) is float
+    assert restored['flags']==original['flags'] and type(restored['flags'][0]) is bool
+    assert restored['title']=='English'
+    with pytest.raises(ValueError,match='array shape'):module.preserve_numeric_leaves([1,2],[1])

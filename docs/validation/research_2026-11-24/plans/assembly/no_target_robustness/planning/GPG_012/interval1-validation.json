@@ -1,0 +1,52 @@
+{
+  "independent": {
+    "passed": true,
+    "residuals": {
+      "momentum": 1.886604483747334e-10,
+      "integration": 1.0880185641326534e-13,
+      "complementarity": 2.364654937904186e-14,
+      "dissipation": 1.0399133156308316e-12,
+      "capability": 0.0,
+      "closure": 3.2439329000766293e-13,
+      "rotation_closure": 2.348225888577637e-13,
+      "grasp_velocity": 3.112544944006146e-13,
+      "point_alignment": 2.4474740453587123e-14,
+      "point_tangent_bounds": 0.0,
+      "limits": 0.0,
+      "endpoint_velocity": 1.4282342773025904e-22,
+      "quaternion_norm": 2.220446049250313e-16,
+      "contact_chart_singularity": 0.0
+    },
+    "configuration_update": "contact_coordinate_midpoint",
+    "configuration_defect": {
+      "maximum_translation_component_m": 0.0,
+      "maximum_rotation_component_rad": 0.0,
+      "maximum_translation_norm_m": 0.0,
+      "maximum_rotation_norm_rad": 0.0,
+      "bounds": []
+    },
+    "contact_chart": {
+      "dependent_joint_midpoint_difference_rad": 2.4037358166140166e-05,
+      "minimum_native_singular_value": 0.09631385168773324
+    },
+    "independent": "native Pinocchio mass/bias/J and NumPy transforms"
+  },
+  "reference_geometry": {
+    "passed": true,
+    "samples": 193,
+    "continuous_certificate": false,
+    "reference_interpolation": "object_SE3_and_conditioned_joint_Hermite_with_dense_IK",
+    "reference_id": "03cc60d97c7495f48a9ff7916f0ca1036e29ec147fe5aaeb516966c0e26a4d38",
+    "reference_mesh": {
+      "minimum_spacing_s": 0.018750016743528608,
+      "maximum_joint_acceleration_rad_s2": 0.18454607472769222,
+      "optimized_node_velocities_preserved": true
+    },
+    "released_gripper_reference": "native URDF open configuration after stationary opening dwell",
+    "projection_limit_rad": 0.02,
+    "projection_max_rad": 5.371544400389894e-07,
+    "compliant_pad_allowance_m": 0.001,
+    "unintended_clearance_m": 0.001,
+    "violations": []
+  }
+}

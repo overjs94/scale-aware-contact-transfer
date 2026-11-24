@@ -44,6 +44,10 @@ const catalog = new Map(entries.map(([id, category, group, title, detail, preset
   [id, { id, category, group, title, detail, preset: preset === true ? id : preset, order }]));
 
 export function libraryEntry(model) {
+  const research=model.id.match(/^research_full_(panel|box|assembly)$/);
+  if(research)return {id:model.id,category:'paper',group:{panel:0,box:2,assembly:3}[research[1]],title:model.title,detail:'Certified source → selected hardware → restricted planning → native execution',order:-1};
+  if(/^research_full_(panel|box|assembly)_/.test(model.id))return {id:model.id,category:'diagnostic',group:1,title:model.title,detail:'Controlled current-framework ablation · all outcomes retained',order:entries.length};
+  if(/^research_(probe|loaded|source_margin)_/.test(model.id))return {id:model.id,category:'diagnostic',group:0,title:model.title,detail:model.id.startsWith('research_loaded_')?'Full task · matched inside-margin load':'Matched inside-margin disturbance comparison',order:entries.length};
   if(/^margin_(hold|platform|compact)_/.test(model.id))return {id:model.id,category:'diagnostic',group:0,title:model.title,detail:'Inside-margin load · matched ON/OFF · recovery observed',order:entries.length-1};
   if(model.id.startsWith('robust_refinement_'))return {id:model.id,category:'diagnostic',group:0,title:recordingTitle(model.id,model.title),detail:'Three arms · box-vertex source robustness · matched disturbances',order:entries.length};
   if(model.id.startsWith('counterfactual_'))return {id:model.id,category:'diagnostic',group:1,title:recordingTitle(model.id,model.title),detail:'Alternative contact type · complete-sequence comparison',order:entries.length};
@@ -70,17 +74,21 @@ export function recordingScope(data) {
     status = 'Historical geometry · revalidation required';
     detail = 'The historical base handle has a 50 mm gap to the wall without connecting geometry. Its original measurements are preserved, but do not validate the repaired geometry. See Free articulated box opening (full_box) for the repaired model and seven-condition comparison.';
   } else if(data.comparison_recording){
-    status=(data.study_kind==='source_robustness'?'Source robustness · ':'Forced contact type · ')+(report.execution_passed?'PASS':'FAIL');
+    const probe=report.robustness_probe,loaded=report.certified_full_disturbance;
+    status=(probe?'Target robustness probe · ':loaded?'Full task with certified load · ':data.study_kind==='source_robustness'?'Source robustness · ':'Forced contact type · ')+(report.execution_passed?'PASS':'FAIL');
     detail=data.study_kind==='source_robustness'?'A controlled source-refinement diagnostic with box-vertex robustness enabled or disabled. Controller, mechanics, and disturbances are matched; transferred target contact sites are fixed during stationary support. This is not a moving-object CITO test or a closed-loop stability proof.':'Complete-sequence planning and native execution with a forced alternative contact type. Objective values, planning rejection, and execution-criterion violations are reported separately.';
     if(report.margin_hold){
       const check=report.margin_hold.certificate;
       status=`Margin validation · ${report.margin_hold.outcome.replaceAll('_',' ')}`;
       detail=`Same controller and applied load in ON/OFF. Initial static certificate: ${check.inside_initial_static_box?'inside':'outside'} this condition’s box · peak / margin = ${check.load_to_margin_ratio.toFixed(3)}. Recovery after load removal is measured. Finite-time loss of support is distinct from mathematical divergence.`;
     }
+    if(probe){status=`Target robustness probe · ${probe.outcome.replaceAll('_',' ')}`;detail=`Separate stationary test of an optimized mid-task pose. Applied load / ON margin = ${probe.inside_on_certificate.load_to_margin_ratio.toFixed(3)}. Scene, controller and loads match across ON/OFF. The certificate concerns the fixed reference pose; it does not prove dynamic stability.`;}
+    if(loaded)detail=`Complete task with a six-second stationary load interval after lift. Applied load / ON margin = ${loaded.inside_on_reference_certificate.load_to_margin_ratio.toFixed(3)}. The static reference certificate and measured task completion are reported separately. Zero-load pause controls are retained.`;
   } else if (data.full_task_recording) {
     status = "Complete sequence · " + (report.execution_passed ? "execution checks passed" : "failed checks retained");
     detail = "Recorded contact-type/arm-assignment selection, moving-object CITO, load-transfer QPs, release dynamics, and native contact execution. The implementation uses midpoint variants; source geometric fallback and ablation results are stated explicitly.";
     if(report.variant==="fixed_path") detail="Fixed-path baseline: optimize reactions and torques on a prescribed interpolated path. Endpoints and phase durations match the complete plan. Integration residuals and measured contact-execution results are reported separately.";
+    if(report.full_framework_pipeline_certified){status='Framework pipeline · execution checks passed';detail='Supplied contracted contacts, certified source refinement, hardware selection, restricted contact-coordinate midpoint planning, and native execution. '+(data.contact_contraction?.source_model_extension?'The source uses 19 explicit physical point sites grouped into three functional contacts. ':'')+'This is a declared framework formulation; exact manuscript equations and learned inference have separate gates.';}
   } else if (full) {
     status = "Sec. III-B–IV execution record";
     detail = "Execution provenance covers all listed stages. See the report for individual checks.";
