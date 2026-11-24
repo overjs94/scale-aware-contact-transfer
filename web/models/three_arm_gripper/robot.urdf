@@ -1,0 +1,195 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="synthetic_gripper_cartesian">
+  <link name="base">
+    <visual>
+      <origin xyz="0 0 -.04" />
+      <geometry>
+        <box size=".12 .12 .08" />
+      </geometry>
+      <material name="tool">
+        <color rgba=".2 .6 .7 1" />
+      </material>
+    </visual>
+  </link>
+  <link name="axis_x">
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="0.8" />
+      <inertia ixx="0.0004066666666666667" iyy="0.0004066666666666667" izz="0.00048" ixy="0" ixz="0" iyz="0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" />
+      <geometry>
+        <box size=".06 .06 .05" />
+      </geometry>
+      <material name="tool">
+        <color rgba=".2 .4 .55 1" />
+      </material>
+    </visual>
+    <visual name="prismatic_rail">
+      <origin xyz="-0.3 0.0 0.0" />
+      <geometry>
+        <box size="0.65 0.028 0.028" />
+      </geometry>
+      <material name="rail">
+        <color rgba=".3 .45 .6 1" />
+      </material>
+    </visual>
+  </link>
+  <joint name="slide_x" type="prismatic">
+    <parent link="base" />
+    <child link="axis_x" />
+    <axis xyz="1 0 0" />
+    <limit lower="-1.5" upper="1.5" effort="100" velocity="1" />
+  </joint>
+  <link name="axis_y">
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="0.6" />
+      <inertia ixx="0.000305" iyy="0.000305" izz="0.00036" ixy="0" ixz="0" iyz="0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" />
+      <geometry>
+        <box size=".06 .06 .05" />
+      </geometry>
+      <material name="tool">
+        <color rgba=".2 .4 .55 1" />
+      </material>
+    </visual>
+    <visual name="prismatic_rail">
+      <origin xyz="0.0 -0.3 0.0" />
+      <geometry>
+        <box size="0.028 0.65 0.028" />
+      </geometry>
+      <material name="rail">
+        <color rgba=".3 .45 .6 1" />
+      </material>
+    </visual>
+  </link>
+  <joint name="slide_y" type="prismatic">
+    <parent link="axis_x" />
+    <child link="axis_y" />
+    <axis xyz="0 1 0" />
+    <limit lower="-1.5" upper="1.5" effort="100" velocity="1" />
+  </joint>
+  <link name="axis_z">
+    <inertial>
+      <origin xyz="0 0 0" />
+      <mass value="0.4" />
+      <inertia ixx="0.00020333333333333336" iyy="0.00020333333333333336" izz="0.00024" ixy="0" ixz="0" iyz="0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" />
+      <geometry>
+        <box size=".06 .06 .05" />
+      </geometry>
+      <material name="tool">
+        <color rgba=".2 .4 .55 1" />
+      </material>
+    </visual>
+    <visual name="prismatic_rail">
+      <origin xyz="0.0 0.0 -0.3" />
+      <geometry>
+        <box size="0.028 0.028 0.65" />
+      </geometry>
+      <material name="rail">
+        <color rgba=".3 .45 .6 1" />
+      </material>
+    </visual>
+  </link>
+  <joint name="slide_z" type="prismatic">
+    <parent link="axis_y" />
+    <child link="axis_z" />
+    <axis xyz="0 0 1" />
+    <limit lower="-1.5" upper="1.5" effort="100" velocity="1" />
+  </joint>
+  <link name="tool">
+    <inertial>
+      <origin xyz="0 0 -.06" />
+      <mass value="0.08" />
+      <inertia ixx="5.333333333333334e-05" iyy="4.816666666666666e-05" izz="8.016666666666667e-05" ixy="0" ixz="0" iyz="0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 -.06" />
+      <geometry>
+        <box size=".075 .08 .04" />
+      </geometry>
+      <material name="tool">
+        <color rgba=".25 .7 .4 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 -.06" />
+      <geometry>
+        <box size=".075 .08 .04" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="tool_mount" type="fixed">
+    <parent link="axis_z" />
+    <child link="tool" />
+  </joint>
+  <link name="left_finger">
+    <inertial>
+      <origin xyz="0 0 .025" />
+      <mass value="0.03" />
+      <inertia ixx="4.1e-05" iyy="2.5360000000000005e-05" izz="1.636e-05" ixy="0" ixz="0" iyz="0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 .025" />
+      <geometry>
+        <box size=".012 .08 .10" />
+      </geometry>
+      <material name="tool">
+        <color rgba=".3 .8 .5 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 .025" />
+      <geometry>
+        <box size=".012 .08 .10" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="left_finger_joint" type="prismatic">
+    <parent link="tool" />
+    <child link="left_finger" />
+    <axis xyz="1 0 0" />
+    <limit lower=".018" upper=".065" effort="30" velocity=".5" />
+  </joint>
+  <link name="right_finger">
+    <inertial>
+      <origin xyz="0 0 .025" />
+      <mass value="0.03" />
+      <inertia ixx="4.1e-05" iyy="2.5360000000000005e-05" izz="1.636e-05" ixy="0" ixz="0" iyz="0" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 .025" />
+      <geometry>
+        <box size=".012 .08 .10" />
+      </geometry>
+      <material name="tool">
+        <color rgba=".3 .8 .5 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 .025" />
+      <geometry>
+        <box size=".012 .08 .10" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="right_finger_joint" type="prismatic">
+    <parent link="tool" />
+    <child link="right_finger" />
+    <axis xyz="-1 0 0" />
+    <limit lower=".018" upper=".065" effort="30" velocity=".5" />
+  </joint>
+  <link name="tip" />
+  <joint name="tip_frame" type="fixed">
+    <parent link="tool" />
+    <child link="tip" />
+    <origin xyz="0 0 0" />
+  </joint>
+</robot>

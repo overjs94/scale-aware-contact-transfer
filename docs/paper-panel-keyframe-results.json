@@ -1,0 +1,184 @@
+{
+  "scope": "rigid panel carry/seat keyframes and FIRST lift interval diagnostic; fixture load transfer and release not yet connected",
+  "full_paper_pipeline_executed": false,
+  "algorithm_validation_passed": false,
+  "sections": {
+    "III-B": "executed and independently checked at five source orientations",
+    "III-C": "executed and independently checked at five target keyframes",
+    "III-D": "not executed: one specified candidate",
+    "IV": "pending"
+  },
+  "keyframes": [
+    {
+      "id": "grip_support",
+      "source_rho": 0.5320674446659238,
+      "source_object_rotation_world": [
+        [
+          0.9781476007338058,
+          0.0,
+          0.20791169081775937
+        ],
+        [
+          0.0,
+          1.0000000000000002,
+          0.0
+        ],
+        [
+          -0.20791169081775937,
+          0.0,
+          0.9781476007338058
+        ]
+      ],
+      "target_rho": 6.500829423124563,
+      "NLP_primal_residual": 1.7763568394002505e-14,
+      "independent": {
+        "rho": 6.500829538327888,
+        "primal_residual": 1.6679280179232592e-10,
+        "certificate": true,
+        "closure_m": 2.7194799110210365e-16,
+        "native_equilibrium_residual": 1.4210854715202004e-14,
+        "native_torque_residual": 2.1316282072803006e-14,
+        "capability_violation": 0.0
+      },
+      "sampled_native_geometry_passed": true
+    },
+    {
+      "id": "lift",
+      "source_rho": 0.5320674446659238,
+      "source_object_rotation_world": [
+        [
+          0.9781476007338058,
+          0.0,
+          0.20791169081775937
+        ],
+        [
+          0.0,
+          1.0000000000000002,
+          0.0
+        ],
+        [
+          -0.20791169081775937,
+          0.0,
+          0.9781476007338058
+        ]
+      ],
+      "target_rho": 6.5008294230960075,
+      "NLP_primal_residual": 1.0658141036401503e-14,
+      "independent": {
+        "rho": 6.50082953844679,
+        "primal_residual": 6.28228136179132e-10,
+        "certificate": true,
+        "closure_m": 2.8576114088871287e-16,
+        "native_equilibrium_residual": 1.0658141036401503e-14,
+        "native_torque_residual": 1.0658141036401503e-14,
+        "capability_violation": 0.0
+      },
+      "sampled_native_geometry_passed": true
+    },
+    {
+      "id": "reorient",
+      "source_rho": 1.115643832178027,
+      "source_object_rotation_world": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "target_rho": 6.626034015196902,
+      "NLP_primal_residual": 1.5170149580967518e-09,
+      "independent": {
+        "rho": 6.626034130418395,
+        "primal_residual": 1.4164674766448115e-08,
+        "certificate": true,
+        "closure_m": 5.783229009710166e-13,
+        "native_equilibrium_residual": 2.042810365310288e-14,
+        "native_torque_residual": 1.5170193989888503e-09,
+        "capability_violation": 0.0
+      },
+      "sampled_native_geometry_passed": true
+    },
+    {
+      "id": "above_jig",
+      "source_rho": 1.115643832178027,
+      "source_object_rotation_world": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "target_rho": 6.626033992768014,
+      "NLP_primal_residual": 1.0658141036401503e-14,
+      "independent": {
+        "rho": 6.626034106377924,
+        "primal_residual": 4.1789612659215436e-08,
+        "certificate": true,
+        "closure_m": 2.618455766672135e-16,
+        "native_equilibrium_residual": 7.105427357601002e-15,
+        "native_torque_residual": 1.0658141036401503e-14,
+        "capability_violation": 0.0
+      },
+      "sampled_native_geometry_passed": true
+    },
+    {
+      "id": "seat",
+      "source_rho": 1.115643832178027,
+      "source_object_rotation_world": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "target_rho": 6.626034003639838,
+      "NLP_primal_residual": 1.7763568394002505e-14,
+      "independent": {
+        "rho": 6.626034115843318,
+        "primal_residual": 6.799971963289408e-08,
+        "certificate": true,
+        "closure_m": 1.7010907505015192e-16,
+        "native_equilibrium_residual": 7.105427357601002e-15,
+        "native_torque_residual": 1.4210854715202004e-14,
+        "capability_violation": 0.0
+      },
+      "sampled_native_geometry_passed": true
+    }
+  ],
+  "failed_original_carry_interval_trials": "iteration limit or local infeasibility; see grasp-discretization-diagnosis.md; no successful final CITO interval claimed",
+  "limitations": [
+    "five static carry/seat keyframes; no fixture load-transfer or release optimization",
+    "declared 18 N per-finger simulation capability; no hardware calibration",
+    "no new MuJoCo execution from an accepted CITO plan"
+  ]
+}

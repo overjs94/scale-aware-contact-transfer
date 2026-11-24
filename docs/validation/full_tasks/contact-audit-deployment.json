@@ -1,0 +1,18 @@
+{
+  "site_url": "https://overjs94.github.io/Contact_contraction/?model=full_box",
+  "code_commit": "b6edba0f698c14b2e4f42adfea0172c49ee85e39",
+  "public_commit": "3afa9f17238e3689e59b185743144bc1de431253",
+  "workflow_run_url": "https://github.com/overjs94/Contact_contraction/actions/runs/43320847994",
+  "workflow_status": "completed",
+  "workflow_conclusion": "success",
+  "workflow_duration": "41s",
+  "post_deployment_live_check_included": true,
+  "static_files_verified": 573,
+  "recordings_verified": 47,
+  "controlled_trials": 21,
+  "native_contact_overlays": 21,
+  "fresh_connected_box_trials": 7,
+  "identical_spherical_mounts": 29,
+  "focused_python_tests_passed": 15,
+  "final_browser_tests_passed": 5
+}

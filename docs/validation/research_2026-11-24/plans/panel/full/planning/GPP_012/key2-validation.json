@@ -1,0 +1,193 @@
+{
+  "independent": {
+    "passed": true,
+    "residuals": {
+      "equilibrium": 1.879687516748163e-10,
+      "capability": 9.566849623610096e-08,
+      "torque": 0.0,
+      "closure": 1.0366707492437399e-14,
+      "rotation_closure": 2.1557130571850364e-16,
+      "rho_margin": 0.0
+    },
+    "frozen_conic": {
+      "rho": 8.081945386169613,
+      "certificate": true,
+      "residual": 5.88933346534759e-10,
+      "status": "Solved",
+      "maximum_margin_status": "Solved",
+      "fixed_rho_feasibility": false,
+      "solver_attempts": [
+        {
+          "status": "Solved",
+          "witness_regularization": 0.0,
+          "backend": "clarabel",
+          "solver_tolerance": 1e-09,
+          "iterations": 19,
+          "wall_time_s": 0.06666366900026333
+        }
+      ]
+    },
+    "independent": "native Pinocchio, NumPy and frozen Clarabel"
+  },
+  "geometry_violations": [],
+  "source": {
+    "origin": "synthetic_contracted_fixture",
+    "inference_executed": false,
+    "synthetic_input": true,
+    "source_refinement_enabled": true,
+    "source_contact_positions_optimized": true,
+    "source_group_ids": [
+      "edge_grip",
+      "under_left",
+      "under_right"
+    ],
+    "effective_source_refinement": {
+      "position_radius_m": 0.002,
+      "normal_radius": 0.0,
+      "geometry_weight": 0.0,
+      "mu": 0.8,
+      "normal_max_N": 2.0
+    },
+    "source_object": {
+      "size": [
+        0.15,
+        0.1,
+        0.01
+      ],
+      "mass": 0.03125,
+      "com": [
+        0,
+        0,
+        0
+      ]
+    },
+    "source_to_target_scale": 4.0,
+    "source_object_rotation_world": [
+      [
+        0.9781476007338058,
+        0.0,
+        0.20791169081775937
+      ],
+      [
+        0.0,
+        1.0000000000000002,
+        0.0
+      ],
+      [
+        -0.20791169081775937,
+        0.0,
+        0.9781476007338058
+      ]
+    ],
+    "source_positions_before_m": [
+      [
+        -0.075,
+        0.0,
+        0.0
+      ],
+      [
+        0.025,
+        -0.03,
+        -0.005
+      ],
+      [
+        0.025,
+        0.03,
+        -0.005
+      ]
+    ],
+    "source_positions_after_m": [
+      [
+        -0.075,
+        7.755483679341254e-19,
+        0.0
+      ],
+      [
+        0.023000000113172006,
+        -0.03000066028558743,
+        -0.005
+      ],
+      [
+        0.023000000113172006,
+        0.03000066028558743,
+        -0.005
+      ]
+    ],
+    "source_normals": [
+      [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      [
+        0.0,
+        0.0,
+        -1.0
+      ]
+    ],
+    "source_rho_before": 0.44343227690736914,
+    "source_rho_after": 0.5320674463017788,
+    "source_certificate": true,
+    "source_status": "positive_margin",
+    "source_validation_residual": 1.3421888600539944e-11,
+    "target_positions_m": [
+      [
+        -0.3,
+        3.1021934717365016e-18,
+        0.0
+      ],
+      [
+        0.09200000045268802,
+        -0.12000264114234972,
+        -0.02
+      ],
+      [
+        0.09200000045268802,
+        0.12000264114234972,
+        -0.02
+      ]
+    ],
+    "target_normals": [
+      [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      [
+        0.0,
+        0.0,
+        -1.0
+      ]
+    ],
+    "source_forces_transferred": false,
+    "target_mass_reused_from_source": false,
+    "source_problem_identity": "ct-source-v2:aad233e722c10acea6fc19b50f646c2ed9b1097883966e68f869a21d069d7419",
+    "source_cache_hit": false,
+    "new_source_solver_executed": true
+  },
+  "target_provenance": {
+    "method": "fixed_geometry_separable_target",
+    "posture_solver": "Solve_Succeeded",
+    "torque_free_rho_upper_bound": 8.081945386080978,
+    "same_rho_torque_feasibility": true,
+    "posture_global_optimality_claimed": false,
+    "posture_reference_rule": "sequential_ik_branch",
+    "same_rho_force_polish": {
+      "witness_applied": true,
+      "status": "AlmostSolved",
+      "rho": 8.081945386080978,
+      "primal_residual": 1.2239425295490491e-07
+    }
+  },
+  "endpoint_polish_max_rad": 9.062363959255748e-08
+}

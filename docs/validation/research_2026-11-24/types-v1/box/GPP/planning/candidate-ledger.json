@@ -1,0 +1,17 @@
+[
+  {
+    "types": [
+      "G",
+      "P",
+      "P"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "keyframe": 0,
+    "accepted": false,
+    "reason": "Point position/axis IK failed at tip"
+  }
+]

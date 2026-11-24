@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "units": "SI",
+  "contact_frame": "object",
+  "origin": "synthetic_mobile_handover_fixture",
+  "inference_executed": false,
+  "source_to_target_scale": 4.0,
+  "object": {
+    "size": [
+      0.15,
+      0.1,
+      0.01
+    ],
+    "mass": 0.03125,
+    "com": [
+      0,
+      0,
+      0
+    ]
+  },
+  "disturbance_scale": [
+    0.001,
+    0.001,
+    0.001,
+    0.05,
+    0.05,
+    0.05
+  ],
+  "refinement": {
+    "radius_m": 0.002,
+    "normal_radius": 0.0,
+    "geometry_weight": 1000.0,
+    "normal_max_N": 2.0,
+    "mu": 0.8
+  },
+  "groups": [
+    {
+      "group_id": "edge_grip",
+      "position": [
+        -0.075,
+        0,
+        0
+      ],
+      "normal": [
+        -1,
+        0,
+        0
+      ],
+      "tangent_axes": [
+        [
+          0,
+          1,
+          0
+        ]
+      ],
+      "half_size": [
+        0.003
+      ]
+    },
+    {
+      "group_id": "under_left",
+      "position": [
+        0.025,
+        -0.03,
+        -0.005
+      ],
+      "normal": [
+        0,
+        0,
+        -1
+      ],
+      "tangent_axes": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ],
+      "half_size": [
+        0.003,
+        0.003
+      ]
+    },
+    {
+      "group_id": "under_right",
+      "position": [
+        0.025,
+        0.01,
+        -0.005
+      ],
+      "normal": [
+        0,
+        0,
+        -1
+      ],
+      "tangent_axes": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ],
+      "half_size": [
+        0.003,
+        0.003
+      ]
+    }
+  ]
+}

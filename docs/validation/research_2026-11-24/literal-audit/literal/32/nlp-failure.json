@@ -1,0 +1,166 @@
+{
+  "status": "Maximum_CpuTime_Exceeded",
+  "accepted": false,
+  "constraints": [
+    {
+      "index": 5102,
+      "violation": 2.928220531106529e-06,
+      "value": 2.928220531106529e-06,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 4963,
+      "violation": 2.918096110360313e-06,
+      "value": 2.918096110360313e-06,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 4824,
+      "violation": 2.8800739779177853e-06,
+      "value": 2.8800739779177853e-06,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 4685,
+      "violation": 2.8329095828616424e-06,
+      "value": 2.8329095828616424e-06,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 2368,
+      "violation": 2.763269254703847e-06,
+      "value": -2.763269254703847e-06,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 2507,
+      "violation": 2.763132994642887e-06,
+      "value": -2.763132994642887e-06,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 2229,
+      "violation": 2.762473668633733e-06,
+      "value": -2.762473668633733e-06,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 2646,
+      "violation": 2.7621933965248265e-06,
+      "value": -2.7621933965248265e-06,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 2090,
+      "violation": 2.76090281991527e-06,
+      "value": -2.76090281991527e-06,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 2785,
+      "violation": 2.760164042051299e-06,
+      "value": -2.760164042051299e-06,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 1812,
+      "violation": 2.760124156138584e-06,
+      "value": -2.760124156138584e-06,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 1673,
+      "violation": 2.760036269555807e-06,
+      "value": -2.760036269555807e-06,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 53,
+      "violation": 2.7600318676737397e-06,
+      "value": -2.7600318676737397e-06,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 1951,
+      "violation": 2.759837935184962e-06,
+      "value": -2.759837935184962e-06,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 2924,
+      "violation": 2.757207403401244e-06,
+      "value": -2.757207403401244e-06,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 3063,
+      "violation": 2.7534844704497387e-06,
+      "value": -2.7534844704497387e-06,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 3202,
+      "violation": 2.7494742933439897e-06,
+      "value": -2.7494742933439897e-06,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 3341,
+      "violation": 2.74506288321494e-06,
+      "value": -2.74506288321494e-06,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 3480,
+      "violation": 2.740548827097041e-06,
+      "value": -2.740548827097041e-06,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    },
+    {
+      "index": 5843,
+      "violation": 2.7403558642580524e-06,
+      "value": -2.7403558642580524e-06,
+      "lower": 0.0,
+      "upper": 0.0,
+      "source": "Opti constraint of shape 1x1, called from /workspace/scale-aware-contact-transfer/src/contact_transfer/optimization.py:67 in equality\n  opti.subject_to(expression[i] == 0)"
+    }
+  ]
+}

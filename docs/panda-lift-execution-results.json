@@ -1,0 +1,402 @@
+{
+  "scope": "same optimized three-Panda first lift, nominal FF execution only; complete task and III-D comparison remain pending",
+  "configuration_update": "independent_midpoint",
+  "control_mode": "impedance_feedforward",
+  "network_input": "supplied synthetic contracted source fixture; no network inference executed",
+  "full_paper_pipeline_executed": false,
+  "mujoco": {
+    "engine": "mujoco",
+    "maximum_position_error_m": 0.0002154928542326328,
+    "final_position_error_m": 0.00014286270690801672,
+    "maximum_rotation_error_rad": 0.002106043767091927,
+    "final_rotation_error_rad": 0.0019398842815519857,
+    "duration_s": 9.301,
+    "object_pose_prescribed": false,
+    "equality_constraints_used": 0,
+    "configuration_update": [
+      "independent_midpoint"
+    ],
+    "controller": "impedance_feedforward",
+    "jaw_force_fraction": 0.7,
+    "measured_force_feedback": false,
+    "minimum_actuator_margin_Nm": 9.489053363151257,
+    "maintained_contact_fraction": {
+      "edge_gripper": 1.0,
+      "support_left": 1.0,
+      "support_right": 1.0
+    },
+    "jaw_force": {
+      "edge_gripper": {
+        "maximum_per_finger_N": [
+          10.806107460324434,
+          14.709885070626086
+        ],
+        "minimum_per_finger_N": [
+          10.516049628780927,
+          14.328536318980433
+        ],
+        "declared_limit_N": 18.0,
+        "minimum_limit_margin_N": 3.290114929373914,
+        "minimum_unilateral_margin_N": 10.516049628780927,
+        "positive_reaction_fraction": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    "normal_force_RMSE_N": [
+      0.11001034916984834,
+      0.14025982057508019,
+      0.2624742885152869
+    ],
+    "tracking_and_contact_passed": true,
+    "physical_finger_force_limits_passed": true,
+    "full_paper_pipeline_executed": false,
+    "unilateral_finger_reactions_passed": true,
+    "sampled_interface_wrench_capability": {
+      "sample_dt_s": 0.05,
+      "raw_native_contacts": true,
+      "continuous_certificate": false,
+      "interfaces": {
+        "edge_gripper": {
+          "samples": 147,
+          "failed_samples": 0,
+          "maximum_residual": 2.6645352591003757e-15,
+          "passed": true
+        },
+        "support_left": {
+          "samples": 147,
+          "failed_samples": 0,
+          "maximum_residual": 0.0,
+          "passed": true
+        },
+        "support_right": {
+          "samples": 147,
+          "failed_samples": 0,
+          "maximum_residual": 1.7763568394002505e-15,
+          "passed": true
+        }
+      },
+      "passed": true
+    },
+    "execution_passed": true
+  },
+  "crisp": {
+    "engine": "crisp",
+    "maximum_position_error_m": 0.0002070939807748882,
+    "final_position_error_m": 0.00014959223359195515,
+    "maximum_rotation_error_rad": 0.00303202111622803,
+    "final_rotation_error_rad": 0.002806536916496748,
+    "duration_s": 9.301,
+    "object_pose_prescribed": false,
+    "equality_constraints_used": 0,
+    "configuration_update": [
+      "independent_midpoint"
+    ],
+    "controller": "impedance_feedforward",
+    "jaw_force_fraction": 0.7,
+    "measured_force_feedback": false,
+    "minimum_actuator_margin_Nm": 9.488316302010606,
+    "maintained_contact_fraction": {
+      "edge_gripper": 1.0,
+      "support_left": 1.0,
+      "support_right": 1.0
+    },
+    "jaw_force": {
+      "edge_gripper": {
+        "maximum_per_finger_N": [
+          10.395536379098617,
+          15.06389412889828
+        ],
+        "minimum_per_finger_N": [
+          10.136094185659008,
+          14.803551375042861
+        ],
+        "declared_limit_N": 18.0,
+        "minimum_limit_margin_N": 2.93610587110172,
+        "minimum_unilateral_margin_N": 10.136094185659008,
+        "positive_reaction_fraction": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    "normal_force_RMSE_N": [
+      0.6111125422169905,
+      0.4865087824442919,
+      0.641614819757595
+    ],
+    "tracking_and_contact_passed": true,
+    "physical_finger_force_limits_passed": true,
+    "full_paper_pipeline_executed": false,
+    "unilateral_finger_reactions_passed": true,
+    "sampled_interface_wrench_capability": {
+      "sample_dt_s": 0.05,
+      "raw_native_contacts": true,
+      "continuous_certificate": false,
+      "interfaces": {
+        "edge_gripper": {
+          "samples": 147,
+          "failed_samples": 0,
+          "maximum_residual": 3.552713678800501e-15,
+          "passed": true
+        },
+        "support_left": {
+          "samples": 147,
+          "failed_samples": 0,
+          "maximum_residual": 0.0,
+          "passed": true
+        },
+        "support_right": {
+          "samples": 147,
+          "failed_samples": 0,
+          "maximum_residual": 2.6645352591003757e-15,
+          "passed": true
+        }
+      },
+      "passed": true
+    },
+    "execution_passed": true,
+    "solver": "canal",
+    "maximum_solver_residual": 9.996831720510338e-09
+  },
+  "comparison": {
+    "object_names": [
+      "panel"
+    ],
+    "final_translation_difference_m": [
+      0.00017463511702034415
+    ],
+    "final_rotation_difference_rad": [
+      0.0008682473456956966
+    ],
+    "tracking_error_max": [
+      0.005004835170743904,
+      0.012343771670561665
+    ],
+    "contact_samples": [
+      76131,
+      120924
+    ]
+  },
+  "current_source_plan_independent_validation": {
+    "scope": "first lift only",
+    "configuration_update": "independent_midpoint",
+    "independent": {
+      "residuals": {
+        "momentum": 3.963075201340871e-09,
+        "joint_integration": 3.6232128408641984e-12,
+        "object_translation_integration": 7.043587935129381e-12,
+        "object_rotation_integration": 1.6757704153232877e-11,
+        "normal_complementarity": 6.233123112611353e-12,
+        "maximum_dissipation": 2.3138334194594137e-11,
+        "capability": 0.0,
+        "grasp_closure_m": 1.3246292951407668e-11,
+        "grasp_closure_rad": 4.1150252786085675e-12,
+        "grasp_velocity": 9.999995386548045e-06,
+        "joint_limit": 0.0,
+        "velocity_limit": 0.0,
+        "torque_limit": 0.0,
+        "endpoint_velocity": 1.5758763888701533e-12
+      },
+      "reference_discretization_defect": {},
+      "configuration_update": "independent_midpoint",
+      "passed": true,
+      "mechanics": "independent native Pinocchio RNEA/M/J + NumPy contact transforms",
+      "continuous_collision_certificate": false
+    },
+    "full_paper_pipeline_executed": false
+  },
+  "crisp_contact_smoke_tests": {
+    "scope": "ground/sphere settling, inclined contact frame/impulse balance and bridge smoke tests; not multi-arm validation or PMI proof",
+    "sdk_license_sha256": "456018e1d3e1dd8d959dd7220a0ff9f49c5efaa55807ca91e8014be6b1018673",
+    "sdk_redistributed": false,
+    "bridge_initialization_step_and_clean_exit_passed": true,
+    "inclined_contact": {
+      "normal": [
+        0.29552020666133955,
+        -0.37202555194225956,
+        0.8799231762812572
+      ],
+      "lambda": [
+        0,
+        0,
+        0.0008732047358426219
+      ],
+      "R_col2": [
+        0,
+        0.47511598988363224,
+        0.8799231762812572
+      ],
+      "R_row2": [
+        0.29552020666133955,
+        -0.37202555194225956,
+        0.8799231762812572
+      ],
+      "negative_R_lambda_over_h": [
+        0,
+        -0.4148735324409429,
+        -0.7683530847064759
+      ],
+      "negative_RT_lambda_over_h": [
+        -0.258049643993872,
+        0.32485447381044635,
+        -0.7683530847064759
+      ],
+      "force_on_sphere_N": [
+        0.258049643993872,
+        -0.32485447381044635,
+        0.7683530847064759
+      ],
+      "independent_impulse_balance_N": [
+        0.25804706352381185,
+        -0.32485122529891747,
+        0.7683552111560769
+      ],
+      "linear_momentum_residual_N": 4.661913854841116e-06,
+      "passed": true
+    },
+    "records": [
+      {
+        "engine": "crisp",
+        "solver": "canal",
+        "dt": 0.001,
+        "time": 1,
+        "height_m": 0.0200000000000005,
+        "raw_support_world": [
+          0,
+          0,
+          -0.000980999999999166
+        ],
+        "weight_N": 0.981,
+        "contact_fraction": 1,
+        "maximum_solver_residual": 4.90687382566696e-13,
+        "pair": [
+          0,
+          1
+        ],
+        "normal": [
+          0,
+          0,
+          -1
+        ],
+        "force_on_sphere_world_N": [
+          -0.0,
+          -0.0,
+          0.9809999999991659
+        ],
+        "passed": true
+      },
+      {
+        "engine": "crisp",
+        "solver": "canal",
+        "dt": 0.0005,
+        "time": 0.999999999999945,
+        "height_m": 0.0200000000000001,
+        "raw_support_world": [
+          0,
+          0,
+          -0.000490500000001814
+        ],
+        "weight_N": 0.981,
+        "contact_fraction": 1,
+        "maximum_solver_residual": 2.45546055836544e-13,
+        "pair": [
+          0,
+          1
+        ],
+        "normal": [
+          0,
+          0,
+          -1
+        ],
+        "force_on_sphere_world_N": [
+          -0.0,
+          -0.0,
+          0.9810000000036281
+        ],
+        "passed": true
+      },
+      {
+        "engine": "crisp",
+        "solver": "sub_admm",
+        "dt": 0.001,
+        "time": 1,
+        "height_m": 0.019999999999042,
+        "raw_support_world": [
+          0,
+          0,
+          -0.000981000000000005
+        ],
+        "weight_N": 0.981,
+        "contact_fraction": 1,
+        "maximum_solver_residual": 9.58046122902928e-11,
+        "pair": [
+          0,
+          1
+        ],
+        "normal": [
+          0,
+          0,
+          -1
+        ],
+        "force_on_sphere_world_N": [
+          -0.0,
+          -0.0,
+          0.9810000000000051
+        ],
+        "passed": true
+      },
+      {
+        "engine": "crisp",
+        "solver": "sub_admm",
+        "dt": 0.0005,
+        "time": 0.999999999999945,
+        "height_m": 0.0199999999997605,
+        "raw_support_world": [
+          0,
+          0,
+          -0.000490500000000004
+        ],
+        "weight_N": 0.981,
+        "contact_fraction": 1,
+        "maximum_solver_residual": 4.79023061451464e-11,
+        "pair": [
+          0,
+          1
+        ],
+        "normal": [
+          0,
+          0,
+          -1
+        ],
+        "force_on_sphere_world_N": [
+          -0.0,
+          -0.0,
+          0.9810000000000079
+        ],
+        "passed": true
+      }
+    ],
+    "passed": true
+  },
+  "hybrid_feedback_crisp_failure": {
+    "time": 1.225,
+    "object_pose": [
+      -0.18832659832074616,
+      -0.037002629891750245,
+      0.741704680427248,
+      -0.014982253711175893,
+      -0.19157759582041448,
+      -0.06599994992942222,
+      0.9791412377500589
+    ],
+    "solver_residual": 1.184527774777058e-13,
+    "reason": "Object tracking error exceeded 0.25 m; CRISP integration rejected",
+    "full_paper_pipeline_executed": false
+  },
+  "trace_sha256": {
+    "mujoco": "be4504d94f0edcfdb929450b1c8b363ccedbed93d25203eb5e7681ba32a51bc0",
+    "crisp": "2a1f81b81d994cad5925fadbba5ed6039940c86cd4c6f452dc946fe6efacac0a"
+  }
+}

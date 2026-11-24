@@ -1,0 +1,12 @@
+/workspace/scale-aware-contact-transfer/src/contact_transfer/full_scenario.py:260: UserWarning: Gimbal lock detected. Setting third angle to zero since it is not possible to uniquely determine all angles.
+  tree=ET.parse(r.path);ET.SubElement(tree.getroot(),'link',name='paper_interface');j=ET.SubElement(tree.getroot(),'joint',name='paper_interface_mount',type='fixed');ET.SubElement(j,'parent',link='tip');ET.SubElement(j,'child',link='paper_interface');ET.SubElement(j,'origin',xyz=' '.join(map(str,Tti[:3,3])),rpy=' '.join(map(str,Rotation.from_matrix(Tti[:3,:3]).as_euler('xyz'))));path=out/f'gripper_{i}_interface.urdf';ET.indent(tree);tree.write(path,encoding='utf-8',xml_declaration=True);r=Robot(path,base_pose=arm.base_pose);full.append(r)
+box: 8 keyframes and 7 intervals passed current independent mechanics
+/workspace/scale-aware-contact-transfer/src/contact_transfer/full_scenario.py:260: UserWarning: Gimbal lock detected. Setting third angle to zero since it is not possible to uniquely determine all angles.
+  tree=ET.parse(r.path);ET.SubElement(tree.getroot(),'link',name='paper_interface');j=ET.SubElement(tree.getroot(),'joint',name='paper_interface_mount',type='fixed');ET.SubElement(j,'parent',link='tip');ET.SubElement(j,'child',link='paper_interface');ET.SubElement(j,'origin',xyz=' '.join(map(str,Tti[:3,3])),rpy=' '.join(map(str,Rotation.from_matrix(Tti[:3,:3]).as_euler('xyz'))));path=out/f'gripper_{i}_interface.urdf';ET.indent(tree);tree.write(path,encoding='utf-8',xml_declaration=True);r=Robot(path,base_pose=arm.base_pose);full.append(r)
+box/full replay: 0/20.0s
+box/full replay: 5/20.0s
+box/full replay: 10/20.0s
+box/full replay: 15/20.0s
+box/full replay: 20/20.0s
+box/full replay: 20/20.0s
+box True

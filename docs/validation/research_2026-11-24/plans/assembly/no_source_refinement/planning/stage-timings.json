@@ -1,0 +1,306 @@
+[
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "stage": "keyframe",
+    "index": 0,
+    "cache_hit": false,
+    "wall_time_s": 29.287285018996045
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "stage": "keyframe",
+    "index": 1,
+    "cache_hit": false,
+    "wall_time_s": 1.537508738001634
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "stage": "keyframe",
+    "index": 2,
+    "cache_hit": false,
+    "wall_time_s": 8.06141547000152
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "stage": "keyframe",
+    "index": 3,
+    "cache_hit": false,
+    "wall_time_s": 67.97311823500058
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "stage": "keyframe",
+    "index": 4,
+    "cache_hit": false,
+    "wall_time_s": 29.132516593999753
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "stage": "keyframe",
+    "index": 5,
+    "cache_hit": false,
+    "wall_time_s": 5.421094065000943
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "stage": "keyframe",
+    "index": 6,
+    "cache_hit": false,
+    "wall_time_s": 6.191841007996118
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "stage": "keyframe",
+    "index": 7,
+    "cache_hit": false,
+    "wall_time_s": 0.7019683239996084
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "stage": "keyframe",
+    "index": 8,
+    "cache_hit": false,
+    "wall_time_s": 0.6544864539973787
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "stage": "keyframe",
+    "index": 9,
+    "cache_hit": false,
+    "wall_time_s": 0.9266503260005265
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "stage": "transition",
+    "index": 0,
+    "cache_hit": false,
+    "wall_time_s": 1.1619382460048655
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "stage": "transition",
+    "index": 1,
+    "cache_hit": false,
+    "wall_time_s": 35.000872165001056
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "stage": "transition",
+    "index": 2,
+    "cache_hit": false,
+    "wall_time_s": 45.52999717700004
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "stage": "transition",
+    "index": 3,
+    "cache_hit": false,
+    "wall_time_s": 53.37990075700509
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "stage": "transition",
+    "index": 4,
+    "cache_hit": false,
+    "wall_time_s": 30.490929383995535
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "stage": "transition",
+    "index": 5,
+    "cache_hit": false,
+    "wall_time_s": 56.935348079001415
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "stage": "transition",
+    "index": 6,
+    "cache_hit": false,
+    "wall_time_s": 1.1949467700032983
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "stage": "transition",
+    "index": 7,
+    "cache_hit": false,
+    "wall_time_s": 0.8821288100007223
+  },
+  {
+    "types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "assignment": [
+      0,
+      1,
+      2
+    ],
+    "stage": "transition",
+    "index": 8,
+    "cache_hit": false,
+    "wall_time_s": 3.719154434002121
+  }
+]

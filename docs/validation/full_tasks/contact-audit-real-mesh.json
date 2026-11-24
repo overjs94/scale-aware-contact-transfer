@@ -1,0 +1,18 @@
+[
+  {
+    "name": "desktop",
+    "errors": [],
+    "loaded_actual_assets": 16,
+    "overflow": false,
+    "contact": "native 16.001 s · 5 접촉면 · 보간 없음 · 최소 gap -0.062 mm",
+    "status": "전체 구간 · 검증 통과"
+  },
+  {
+    "name": "mobile",
+    "errors": [],
+    "loaded_actual_assets": 16,
+    "overflow": false,
+    "contact": "native 16.001 s · 5 접촉면 · 보간 없음 · 최소 gap -0.062 mm",
+    "status": "전체 구간 · 검증 통과"
+  }
+]

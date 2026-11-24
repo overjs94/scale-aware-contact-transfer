@@ -1,0 +1,62 @@
+{
+  "id": "shared_spherical_tip",
+  "urdf_sha256": "199eb9de0509ebe10a39f69b77d3acc3e92f9a06911bf8def3e29b45ca554eab",
+  "radius_m": 0.025,
+  "ee_to_tip": [
+    [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      1.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      1.0,
+      0.165
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "ee_to_sphere_center": [
+    [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      1.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      1.0,
+      0.14
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "mass_kg": 0.1,
+  "contact_point": "leading sphere surface, local +Z",
+  "license": "MIT",
+  "ee_frame": "panda_link8",
+  "prepared_urdf_sha256": "d1e9dffae1ee1e61d037c7188a3a321696d967f4b243a440c216b5d21ad158f4"
+}

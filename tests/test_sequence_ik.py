@@ -30,3 +30,17 @@ def test_urdf_ik_initialization_reaches_known_pose():
     target = robot.fk(q0+np.array([.01, -.02, .01, .01, -.01, .02, -.01]), "panda_link8")
     result = solve_ik(robot.symbolic(), "panda_link8", target, q0)
     assert result.position_error < 2e-5 and result.rotation_cost < 1e-8
+
+
+def test_sequence_prunes_only_dominated_realized_endpoint_cost_bounds():
+    visited=[]
+    def keyframe(k,types,assignment,previous):return SimpleNamespace(objective=-5. if types[0]=='G' else -1.)
+    def transition(k,left,right,types,assignments):
+        visited.append(types);return SimpleNamespace(objective=.5,full_geometry_checked=True)
+    pruned=choose_sequence([('G','P')],[((0,),(0,))],keyframe,transition,transition_cost_lower_bound=0.)
+    exhaustive=choose_sequence([('G','P')],[((0,),(0,))],keyframe,transition)
+    assert pruned.best.types==exhaustive.best.types==('G',)
+    assert pruned.best.objective==exhaustive.best.objective
+    assert len(pruned.pruned)==1 and not pruned.failures
+    assert pruned.pruned[0]['types']==('P',)
+    assert visited==[('G',),('G',),('P',)]

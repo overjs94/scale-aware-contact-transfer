@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="rigid_loaded_platform">
+  <link name="panel">
+    <inertial>
+      <origin xyz="0.0 0.0 0.096125" />
+      <mass value="2.0" />
+      <inertia ixx="0.013108302083333336" iyy="0.01977496875" izz="0.019860000000000003" ixy="0.0" ixz="0.0" iyz="0.0" />
+    </inertial>
+    <visual name="platform">
+      <origin xyz="0 0 0" />
+      <geometry>
+        <box size="0.6 0.4 0.04" />
+      </geometry>
+      <material name="platform">
+        <color rgba=".69 .48 .29 1" />
+      </material>
+    </visual>
+    <collision name="platform">
+      <origin xyz="0 0 0" />
+      <geometry>
+        <box size="0.6 0.4 0.04" />
+      </geometry>
+    </collision>
+    <visual name="rigid_riser">
+      <origin xyz="0 0 0.0475" />
+      <geometry>
+        <box size="0.04 0.04 0.055" />
+      </geometry>
+      <material name="rigid_riser">
+        <color rgba=".3 .35 .4 1" />
+      </material>
+    </visual>
+    <collision name="rigid_riser">
+      <origin xyz="0 0 0.0475" />
+      <geometry>
+        <box size="0.04 0.04 0.055" />
+      </geometry>
+    </collision>
+    <visual name="fixed_payload">
+      <origin xyz="0 0 0.125" />
+      <geometry>
+        <box size="0.1 0.1 0.1" />
+      </geometry>
+      <material name="fixed_payload">
+        <color rgba=".94 .48 .18 1" />
+      </material>
+    </visual>
+    <collision name="fixed_payload">
+      <origin xyz="0 0 0.125" />
+      <geometry>
+        <box size="0.1 0.1 0.1" />
+      </geometry>
+    </collision>
+  </link>
+</robot>

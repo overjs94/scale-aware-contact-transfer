@@ -1,0 +1,94 @@
+{
+  "free_box_lid": {
+    "execution_passed": true,
+    "arm_count": 3,
+    "base_joint_type": "free",
+    "internal_joint_type": "revolute",
+    "world_hinge": false,
+    "object_joint_actuators": 0,
+    "object_pose_prescribed": false,
+    "final_error": 0.0021854149792306377,
+    "base_max_position_error_m": 6.57121803852319e-05,
+    "base_max_rotation_error_rad": 0.0014120327046497805,
+    "contact_fraction": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "peak_contact_force_per_arm_N": [
+      7.829155282788636,
+      18.187503889498892,
+      4.627825442254091
+    ],
+    "unexpected_penetrations_m": {},
+    "primal_residual": 7.105427357601002e-15
+  },
+  "free_folding_object": {
+    "execution_passed": true,
+    "arm_count": 3,
+    "base_joint_type": "free",
+    "internal_joint_type": "revolute",
+    "world_hinge": false,
+    "object_joint_actuators": 0,
+    "object_pose_prescribed": false,
+    "final_error": 0.0028606186182447055,
+    "base_max_position_error_m": 0.0001545083451612675,
+    "base_max_rotation_error_rad": 0.0009288834006754184,
+    "contact_fraction": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "peak_contact_force_per_arm_N": [
+      6.447383952135943,
+      18.512739095668632,
+      9.11844892268555
+    ],
+    "unexpected_penetrations_m": {},
+    "primal_residual": 7.105427357601002e-15
+  },
+  "free_portable_drawer": {
+    "execution_passed": true,
+    "arm_count": 3,
+    "base_joint_type": "free",
+    "internal_joint_type": "prismatic",
+    "world_hinge": false,
+    "object_joint_actuators": 0,
+    "object_pose_prescribed": false,
+    "final_error": 5.677169494106016e-05,
+    "base_max_position_error_m": 7.990948440630254e-05,
+    "base_max_rotation_error_rad": 0.00091007159246381,
+    "contact_fraction": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "peak_contact_force_per_arm_N": [
+      2.8225326457568993,
+      19.020303124226974,
+      5.869641707095727
+    ],
+    "unexpected_penetrations_m": {},
+    "primal_residual": 7.105427357601002e-15
+  },
+  "pulse_5N": {
+    "execution_passed": true,
+    "base_max_position_error_m": 0.0005523252087523967,
+    "contact_fraction": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "final_error": 0.00218508265616868
+  },
+  "contact_disabled": {
+    "execution_passed": false,
+    "base_max_position_error_m": 0.4750367742930129,
+    "contact_fraction": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "final_error": 1.0479931260352102
+  }
+}

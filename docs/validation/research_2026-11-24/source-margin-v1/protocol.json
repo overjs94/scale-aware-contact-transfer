@@ -1,0 +1,157 @@
+{
+  "protocol": {
+    "version": 1,
+    "hold_reference_duration_s": 13.0,
+    "onset_s": 4.0,
+    "hold_load_duration_s": 5.0,
+    "ramp_duration_s": 0.5,
+    "repeated_onsets_s": [
+      4.0,
+      6.0,
+      8.0,
+      10.0
+    ],
+    "repeated_duration_s": 1.0,
+    "recovery_window_s": 1.0,
+    "persistent_position_error_m": 0.05,
+    "persistent_rotation_error_rad": 0.3,
+    "persistent_exceedance_fraction": 0.9,
+    "persistent_all_support_fraction_max": 0.1,
+    "trials_per_condition": 1,
+    "statistical_success_rate_claimed": false,
+    "mathematical_divergence_claimed": false,
+    "primary_comparison": "slow_up4",
+    "cases": {
+      "nominal": {
+        "title": "No external load",
+        "force_N": 0.0,
+        "profile": "smooth_hold"
+      },
+      "common_up2": {
+        "title": "Common interior \u00b7 2 N upward hold",
+        "force_N": -2.0,
+        "profile": "smooth_hold"
+      },
+      "common_up1": {
+        "title": "Common interior \u00b7 1 N with slow rise",
+        "force_N": -1.0,
+        "profile": "smooth_hold",
+        "ramp_duration_s": 2.0,
+        "duration_s": 8.0
+      },
+      "sustained_up4": {
+        "title": "4 N upward \u00b7 sustained load",
+        "force_N": -4.0,
+        "profile": "smooth_hold"
+      },
+      "sustained_down4": {
+        "title": "4 N downward \u00b7 sustained load",
+        "force_N": 4.0,
+        "profile": "smooth_hold"
+      },
+      "repeated_up4": {
+        "title": "4 N upward \u00b7 four repeated pulses",
+        "force_N": -4.0,
+        "profile": "sin_squared"
+      },
+      "slow_up4": {
+        "title": "4 N upward \u00b7 slow 2 s rise and fall",
+        "force_N": -4.0,
+        "profile": "smooth_hold",
+        "ramp_duration_s": 2.0,
+        "duration_s": 8.0
+      },
+      "diagonal": {
+        "title": "Diagonal hold \u00b7 4.5 N up, 1.4 N in x/y",
+        "force_N": -4.5,
+        "force_world_N": [
+          1.4,
+          -1.4,
+          4.5
+        ],
+        "profile": "smooth_hold",
+        "ramp_duration_s": 2.0,
+        "duration_s": 8.0
+      }
+    },
+    "only_ablation": "source box-vertex refinement ON/OFF; target material sites fixed",
+    "certificate_scope": "initial-pose static force box; not a closed-loop stability certificate",
+    "historical_single_pulse_records_preserved": true,
+    "object_variant": "loaded",
+    "object_description": "Rigid platform with a fixed upper payload",
+    "target_com_object_m": [
+      0.0,
+      0.0,
+      0.2005
+    ],
+    "source_and_target_com_from_urdf": true
+  },
+  "source_protocol": {
+    "version": 2,
+    "source_to_target_scale": 4.0,
+    "source_mass_kg": 0.03125,
+    "target_mass_kg": 2.0,
+    "source_position_radius_m": 0.0325,
+    "geometry_weight": 1000.0,
+    "target_initial_sites_m": [
+      [
+        -0.17,
+        -0.035,
+        -0.02
+      ],
+      [
+        0.0,
+        0.035,
+        -0.02
+      ],
+      [
+        0.17,
+        -0.035,
+        -0.02
+      ]
+    ],
+    "source_patch_half_size_m": 0.0325,
+    "mu": 0.8,
+    "target_normal_limit_N": 40.0,
+    "force_application_point_body_m": [
+      0.0,
+      0.18,
+      0.02
+    ],
+    "target_force_box_scales_N": [
+      2.56,
+      2.56,
+      8.0
+    ],
+    "force_direction_world": [
+      0.0,
+      0.0,
+      -1.0
+    ],
+    "force_levels_N": [
+      0.0,
+      -4.0,
+      4.0,
+      -8.0,
+      8.0,
+      -12.0,
+      12.0
+    ],
+    "force_sign_convention": "positive downward, negative upward; both tested before selecting a demonstration",
+    "pulse_start_s": 4.0,
+    "pulse_duration_s": 1.0,
+    "hold_duration_s": 5.0,
+    "physics_dt_s": 0.001,
+    "target_contact_geometry_adjustment": false,
+    "target_posture_and_forces_reoptimized": true,
+    "arm_control": "impedance_feedforward",
+    "object_actuators": 0,
+    "object_welds": 0,
+    "pass_position_error_m": 0.008,
+    "pass_rotation_error_rad": 0.06,
+    "pass_contact_fraction": 0.99,
+    "source_normals_fixed": true,
+    "source_and_target_task_basis_fixed_before_trials": true,
+    "statistical_success_rate_claimed": false
+  }
+}

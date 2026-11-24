@@ -1,0 +1,148 @@
+{
+  "scope": "first optimized lift only; supplied synthetic contracted groups and G/P/P assignment; not III-D search or full paper sequence",
+  "case_id": "99a7e5691346f2f9c1c903ae811ad94dab1a73db3fc41643855d481a4049468d",
+  "plan_id": "36cdfc73cf0a83d9d7a1e97f01421bfa0a1f2a4eb22f96c4431a337098422db6",
+  "reference_interpolation": "holding_grasp",
+  "keyframes": [
+    {
+      "rho": 10.106540800805599,
+      "primal_residual": 6.348432890490585e-10,
+      "certificate": true,
+      "closure_m": 9.209666375651935e-16,
+      "native_equilibrium_residual": 1.2331691223721464e-11,
+      "native_torque_residual": 5.347658316168236e-09,
+      "capability_violation": 0.0
+    },
+    {
+      "rho": 10.106540800716107,
+      "primal_residual": 2.040636104538862e-09,
+      "certificate": true,
+      "closure_m": 2.6766507790745728e-16,
+      "native_equilibrium_residual": 2.1316282072803006e-14,
+      "native_torque_residual": 1.9627677261269127e-10,
+      "capability_violation": 0.0
+    }
+  ],
+  "independent_plan": {
+    "residuals": {
+      "momentum": 9.706058179403954e-10,
+      "joint_integration": 2.9010438495902235e-10,
+      "object_translation_integration": 2.0367304257939307e-10,
+      "object_rotation_integration": 1.2555778766603091e-09,
+      "normal_complementarity": 2.4039269642593193e-10,
+      "maximum_dissipation": 4.629757590577227e-10,
+      "capability": 0.0,
+      "grasp_closure_m": 2.7582691686234284e-10,
+      "grasp_closure_rad": 3.3076426734591806e-10,
+      "grasp_velocity": 9.999739158360072e-06,
+      "joint_limit": 0.0,
+      "velocity_limit": 0.0,
+      "torque_limit": 0.0,
+      "endpoint_velocity": 1.1445689377948888e-10
+    },
+    "reference_discretization_defect": {},
+    "configuration_update": "independent_midpoint",
+    "passed": true,
+    "mechanics": "independent native Pinocchio RNEA/M/J + NumPy contact transforms",
+    "continuous_collision_certificate": false
+  },
+  "geometry": {
+    "sampled_execution_reference_passed": true,
+    "continuous_certificate": false,
+    "independent_se3_interpolation_passed": false,
+    "independent_interpolation_violations": 54,
+    "minimum_independent_interpolation_gap_m": -0.0007828556279081494
+  },
+  "execution": {
+    "engine": "mujoco",
+    "maximum_position_error_m": 0.00021606885661482053,
+    "final_position_error_m": 0.00016092442115641205,
+    "maximum_rotation_error_rad": 0.0019180461795237195,
+    "final_rotation_error_rad": 0.0009397106508299329,
+    "duration_s": 9.311,
+    "object_pose_prescribed": false,
+    "equality_constraints_used": 3,
+    "configuration_update": [
+      "independent_midpoint"
+    ],
+    "controller": "impedance_feedforward",
+    "jaw_force_fraction": 0.7,
+    "measured_force_feedback": false,
+    "minimum_actuator_margin_Nm": 0.0,
+    "maintained_contact_fraction": {
+      "edge_gripper": 1.0,
+      "support_left": 1.0,
+      "support_right": 0.9998632198057721
+    },
+    "jaw_force": {
+      "edge_gripper": {
+        "maximum_per_finger_N": [
+          38.913795986793225,
+          42.47386647327994
+        ],
+        "minimum_per_finger_N": [
+          38.40446073464821,
+          41.90037738487218
+        ],
+        "declared_limit_N": 60,
+        "minimum_limit_margin_N": 17.52613352672006,
+        "minimum_unilateral_margin_N": 38.40446073464821,
+        "positive_reaction_fraction": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    "normal_force_RMSE_N": [
+      0.18965427115389552,
+      0.2654194697238556,
+      0.3048146759414799
+    ],
+    "tracking_and_contact_passed": true,
+    "physical_finger_force_limits_passed": true,
+    "full_paper_pipeline_executed": false,
+    "unilateral_finger_reactions_passed": true,
+    "object_equality_constraints_used": 0,
+    "internal_gripper_equalities": 3,
+    "gripper_model": "robotiq_2f85",
+    "gripper_measured_force_feedback": true,
+    "sampled_interface_wrench_capability": {
+      "sample_dt_s": 0.05,
+      "raw_native_contacts": true,
+      "continuous_certificate": false,
+      "interfaces": {
+        "edge_gripper": {
+          "samples": 147,
+          "failed_samples": 0,
+          "maximum_residual": 3.552713678800501e-15,
+          "passed": true
+        },
+        "support_left": {
+          "samples": 147,
+          "failed_samples": 0,
+          "maximum_residual": 0.0,
+          "passed": true
+        },
+        "support_right": {
+          "samples": 147,
+          "failed_samples": 0,
+          "maximum_residual": 8.881784197001252e-16,
+          "passed": true
+        }
+      },
+      "passed": true
+    },
+    "execution_passed": true,
+    "reference_interpolation": "holding_grasp",
+    "sampled_execution_reference_geometry_passed": true
+  },
+  "sha256": {
+    "plan.npz": "a6562fe318d9c4b5044d18294b3b5f1d312271daece067c98a79f8a464c99346",
+    "candidate-plan.npz": "7893fece2fa31faebebb6499113dc819cf216b71b11f64bb71a4729640a456af",
+    "candidate-validation.json": "1371d7d160a6e1e9b4c5df506ba9255dbb220d6813e424d7b384ece0074bbd89",
+    "mujoco/execution.npz": "baf4569678911134d8d2ea90ce199261e19fbdac77a2d55ec2ea2614b4571275",
+    "mujoco/control.json": "a5e6d4d4af8f9b23235df72cd194b20641e0052283b05d5b9c28b4a174595164",
+    "mujoco/scene.xml": "a4c08bc94ef52e30884a758a2c32b297fa880d140e893a4997e17323a3d90671",
+    "mujoco/execution-report.json": "75ce05820dd1571f698c07bd1e7eb802c222b5dc00c44f3675061f3110b6c9ac"
+  }
+}

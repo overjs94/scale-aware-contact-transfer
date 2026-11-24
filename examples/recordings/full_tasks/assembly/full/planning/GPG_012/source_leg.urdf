@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="leg">
+  <link name="leg">
+    <inertial>
+      <origin xyz="0.0 0.0 -0.000953125" />
+      <mass value="0.00625" />
+      <inertia ixx="2.7612688191731774e-06" ixy="0.0" ixz="0.0" iyy="2.7612688191731774e-06" iyz="0.0" izz="1.0208984375000001e-07" />
+    </inertial>
+    <visual name="leg_visual_0">
+      <origin xyz="0.0 0.0 0.0" />
+      <geometry>
+        <box size="0.01 0.01 0.07" />
+      </geometry>
+      <material name="leg_material">
+        <color rgba=".42 .27 .16 1" />
+      </material>
+    </visual>
+    <collision name="leg_collision_0">
+      <origin xyz="0.0 0.0 0.0" />
+      <geometry>
+        <box size="0.01 0.01 0.07" />
+      </geometry>
+    </collision>
+    <visual name="leg_visual_1">
+      <origin xyz="0.0 0.0 -0.038125" />
+      <geometry>
+        <box size="0.0045 0.0045 0.00625" />
+      </geometry>
+      <material name="leg_material">
+        <color rgba=".42 .27 .16 1" />
+      </material>
+    </visual>
+    <collision name="leg_collision_1">
+      <origin xyz="0.0 0.0 -0.038125" />
+      <geometry>
+        <box size="0.0045 0.0045 0.00625" />
+      </geometry>
+    </collision>
+  </link>
+</robot>

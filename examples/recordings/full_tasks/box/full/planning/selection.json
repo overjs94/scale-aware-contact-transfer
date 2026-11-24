@@ -1,0 +1,1445 @@
+{
+  "selection_executed": true,
+  "selection_method": "exhaustive configured hardware-compatible P/G and fixed-through-sequence injective assignment candidates",
+  "candidate_count": 24,
+  "accepted_candidates": [
+    {
+      "types": [
+        "G",
+        "P",
+        "G"
+      ],
+      "assignment": [
+        0,
+        1,
+        2
+      ],
+      "objective": -124.69738538200475
+    }
+  ],
+  "rejections": [
+    {
+      "types": [
+        "G",
+        "P",
+        "G"
+      ],
+      "assignments": [
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ]
+      ],
+      "reason": "Point position/axis IK failed at tip"
+    },
+    {
+      "types": [
+        "G",
+        "P",
+        "G"
+      ],
+      "assignments": [
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ]
+      ],
+      "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+    },
+    {
+      "types": [
+        "G",
+        "P",
+        "G"
+      ],
+      "assignments": [
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ]
+      ],
+      "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+    },
+    {
+      "types": [
+        "G",
+        "P",
+        "G"
+      ],
+      "assignments": [
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ]
+      ],
+      "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+    },
+    {
+      "types": [
+        "G",
+        "P",
+        "G"
+      ],
+      "assignments": [
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ]
+      ],
+      "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+    },
+    {
+      "types": [
+        "G",
+        "P",
+        "P"
+      ],
+      "assignments": [
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          2
+        ]
+      ],
+      "reason": "Point position/axis IK failed at tip"
+    },
+    {
+      "types": [
+        "G",
+        "P",
+        "P"
+      ],
+      "assignments": [
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ]
+      ],
+      "reason": "Point position/axis IK failed at tip"
+    },
+    {
+      "types": [
+        "G",
+        "P",
+        "P"
+      ],
+      "assignments": [
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ]
+      ],
+      "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+    },
+    {
+      "types": [
+        "G",
+        "P",
+        "P"
+      ],
+      "assignments": [
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ]
+      ],
+      "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+    },
+    {
+      "types": [
+        "G",
+        "P",
+        "P"
+      ],
+      "assignments": [
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ]
+      ],
+      "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+    },
+    {
+      "types": [
+        "G",
+        "P",
+        "P"
+      ],
+      "assignments": [
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ]
+      ],
+      "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+    },
+    {
+      "types": [
+        "P",
+        "P",
+        "G"
+      ],
+      "assignments": [
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ]
+      ],
+      "reason": "Point position/axis IK failed at tip"
+    },
+    {
+      "types": [
+        "P",
+        "P",
+        "G"
+      ],
+      "assignments": [
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ]
+      ],
+      "reason": "Point position/axis IK failed at tip"
+    },
+    {
+      "types": [
+        "P",
+        "P",
+        "G"
+      ],
+      "assignments": [
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ]
+      ],
+      "reason": "Point position/axis IK failed at tip"
+    },
+    {
+      "types": [
+        "P",
+        "P",
+        "G"
+      ],
+      "assignments": [
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ]
+      ],
+      "reason": "Point position/axis IK failed at tip"
+    },
+    {
+      "types": [
+        "P",
+        "P",
+        "G"
+      ],
+      "assignments": [
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ]
+      ],
+      "reason": "Point position/axis IK failed at tip"
+    },
+    {
+      "types": [
+        "P",
+        "P",
+        "P"
+      ],
+      "assignments": [
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          2
+        ]
+      ],
+      "reason": "Point position/axis IK failed at tip"
+    },
+    {
+      "types": [
+        "P",
+        "P",
+        "P"
+      ],
+      "assignments": [
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          0,
+          2,
+          1
+        ]
+      ],
+      "reason": "Point position/axis IK failed at tip"
+    },
+    {
+      "types": [
+        "P",
+        "P",
+        "P"
+      ],
+      "assignments": [
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          1,
+          0,
+          2
+        ]
+      ],
+      "reason": "Point position/axis IK failed at tip"
+    },
+    {
+      "types": [
+        "P",
+        "P",
+        "P"
+      ],
+      "assignments": [
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          2,
+          0
+        ]
+      ],
+      "reason": "Point position/axis IK failed at tip"
+    },
+    {
+      "types": [
+        "P",
+        "P",
+        "P"
+      ],
+      "assignments": [
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          2,
+          0,
+          1
+        ]
+      ],
+      "reason": "Point position/axis IK failed at tip"
+    },
+    {
+      "types": [
+        "P",
+        "P",
+        "P"
+      ],
+      "assignments": [
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ],
+        [
+          2,
+          1,
+          0
+        ]
+      ],
+      "reason": "Point position/axis IK failed at tip"
+    }
+  ],
+  "pruned_candidates": [
+    {
+      "types": [
+        "P",
+        "P",
+        "G"
+      ],
+      "assignments": [
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          1,
+          2
+        ]
+      ],
+      "reason": "Dominated cost bound for these realized keyframes; no physical infeasibility claim",
+      "realized_keyframe_cost": -48.26608037194851,
+      "transition_cost_lower_bound": 0.0,
+      "sequence_cost_lower_bound": -48.26608037194851,
+      "incumbent_objective": -124.69738538200475
+    }
+  ],
+  "transition_cost_bound_scope": "Nonnegative interval objective conditional on each realized keyframe sequence; not a global IK bound",
+  "selected_types": [
+    "G",
+    "P",
+    "G"
+  ],
+  "selected_assignment": [
+    0,
+    1,
+    2
+  ],
+  "objective": -124.69738538200475,
+  "objective_definition": "sum keyframe geometry/posture minus robustness plus sum interval motion costs; no type penalty",
+  "planning_wall_time_s": 80.80564191199664,
+  "source_refinement_enabled": true,
+  "source_certificates": [
+    {
+      "synthetic_input": true,
+      "network_inference_executed": false,
+      "source_refinement_enabled": true,
+      "source_status": "failed_source_solve",
+      "source_certificate": false,
+      "source_rho": null,
+      "source_failure": "NLP rejected [ipopt]: Infeasible_Problem_Detected",
+      "source_geometry_fallback": true,
+      "source_forces_transferred": false,
+      "source_to_target_scale": 4.0
+    },
+    {
+      "synthetic_input": true,
+      "network_inference_executed": false,
+      "source_refinement_enabled": true,
+      "source_status": "failed_source_solve",
+      "source_certificate": false,
+      "source_rho": null,
+      "source_failure": "NLP rejected [ipopt]: Infeasible_Problem_Detected",
+      "source_geometry_fallback": true,
+      "source_forces_transferred": false,
+      "source_to_target_scale": 4.0
+    },
+    {
+      "synthetic_input": true,
+      "network_inference_executed": false,
+      "source_refinement_enabled": true,
+      "source_status": "failed_source_solve",
+      "source_certificate": false,
+      "source_rho": null,
+      "source_failure": "NLP rejected [ipopt]: Maximum_Iterations_Exceeded",
+      "source_geometry_fallback": true,
+      "source_forces_transferred": false,
+      "source_to_target_scale": 4.0
+    },
+    {
+      "synthetic_input": true,
+      "network_inference_executed": false,
+      "source_refinement_enabled": true,
+      "source_status": "failed_source_solve",
+      "source_certificate": false,
+      "source_rho": null,
+      "source_failure": "NLP rejected [ipopt]: Maximum_Iterations_Exceeded",
+      "source_geometry_fallback": true,
+      "source_forces_transferred": false,
+      "source_to_target_scale": 4.0
+    },
+    {
+      "synthetic_input": true,
+      "network_inference_executed": false,
+      "source_refinement_enabled": true,
+      "source_status": "failed_source_solve",
+      "source_certificate": false,
+      "source_rho": null,
+      "source_failure": "NLP rejected [ipopt]: Maximum_Iterations_Exceeded",
+      "source_geometry_fallback": true,
+      "source_forces_transferred": false,
+      "source_to_target_scale": 4.0
+    },
+    {
+      "synthetic_input": true,
+      "network_inference_executed": false,
+      "source_refinement_enabled": true,
+      "source_status": "failed_source_solve",
+      "source_certificate": false,
+      "source_rho": null,
+      "source_failure": "NLP rejected [ipopt]: Infeasible_Problem_Detected",
+      "source_geometry_fallback": true,
+      "source_forces_transferred": false,
+      "source_to_target_scale": 4.0
+    },
+    {
+      "synthetic_input": true,
+      "network_inference_executed": false,
+      "source_refinement_enabled": true,
+      "source_status": "failed_source_solve",
+      "source_certificate": false,
+      "source_rho": null,
+      "source_failure": "NLP rejected [ipopt]: Infeasible_Problem_Detected",
+      "source_geometry_fallback": true,
+      "source_forces_transferred": false,
+      "source_to_target_scale": 4.0
+    },
+    {
+      "synthetic_input": true,
+      "network_inference_executed": false,
+      "source_refinement_enabled": true,
+      "source_status": "failed_source_solve",
+      "source_certificate": false,
+      "source_rho": null,
+      "source_failure": "NLP rejected [ipopt]: Infeasible_Problem_Detected",
+      "source_geometry_fallback": true,
+      "source_forces_transferred": false,
+      "source_to_target_scale": 4.0
+    }
+  ],
+  "target_keyframe_margins": [
+    18.70862311367394,
+    18.70862311367394,
+    18.443235659770888,
+    18.443235659770888,
+    15.150593332871907,
+    12.611933033421762,
+    12.27845749400103,
+    12.27845749400103
+  ],
+  "target_methods": [
+    {
+      "method": "legacy_target_record",
+      "same_rho_force_polish": {
+        "witness_applied": true,
+        "status": "AlmostSolved",
+        "rho": 18.70862311367394,
+        "primal_residual": 1.128647397763416e-09
+      }
+    },
+    {
+      "method": "legacy_target_record",
+      "same_rho_force_polish": {
+        "witness_applied": true,
+        "status": "AlmostSolved",
+        "rho": 18.70862311367394,
+        "primal_residual": 1.128647397763416e-09
+      }
+    },
+    {
+      "method": "legacy_target_record",
+      "same_rho_force_polish": {
+        "witness_applied": true,
+        "status": "AlmostSolved",
+        "rho": 18.443235659770888,
+        "primal_residual": 4.230142494066058e-07
+      }
+    },
+    {
+      "method": "legacy_target_record",
+      "same_rho_force_polish": {
+        "witness_applied": true,
+        "status": "AlmostSolved",
+        "rho": 18.443235659770888,
+        "primal_residual": 4.230142494066058e-07
+      }
+    },
+    {
+      "method": "fixed_geometry_separable_target",
+      "posture_solver": "Solve_Succeeded",
+      "torque_free_rho_upper_bound": 15.150593332871907,
+      "same_rho_torque_feasibility": true,
+      "posture_global_optimality_claimed": false,
+      "same_rho_force_polish": {
+        "witness_applied": true,
+        "status": "AlmostSolved",
+        "rho": 15.150593332871907,
+        "primal_residual": 1.5721216328756782e-08
+      }
+    },
+    {
+      "method": "coupled_target_NLP",
+      "same_rho_force_polish": {
+        "witness_applied": false,
+        "rejected_reason": "Condensed allocation rejected: AlmostSolved"
+      }
+    },
+    {
+      "method": "fixed_geometry_separable_target",
+      "posture_solver": "Solve_Succeeded",
+      "torque_free_rho_upper_bound": 12.27845749400103,
+      "same_rho_torque_feasibility": true,
+      "posture_global_optimality_claimed": false,
+      "same_rho_force_polish": {
+        "witness_applied": false,
+        "rejected_reason": "Condensed allocation rejected: AlmostPrimalInfeasible"
+      }
+    },
+    {
+      "method": "fixed_geometry_separable_target",
+      "posture_solver": "Solve_Succeeded",
+      "torque_free_rho_upper_bound": 12.27845749400103,
+      "same_rho_torque_feasibility": true,
+      "posture_global_optimality_claimed": false,
+      "same_rho_force_polish": {
+        "witness_applied": false,
+        "rejected_reason": "Condensed allocation rejected: AlmostPrimalInfeasible"
+      }
+    }
+  ],
+  "actual_interval_nodes": [
+    16,
+    16,
+    16,
+    16,
+    16,
+    16,
+    16
+  ],
+  "solver_configuration": {
+    "max_iterations": 1000,
+    "tolerance": 1e-06,
+    "acceptance_tolerance": 2e-06,
+    "backend": "ipopt",
+    "options": {
+      "expand": false,
+      "ipopt.max_cpu_time": 180.0,
+      "ipopt.mu_strategy": "adaptive",
+      "ipopt.mu_init": 1e-05,
+      "ipopt.bound_push": 1e-08,
+      "ipopt.bound_frac": 1e-08,
+      "ipopt.slack_bound_push": 1e-08,
+      "ipopt.slack_bound_frac": 1e-08,
+      "ipopt.acceptable_tol": 0.0001,
+      "ipopt.acceptable_constr_viol_tol": 1e-06,
+      "ipopt.acceptable_compl_inf_tol": 0.0001,
+      "ipopt.acceptable_dual_inf_tol": 0.001,
+      "ipopt.acceptable_obj_change_tol": 1e-06,
+      "ipopt.acceptable_iter": 8
+    }
+  },
+  "stage_cache_counts": {
+    "cached": 20,
+    "fresh": 3
+  },
+  "all_keyframes_optimized": true,
+  "all_intervals_cito_optimized": false,
+  "all_moving_object_intervals_cito_optimized": true,
+  "interval_methods": [
+    "stationary_contact_conic_QP",
+    "motion_cost",
+    "stationary_contact_conic_QP",
+    "motion_cost",
+    "motion_cost",
+    "motion_cost",
+    "stationary_contact_conic_QP"
+  ],
+  "keyframes": 8,
+  "intervals": 7,
+  "restricted_contact_candidates": true,
+  "sampled_geometry": true,
+  "continuous_certificate": false,
+  "configuration_update": [
+    "independent_midpoint",
+    "contact_coordinate_midpoint",
+    "independent_midpoint",
+    "contact_coordinate_midpoint",
+    "contact_coordinate_midpoint",
+    "contact_coordinate_midpoint",
+    "independent_midpoint"
+  ],
+  "manuscript_literal_equations_passed": false,
+  "extension": "free articulated object",
+  "full_paper_pipeline_executed": false
+}

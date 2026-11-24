@@ -1,0 +1,83 @@
+{
+  "case": "restricted_stationary_support",
+  "casadi_version": "3.7.2",
+  "steps": 8,
+  "duration": 0.4,
+  "relaxations": [
+    0.001,
+    1e-05,
+    1e-08
+  ],
+  "contact_acceptance": 2e-05,
+  "full_geometry_checked": false,
+  "initialization": "fresh default initialization for every solve",
+  "backends": {
+    "ipopt": {
+      "settings": {
+        "max_iterations": 1500,
+        "tolerance": 1e-08,
+        "acceptance_tolerance": 2e-06,
+        "verbose": false,
+        "backend": "ipopt",
+        "options": {},
+        "diagnostics_path": null
+      },
+      "trials": [
+        {
+          "trial": 0,
+          "accepted": true,
+          "residuals": {
+            "primal_residual": 2.5386098778668043e-09,
+            "complementarity_residual": 1.9399398993149305e-09,
+            "friction_residual": 5.443886316447503e-13,
+            "minimum_gap": 2.5386098778668043e-09,
+            "gripper_velocity_residual": 0.0
+          },
+          "seconds": 0.41890292900001214
+        },
+        {
+          "trial": 1,
+          "accepted": true,
+          "residuals": {
+            "primal_residual": 2.5386098778668043e-09,
+            "complementarity_residual": 1.9399398993149305e-09,
+            "friction_residual": 5.443886316447503e-13,
+            "minimum_gap": 2.5386098778668043e-09,
+            "gripper_velocity_residual": 0.0
+          },
+          "seconds": 0.497623754000017
+        },
+        {
+          "trial": 2,
+          "accepted": true,
+          "residuals": {
+            "primal_residual": 2.5386098778668043e-09,
+            "complementarity_residual": 1.9399398993149305e-09,
+            "friction_residual": 5.443886316447503e-13,
+            "minimum_gap": 2.5386098778668043e-09,
+            "gripper_velocity_residual": 0.0
+          },
+          "seconds": 0.4235548099999846
+        }
+      ],
+      "status": "completed",
+      "accepted_rate": 1.0,
+      "accepted_median_seconds": 0.4235548099999846
+    },
+    "snopt": {
+      "settings": {
+        "max_iterations": 1500,
+        "tolerance": 1e-08,
+        "acceptance_tolerance": 2e-06,
+        "verbose": false,
+        "backend": "snopt",
+        "options": {},
+        "diagnostics_path": null
+      },
+      "trials": [],
+      "status": "unavailable",
+      "accepted_rate": null,
+      "accepted_median_seconds": null
+    }
+  }
+}

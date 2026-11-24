@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "prediction_source": "assumed_contracted_network_output",
+  "units": "SI",
+  "contact_frame": "object",
+  "contracted_contacts": [
+    {
+      "group_id": "support_sphere",
+      "arm_id": "point",
+      "point_object": [
+        -0.05,
+        -0.06,
+        -0.02
+      ],
+      "normal_object": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "group_id": "jaw_hold",
+      "arm_id": "gripper",
+      "point_object": [
+        -0.25,
+        0,
+        0
+      ],
+      "normal_object": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "group_id": "vacuum_hold",
+      "arm_id": "suction",
+      "point_object": [
+        0.15,
+        0.06,
+        0.02
+      ],
+      "normal_object": [
+        0,
+        0,
+        1
+      ]
+    }
+  ]
+}

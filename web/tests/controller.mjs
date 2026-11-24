@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {libraryEntry,recordingScope} from '../src/library.js';
+const data={id:'research_controller_box_adaptive_opposite',title:'Box controller replay',comparison_recording:true,study_kind:'controller_replay',report:{execution_passed:true,full_paper_pipeline_executed:false,controller_replay:{}}};
+assert.equal(libraryEntry(data).category,'diagnostic');
+assert.equal(recordingScope(data).status,'Controller replay · PASS');
+assert.equal(recordingScope(data).full,false);
+assert.match(recordingScope(data).detail,/not rerun/);
+data.report.execution_passed=false;
+assert.equal(recordingScope(data).status,'Controller replay · FAIL');
+console.log('Controller replay scope checks passed');

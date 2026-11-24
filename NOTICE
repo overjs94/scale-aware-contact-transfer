@@ -1,0 +1,11 @@
+Scale-aware contact transfer
+Copyright 2026 the scale-aware-contact-transfer contributors.
+
+Original framework code is licensed under the Apache License, Version 2.0.
+Bundled robot models, meshes, and other third-party materials retain their
+respective upstream licenses. See THIRD_PARTY_NOTICES.md and the LICENSE*
+files accompanying each model/scenario. They are not relicensed by this notice.
+
+The optional CRISP SDK is not bundled or relicensed. Users obtain it separately
+under its upstream terms; the SDK's research distribution does not grant a
+commercial-use license through this project's Apache-2.0 license.

@@ -1,0 +1,5 @@
+No redistribution license has been selected for the original research package.
+
+Bundled robot model subsets remain under their respective upstream licenses.
+See src/contact_transfer/models/<model>/LICENSE.upstream and docs/models.md.
+This notice does not replace, restrict, or relicense those upstream licenses.

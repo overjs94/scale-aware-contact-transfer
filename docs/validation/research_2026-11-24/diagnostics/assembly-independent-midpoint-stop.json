@@ -1,0 +1,6 @@
+{
+  "status": "stopped_diagnostic",
+  "reason": "Primary three-task protocol uses the same contact-coordinate midpoint; that assembly plan and native execution have passed. Preserve rejected16/32-node attempts;64-node attempt is incomplete.",
+  "native_execution_evaluated": false,
+  "process_command": "/workspace/scale-aware-contact-transfer/.venv/bin/python -u /workspace/scale-aware-contact-transfer/tools/run_research_ablation.py --root outputs/research-study/full-v1 --tasks assembly --phase full --variants no_source_refinement fixed_contact_types no_target_robustness fixed_path external_push --workers 1 "
+}

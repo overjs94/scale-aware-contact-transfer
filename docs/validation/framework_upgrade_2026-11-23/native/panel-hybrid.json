@@ -1,0 +1,146 @@
+{
+  "execution_passed": false,
+  "engine": "mujoco",
+  "duration_s": 30.581,
+  "object_tracking": {
+    "panel": {
+      "maximum_position_error_m": 0.09042891293616721,
+      "final_position_error_m": 0.005501975098290102,
+      "maximum_rotation_error_rad": 0.3592789456305839,
+      "final_rotation_error_rad": 0.02120864878834751
+    }
+  },
+  "task_metrics": {
+    "placed_on_jig": true,
+    "jig_support_final_N": [
+      -1.9455238125949394e-17,
+      -4.967078641304929e-18,
+      19.619999999999962
+    ],
+    "object_weight_N": 19.62,
+    "all_tools_released": true,
+    "robot_release_planned": true,
+    "final_position_error_m": 0.005501975098290102,
+    "final_rotation_error_rad": 0.02120864878834751
+  },
+  "task_passed": true,
+  "tracking_passed": false,
+  "maintained_contact_fraction": {
+    "edge_grip": 0.9999563337845508,
+    "under_left": 1.0,
+    "under_right": 1.0
+  },
+  "geometric_holding_contact_fraction": {
+    "edge_grip": 0.9999563337845508,
+    "under_left": 0.8611851010872887,
+    "under_right": 0.8615344308108817
+  },
+  "required_loaded_contact_samples": {
+    "edge_grip": 22901,
+    "under_left": 19676,
+    "under_right": 19676
+  },
+  "contact_retention_definition": "P: stored planned normal reaction >0.1 N; G: attached holding gripper. Zero-force handoff remains in geometric_holding_contact_fraction.",
+  "contact_retention_passed": true,
+  "jaw_force": {
+    "edge_grip": {
+      "maximum_per_jaw_N": [
+        37.40544106161154,
+        20.849887201625897
+      ],
+      "all_time_maximum_per_jaw_N": [
+        37.40544106161154,
+        20.849887201625897
+      ],
+      "force_limit_window": "entire recorded execution including preparation and release",
+      "minimum_per_jaw_N": [
+        0.0,
+        0.0
+      ],
+      "positive_reaction_fraction": [
+        0.9999126675691018,
+        0.9999126675691018
+      ],
+      "limit_N": 40,
+      "limit_margin_N": 2.5945589383884595,
+      "passed": true
+    }
+  },
+  "minimum_actuator_margin_Nm": 0.0,
+  "sampled_interface_wrench_capability": {
+    "sample_dt_s": 0.05,
+    "raw_native_contacts": true,
+    "continuous_certificate": false,
+    "interfaces": {
+      "edge_grip": {
+        "samples": 459,
+        "failed_samples": 0,
+        "maximum_residual": 2.530864406935507e-12,
+        "passed": true
+      },
+      "under_left": {
+        "samples": 459,
+        "failed_samples": 0,
+        "maximum_residual": 0.0,
+        "passed": true
+      },
+      "under_right": {
+        "samples": 459,
+        "failed_samples": 0,
+        "maximum_residual": 8.881784197001252e-16,
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  "unexpected_loaded_contact_penetrations_m": {
+    "floor / arm1_panda_link6_collision_0": 0.0006710675970180574,
+    "floor / arm2_panda_link6_collision_0": 0.0006805030869413975
+  },
+  "reference_geometry": {
+    "passed": true,
+    "samples": 1504,
+    "continuous_certificate": false,
+    "reference_interpolation": "object_SE3_and_joint_Hermite_with_dense_robot_IK",
+    "released_gripper_reference": "native URDF open configuration after stationary opening dwell",
+    "projection_limit_rad": 0.02,
+    "projection_max_rad": 2.503954601662528e-06,
+    "compliant_pad_allowance_m": 0.001,
+    "unintended_clearance_m": 0.001,
+    "violations": []
+  },
+  "object_pose_prescribed": false,
+  "object_equality_constraints_used": 0,
+  "internal_gripper_equalities": 3,
+  "controller": "hybrid_feedback",
+  "arm_measured_force_feedback": true,
+  "arm_force_selection": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0
+  ],
+  "joint_nullspace_impedance": {
+    "stiffness": 40.0,
+    "damping": 8.0
+  },
+  "arm_reaction_feedforward": true,
+  "measured_jaw_force_feedback": true,
+  "jaw_force_fraction": 0.45,
+  "jaw_force_target_N": {
+    "edge_grip": 18.0
+  },
+  "contacts_enabled": true,
+  "full_paper_pipeline_executed": false,
+  "new_physical_trial_executed": true,
+  "task": "panel",
+  "plan_source": "outputs/framework-upgrade/fresh-eliminated/panel/full/result.json",
+  "plan_source_sha256": "c239e5e49aac06f6cc2a9e4173af7e1cace00ad70c293d6085fc1f1c92067f9b",
+  "new_target_solver_executed": false,
+  "new_cito_solver_executed": false,
+  "physics_dt_s": 0.001,
+  "force_feedforward": true,
+  "trial_wall_time_s": 215.71837636500004
+}

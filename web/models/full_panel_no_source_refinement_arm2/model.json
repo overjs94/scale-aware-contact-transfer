@@ -1,0 +1,112 @@
+{
+  "id": "full_panel_no_source_refinement_arm2",
+  "urdf": "robot.urdf",
+  "packages": {
+    "upstream": "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f"
+  },
+  "source_repository": "https://github.com/Gepetto/example-robot-data.git",
+  "commit": "78b6101a6387de721316b0db717351d899f97b4f",
+  "source_path": "robots/panda_description/urdf/panda.urdf",
+  "source_file_sha256": "63792d2679f22c4e41cda2c4d9d903644e628970ad0656b9eec8485113941555",
+  "urdf_sha256": "d1e9dffae1ee1e61d037c7188a3a321696d967f4b243a440c216b5d21ad158f4",
+  "license": "Apache-2.0",
+  "license_file": "LICENSE.panda",
+  "assets": [
+    "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/collision/hand.stl",
+    "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/collision/link0.stl",
+    "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/collision/link1.stl",
+    "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/collision/link2.stl",
+    "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/collision/link3.stl",
+    "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/collision/link4.stl",
+    "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/collision/link5.stl",
+    "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/collision/link6.stl",
+    "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/collision/link7.stl",
+    "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/visual/finger.dae",
+    "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/visual/hand.dae",
+    "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/visual/link0.dae",
+    "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/visual/link1.dae",
+    "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/visual/link2.dae",
+    "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/visual/link3.dae",
+    "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/visual/link4.dae",
+    "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/visual/link5.dae",
+    "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/visual/link6.dae",
+    "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/visual/link7.dae"
+  ],
+  "geometry": "upstream_visual_and_collision",
+  "asset_transport": "pinned_upstream_https",
+  "modifications": [
+    "xacro expanded where applicable",
+    "mesh/texture URIs rewritten to pinned upstream package",
+    "controller tags omitted",
+    "upstream comments retained in header"
+  ],
+  "mechanics_verified": true,
+  "additional_licenses": [
+    {
+      "license": "MIT",
+      "license_file": "LICENSE.authored"
+    }
+  ],
+  "point_tool": {
+    "id": "shared_spherical_tip",
+    "urdf_sha256": "199eb9de0509ebe10a39f69b77d3acc3e92f9a06911bf8def3e29b45ca554eab",
+    "radius_m": 0.025,
+    "ee_to_tip": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.165
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "ee_to_sphere_center": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.14
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "mass_kg": 0.1,
+    "contact_point": "leading sphere surface, local +Z",
+    "license": "MIT",
+    "ee_frame": "panda_link8",
+    "prepared_urdf_sha256": "d1e9dffae1ee1e61d037c7188a3a321696d967f4b243a440c216b5d21ad158f4"
+  }
+}

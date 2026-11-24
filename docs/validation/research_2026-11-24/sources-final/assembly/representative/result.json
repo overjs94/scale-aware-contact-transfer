@@ -1,0 +1,346 @@
+{
+  "task": "assembly",
+  "mode": "representative",
+  "keyframes": [
+    {
+      "keyframe": "grip_and_support",
+      "wall_time_s": 0.016745436005294323,
+      "synthetic_input": true,
+      "network_inference_executed": false,
+      "source_refinement_enabled": true,
+      "source_status": "structurally_infeasible",
+      "source_certificate": false,
+      "source_rho": null,
+      "source_failure": "Source unilateral-point wrench span is insufficient: [{'body': 'tabletop', 'maximum_rank': 5, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}, {'body': 'leg', 'maximum_rank': 3, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}]",
+      "source_failure_kind": "structural_infeasibility",
+      "source_diagnostics": {
+        "span_failures": [
+          {
+            "body": "tabletop",
+            "maximum_rank": 5,
+            "required_rank": 6,
+            "scope": "necessary span bound for an initially independent free rigid body"
+          },
+          {
+            "body": "leg",
+            "maximum_rank": 3,
+            "required_rank": 6,
+            "scope": "necessary span bound for an initially independent free rigid body"
+          }
+        ]
+      },
+      "source_geometry_fallback": true,
+      "source_forces_transferred": false,
+      "source_to_target_scale": 4.0,
+      "source_problem_identity": "ct-source-v2:57c5c338a6de7233f9a8bbd1a31dd262c0dda1da17b78b36ca869c09e23f0815",
+      "source_cache_hit": false,
+      "new_source_solver_executed": false
+    },
+    {
+      "keyframe": "grasp_settled",
+      "wall_time_s": 0.0022216509969439358,
+      "synthetic_input": true,
+      "network_inference_executed": false,
+      "source_refinement_enabled": true,
+      "source_status": "structurally_infeasible",
+      "source_certificate": false,
+      "source_rho": null,
+      "source_failure": "Source unilateral-point wrench span is insufficient: [{'body': 'tabletop', 'maximum_rank': 5, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}, {'body': 'leg', 'maximum_rank': 3, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}]",
+      "source_failure_kind": "structural_infeasibility",
+      "source_diagnostics": {
+        "span_failures": [
+          {
+            "body": "tabletop",
+            "maximum_rank": 5,
+            "required_rank": 6,
+            "scope": "necessary span bound for an initially independent free rigid body"
+          },
+          {
+            "body": "leg",
+            "maximum_rank": 3,
+            "required_rank": 6,
+            "scope": "necessary span bound for an initially independent free rigid body"
+          }
+        ]
+      },
+      "source_geometry_fallback": true,
+      "source_forces_transferred": false,
+      "source_to_target_scale": 4.0,
+      "source_problem_identity": "ct-source-v2:57c5c338a6de7233f9a8bbd1a31dd262c0dda1da17b78b36ca869c09e23f0815",
+      "source_cache_hit": true,
+      "new_source_solver_executed": false
+    },
+    {
+      "keyframe": "lift_tabletop",
+      "wall_time_s": 0.027772585999628063,
+      "synthetic_input": true,
+      "network_inference_executed": false,
+      "source_refinement_enabled": true,
+      "source_status": "structurally_infeasible",
+      "source_certificate": false,
+      "source_rho": null,
+      "source_failure": "Source unilateral-point wrench span is insufficient: [{'body': 'tabletop', 'maximum_rank': 5, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}, {'body': 'leg', 'maximum_rank': 3, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}]",
+      "source_failure_kind": "structural_infeasibility",
+      "source_diagnostics": {
+        "span_failures": [
+          {
+            "body": "tabletop",
+            "maximum_rank": 5,
+            "required_rank": 6,
+            "scope": "necessary span bound for an initially independent free rigid body"
+          },
+          {
+            "body": "leg",
+            "maximum_rank": 3,
+            "required_rank": 6,
+            "scope": "necessary span bound for an initially independent free rigid body"
+          }
+        ]
+      },
+      "source_geometry_fallback": true,
+      "source_forces_transferred": false,
+      "source_to_target_scale": 4.0,
+      "source_problem_identity": "ct-source-v2:9b4d0907064dffca378841856342099fdce63ce2a556ba34f833fbb6fbe92148",
+      "source_cache_hit": false,
+      "new_source_solver_executed": false
+    },
+    {
+      "keyframe": "reorient_tabletop",
+      "wall_time_s": 0.0065339219945599325,
+      "synthetic_input": true,
+      "network_inference_executed": false,
+      "source_refinement_enabled": true,
+      "source_status": "structurally_infeasible",
+      "source_certificate": false,
+      "source_rho": null,
+      "source_failure": "Source unilateral-point wrench span is insufficient: [{'body': 'tabletop', 'maximum_rank': 5, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}, {'body': 'leg', 'maximum_rank': 3, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}]",
+      "source_failure_kind": "structural_infeasibility",
+      "source_diagnostics": {
+        "span_failures": [
+          {
+            "body": "tabletop",
+            "maximum_rank": 5,
+            "required_rank": 6,
+            "scope": "necessary span bound for an initially independent free rigid body"
+          },
+          {
+            "body": "leg",
+            "maximum_rank": 3,
+            "required_rank": 6,
+            "scope": "necessary span bound for an initially independent free rigid body"
+          }
+        ]
+      },
+      "source_geometry_fallback": true,
+      "source_forces_transferred": false,
+      "source_to_target_scale": 4.0,
+      "source_problem_identity": "ct-source-v2:1305353b4c97b723d1a9d9cc444d41429c70224ae7de57bcba554e73a7710abc",
+      "source_cache_hit": false,
+      "new_source_solver_executed": false
+    },
+    {
+      "keyframe": "approach_socket",
+      "wall_time_s": 0.006618650993914343,
+      "synthetic_input": true,
+      "network_inference_executed": false,
+      "source_refinement_enabled": true,
+      "source_status": "structurally_infeasible",
+      "source_certificate": false,
+      "source_rho": null,
+      "source_failure": "Source unilateral-point wrench span is insufficient: [{'body': 'tabletop', 'maximum_rank': 5, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}, {'body': 'leg', 'maximum_rank': 3, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}]",
+      "source_failure_kind": "structural_infeasibility",
+      "source_diagnostics": {
+        "span_failures": [
+          {
+            "body": "tabletop",
+            "maximum_rank": 5,
+            "required_rank": 6,
+            "scope": "necessary span bound for an initially independent free rigid body"
+          },
+          {
+            "body": "leg",
+            "maximum_rank": 3,
+            "required_rank": 6,
+            "scope": "necessary span bound for an initially independent free rigid body"
+          }
+        ]
+      },
+      "source_geometry_fallback": true,
+      "source_forces_transferred": false,
+      "source_to_target_scale": 4.0,
+      "source_problem_identity": "ct-source-v2:c7755211b99adf0d8172816fa5ef43b00b72c989969ce3a728bfef5e59818b60",
+      "source_cache_hit": false,
+      "new_source_solver_executed": false
+    },
+    {
+      "keyframe": "align_leg",
+      "wall_time_s": 0.007361408999713603,
+      "synthetic_input": true,
+      "network_inference_executed": false,
+      "source_refinement_enabled": true,
+      "source_status": "structurally_infeasible",
+      "source_certificate": false,
+      "source_rho": null,
+      "source_failure": "Source unilateral-point wrench span is insufficient: [{'body': 'tabletop', 'maximum_rank': 5, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}, {'body': 'leg', 'maximum_rank': 3, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}]",
+      "source_failure_kind": "structural_infeasibility",
+      "source_diagnostics": {
+        "span_failures": [
+          {
+            "body": "tabletop",
+            "maximum_rank": 5,
+            "required_rank": 6,
+            "scope": "necessary span bound for an initially independent free rigid body"
+          },
+          {
+            "body": "leg",
+            "maximum_rank": 3,
+            "required_rank": 6,
+            "scope": "necessary span bound for an initially independent free rigid body"
+          }
+        ]
+      },
+      "source_geometry_fallback": true,
+      "source_forces_transferred": false,
+      "source_to_target_scale": 4.0,
+      "source_problem_identity": "ct-source-v2:ced9e946b9ca13d0630ddd7df4d888a4ce99606ce6cf644e3e41943f2a0b4c3e",
+      "source_cache_hit": false,
+      "new_source_solver_executed": false
+    },
+    {
+      "keyframe": "insert_leg",
+      "wall_time_s": 0.006848899996839464,
+      "synthetic_input": true,
+      "network_inference_executed": false,
+      "source_refinement_enabled": true,
+      "source_status": "structurally_infeasible",
+      "source_certificate": false,
+      "source_rho": null,
+      "source_failure": "Source unilateral-point wrench span is insufficient: [{'body': 'tabletop', 'maximum_rank': 5, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}, {'body': 'leg', 'maximum_rank': 3, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}]",
+      "source_failure_kind": "structural_infeasibility",
+      "source_diagnostics": {
+        "span_failures": [
+          {
+            "body": "tabletop",
+            "maximum_rank": 5,
+            "required_rank": 6,
+            "scope": "necessary span bound for an initially independent free rigid body"
+          },
+          {
+            "body": "leg",
+            "maximum_rank": 3,
+            "required_rank": 6,
+            "scope": "necessary span bound for an initially independent free rigid body"
+          }
+        ]
+      },
+      "source_geometry_fallback": true,
+      "source_forces_transferred": false,
+      "source_to_target_scale": 4.0,
+      "source_problem_identity": "ct-source-v2:3744f47da6763f82d251cf2064aad959cf715a487106ff5e06cee6d46e6eeaf6",
+      "source_cache_hit": false,
+      "new_source_solver_executed": false
+    },
+    {
+      "keyframe": "unload_leg",
+      "wall_time_s": 0.002288351002789568,
+      "synthetic_input": true,
+      "network_inference_executed": false,
+      "source_refinement_enabled": true,
+      "source_status": "structurally_infeasible",
+      "source_certificate": false,
+      "source_rho": null,
+      "source_failure": "Source unilateral-point wrench span is insufficient: [{'body': 'tabletop', 'maximum_rank': 5, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}, {'body': 'leg', 'maximum_rank': 3, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}]",
+      "source_failure_kind": "structural_infeasibility",
+      "source_diagnostics": {
+        "span_failures": [
+          {
+            "body": "tabletop",
+            "maximum_rank": 5,
+            "required_rank": 6,
+            "scope": "necessary span bound for an initially independent free rigid body"
+          },
+          {
+            "body": "leg",
+            "maximum_rank": 3,
+            "required_rank": 6,
+            "scope": "necessary span bound for an initially independent free rigid body"
+          }
+        ]
+      },
+      "source_geometry_fallback": true,
+      "source_forces_transferred": false,
+      "source_to_target_scale": 4.0,
+      "source_problem_identity": "ct-source-v2:3744f47da6763f82d251cf2064aad959cf715a487106ff5e06cee6d46e6eeaf6",
+      "source_cache_hit": true,
+      "new_source_solver_executed": false
+    },
+    {
+      "keyframe": "open_leg_gripper",
+      "wall_time_s": 0.0019538249980541877,
+      "synthetic_input": true,
+      "network_inference_executed": false,
+      "source_refinement_enabled": true,
+      "source_status": "structurally_infeasible",
+      "source_certificate": false,
+      "source_rho": null,
+      "source_failure": "Source unilateral-point wrench span is insufficient: [{'body': 'tabletop', 'maximum_rank': 5, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}, {'body': 'leg', 'maximum_rank': 3, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}]",
+      "source_failure_kind": "structural_infeasibility",
+      "source_diagnostics": {
+        "span_failures": [
+          {
+            "body": "tabletop",
+            "maximum_rank": 5,
+            "required_rank": 6,
+            "scope": "necessary span bound for an initially independent free rigid body"
+          },
+          {
+            "body": "leg",
+            "maximum_rank": 3,
+            "required_rank": 6,
+            "scope": "necessary span bound for an initially independent free rigid body"
+          }
+        ]
+      },
+      "source_geometry_fallback": true,
+      "source_forces_transferred": false,
+      "source_to_target_scale": 4.0,
+      "source_problem_identity": "ct-source-v2:3744f47da6763f82d251cf2064aad959cf715a487106ff5e06cee6d46e6eeaf6",
+      "source_cache_hit": true,
+      "new_source_solver_executed": false
+    },
+    {
+      "keyframe": "assembled_and_released",
+      "wall_time_s": 0.0018034759996226057,
+      "synthetic_input": true,
+      "network_inference_executed": false,
+      "source_refinement_enabled": true,
+      "source_status": "structurally_infeasible",
+      "source_certificate": false,
+      "source_rho": null,
+      "source_failure": "Source unilateral-point wrench span is insufficient: [{'body': 'tabletop', 'maximum_rank': 5, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}, {'body': 'leg', 'maximum_rank': 3, 'required_rank': 6, 'scope': 'necessary span bound for an initially independent free rigid body'}]",
+      "source_failure_kind": "structural_infeasibility",
+      "source_diagnostics": {
+        "span_failures": [
+          {
+            "body": "tabletop",
+            "maximum_rank": 5,
+            "required_rank": 6,
+            "scope": "necessary span bound for an initially independent free rigid body"
+          },
+          {
+            "body": "leg",
+            "maximum_rank": 3,
+            "required_rank": 6,
+            "scope": "necessary span bound for an initially independent free rigid body"
+          }
+        ]
+      },
+      "source_geometry_fallback": true,
+      "source_forces_transferred": false,
+      "source_to_target_scale": 4.0,
+      "source_problem_identity": "ct-source-v2:3744f47da6763f82d251cf2064aad959cf715a487106ff5e06cee6d46e6eeaf6",
+      "source_cache_hit": true,
+      "new_source_solver_executed": false
+    }
+  ]
+}

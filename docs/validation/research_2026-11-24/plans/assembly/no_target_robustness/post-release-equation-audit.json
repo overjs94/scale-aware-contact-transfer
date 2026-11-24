@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "source_certificates_complete": true,
+  "source_site_model_extension": true,
+  "single_rigid_object_domain": false,
+  "target_robustness_enabled": false,
+  "fixed_E_D": true,
+  "source_forces_transferred": false,
+  "literal_integration": [
+    {
+      "passed": true,
+      "tolerance": 2e-05,
+      "residuals": {
+        "joint_coordinates": 0.0,
+        "object_translation_m": 0.0,
+        "object_rotation_rad": 0.0,
+        "object_internal_coordinates": 0.0
+      },
+      "reference": "independent native post-step joint and SE(3) integration",
+      "optimized_configuration_update": "independent_midpoint",
+      "not_a_continuous_certificate": true
+    },
+    {
+      "passed": false,
+      "tolerance": 2e-05,
+      "residuals": {
+        "joint_coordinates": 0.0046619682236264115,
+        "object_translation_m": 0.0012549867214367572,
+        "object_rotation_rad": 0.00017136262398634257,
+        "object_internal_coordinates": 0.0
+      },
+      "reference": "independent native post-step joint and SE(3) integration",
+      "optimized_configuration_update": "contact_coordinate_midpoint",
+      "not_a_continuous_certificate": true
+    },
+    {
+      "passed": false,
+      "tolerance": 2e-05,
+      "residuals": {
+        "joint_coordinates": 0.005439085430299029,
+        "object_translation_m": 1.60696708785663e-05,
+        "object_rotation_rad": 0.002586761211569023,
+        "object_internal_coordinates": 0.0
+      },
+      "reference": "independent native post-step joint and SE(3) integration",
+      "optimized_configuration_update": "contact_coordinate_midpoint",
+      "not_a_continuous_certificate": true
+    },
+    {
+      "passed": false,
+      "tolerance": 2e-05,
+      "residuals": {
+        "joint_coordinates": 0.009097844911497677,
+        "object_translation_m": 0.002053807301422128,
+        "object_rotation_rad": 0.00014175513925800771,
+        "object_internal_coordinates": 0.0
+      },
+      "reference": "independent native post-step joint and SE(3) integration",
+      "optimized_configuration_update": "contact_coordinate_midpoint",
+      "not_a_continuous_certificate": true
+    },
+    {
+      "passed": false,
+      "tolerance": 2e-05,
+      "residuals": {
+        "joint_coordinates": 0.0018714012857845184,
+        "object_translation_m": 0.0005673793676272687,
+        "object_rotation_rad": 5.771721289876953e-05,
+        "object_internal_coordinates": 0.0
+      },
+      "reference": "independent native post-step joint and SE(3) integration",
+      "optimized_configuration_update": "contact_coordinate_midpoint",
+      "not_a_continuous_certificate": true
+    },
+    {
+      "passed": false,
+      "tolerance": 2e-05,
+      "residuals": {
+        "joint_coordinates": 0.002766194476509831,
+        "object_translation_m": 0.0007943188556442937,
+        "object_rotation_rad": 9.399529607487734e-05,
+        "object_internal_coordinates": 0.0
+      },
+      "reference": "independent native post-step joint and SE(3) integration",
+      "optimized_configuration_update": "contact_coordinate_midpoint",
+      "not_a_continuous_certificate": true
+    },
+    {
+      "passed": true,
+      "tolerance": 2e-05,
+      "residuals": {
+        "joint_coordinates": 0.0,
+        "object_translation_m": 0.0,
+        "object_rotation_rad": 0.0,
+        "object_internal_coordinates": 0.0
+      },
+      "reference": "independent native post-step joint and SE(3) integration",
+      "optimized_configuration_update": "independent_midpoint",
+      "not_a_continuous_certificate": true
+    },
+    {
+      "passed": true,
+      "tolerance": 2e-05,
+      "residuals": {
+        "joint_coordinates": 0.0,
+        "object_translation_m": 0.0,
+        "object_rotation_rad": 0.0,
+        "object_internal_coordinates": 0.0
+      },
+      "reference": "independent native post-step joint and SE(3) integration",
+      "optimized_configuration_update": "independent_midpoint",
+      "not_a_continuous_certificate": true
+    },
+    {
+      "passed": false,
+      "tolerance": 2e-05,
+      "residuals": {
+        "joint_coordinates": 0.004229492269315127,
+        "object_translation_m": 0.0,
+        "object_rotation_rad": 0.0,
+        "object_internal_coordinates": 0.0
+      },
+      "reference": "independent native post-step joint and SE(3) integration",
+      "optimized_configuration_update": "independent_midpoint",
+      "not_a_continuous_certificate": true
+    }
+  ],
+  "restrictions": {
+    "gripper_geometry": "fixed_surface",
+    "point_geometry": "fixed_after_first",
+    "normal_geometry": "fixed_surface",
+    "posture_reference": "hardware_seed",
+    "posture_trust_radius_rad": null,
+    "assignment": "fixed_through_sequence",
+    "point_mode": "sticking",
+    "stationary_solver": "condensed",
+    "fixture_activation_distance_m": 0.03,
+    "fixture_terminal_transitions": [],
+    "terminal_rule_reference": "contact phase names, not keyframe IDs",
+    "inactive_terminal_phase_rules": [],
+    "effective_environment_nodes": [
+      {},
+      {},
+      {},
+      {},
+      {},
+      {
+        "shoulder_0": null,
+        "shoulder_1": null,
+        "shoulder_2": null
+      },
+      {
+        "shoulder_0": null,
+        "shoulder_1": null,
+        "shoulder_2": null
+      },
+      {
+        "shoulder_0": null,
+        "shoulder_1": null,
+        "shoulder_2": null
+      },
+      {
+        "shoulder_0": null,
+        "shoulder_1": null,
+        "shoulder_2": null
+      }
+    ],
+    "phase_modes": {
+      "leg_gripper": {
+        "unload_leg": "unloaded",
+        "release_leg": "released"
+      }
+    },
+    "frozen_keyframes": [
+      "unload_leg",
+      "open_leg_gripper",
+      "assembled_and_released"
+    ]
+  },
+  "unrestricted_problem_optimality_claimed": false,
+  "interval_optimization_methods": [
+    "stationary_contact_conic_QP",
+    "motion_cost",
+    "motion_cost",
+    "motion_cost",
+    "motion_cost",
+    "motion_cost",
+    "stationary_contact_conic_QP",
+    "stationary_contact_conic_QP",
+    "stationary_objects_release_NLP"
+  ],
+  "source_refinement_executed_or_equivalently_reused": true,
+  "transition_optimization_complete": true,
+  "full_framework_stage_execution": false,
+  "manuscript_literal_equations_passed": false,
+  "full_paper_pipeline_executed": false,
+  "learned_inference_executed": false,
+  "continuous_geometry_certificate": false
+}

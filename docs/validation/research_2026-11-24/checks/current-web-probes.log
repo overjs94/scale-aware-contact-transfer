@@ -1,0 +1,13 @@
+[WebServer] (node:16291) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 2 workers
+
+(node:16303) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16304) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/urdf-view.spec.js:545:1 › current inside-margin box counterexample preserves the failed tracking and arrow (19.7s)
+  ✓  2 tests/urdf-view.spec.js:559:1 › current source-margin comparison retains the matched controls and recovery failure (26.0s)
+
+  2 passed (30.1s)

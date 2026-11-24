@@ -1,0 +1,7 @@
+{
+  "id": "three_arm_point",
+  "urdf": "robot.urdf",
+  "packages": {},
+  "source": "authored synthetic URDF Cartesian/tool testbed",
+  "geometry": "URDF primitives"
+}

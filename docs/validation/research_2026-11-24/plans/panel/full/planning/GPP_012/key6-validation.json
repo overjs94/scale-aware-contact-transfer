@@ -1,0 +1,189 @@
+{
+  "independent": {
+    "passed": true,
+    "residuals": {
+      "equilibrium": 2.291500322826323e-13,
+      "capability": 0.0,
+      "torque": 0.0,
+      "closure": 1.3655743202889425e-14,
+      "rotation_closure": 8.81304751288727e-13,
+      "rho_margin": 1.6004975122996257e-12
+    },
+    "frozen_conic": {
+      "rho": 5.443699421962055,
+      "certificate": true,
+      "residual": 3.552713678800501e-15,
+      "status": "Solved",
+      "maximum_margin_status": "Solved",
+      "fixed_rho_feasibility": false,
+      "solver_attempts": [
+        {
+          "status": "Solved",
+          "witness_regularization": 0.0,
+          "backend": "clarabel",
+          "solver_tolerance": 1e-09,
+          "iterations": 12,
+          "wall_time_s": 0.010821448006026912
+        }
+      ]
+    },
+    "independent": "native Pinocchio, NumPy and frozen Clarabel"
+  },
+  "geometry_violations": [],
+  "source": {
+    "origin": "synthetic_contracted_fixture",
+    "inference_executed": false,
+    "synthetic_input": true,
+    "source_refinement_enabled": true,
+    "source_contact_positions_optimized": true,
+    "source_group_ids": [
+      "edge_grip",
+      "under_left",
+      "under_right"
+    ],
+    "effective_source_refinement": {
+      "position_radius_m": 0.002,
+      "normal_radius": 0.0,
+      "geometry_weight": 0.0,
+      "mu": 0.8,
+      "normal_max_N": 2.0
+    },
+    "source_object": {
+      "size": [
+        0.15,
+        0.1,
+        0.01
+      ],
+      "mass": 0.03125,
+      "com": [
+        0,
+        0,
+        0
+      ]
+    },
+    "source_to_target_scale": 4.0,
+    "source_object_rotation_world": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "source_positions_before_m": [
+      [
+        -0.075,
+        0.0,
+        0.0
+      ],
+      [
+        0.025,
+        -0.03,
+        -0.005
+      ],
+      [
+        0.025,
+        0.03,
+        -0.005
+      ]
+    ],
+    "source_positions_after_m": [
+      [
+        -0.075,
+        -7.890556159358519e-18,
+        0.0
+      ],
+      [
+        0.023000057954670156,
+        -0.030015224701079528,
+        -0.005
+      ],
+      [
+        0.023000057954670156,
+        0.030015224701079528,
+        -0.005
+      ]
+    ],
+    "source_normals": [
+      [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      [
+        0.0,
+        0.0,
+        -1.0
+      ]
+    ],
+    "source_rho_before": 1.0534115692717418,
+    "source_rho_after": 1.115643837008035,
+    "source_certificate": true,
+    "source_status": "positive_margin",
+    "source_validation_residual": 3.0421561103555206e-11,
+    "target_positions_m": [
+      [
+        -0.3,
+        -3.1562224637434075e-17,
+        0.0
+      ],
+      [
+        0.09200023181868063,
+        -0.12006089880431811,
+        -0.02
+      ],
+      [
+        0.09200023181868063,
+        0.12006089880431811,
+        -0.02
+      ]
+    ],
+    "target_normals": [
+      [
+        -1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        -1.0
+      ],
+      [
+        0.0,
+        0.0,
+        -1.0
+      ]
+    ],
+    "source_forces_transferred": false,
+    "target_mass_reused_from_source": false,
+    "source_problem_identity": "ct-source-v2:426ed29587e53cebddbbdbb6ccf55d3bf81cb3e5af8c761a66631188a5b0b47f",
+    "source_cache_hit": true,
+    "new_source_solver_executed": false
+  },
+  "target_provenance": {
+    "method": "declared_fixed_posture_robust_SOCP",
+    "posture_reference_rule": "sequential_ik_branch",
+    "same_rho_force_polish": {
+      "witness_applied": true,
+      "status": "AlmostSolved",
+      "rho": 5.443699421963656,
+      "primal_residual": 2.0704634895452045e-08
+    }
+  },
+  "endpoint_polish_max_rad": 0.0
+}

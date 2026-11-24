@@ -1,0 +1,39 @@
+{
+  "id": "rb3",
+  "urdf": "robot.urdf",
+  "packages": {
+    "upstream": "https://raw.githubusercontent.com/RainbowRobotics/rbpodo_ros2/5e8294a985e7ce5e20e70564c2681130afc5f502"
+  },
+  "source_repository": "https://github.com/RainbowRobotics/rbpodo_ros2.git",
+  "commit": "5e8294a985e7ce5e20e70564c2681130afc5f502",
+  "source_path": "rbpodo_description/robots/rb3_730es_u.urdf",
+  "source_file_sha256": "25597eaa63aae8b2a6f966097d7a28951f3802e21e131037bd1173a7fbdc568a",
+  "urdf_sha256": "08b5000beed68c913790f90b667d79ab37dc4255f30fbbe5af824e83e9433aff",
+  "license": "Apache-2.0",
+  "license_file": "LICENSE.upstream",
+  "assets": [
+    "https://raw.githubusercontent.com/RainbowRobotics/rbpodo_ros2/5e8294a985e7ce5e20e70564c2681130afc5f502/rbpodo_description/meshes/rb3_730es_u/collision/link0.stl",
+    "https://raw.githubusercontent.com/RainbowRobotics/rbpodo_ros2/5e8294a985e7ce5e20e70564c2681130afc5f502/rbpodo_description/meshes/rb3_730es_u/collision/link1.stl",
+    "https://raw.githubusercontent.com/RainbowRobotics/rbpodo_ros2/5e8294a985e7ce5e20e70564c2681130afc5f502/rbpodo_description/meshes/rb3_730es_u/collision/link2.stl",
+    "https://raw.githubusercontent.com/RainbowRobotics/rbpodo_ros2/5e8294a985e7ce5e20e70564c2681130afc5f502/rbpodo_description/meshes/rb3_730es_u/collision/link3.stl",
+    "https://raw.githubusercontent.com/RainbowRobotics/rbpodo_ros2/5e8294a985e7ce5e20e70564c2681130afc5f502/rbpodo_description/meshes/rb3_730es_u/collision/link4.stl",
+    "https://raw.githubusercontent.com/RainbowRobotics/rbpodo_ros2/5e8294a985e7ce5e20e70564c2681130afc5f502/rbpodo_description/meshes/rb3_730es_u/collision/link5.stl",
+    "https://raw.githubusercontent.com/RainbowRobotics/rbpodo_ros2/5e8294a985e7ce5e20e70564c2681130afc5f502/rbpodo_description/meshes/rb3_730es_u/collision/link6.stl",
+    "https://raw.githubusercontent.com/RainbowRobotics/rbpodo_ros2/5e8294a985e7ce5e20e70564c2681130afc5f502/rbpodo_description/meshes/rb3_730es_u/visual/link0.dae",
+    "https://raw.githubusercontent.com/RainbowRobotics/rbpodo_ros2/5e8294a985e7ce5e20e70564c2681130afc5f502/rbpodo_description/meshes/rb3_730es_u/visual/link1.dae",
+    "https://raw.githubusercontent.com/RainbowRobotics/rbpodo_ros2/5e8294a985e7ce5e20e70564c2681130afc5f502/rbpodo_description/meshes/rb3_730es_u/visual/link2.dae",
+    "https://raw.githubusercontent.com/RainbowRobotics/rbpodo_ros2/5e8294a985e7ce5e20e70564c2681130afc5f502/rbpodo_description/meshes/rb3_730es_u/visual/link3.dae",
+    "https://raw.githubusercontent.com/RainbowRobotics/rbpodo_ros2/5e8294a985e7ce5e20e70564c2681130afc5f502/rbpodo_description/meshes/rb3_730es_u/visual/link4.dae",
+    "https://raw.githubusercontent.com/RainbowRobotics/rbpodo_ros2/5e8294a985e7ce5e20e70564c2681130afc5f502/rbpodo_description/meshes/rb3_730es_u/visual/link5.dae",
+    "https://raw.githubusercontent.com/RainbowRobotics/rbpodo_ros2/5e8294a985e7ce5e20e70564c2681130afc5f502/rbpodo_description/meshes/rb3_730es_u/visual/link6.dae"
+  ],
+  "geometry": "upstream_visual_and_collision",
+  "asset_transport": "pinned_upstream_https",
+  "modifications": [
+    "xacro expanded where applicable",
+    "mesh/texture URIs rewritten to pinned upstream package",
+    "controller tags omitted",
+    "upstream comments retained in header"
+  ],
+  "mechanics_verified": true
+}

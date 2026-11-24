@@ -1,0 +1,2651 @@
+{
+  "identical": false,
+  "keyframes": [
+    {
+      "keyframe": "grip_support",
+      "maximum_prior_difference": 0.007999999547311981,
+      "full": {
+        "origin": "synthetic_contracted_fixture",
+        "inference_executed": false,
+        "synthetic_input": true,
+        "source_refinement_enabled": true,
+        "source_contact_positions_optimized": true,
+        "source_group_ids": [
+          "edge_grip",
+          "under_left",
+          "under_right"
+        ],
+        "effective_source_refinement": {
+          "position_radius_m": 0.002,
+          "normal_radius": 0.0,
+          "geometry_weight": 0.0,
+          "mu": 0.8,
+          "normal_max_N": 2.0
+        },
+        "source_object": {
+          "size": [
+            0.15,
+            0.1,
+            0.01
+          ],
+          "mass": 0.03125,
+          "com": [
+            0,
+            0,
+            0
+          ]
+        },
+        "source_to_target_scale": 4.0,
+        "source_object_rotation_world": [
+          [
+            0.9781476007338058,
+            0.0,
+            0.20791169081775937
+          ],
+          [
+            0.0,
+            1.0000000000000002,
+            0.0
+          ],
+          [
+            -0.20791169081775937,
+            0.0,
+            0.9781476007338058
+          ]
+        ],
+        "source_positions_before_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_positions_after_m": [
+          [
+            -0.075,
+            7.755483679341254e-19,
+            0.0
+          ],
+          [
+            0.023000000113172006,
+            -0.03000066028558743,
+            -0.005
+          ],
+          [
+            0.023000000113172006,
+            0.03000066028558743,
+            -0.005
+          ]
+        ],
+        "source_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_rho_before": 0.44343227690736914,
+        "source_rho_after": 0.5320674463017788,
+        "source_certificate": true,
+        "source_status": "positive_margin",
+        "source_validation_residual": 1.3421888600539944e-11,
+        "target_positions_m": [
+          [
+            -0.3,
+            3.1021934717365016e-18,
+            0.0
+          ],
+          [
+            0.09200000045268802,
+            -0.12000264114234972,
+            -0.02
+          ],
+          [
+            0.09200000045268802,
+            0.12000264114234972,
+            -0.02
+          ]
+        ],
+        "target_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_forces_transferred": false,
+        "target_mass_reused_from_source": false,
+        "source_problem_identity": "ct-source-v2:84e61346fbd894fd8e9d32d9a040c885f17dd346fff25446a2321afc9e17fb21",
+        "source_cache_hit": false,
+        "new_source_solver_executed": true
+      },
+      "without_refinement": {
+        "origin": "synthetic_contracted_fixture",
+        "inference_executed": false,
+        "synthetic_input": true,
+        "source_refinement_enabled": false,
+        "source_contact_positions_optimized": false,
+        "source_group_ids": [
+          "edge_grip",
+          "under_left",
+          "under_right"
+        ],
+        "effective_source_refinement": {
+          "position_radius_m": 0.002,
+          "normal_radius": 0.0,
+          "geometry_weight": 0.0,
+          "mu": 0.8,
+          "normal_max_N": 2.0
+        },
+        "source_object": {
+          "size": [
+            0.15,
+            0.1,
+            0.01
+          ],
+          "mass": 0.03125,
+          "com": [
+            0,
+            0,
+            0
+          ]
+        },
+        "source_to_target_scale": 4.0,
+        "source_object_rotation_world": [
+          [
+            0.9781476007338058,
+            0.0,
+            0.20791169081775937
+          ],
+          [
+            0.0,
+            1.0000000000000002,
+            0.0
+          ],
+          [
+            -0.20791169081775937,
+            0.0,
+            0.9781476007338058
+          ]
+        ],
+        "source_positions_before_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_positions_after_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_rho_before": 0.44343227690736914,
+        "source_rho_after": 0.44343227690736914,
+        "source_certificate": true,
+        "source_status": "positive_margin",
+        "source_validation_residual": 5.277472903131297e-12,
+        "target_positions_m": [
+          [
+            -0.3,
+            0.0,
+            0.0
+          ],
+          [
+            0.1,
+            -0.12,
+            -0.02
+          ],
+          [
+            0.1,
+            0.12,
+            -0.02
+          ]
+        ],
+        "target_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_forces_transferred": false,
+        "target_mass_reused_from_source": false,
+        "source_problem_identity": "ct-source-v2:d6ab2470c295ebe55fc6bdf4341365e52c57cb4d5899fafd259e4b30a4b3671a",
+        "source_cache_hit": false,
+        "new_source_solver_executed": true
+      }
+    },
+    {
+      "keyframe": "grasp_settled",
+      "maximum_prior_difference": 0.007999999547311981,
+      "full": {
+        "origin": "synthetic_contracted_fixture",
+        "inference_executed": false,
+        "synthetic_input": true,
+        "source_refinement_enabled": true,
+        "source_contact_positions_optimized": true,
+        "source_group_ids": [
+          "edge_grip",
+          "under_left",
+          "under_right"
+        ],
+        "effective_source_refinement": {
+          "position_radius_m": 0.002,
+          "normal_radius": 0.0,
+          "geometry_weight": 0.0,
+          "mu": 0.8,
+          "normal_max_N": 2.0
+        },
+        "source_object": {
+          "size": [
+            0.15,
+            0.1,
+            0.01
+          ],
+          "mass": 0.03125,
+          "com": [
+            0,
+            0,
+            0
+          ]
+        },
+        "source_to_target_scale": 4.0,
+        "source_object_rotation_world": [
+          [
+            0.9781476007338058,
+            0.0,
+            0.20791169081775937
+          ],
+          [
+            0.0,
+            1.0000000000000002,
+            0.0
+          ],
+          [
+            -0.20791169081775937,
+            0.0,
+            0.9781476007338058
+          ]
+        ],
+        "source_positions_before_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_positions_after_m": [
+          [
+            -0.075,
+            7.755483679341254e-19,
+            0.0
+          ],
+          [
+            0.023000000113172006,
+            -0.03000066028558743,
+            -0.005
+          ],
+          [
+            0.023000000113172006,
+            0.03000066028558743,
+            -0.005
+          ]
+        ],
+        "source_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_rho_before": 0.44343227690736914,
+        "source_rho_after": 0.5320674463017788,
+        "source_certificate": true,
+        "source_status": "positive_margin",
+        "source_validation_residual": 1.3421888600539944e-11,
+        "target_positions_m": [
+          [
+            -0.3,
+            3.1021934717365016e-18,
+            0.0
+          ],
+          [
+            0.09200000045268802,
+            -0.12000264114234972,
+            -0.02
+          ],
+          [
+            0.09200000045268802,
+            0.12000264114234972,
+            -0.02
+          ]
+        ],
+        "target_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_forces_transferred": false,
+        "target_mass_reused_from_source": false,
+        "source_problem_identity": "ct-source-v2:84e61346fbd894fd8e9d32d9a040c885f17dd346fff25446a2321afc9e17fb21",
+        "source_cache_hit": true,
+        "new_source_solver_executed": false
+      },
+      "without_refinement": {
+        "origin": "synthetic_contracted_fixture",
+        "inference_executed": false,
+        "synthetic_input": true,
+        "source_refinement_enabled": false,
+        "source_contact_positions_optimized": false,
+        "source_group_ids": [
+          "edge_grip",
+          "under_left",
+          "under_right"
+        ],
+        "effective_source_refinement": {
+          "position_radius_m": 0.002,
+          "normal_radius": 0.0,
+          "geometry_weight": 0.0,
+          "mu": 0.8,
+          "normal_max_N": 2.0
+        },
+        "source_object": {
+          "size": [
+            0.15,
+            0.1,
+            0.01
+          ],
+          "mass": 0.03125,
+          "com": [
+            0,
+            0,
+            0
+          ]
+        },
+        "source_to_target_scale": 4.0,
+        "source_object_rotation_world": [
+          [
+            0.9781476007338058,
+            0.0,
+            0.20791169081775937
+          ],
+          [
+            0.0,
+            1.0000000000000002,
+            0.0
+          ],
+          [
+            -0.20791169081775937,
+            0.0,
+            0.9781476007338058
+          ]
+        ],
+        "source_positions_before_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_positions_after_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_rho_before": 0.44343227690736914,
+        "source_rho_after": 0.44343227690736914,
+        "source_certificate": true,
+        "source_status": "positive_margin",
+        "source_validation_residual": 5.277472903131297e-12,
+        "target_positions_m": [
+          [
+            -0.3,
+            0.0,
+            0.0
+          ],
+          [
+            0.1,
+            -0.12,
+            -0.02
+          ],
+          [
+            0.1,
+            0.12,
+            -0.02
+          ]
+        ],
+        "target_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_forces_transferred": false,
+        "target_mass_reused_from_source": false,
+        "source_problem_identity": "ct-source-v2:d6ab2470c295ebe55fc6bdf4341365e52c57cb4d5899fafd259e4b30a4b3671a",
+        "source_cache_hit": true,
+        "new_source_solver_executed": false
+      }
+    },
+    {
+      "keyframe": "lift",
+      "maximum_prior_difference": 0.007999999547311981,
+      "full": {
+        "origin": "synthetic_contracted_fixture",
+        "inference_executed": false,
+        "synthetic_input": true,
+        "source_refinement_enabled": true,
+        "source_contact_positions_optimized": true,
+        "source_group_ids": [
+          "edge_grip",
+          "under_left",
+          "under_right"
+        ],
+        "effective_source_refinement": {
+          "position_radius_m": 0.002,
+          "normal_radius": 0.0,
+          "geometry_weight": 0.0,
+          "mu": 0.8,
+          "normal_max_N": 2.0
+        },
+        "source_object": {
+          "size": [
+            0.15,
+            0.1,
+            0.01
+          ],
+          "mass": 0.03125,
+          "com": [
+            0,
+            0,
+            0
+          ]
+        },
+        "source_to_target_scale": 4.0,
+        "source_object_rotation_world": [
+          [
+            0.9781476007338058,
+            0.0,
+            0.20791169081775937
+          ],
+          [
+            0.0,
+            1.0000000000000002,
+            0.0
+          ],
+          [
+            -0.20791169081775937,
+            0.0,
+            0.9781476007338058
+          ]
+        ],
+        "source_positions_before_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_positions_after_m": [
+          [
+            -0.075,
+            7.755483679341254e-19,
+            0.0
+          ],
+          [
+            0.023000000113172006,
+            -0.03000066028558743,
+            -0.005
+          ],
+          [
+            0.023000000113172006,
+            0.03000066028558743,
+            -0.005
+          ]
+        ],
+        "source_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_rho_before": 0.44343227690736914,
+        "source_rho_after": 0.5320674463017788,
+        "source_certificate": true,
+        "source_status": "positive_margin",
+        "source_validation_residual": 1.3421888600539944e-11,
+        "target_positions_m": [
+          [
+            -0.3,
+            3.1021934717365016e-18,
+            0.0
+          ],
+          [
+            0.09200000045268802,
+            -0.12000264114234972,
+            -0.02
+          ],
+          [
+            0.09200000045268802,
+            0.12000264114234972,
+            -0.02
+          ]
+        ],
+        "target_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_forces_transferred": false,
+        "target_mass_reused_from_source": false,
+        "source_problem_identity": "ct-source-v2:aad233e722c10acea6fc19b50f646c2ed9b1097883966e68f869a21d069d7419",
+        "source_cache_hit": false,
+        "new_source_solver_executed": true
+      },
+      "without_refinement": {
+        "origin": "synthetic_contracted_fixture",
+        "inference_executed": false,
+        "synthetic_input": true,
+        "source_refinement_enabled": false,
+        "source_contact_positions_optimized": false,
+        "source_group_ids": [
+          "edge_grip",
+          "under_left",
+          "under_right"
+        ],
+        "effective_source_refinement": {
+          "position_radius_m": 0.002,
+          "normal_radius": 0.0,
+          "geometry_weight": 0.0,
+          "mu": 0.8,
+          "normal_max_N": 2.0
+        },
+        "source_object": {
+          "size": [
+            0.15,
+            0.1,
+            0.01
+          ],
+          "mass": 0.03125,
+          "com": [
+            0,
+            0,
+            0
+          ]
+        },
+        "source_to_target_scale": 4.0,
+        "source_object_rotation_world": [
+          [
+            0.9781476007338058,
+            0.0,
+            0.20791169081775937
+          ],
+          [
+            0.0,
+            1.0000000000000002,
+            0.0
+          ],
+          [
+            -0.20791169081775937,
+            0.0,
+            0.9781476007338058
+          ]
+        ],
+        "source_positions_before_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_positions_after_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_rho_before": 0.44343227690736914,
+        "source_rho_after": 0.44343227690736914,
+        "source_certificate": true,
+        "source_status": "positive_margin",
+        "source_validation_residual": 5.277472903131297e-12,
+        "target_positions_m": [
+          [
+            -0.3,
+            0.0,
+            0.0
+          ],
+          [
+            0.1,
+            -0.12,
+            -0.02
+          ],
+          [
+            0.1,
+            0.12,
+            -0.02
+          ]
+        ],
+        "target_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_forces_transferred": false,
+        "target_mass_reused_from_source": false,
+        "source_problem_identity": "ct-source-v2:26a04f1a517d56ff745fc4ee29ef1e4a1b45aa02e57a229bf4da5aa1d470eb3d",
+        "source_cache_hit": false,
+        "new_source_solver_executed": true
+      }
+    },
+    {
+      "keyframe": "reorient",
+      "maximum_prior_difference": 0.00799976818131938,
+      "full": {
+        "origin": "synthetic_contracted_fixture",
+        "inference_executed": false,
+        "synthetic_input": true,
+        "source_refinement_enabled": true,
+        "source_contact_positions_optimized": true,
+        "source_group_ids": [
+          "edge_grip",
+          "under_left",
+          "under_right"
+        ],
+        "effective_source_refinement": {
+          "position_radius_m": 0.002,
+          "normal_radius": 0.0,
+          "geometry_weight": 0.0,
+          "mu": 0.8,
+          "normal_max_N": 2.0
+        },
+        "source_object": {
+          "size": [
+            0.15,
+            0.1,
+            0.01
+          ],
+          "mass": 0.03125,
+          "com": [
+            0,
+            0,
+            0
+          ]
+        },
+        "source_to_target_scale": 4.0,
+        "source_object_rotation_world": [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_positions_before_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_positions_after_m": [
+          [
+            -0.075,
+            -7.890556159358519e-18,
+            0.0
+          ],
+          [
+            0.023000057954670156,
+            -0.030015224701079528,
+            -0.005
+          ],
+          [
+            0.023000057954670156,
+            0.030015224701079528,
+            -0.005
+          ]
+        ],
+        "source_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_rho_before": 1.0534115692717418,
+        "source_rho_after": 1.115643837008035,
+        "source_certificate": true,
+        "source_status": "positive_margin",
+        "source_validation_residual": 3.0421561103555206e-11,
+        "target_positions_m": [
+          [
+            -0.3,
+            -3.1562224637434075e-17,
+            0.0
+          ],
+          [
+            0.09200023181868063,
+            -0.12006089880431811,
+            -0.02
+          ],
+          [
+            0.09200023181868063,
+            0.12006089880431811,
+            -0.02
+          ]
+        ],
+        "target_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_forces_transferred": false,
+        "target_mass_reused_from_source": false,
+        "source_problem_identity": "ct-source-v2:8eaf7a00fe9d588dfccdf278f904cb99789357ab9ae743ac095a09b2da32dbfb",
+        "source_cache_hit": false,
+        "new_source_solver_executed": true
+      },
+      "without_refinement": {
+        "origin": "synthetic_contracted_fixture",
+        "inference_executed": false,
+        "synthetic_input": true,
+        "source_refinement_enabled": false,
+        "source_contact_positions_optimized": false,
+        "source_group_ids": [
+          "edge_grip",
+          "under_left",
+          "under_right"
+        ],
+        "effective_source_refinement": {
+          "position_radius_m": 0.002,
+          "normal_radius": 0.0,
+          "geometry_weight": 0.0,
+          "mu": 0.8,
+          "normal_max_N": 2.0
+        },
+        "source_object": {
+          "size": [
+            0.15,
+            0.1,
+            0.01
+          ],
+          "mass": 0.03125,
+          "com": [
+            0,
+            0,
+            0
+          ]
+        },
+        "source_to_target_scale": 4.0,
+        "source_object_rotation_world": [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_positions_before_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_positions_after_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_rho_before": 1.0534115692717418,
+        "source_rho_after": 1.0534115692717418,
+        "source_certificate": true,
+        "source_status": "positive_margin",
+        "source_validation_residual": 1.549636044484437e-10,
+        "target_positions_m": [
+          [
+            -0.3,
+            0.0,
+            0.0
+          ],
+          [
+            0.1,
+            -0.12,
+            -0.02
+          ],
+          [
+            0.1,
+            0.12,
+            -0.02
+          ]
+        ],
+        "target_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_forces_transferred": false,
+        "target_mass_reused_from_source": false,
+        "source_problem_identity": "ct-source-v2:0733077214899f95f863281ebff01143d2773be3a5fae2f30d92386c7373eeb1",
+        "source_cache_hit": false,
+        "new_source_solver_executed": true
+      }
+    },
+    {
+      "keyframe": "above_jig",
+      "maximum_prior_difference": 0.00799976818131938,
+      "full": {
+        "origin": "synthetic_contracted_fixture",
+        "inference_executed": false,
+        "synthetic_input": true,
+        "source_refinement_enabled": true,
+        "source_contact_positions_optimized": true,
+        "source_group_ids": [
+          "edge_grip",
+          "under_left",
+          "under_right"
+        ],
+        "effective_source_refinement": {
+          "position_radius_m": 0.002,
+          "normal_radius": 0.0,
+          "geometry_weight": 0.0,
+          "mu": 0.8,
+          "normal_max_N": 2.0
+        },
+        "source_object": {
+          "size": [
+            0.15,
+            0.1,
+            0.01
+          ],
+          "mass": 0.03125,
+          "com": [
+            0,
+            0,
+            0
+          ]
+        },
+        "source_to_target_scale": 4.0,
+        "source_object_rotation_world": [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_positions_before_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_positions_after_m": [
+          [
+            -0.075,
+            -7.890556159358519e-18,
+            0.0
+          ],
+          [
+            0.023000057954670156,
+            -0.030015224701079528,
+            -0.005
+          ],
+          [
+            0.023000057954670156,
+            0.030015224701079528,
+            -0.005
+          ]
+        ],
+        "source_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_rho_before": 1.0534115692717418,
+        "source_rho_after": 1.115643837008035,
+        "source_certificate": true,
+        "source_status": "positive_margin",
+        "source_validation_residual": 3.0421561103555206e-11,
+        "target_positions_m": [
+          [
+            -0.3,
+            -3.1562224637434075e-17,
+            0.0
+          ],
+          [
+            0.09200023181868063,
+            -0.12006089880431811,
+            -0.02
+          ],
+          [
+            0.09200023181868063,
+            0.12006089880431811,
+            -0.02
+          ]
+        ],
+        "target_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_forces_transferred": false,
+        "target_mass_reused_from_source": false,
+        "source_problem_identity": "ct-source-v2:c3662340f71144ba3eac2ad9d435c7f59a1e723e9724944e07a644179fe44c18",
+        "source_cache_hit": false,
+        "new_source_solver_executed": true
+      },
+      "without_refinement": {
+        "origin": "synthetic_contracted_fixture",
+        "inference_executed": false,
+        "synthetic_input": true,
+        "source_refinement_enabled": false,
+        "source_contact_positions_optimized": false,
+        "source_group_ids": [
+          "edge_grip",
+          "under_left",
+          "under_right"
+        ],
+        "effective_source_refinement": {
+          "position_radius_m": 0.002,
+          "normal_radius": 0.0,
+          "geometry_weight": 0.0,
+          "mu": 0.8,
+          "normal_max_N": 2.0
+        },
+        "source_object": {
+          "size": [
+            0.15,
+            0.1,
+            0.01
+          ],
+          "mass": 0.03125,
+          "com": [
+            0,
+            0,
+            0
+          ]
+        },
+        "source_to_target_scale": 4.0,
+        "source_object_rotation_world": [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_positions_before_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_positions_after_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_rho_before": 1.0534115692717418,
+        "source_rho_after": 1.0534115692717418,
+        "source_certificate": true,
+        "source_status": "positive_margin",
+        "source_validation_residual": 1.549636044484437e-10,
+        "target_positions_m": [
+          [
+            -0.3,
+            0.0,
+            0.0
+          ],
+          [
+            0.1,
+            -0.12,
+            -0.02
+          ],
+          [
+            0.1,
+            0.12,
+            -0.02
+          ]
+        ],
+        "target_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_forces_transferred": false,
+        "target_mass_reused_from_source": false,
+        "source_problem_identity": "ct-source-v2:3d4b1e76de088457ca17f117b9f93234d5cdd48ecff6459abc5afa632876e728",
+        "source_cache_hit": false,
+        "new_source_solver_executed": true
+      }
+    },
+    {
+      "keyframe": "seat",
+      "maximum_prior_difference": 0.00799976818131938,
+      "full": {
+        "origin": "synthetic_contracted_fixture",
+        "inference_executed": false,
+        "synthetic_input": true,
+        "source_refinement_enabled": true,
+        "source_contact_positions_optimized": true,
+        "source_group_ids": [
+          "edge_grip",
+          "under_left",
+          "under_right"
+        ],
+        "effective_source_refinement": {
+          "position_radius_m": 0.002,
+          "normal_radius": 0.0,
+          "geometry_weight": 0.0,
+          "mu": 0.8,
+          "normal_max_N": 2.0
+        },
+        "source_object": {
+          "size": [
+            0.15,
+            0.1,
+            0.01
+          ],
+          "mass": 0.03125,
+          "com": [
+            0,
+            0,
+            0
+          ]
+        },
+        "source_to_target_scale": 4.0,
+        "source_object_rotation_world": [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_positions_before_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_positions_after_m": [
+          [
+            -0.075,
+            -7.890556159358519e-18,
+            0.0
+          ],
+          [
+            0.023000057954670156,
+            -0.030015224701079528,
+            -0.005
+          ],
+          [
+            0.023000057954670156,
+            0.030015224701079528,
+            -0.005
+          ]
+        ],
+        "source_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_rho_before": 1.0534115692717418,
+        "source_rho_after": 1.115643837008035,
+        "source_certificate": true,
+        "source_status": "positive_margin",
+        "source_validation_residual": 3.0421561103555206e-11,
+        "target_positions_m": [
+          [
+            -0.3,
+            -3.1562224637434075e-17,
+            0.0
+          ],
+          [
+            0.09200023181868063,
+            -0.12006089880431811,
+            -0.02
+          ],
+          [
+            0.09200023181868063,
+            0.12006089880431811,
+            -0.02
+          ]
+        ],
+        "target_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_forces_transferred": false,
+        "target_mass_reused_from_source": false,
+        "source_problem_identity": "ct-source-v2:426ed29587e53cebddbbdbb6ccf55d3bf81cb3e5af8c761a66631188a5b0b47f",
+        "source_cache_hit": false,
+        "new_source_solver_executed": true
+      },
+      "without_refinement": {
+        "origin": "synthetic_contracted_fixture",
+        "inference_executed": false,
+        "synthetic_input": true,
+        "source_refinement_enabled": false,
+        "source_contact_positions_optimized": false,
+        "source_group_ids": [
+          "edge_grip",
+          "under_left",
+          "under_right"
+        ],
+        "effective_source_refinement": {
+          "position_radius_m": 0.002,
+          "normal_radius": 0.0,
+          "geometry_weight": 0.0,
+          "mu": 0.8,
+          "normal_max_N": 2.0
+        },
+        "source_object": {
+          "size": [
+            0.15,
+            0.1,
+            0.01
+          ],
+          "mass": 0.03125,
+          "com": [
+            0,
+            0,
+            0
+          ]
+        },
+        "source_to_target_scale": 4.0,
+        "source_object_rotation_world": [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_positions_before_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_positions_after_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_rho_before": 1.0534115692717418,
+        "source_rho_after": 1.0534115692717418,
+        "source_certificate": true,
+        "source_status": "positive_margin",
+        "source_validation_residual": 1.549636044484437e-10,
+        "target_positions_m": [
+          [
+            -0.3,
+            0.0,
+            0.0
+          ],
+          [
+            0.1,
+            -0.12,
+            -0.02
+          ],
+          [
+            0.1,
+            0.12,
+            -0.02
+          ]
+        ],
+        "target_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_forces_transferred": false,
+        "target_mass_reused_from_source": false,
+        "source_problem_identity": "ct-source-v2:4847ea97a8a55a27da73405f3fd52bb212be2169a762b8ec7a74a3e64f1dc5e4",
+        "source_cache_hit": false,
+        "new_source_solver_executed": true
+      }
+    },
+    {
+      "keyframe": "load_transfer",
+      "maximum_prior_difference": 0.00799976818131938,
+      "full": {
+        "origin": "synthetic_contracted_fixture",
+        "inference_executed": false,
+        "synthetic_input": true,
+        "source_refinement_enabled": true,
+        "source_contact_positions_optimized": true,
+        "source_group_ids": [
+          "edge_grip",
+          "under_left",
+          "under_right"
+        ],
+        "effective_source_refinement": {
+          "position_radius_m": 0.002,
+          "normal_radius": 0.0,
+          "geometry_weight": 0.0,
+          "mu": 0.8,
+          "normal_max_N": 2.0
+        },
+        "source_object": {
+          "size": [
+            0.15,
+            0.1,
+            0.01
+          ],
+          "mass": 0.03125,
+          "com": [
+            0,
+            0,
+            0
+          ]
+        },
+        "source_to_target_scale": 4.0,
+        "source_object_rotation_world": [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_positions_before_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_positions_after_m": [
+          [
+            -0.075,
+            -7.890556159358519e-18,
+            0.0
+          ],
+          [
+            0.023000057954670156,
+            -0.030015224701079528,
+            -0.005
+          ],
+          [
+            0.023000057954670156,
+            0.030015224701079528,
+            -0.005
+          ]
+        ],
+        "source_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_rho_before": 1.0534115692717418,
+        "source_rho_after": 1.115643837008035,
+        "source_certificate": true,
+        "source_status": "positive_margin",
+        "source_validation_residual": 3.0421561103555206e-11,
+        "target_positions_m": [
+          [
+            -0.3,
+            -3.1562224637434075e-17,
+            0.0
+          ],
+          [
+            0.09200023181868063,
+            -0.12006089880431811,
+            -0.02
+          ],
+          [
+            0.09200023181868063,
+            0.12006089880431811,
+            -0.02
+          ]
+        ],
+        "target_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_forces_transferred": false,
+        "target_mass_reused_from_source": false,
+        "source_problem_identity": "ct-source-v2:426ed29587e53cebddbbdbb6ccf55d3bf81cb3e5af8c761a66631188a5b0b47f",
+        "source_cache_hit": true,
+        "new_source_solver_executed": false
+      },
+      "without_refinement": {
+        "origin": "synthetic_contracted_fixture",
+        "inference_executed": false,
+        "synthetic_input": true,
+        "source_refinement_enabled": false,
+        "source_contact_positions_optimized": false,
+        "source_group_ids": [
+          "edge_grip",
+          "under_left",
+          "under_right"
+        ],
+        "effective_source_refinement": {
+          "position_radius_m": 0.002,
+          "normal_radius": 0.0,
+          "geometry_weight": 0.0,
+          "mu": 0.8,
+          "normal_max_N": 2.0
+        },
+        "source_object": {
+          "size": [
+            0.15,
+            0.1,
+            0.01
+          ],
+          "mass": 0.03125,
+          "com": [
+            0,
+            0,
+            0
+          ]
+        },
+        "source_to_target_scale": 4.0,
+        "source_object_rotation_world": [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_positions_before_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_positions_after_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_rho_before": 1.0534115692717418,
+        "source_rho_after": 1.0534115692717418,
+        "source_certificate": true,
+        "source_status": "positive_margin",
+        "source_validation_residual": 1.549636044484437e-10,
+        "target_positions_m": [
+          [
+            -0.3,
+            0.0,
+            0.0
+          ],
+          [
+            0.1,
+            -0.12,
+            -0.02
+          ],
+          [
+            0.1,
+            0.12,
+            -0.02
+          ]
+        ],
+        "target_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_forces_transferred": false,
+        "target_mass_reused_from_source": false,
+        "source_problem_identity": "ct-source-v2:4847ea97a8a55a27da73405f3fd52bb212be2169a762b8ec7a74a3e64f1dc5e4",
+        "source_cache_hit": true,
+        "new_source_solver_executed": false
+      }
+    },
+    {
+      "keyframe": "open_gripper",
+      "maximum_prior_difference": 0.00799976818131938,
+      "full": {
+        "origin": "synthetic_contracted_fixture",
+        "inference_executed": false,
+        "synthetic_input": true,
+        "source_refinement_enabled": true,
+        "source_contact_positions_optimized": true,
+        "source_group_ids": [
+          "edge_grip",
+          "under_left",
+          "under_right"
+        ],
+        "effective_source_refinement": {
+          "position_radius_m": 0.002,
+          "normal_radius": 0.0,
+          "geometry_weight": 0.0,
+          "mu": 0.8,
+          "normal_max_N": 2.0
+        },
+        "source_object": {
+          "size": [
+            0.15,
+            0.1,
+            0.01
+          ],
+          "mass": 0.03125,
+          "com": [
+            0,
+            0,
+            0
+          ]
+        },
+        "source_to_target_scale": 4.0,
+        "source_object_rotation_world": [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_positions_before_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_positions_after_m": [
+          [
+            -0.075,
+            -7.890556159358519e-18,
+            0.0
+          ],
+          [
+            0.023000057954670156,
+            -0.030015224701079528,
+            -0.005
+          ],
+          [
+            0.023000057954670156,
+            0.030015224701079528,
+            -0.005
+          ]
+        ],
+        "source_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_rho_before": 1.0534115692717418,
+        "source_rho_after": 1.115643837008035,
+        "source_certificate": true,
+        "source_status": "positive_margin",
+        "source_validation_residual": 3.0421561103555206e-11,
+        "target_positions_m": [
+          [
+            -0.3,
+            -3.1562224637434075e-17,
+            0.0
+          ],
+          [
+            0.09200023181868063,
+            -0.12006089880431811,
+            -0.02
+          ],
+          [
+            0.09200023181868063,
+            0.12006089880431811,
+            -0.02
+          ]
+        ],
+        "target_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_forces_transferred": false,
+        "target_mass_reused_from_source": false,
+        "source_problem_identity": "ct-source-v2:426ed29587e53cebddbbdbb6ccf55d3bf81cb3e5af8c761a66631188a5b0b47f",
+        "source_cache_hit": true,
+        "new_source_solver_executed": false
+      },
+      "without_refinement": {
+        "origin": "synthetic_contracted_fixture",
+        "inference_executed": false,
+        "synthetic_input": true,
+        "source_refinement_enabled": false,
+        "source_contact_positions_optimized": false,
+        "source_group_ids": [
+          "edge_grip",
+          "under_left",
+          "under_right"
+        ],
+        "effective_source_refinement": {
+          "position_radius_m": 0.002,
+          "normal_radius": 0.0,
+          "geometry_weight": 0.0,
+          "mu": 0.8,
+          "normal_max_N": 2.0
+        },
+        "source_object": {
+          "size": [
+            0.15,
+            0.1,
+            0.01
+          ],
+          "mass": 0.03125,
+          "com": [
+            0,
+            0,
+            0
+          ]
+        },
+        "source_to_target_scale": 4.0,
+        "source_object_rotation_world": [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_positions_before_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_positions_after_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_rho_before": 1.0534115692717418,
+        "source_rho_after": 1.0534115692717418,
+        "source_certificate": true,
+        "source_status": "positive_margin",
+        "source_validation_residual": 1.549636044484437e-10,
+        "target_positions_m": [
+          [
+            -0.3,
+            0.0,
+            0.0
+          ],
+          [
+            0.1,
+            -0.12,
+            -0.02
+          ],
+          [
+            0.1,
+            0.12,
+            -0.02
+          ]
+        ],
+        "target_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_forces_transferred": false,
+        "target_mass_reused_from_source": false,
+        "source_problem_identity": "ct-source-v2:4847ea97a8a55a27da73405f3fd52bb212be2169a762b8ec7a74a3e64f1dc5e4",
+        "source_cache_hit": true,
+        "new_source_solver_executed": false
+      }
+    },
+    {
+      "keyframe": "released",
+      "maximum_prior_difference": 0.00799976818131938,
+      "full": {
+        "origin": "synthetic_contracted_fixture",
+        "inference_executed": false,
+        "synthetic_input": true,
+        "source_refinement_enabled": true,
+        "source_contact_positions_optimized": true,
+        "source_group_ids": [
+          "edge_grip",
+          "under_left",
+          "under_right"
+        ],
+        "effective_source_refinement": {
+          "position_radius_m": 0.002,
+          "normal_radius": 0.0,
+          "geometry_weight": 0.0,
+          "mu": 0.8,
+          "normal_max_N": 2.0
+        },
+        "source_object": {
+          "size": [
+            0.15,
+            0.1,
+            0.01
+          ],
+          "mass": 0.03125,
+          "com": [
+            0,
+            0,
+            0
+          ]
+        },
+        "source_to_target_scale": 4.0,
+        "source_object_rotation_world": [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_positions_before_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_positions_after_m": [
+          [
+            -0.075,
+            -7.890556159358519e-18,
+            0.0
+          ],
+          [
+            0.023000057954670156,
+            -0.030015224701079528,
+            -0.005
+          ],
+          [
+            0.023000057954670156,
+            0.030015224701079528,
+            -0.005
+          ]
+        ],
+        "source_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_rho_before": 1.0534115692717418,
+        "source_rho_after": 1.115643837008035,
+        "source_certificate": true,
+        "source_status": "positive_margin",
+        "source_validation_residual": 3.0421561103555206e-11,
+        "target_positions_m": [
+          [
+            -0.3,
+            -3.1562224637434075e-17,
+            0.0
+          ],
+          [
+            0.09200023181868063,
+            -0.12006089880431811,
+            -0.02
+          ],
+          [
+            0.09200023181868063,
+            0.12006089880431811,
+            -0.02
+          ]
+        ],
+        "target_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_forces_transferred": false,
+        "target_mass_reused_from_source": false,
+        "source_problem_identity": "ct-source-v2:426ed29587e53cebddbbdbb6ccf55d3bf81cb3e5af8c761a66631188a5b0b47f",
+        "source_cache_hit": true,
+        "new_source_solver_executed": false
+      },
+      "without_refinement": {
+        "origin": "synthetic_contracted_fixture",
+        "inference_executed": false,
+        "synthetic_input": true,
+        "source_refinement_enabled": false,
+        "source_contact_positions_optimized": false,
+        "source_group_ids": [
+          "edge_grip",
+          "under_left",
+          "under_right"
+        ],
+        "effective_source_refinement": {
+          "position_radius_m": 0.002,
+          "normal_radius": 0.0,
+          "geometry_weight": 0.0,
+          "mu": 0.8,
+          "normal_max_N": 2.0
+        },
+        "source_object": {
+          "size": [
+            0.15,
+            0.1,
+            0.01
+          ],
+          "mass": 0.03125,
+          "com": [
+            0,
+            0,
+            0
+          ]
+        },
+        "source_to_target_scale": 4.0,
+        "source_object_rotation_world": [
+          [
+            1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            1.0
+          ]
+        ],
+        "source_positions_before_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_positions_after_m": [
+          [
+            -0.075,
+            0.0,
+            0.0
+          ],
+          [
+            0.025,
+            -0.03,
+            -0.005
+          ],
+          [
+            0.025,
+            0.03,
+            -0.005
+          ]
+        ],
+        "source_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_rho_before": 1.0534115692717418,
+        "source_rho_after": 1.0534115692717418,
+        "source_certificate": true,
+        "source_status": "positive_margin",
+        "source_validation_residual": 1.549636044484437e-10,
+        "target_positions_m": [
+          [
+            -0.3,
+            0.0,
+            0.0
+          ],
+          [
+            0.1,
+            -0.12,
+            -0.02
+          ],
+          [
+            0.1,
+            0.12,
+            -0.02
+          ]
+        ],
+        "target_normals": [
+          [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ],
+          [
+            0.0,
+            0.0,
+            -1.0
+          ]
+        ],
+        "source_forces_transferred": false,
+        "target_mass_reused_from_source": false,
+        "source_problem_identity": "ct-source-v2:4847ea97a8a55a27da73405f3fd52bb212be2169a762b8ec7a74a3e64f1dc5e4",
+        "source_cache_hit": true,
+        "new_source_solver_executed": false
+      }
+    }
+  ]
+}

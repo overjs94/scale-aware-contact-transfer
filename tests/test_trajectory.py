@@ -1,20 +1,27 @@
 import numpy as np
 import casadi as ca
+import pytest
 
 from contact_transfer.contacts import Capability
 from contact_transfer.system import MechanicalSystem, RigidObject
-from contact_transfer.trajectory import Contact, solve_cito
+from contact_transfer.trajectory import Contact, TrajectoryResult, solve_cito
 from contact_transfer import Robot
 from contact_transfer.embodiments import load, catalog
 
 
-def test_cito_support_impulse_and_unrelaxed_residuals():
+@pytest.mark.parametrize('friction_speed_model',['auxiliary_cone','direct_norm','huber_norm'])
+def test_cito_support_impulse_and_unrelaxed_residuals(friction_speed_model):
     body = RigidObject(1., np.zeros(3), np.eye(3)*.02)
     system = MechanicalSystem([], body)
     q = np.array([0., 0, .5, 0, 0, 0, 1])
     contact = Contact("ground", np.zeros(3), [0, 0, 1],
                       Capability(mu=.5, normal_max=30), plane_offset=.5)
-    result = solve_cito(system, q, q, [contact], steps=8, duration=.4)
+    initial=None
+    if friction_speed_model=='huber_norm':
+        # The smooth zero-speed representation is exercised with the same
+        # positive, independently balanced force seed as the full task runner.
+        initial=TrajectoryResult(np.tile(q,(9,1)),np.zeros((9,6)),np.zeros((8,0)),np.full(8,.05),{'ground':np.tile([0.,0.,9.81*.05],(8,1))},0.,0.,0.,0.,0.,False,())
+    result = solve_cito(system, q, q, [contact], steps=8, duration=.4,friction_speed_model=friction_speed_model,friction_relaxations=(1e-8,)*3,initial=initial,eliminate_endpoint_redundancy=friction_speed_model=='huber_norm')
     assert result.complementarity_residual < 2e-5
     assert result.friction_residual < 2e-5
     assert result.minimum_gap >= -2e-6
@@ -23,7 +30,8 @@ def test_cito_support_impulse_and_unrelaxed_residuals():
     np.testing.assert_allclose(result.impulses["ground"][:, 2].sum(), 9.81*.4, atol=2e-5)
 
 
-def test_dual_arm_attached_object_translation(slider_urdf):
+@pytest.mark.parametrize('eliminate_endpoint_redundancy,configuration_update',[(False,'independent_se3'),(True,'independent_se3'),(True,'contact_coordinate_midpoint')])
+def test_dual_arm_attached_object_translation(slider_urdf,eliminate_endpoint_redundancy,configuration_update):
     robot = Robot(slider_urdf).symbolic()
     system = MechanicalSystem([robot, robot], RigidObject(1., np.zeros(3), np.eye(3)*.02))
     q = np.r_[-.25, 0, .5, .25, 0, .5, 0, 0, .5, 0, 0, 0, 1]
@@ -34,10 +42,13 @@ def test_dual_arm_attached_object_translation(slider_urdf):
                         robot_index=0, frame="link2", attached_steps=tuple(range(8))),
                 Contact("right", [.25, 0, 0], [0, 0, -1], cap,
                         robot_index=1, frame="link2", attached_steps=tuple(range(8)))]
-    result = solve_cito(system, q, goal, contacts, steps=8, duration=.8)
+    result = solve_cito(system, q, goal, contacts, steps=8, duration=.8,eliminate_endpoint_redundancy=eliminate_endpoint_redundancy,configuration_update=configuration_update,feasibility_warm_start=configuration_update=='contact_coordinate_midpoint')
     np.testing.assert_allclose(result.q[-1], goal, atol=1e-6)
     assert result.primal_residual < 2e-6
     assert result.gripper_velocity_residual < 2e-6
+    if configuration_update=='contact_coordinate_midpoint':
+        assert len(result.contact_coordinate_charts)==2
+        assert all(c['independent']==[] for c in result.contact_coordinate_charts.values())
 
 
 def test_floating_robot_environment_contact_velocity():
@@ -56,3 +67,13 @@ def test_floating_robot_environment_contact_velocity():
     plus, minus = system.integrate(q, h*v), system.integrate(q, -h*v)
     finite_difference = (float(fn(plus)[0])-float(fn(minus)[0]))/(2*h)
     np.testing.assert_allclose(np.array(fn(q)[1])[2]@v, finite_difference, atol=1e-7)
+
+
+def test_per_contact_coordinates_handle_a_separated_zero_force_candidate(slider_urdf):
+    robot=Robot(slider_urdf).symbolic();system=MechanicalSystem([robot,robot],RigidObject(1.,np.zeros(3),np.eye(3)*.02));q=np.r_[-.25,0,.5,.25,0,.5,0,0,.5,0,0,0,1];goal=q.copy();goal[[2,5,8]]+=.03;N=8
+    cap=Capability.force_gripper([50.,50.,50.]);contacts=[Contact('left',[-.25,0,0],[0,0,-1],cap,robot_index=0,frame='link2',attached_steps=tuple(range(N))),Contact('right',[.25,0,0],[0,0,-1],cap,robot_index=1,frame='link2',attached_steps=tuple(range(N))),Contact('separated',[0,0,.2],[0,0,1],Capability(mu=.5,normal_max=30.),plane_offset=.5,force_coordinates='scaled_tangent',tangent_ratio_regularization=1e-6)]
+    result=solve_cito(system,q,goal,contacts,steps=N,duration=.8,friction_speed_model='huber_norm',friction_relaxations=(1e-8,),relaxations=(1e-8,),eliminate_endpoint_redundancy=True)
+    assert result.complementarity_residual<2e-5 and result.friction_residual<2e-5
+    assert np.max(abs(result.impulses['separated']))<1e-6
+    np.testing.assert_allclose(result.q[-1],goal,atol=1e-6)
+    assert result.continuation['per_contact_force_coordinates']['separated']['coordinates']=='scaled_tangent'

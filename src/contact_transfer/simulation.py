@@ -65,6 +65,7 @@ def export_mjcf(robot, *, timestep=.002, markers=True):
                           rgba=".2 .5 .8 1", contype="0", conaffinity="0", mass="0")
     actuators = ET.SubElement(root, "actuator")
     for name, effort in zip(robot.joint_names, robot.effort):
+        if effort==0:continue  # Explicitly passive joints remain unactuated.
         attrs = {"name": "motor_"+name, "joint": name, "gear": "1"}
         if np.isfinite(effort):
             attrs.update(ctrllimited="true", ctrlrange=_text([-effort, effort]))
@@ -81,8 +82,9 @@ class MujocoRobot:
         self.data = mujoco.MjData(self.model)
         self.joint_ids = [mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_JOINT, n)
                           for n in robot.joint_names]
-        self.actuator_ids = [mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_ACTUATOR, "motor_"+n)
-                            for n in robot.joint_names]
+        self.actuated_indices=np.flatnonzero(robot.effort>0)
+        self.actuator_ids = [mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_ACTUATOR, "motor_"+robot.joint_names[i])
+                            for i in self.actuated_indices]
 
     def reset(self, q, v=None):
         q, v = np.asarray(q), np.zeros(self.robot.nv) if v is None else np.asarray(v)
@@ -109,7 +111,9 @@ class MujocoRobot:
                 np.r_[self.data.qvel[3:6], R.T@self.data.qvel[:3], vj])
 
     def step(self, torque):
-        self.data.ctrl[self.actuator_ids] = np.asarray(torque)
+        torque=np.asarray(torque,float).reshape(self.robot.n)
+        if np.any(torque[self.robot.effort==0]!=0):raise ValueError('Passive joints cannot receive effort commands')
+        self.data.ctrl[self.actuator_ids] = torque[self.actuated_indices]
         self.mj.mj_step(self.model, self.data)
         return self.state()
 

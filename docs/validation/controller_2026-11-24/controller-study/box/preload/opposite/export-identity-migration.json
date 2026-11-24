@@ -1,0 +1,14 @@
+{
+  "removed_absent_default": "target.gripper_force_fraction=1.0",
+  "exact_legacy_case_and_plan_match": true,
+  "current_identity": [
+    "a7846ba79fe4cc712b6f9731069c3c447252bd95ac20aa3f26dd8953d6b3178d",
+    "7b52d40796edf8bdaa584ee29256ebfdc9416d085bc1a3dd630a0918be5e78e9"
+  ],
+  "recorded_identity": [
+    "91f876572cb8642adda9a43d94154374d7dff65e026c46e642bf5646661d44db",
+    "7b52d40796edf8bdaa584ee29256ebfdc9416d085bc1a3dd630a0918be5e78e9"
+  ],
+  "scene_sha256_matched": true,
+  "raw_trace_modified": false
+}

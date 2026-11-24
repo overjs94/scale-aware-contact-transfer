@@ -1,0 +1,15 @@
+[WebServer] (node:40345) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 2 workers
+
+(node:40357) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:40358) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 tests/urdf-view.spec.js:492:1 › full assembly external push replays applied force and all controlled ablations (26.4s)
+  ✓  2 tests/urdf-view.spec.js:520:3 › full assembly: optimized multi-arm task retains measured URDF and acceptance provenance (27.3s)
+  ✓  4 tests/urdf-view.spec.js:520:3 › full panel: optimized multi-arm task retains measured URDF and acceptance provenance (21.7s)
+  ✓  3 tests/urdf-view.spec.js:520:3 › full box: optimized multi-arm task retains measured URDF and acceptance provenance (23.9s)
+
+  4 passed (52.7s)

@@ -1,0 +1,25 @@
+{
+  "id": "robotiq_2f85",
+  "urdf": "robot.urdf",
+  "packages": {
+    "robotiq_2f85": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85"
+  },
+  "source_repository": "https://github.com/google-deepmind/mujoco_menagerie",
+  "commit": "370c43965323c0944b433b202aac5058b5f907a9",
+  "source_path": "robotiq_2f85/2f85.xml",
+  "source_file_sha256": "d48aca5f9151798ffd38111ce4e8b2081f3ec2d4f525161b33643451580010de",
+  "urdf_sha256": "04bf2f84718888f101c0c6bd8d423161afc034aa96ef0825b5ce9f6ccc0de954",
+  "license": "BSD-2-Clause",
+  "license_file": "LICENSE.upstream",
+  "assets": [
+    "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/base_mount.stl",
+    "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/base.stl",
+    "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/driver.stl",
+    "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/coupler.stl",
+    "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/follower.stl",
+    "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/pad.stl",
+    "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/silicone_pad.stl",
+    "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/spring_link.stl"
+  ],
+  "description": "Exact tree frames/inertias derived from the native closed-loop gripper; measured native joint positions animate all linkage bodies."
+}

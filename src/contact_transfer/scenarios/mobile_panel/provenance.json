@@ -1,0 +1,18 @@
+{
+  "id": "rby1a_mobile",
+  "upstream_repository": "https://github.com/RainbowRobotics/rby1-sdk",
+  "upstream_commit": "300a585c297d1bdf8554312c3a1659610a9823f5",
+  "upstream_path": "models/rby1a/urdf/model.urdf",
+  "upstream_sha256": "dde1ff510c05e7a2e3eb5f9fced803f19184cf160a8233152f74f8e538cf6d69",
+  "license": "Apache-2.0",
+  "license_file": "LICENSE.rby1",
+  "notice_file": "NOTICE.rby1",
+  "wheel_effort_upstream_specified": false,
+  "wheel_effort_simulation_Nm": 40,
+  "changes": [
+    "custom capsule proxies replaced by convex hulls of official per-link OBJ geometry; inertias/joint geometry preserved",
+    "40 Nm wheel effort is an authored simulation bound, not a manufacturer rating",
+    "official chassis convex collision meshes and wheel cylinders from official mobile/mesh geometry",
+    "authored gripper pads and spherical support; native hands remain in model"
+  ]
+}

@@ -1,0 +1,17 @@
+[
+  {
+    "task": "panel",
+    "exit_code": 0,
+    "log": "outputs/research-study/probes-v1/panel.log"
+  },
+  {
+    "task": "box",
+    "exit_code": 0,
+    "log": "outputs/research-study/probes-v1/box.log"
+  },
+  {
+    "task": "assembly",
+    "exit_code": 0,
+    "log": "outputs/research-study/probes-v1/assembly.log"
+  }
+]

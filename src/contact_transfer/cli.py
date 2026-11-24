@@ -20,6 +20,25 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("models", help="List offline URDF presets and source revisions")
+    doctor=sub.add_parser('doctor',help='Inspect installed solvers and simulation backend scope')
+    doctor.add_argument('--crisp-binary',type=Path)
+    assets=sub.add_parser('assets',help='Fetch and hash-verify pinned Panda/Robotiq native assets')
+    assets.add_argument('--root',type=Path,default=Path('.cache'))
+    assets.add_argument('--refresh',action='store_true')
+    config=sub.add_parser('config',help='Print resolved task policies, independently of robot mechanics')
+    config.add_argument('--task',choices=['panel','box','assembly'],required=True)
+    config.add_argument('--configuration',type=Path)
+    run=sub.add_parser('run',help='Optimize and execute a complete configured multi-arm task')
+    run.add_argument('--task',choices=['panel','box','assembly'],required=True)
+    run.add_argument('--configuration',type=Path)
+    run.add_argument('--output',type=Path,default=Path('outputs/framework'))
+    run.add_argument('--solver',choices=['ipopt','snopt'],default='ipopt')
+    run.add_argument('--conic-solver',choices=['clarabel','scs'],default='clarabel')
+    run.add_argument('--steps',type=int,default=16)
+    run.add_argument('--max-steps',type=int,default=64)
+    run.add_argument('--iterations',type=int,default=1000)
+    run.add_argument('--source-failure-policy',choices=['error','geometric_prior'])
+    run.add_argument('--variants',nargs='+',default=['full'],choices=['full','no_source_refinement','fixed_contact_types','no_target_robustness','fixed_path','no_arm_force_feedforward','contact_disabled','external_push'])
     inspect = sub.add_parser("inspect", help="Inspect a preset or a custom URDF")
     inspect.add_argument("model")
     inspect.add_argument("--fixed-base", action="store_true")
@@ -33,8 +52,37 @@ def main(argv=None):
     sim.add_argument("model", nargs="?", default="franka_panda")
     sim.add_argument("--seconds", type=float, default=1.)
     sim.add_argument("--output", default="outputs/control.npz")
+    three = sub.add_parser("demo-three-arm", help="Assumed contacts -> 3 keyframes -> optimization -> MuJoCo tools")
+    three.add_argument("--scenario", choices=["cartesian", "franka"], default="cartesian")
+    three.add_argument("--case")
+    three.add_argument("--contacts", help="External contracted-contact predictions JSON")
+    three.add_argument("--output", default="outputs/three_arm")
+    three.add_argument("--viewer", help="Export actual multi-robot recording to a web source directory")
+    assembly = sub.add_parser("demo-table-assembly", help="30 s two-gripper/point Panda tabletop and leg assembly")
+    assembly.add_argument("--case")
+    assembly.add_argument("--output", default="outputs/table_assembly")
+    assembly.add_argument("--viewer")
     args = parser.parse_args(argv)
-    if args.command == "models":
+    if args.command=='doctor':
+        from .diagnostics import runtime_capabilities
+        print(json.dumps(runtime_capabilities(args.crisp_binary),indent=2))
+    elif args.command=='assets':
+        from .assets import fetch_native_assets
+        print(json.dumps(fetch_native_assets(args.root,refresh=args.refresh),indent=2))
+    elif args.command=='config':
+        from .configuration import load_task_configuration
+        print(json.dumps(load_task_configuration(args.task,args.configuration).to_dict(),indent=2))
+    elif args.command=='run':
+        from .full_pipeline import run_task,scenario_solver_settings
+        from .conic_backends import ConicSettings
+        overrides={} if args.configuration is None else json.loads(args.configuration.read_text())
+        if args.source_failure_policy is not None:overrides.setdefault('source',{})['failure_policy']=args.source_failure_policy
+        results=run_task(args.task,args.output/args.task,variants=args.variants,steps=args.steps,max_steps=args.max_steps,
+                         settings=scenario_solver_settings(args.iterations,backend=args.solver),configuration=overrides,
+                         conic_settings=ConicSettings(backend=args.conic_solver))
+        print(json.dumps({name:r['execution_passed'] for name,r in results.items()},indent=2))
+        if 'full' in results and not results['full']['execution_passed']:raise SystemExit(1)
+    elif args.command == "models":
         print(json.dumps(catalog(), indent=2))
     elif args.command == "demo-refinement":
         from .contacts import Capability, SurfacePatch, TaskWrench
@@ -66,6 +114,25 @@ def main(argv=None):
         print(json.dumps({"output": str(path.resolve()),
                           "final_position_error": float(np.linalg.norm(sim.state()[0]-target)),
                           "steps": len(log["time"])}, indent=2))
+    elif args.command == "demo-table-assembly":
+        from .table_assembly import run_table_assembly
+        from .assembly_view import export_assembly_view
+        plan, trace, report, flags = run_table_assembly(args.output, case_path=args.case)
+        if args.viewer: export_assembly_view(plan, trace, report, flags, args.viewer)
+        print(json.dumps(report, indent=2))
+        if not report["execution_passed"]: raise SystemExit("Table assembly execution rejected; inspect report.")
+    elif args.command == "demo-three-arm":
+        from .three_arm import run_three_arm
+        from .three_arm_view import export_three_arm_view
+        case_path = args.case
+        if case_path is None and args.scenario == "franka":
+            case_path = Path(__file__).parent/"scenarios/three_franka/case.json"
+        plan, trace, seal, report = run_three_arm(args.output, case_path=case_path, contacts_path=args.contacts)
+        if args.viewer:
+            export_three_arm_view(plan, trace, report, args.viewer)
+        print(json.dumps(report, indent=2))
+        if not (report["tracking_passed"] and report["seal_retained_before_vent"] and report["force_envelopes_passed"] and report["sampled_collision_check_passed"]):
+            raise SystemExit("Three-arm physical execution rejected; inspect report and traces.")
     else:
         robot = _robot(args.model, args.fixed_base)
         if args.command == "inspect":

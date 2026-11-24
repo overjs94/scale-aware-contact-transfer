@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "components": {
+    "panda_meshes": {
+      "source": "Gepetto/example-robot-data",
+      "revision": "78b6101a6387de721316b0db717351d899f97b4f",
+      "license": "Apache-2.0",
+      "files": {
+        "hand.stl": {
+          "url": "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/collision/hand.stl",
+          "sha256": "94493e94f30fe940f2c8ca2f155c3bbe67bbff406d3edf5e261670d2f0f6e2ed"
+        },
+        "link0.stl": {
+          "url": "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/collision/link0.stl",
+          "sha256": "dfc6d94330de8ddb005b311bfdba9f3b8e1aa7c256b71592ee7ff32cb9a9a5aa"
+        },
+        "link1.stl": {
+          "url": "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/collision/link1.stl",
+          "sha256": "e41a39a94108fcf56aacff603fc91ec80541f4c1af17b51a0de5617f5566e6d2"
+        },
+        "link2.stl": {
+          "url": "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/collision/link2.stl",
+          "sha256": "370f7605a0fae3529db169ded50f52f171024aa792d4d773bc84197301f6a039"
+        },
+        "link3.stl": {
+          "url": "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/collision/link3.stl",
+          "sha256": "0a8d638b9349c6c0eefc4e888636ac4838c4b27170f18a51699321118af709c1"
+        },
+        "link4.stl": {
+          "url": "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/collision/link4.stl",
+          "sha256": "0180ebb5772ec9840cb049750cffb29a9ddc90311752a16ea34757782ef9e48d"
+        },
+        "link5.stl": {
+          "url": "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/collision/link5.stl",
+          "sha256": "dd17e688c7870e722283525879643d53a74c0024d328b0e14b034b54c8b6c31a"
+        },
+        "link6.stl": {
+          "url": "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/collision/link6.stl",
+          "sha256": "20b768e99a0e0440b5754dcca108016434e57937cc356acd9c352ccd3cb27f77"
+        },
+        "link7.stl": {
+          "url": "https://raw.githubusercontent.com/Gepetto/example-robot-data/78b6101a6387de721316b0db717351d899f97b4f/robots/panda_description/meshes/collision/link7.stl",
+          "sha256": "92ac6afcf7574c034d3170d8a68e95ac9048ab9d0dd5bbd8311b86e551b9ab1c"
+        }
+      }
+    },
+    "robotiq_2f85": {
+      "source": "google-deepmind/mujoco_menagerie/robotiq_2f85",
+      "revision": "370c43965323c0944b433b202aac5058b5f907a9",
+      "license": "BSD-2-Clause (ROS-Industrial)",
+      "files": {
+        "2f85.xml": {
+          "sha256": "d48aca5f9151798ffd38111ce4e8b2081f3ec2d4f525161b33643451580010de",
+          "bytes": 9540,
+          "url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/2f85.xml"
+        },
+        "LICENSE": {
+          "sha256": "3d5edd18d1e22a17666e9bb84270171ed5ac90b192d24e0177fd171708ea2316",
+          "bytes": 1297,
+          "url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/LICENSE"
+        },
+        "README.md": {
+          "sha256": "a10f34027d417f8f7b9102b74b42976031f0246f3090444728ab322bc4632aaf",
+          "bytes": 1367,
+          "url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/README.md"
+        },
+        "assets/base_mount.stl": {
+          "sha256": "87971dfdd6e5311b5a723e7b73c4701ebf5c2364df671500f30dfc1c53c8e61a",
+          "bytes": 1091784,
+          "url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/base_mount.stl"
+        },
+        "assets/base.stl": {
+          "sha256": "1c7b9f2bd92d705fc4e897c94e905973a3c05f406845e942229433deb7041453",
+          "bytes": 1712484,
+          "url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/base.stl"
+        },
+        "assets/driver.stl": {
+          "sha256": "bbd6e868b1778bead60d2516c7ede581d7ad4e431744b1828757d6ea5129c112",
+          "bytes": 67084,
+          "url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/driver.stl"
+        },
+        "assets/coupler.stl": {
+          "sha256": "d5ee95e62f8415bf5b6e503c831a958f5fc1990bf9b2865329ec38a28932727c",
+          "bytes": 89084,
+          "url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/coupler.stl"
+        },
+        "assets/follower.stl": {
+          "sha256": "633793332c081641ce200df27a40643cc293b29956e3cb5cb29cb811c33ef1c7",
+          "bytes": 110484,
+          "url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/follower.stl"
+        },
+        "assets/pad.stl": {
+          "sha256": "4af1fa8d9bb285abecbf5dfc88e74cb30f059a7a074c2030dc35e9ee4316019d",
+          "bytes": 15084,
+          "url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/pad.stl"
+        },
+        "assets/silicone_pad.stl": {
+          "sha256": "ca20c0fa61e6d3ce7b04bed25360e048e31dfd88ace04187aa6d9e8f4ca3fd0f",
+          "bytes": 15084,
+          "url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/silicone_pad.stl"
+        },
+        "assets/spring_link.stl": {
+          "sha256": "4fb74a8a0d76c0e471cf19fd48bc676fd5b19123798e7a39eb6aa56869354283",
+          "bytes": 84884,
+          "url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/spring_link.stl"
+        }
+      }
+    }
+  }
+}

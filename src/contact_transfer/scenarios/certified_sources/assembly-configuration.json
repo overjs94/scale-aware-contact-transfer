@@ -1,0 +1,18 @@
+{
+  "source": {
+    "representation": "functional_group_sites",
+    "site_file": "package:scenarios/certified_sources/assembly.json",
+    "failure_policy": "error"
+  },
+  "execution": {
+    "control_mode": "hybrid_feedback",
+    "force_d": [
+      2,
+      2,
+      2,
+      40,
+      40,
+      160
+    ]
+  }
+}

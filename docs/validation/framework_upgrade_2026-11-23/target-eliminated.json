@@ -1,0 +1,46 @@
+{
+  "accepted": true,
+  "rho": 8.081945388447986,
+  "objective": -8.080691358394821,
+  "independent": {
+    "passed": true,
+    "residuals": {
+      "equilibrium": 2.1316282072803006e-14,
+      "capability": 8.412156382190229e-09,
+      "torque": 0.0,
+      "closure": 1.942890293094024e-16,
+      "rotation_closure": 7.297721995243101e-16,
+      "rho_margin": 2.4709123636057484e-09
+    },
+    "frozen_conic": {
+      "rho": 8.081945385977074,
+      "certificate": true,
+      "residual": 1.4913226209500863e-10,
+      "status": "Solved",
+      "maximum_margin_status": "Solved",
+      "fixed_rho_feasibility": false,
+      "solver_attempts": [
+        {
+          "status": "Solved",
+          "witness_regularization": 0.0,
+          "backend": "clarabel",
+          "solver_tolerance": 1e-09,
+          "iterations": 19,
+          "wall_time_s": 0.0742344400005095
+        }
+      ]
+    },
+    "independent": "native Pinocchio, NumPy and frozen Clarabel"
+  },
+  "geometry": [],
+  "provenance": {
+    "method": "coupled_target_NLP",
+    "static_torques_eliminated": true,
+    "posture_reference_rule": "sequential_ik_branch",
+    "same_rho_force_polish": {
+      "witness_applied": false,
+      "rejected_reason": "Condensed allocation rejected: PrimalInfeasible"
+    }
+  },
+  "seconds": 18.25529157300025
+}

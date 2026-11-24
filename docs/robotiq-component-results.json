@@ -1,0 +1,182 @@
+{
+  "scope": "native gripper component only; not full paper or multi-arm sequence",
+  "engine": "MuJoCo",
+  "engine_version": "4.0.0",
+  "report": {
+    "scope": "native closed-loop gripper clamp on FREE calibration block, given initial grasp, component test only",
+    "passed": true,
+    "input_id": "9cda12aca2bec7ea4e32ca13954a564bff643ef787eff6f642a98b37cd148f8f",
+    "mechanics": {
+      "residuals": {
+        "mass": 3.049318610115481e-19,
+        "gravity": 1.3877787807814457e-17,
+        "position": 8.536667583201005e-17,
+        "rotation": 1.1106133018972907e-15
+      },
+      "passed": true,
+      "mechanics": "native MuJoCo unconstrained mass (separate armature), gravity and body FK vs independent Pinocchio",
+      "closed_loop_dynamics_claimed_by_urdf": false
+    },
+    "model": "Robotiq 2F-85",
+    "settings": {
+      "id": "robotiq_2f85",
+      "native_repository": "https://github.com/google-deepmind/mujoco_menagerie",
+      "native_revision": "370c43965323c0944b433b202aac5058b5f907a9",
+      "native_path": "robotiq_2f85/2f85.xml",
+      "license": "BSD-2-Clause (ROS-Industrial)",
+      "manufacturer_product_sheet": "https://robotiq.com/hubfs/Product-sheets/Adaptive%20Grippers/Product-sheet-Adaptive-Grippers-EN.pdf",
+      "manufacturer_manual": "https://blog.robotiq.com/hubfs/support-files/2F-85_2F-140_UR_PDF_2026-03-17.pdf",
+      "manufacturer_stroke_m": 0.085,
+      "manufacturer_grip_force_range_N": [
+        20,
+        235
+      ],
+      "declared_simulation_force_limit_per_jaw_N": 60,
+      "nominal_force_command_per_jaw_N": 40,
+      "force_admittance_virtual_inertia": 0.02,
+      "force_admittance_virtual_damping": 30,
+      "external_force_component_limit_N": 50,
+      "external_moment_component_limits_Nm": [
+        5,
+        5,
+        3
+      ],
+      "velocity_limit_rad_s": 0.5,
+      "velocity_limit_source": "declared planning bound, consistent with PickNik 2F-85 URDF; not motor identification",
+      "calibration_fixture_size_grasp_xyz_m": [
+        0.06,
+        0.04,
+        0.028
+      ],
+      "calibration_object_mass_kg": 0.1,
+      "timestep_s": 0.0005,
+      "duration_s": 4,
+      "claim": "Manufacturer ranges are references. The smaller simulation capacity must pass native finite-actuator clamp tests; it is not hardware calibration."
+    },
+    "maximum_jaw_force_N": [
+      40.000191107901735,
+      40.00019121578808
+    ],
+    "minimum_jaw_force_N": [
+      39.99622092241162,
+      39.996220971092825
+    ],
+    "mean_jaw_force_N": [
+      39.9990902002737,
+      39.99909028413444
+    ],
+    "maximum_motor_force_Nm": 5.0,
+    "maximum_loop_residual": 0.00017759369586914375,
+    "native_internal_equalities": 3,
+    "object_pose_prescribed": false,
+    "fixed_fixture": false,
+    "full_paper_pipeline_executed": false,
+    "fixture": {
+      "position": [
+        -5.979591821692054e-15,
+        3.469446951953614e-18,
+        0.1528996219755222
+      ],
+      "quaternion_xyzw": [
+        -7.30002338751519e-14,
+        -7.30002338751519e-14,
+        0.7071067811865475,
+        0.7071067811865475
+      ],
+      "size": [
+        0.06,
+        0.04,
+        0.028
+      ]
+    },
+    "hold_joint_positions": {
+      "right_driver_joint": 0.44056722931611453,
+      "right_coupler_joint": 0.0,
+      "right_spring_link_joint": 0.43972553562690314,
+      "right_follower_joint": -0.4222285544913421,
+      "left_driver_joint": 0.44056722931611453,
+      "left_coupler_joint": 0.0,
+      "left_spring_link_joint": 0.4397255356268784,
+      "left_follower_joint": -0.42222855449173036
+    },
+    "initial_joint_positions": {
+      "right_driver_joint": 0.4423335648549301,
+      "right_coupler_joint": 0.0,
+      "right_spring_link_joint": 0.4414934735522342,
+      "right_follower_joint": -0.4239285409554747,
+      "left_driver_joint": 0.4423335648549301,
+      "left_coupler_joint": 0.0,
+      "left_spring_link_joint": 0.4414934735521694,
+      "left_follower_joint": -0.42392854095552335
+    }
+  },
+  "sha256": {
+    "scene.xml": "3d1784cff11dfa60d5c0f81dc9b4ccdf857073eecde43b41dff0f3d58e366dbe",
+    "report.json": "c6b12061ad03ba32abb15f1625f23a446949c0d46552f3b74bb51d96b33b2663",
+    "recording.npz": "ed1fa5df85b76a29ca24d3695d9486a9f0ae8554bd98a4b1b317d991a0a35a0d",
+    "control.json": "d5a2a869327ddcb720f0a59cc419530f80e5249b73d41c05e3238ce3e1162ebe",
+    "model/robot.urdf": "04bf2f84718888f101c0c6bd8d423161afc034aa96ef0825b5ce9f6ccc0de954"
+  },
+  "source": {
+    "source": "google-deepmind/mujoco_menagerie/robotiq_2f85",
+    "revision": "370c43965323c0944b433b202aac5058b5f907a9",
+    "license": "BSD-2-Clause (ROS-Industrial)",
+    "files": {
+      "2f85.xml": {
+        "sha256": "d48aca5f9151798ffd38111ce4e8b2081f3ec2d4f525161b33643451580010de",
+        "bytes": 9540,
+        "url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/2f85.xml"
+      },
+      "LICENSE": {
+        "sha256": "3d5edd18d1e22a17666e9bb84270171ed5ac90b192d24e0177fd171708ea2316",
+        "bytes": 1297,
+        "url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/LICENSE"
+      },
+      "README.md": {
+        "sha256": "a10f34027d417f8f7b9102b74b42976031f0246f3090444728ab322bc4632aaf",
+        "bytes": 1367,
+        "url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/README.md"
+      },
+      "assets/base_mount.stl": {
+        "sha256": "87971dfdd6e5311b5a723e7b73c4701ebf5c2364df671500f30dfc1c53c8e61a",
+        "bytes": 1091784,
+        "url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/base_mount.stl"
+      },
+      "assets/base.stl": {
+        "sha256": "1c7b9f2bd92d705fc4e897c94e905973a3c05f406845e942229433deb7041453",
+        "bytes": 1712484,
+        "url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/base.stl"
+      },
+      "assets/driver.stl": {
+        "sha256": "bbd6e868b1778bead60d2516c7ede581d7ad4e431744b1828757d6ea5129c112",
+        "bytes": 67084,
+        "url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/driver.stl"
+      },
+      "assets/coupler.stl": {
+        "sha256": "d5ee95e62f8415bf5b6e503c831a958f5fc1990bf9b2865329ec38a28932727c",
+        "bytes": 89084,
+        "url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/coupler.stl"
+      },
+      "assets/follower.stl": {
+        "sha256": "633793332c081641ce200df27a40643cc293b29956e3cb5cb29cb811c33ef1c7",
+        "bytes": 110484,
+        "url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/follower.stl"
+      },
+      "assets/pad.stl": {
+        "sha256": "4af1fa8d9bb285abecbf5dfc88e74cb30f059a7a074c2030dc35e9ee4316019d",
+        "bytes": 15084,
+        "url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/pad.stl"
+      },
+      "assets/silicone_pad.stl": {
+        "sha256": "ca20c0fa61e6d3ce7b04bed25360e048e31dfd88ace04187aa6d9e8f4ca3fd0f",
+        "bytes": 15084,
+        "url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/silicone_pad.stl"
+      },
+      "assets/spring_link.stl": {
+        "sha256": "4fb74a8a0d76c0e471cf19fd48bc676fd5b19123798e7a39eb6aa56869354283",
+        "bytes": 84884,
+        "url": "https://raw.githubusercontent.com/google-deepmind/mujoco_menagerie/370c43965323c0944b433b202aac5058b5f907a9/robotiq_2f85/assets/spring_link.stl"
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+........................................................................ [ 46%]
+........................................................................ [ 92%]
+............                                                             [100%]
+=============================== warnings summary ===============================
+../../opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/anyio/pytest_plugin.py:14
+  /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/anyio/pytest_plugin.py:14: PytestRemovedIn10Warning: _pytest.python.CallSpec2 has been renamed to CallSpec.
+  The CallSpec2 alias will be removed in pytest 10.
+  Update imports to use CallSpec instead.
+  See https://docs.pytest.org/en/stable/deprecations.html#callspec2-renamed
+    from _pytest.python import CallSpec2
+
+tests/test_full_scenarios.py::test_complete_scenes_preserve_unactuated_objects_and_native_mechanics[box-GPG]
+tests/test_full_scenarios.py::test_contact_coordinates_choose_native_nonsingular_grasp_and_point_charts
+  /workspace/scale-aware-contact-transfer/src/contact_transfer/full_scenario.py:256: UserWarning: Gimbal lock detected. Setting third angle to zero since it is not possible to uniquely determine all angles.
+    tree=ET.parse(r.path);ET.SubElement(tree.getroot(),'link',name='paper_interface');j=ET.SubElement(tree.getroot(),'joint',name='paper_interface_mount',type='fixed');ET.SubElement(j,'parent',link='tip');ET.SubElement(j,'child',link='paper_interface');ET.SubElement(j,'origin',xyz=' '.join(map(str,Tti[:3,3])),rpy=' '.join(map(str,Rotation.from_matrix(Tti[:3,:3]).as_euler('xyz'))));path=out/f'gripper_{i}_interface.urdf';ET.indent(tree);tree.write(path,encoding='utf-8',xml_declaration=True);r=Robot(path,base_pose=arm.base_pose);full.append(r)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+156 passed, 3 warnings in 1149.63s (0:19:09)

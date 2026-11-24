@@ -1,0 +1,181 @@
+{
+  "execution_passed": true,
+  "engine": "mujoco",
+  "duration_s": 20.001,
+  "object_tracking": {
+    "base": {
+      "maximum_position_error_m": 0.0017391733991509446,
+      "final_position_error_m": 0.0012239602291514262,
+      "maximum_rotation_error_rad": 0.0027929781241519476,
+      "final_rotation_error_rad": 0.0011589911673746413
+    },
+    "moving": {
+      "maximum_position_error_m": 0.001828965766556382,
+      "final_position_error_m": 0.0014018438723858444,
+      "maximum_rotation_error_rad": 0.003631383718994111,
+      "final_rotation_error_rad": 0.0016864486345890548
+    }
+  },
+  "task_metrics": {
+    "final_hinge_angle_rad": 1.0477282364904659,
+    "target_hinge_angle_rad": 1.0471975511965976,
+    "hinge_error_rad": 0.0005306852938682383,
+    "floating_box": true,
+    "passive_hinge": true
+  },
+  "task_passed": true,
+  "tracking_passed": true,
+  "maintained_contact_fraction": {
+    "base_grasp": 1.0,
+    "base_support": 1.0,
+    "moving_manipulation": 1.0
+  },
+  "geometric_holding_contact_fraction": {
+    "base_grasp": 1.0,
+    "base_support": 1.0,
+    "moving_manipulation": 1.0
+  },
+  "required_loaded_contact_samples": {
+    "base_grasp": 17901,
+    "base_support": 17901,
+    "moving_manipulation": 17901
+  },
+  "contact_retention_definition": "P: stored planned normal reaction >0.1 N; G: attached holding gripper. Zero-force handoff remains in geometric_holding_contact_fraction.",
+  "contact_retention_passed": true,
+  "jaw_force": {
+    "base_grasp": {
+      "maximum_per_jaw_N": [
+        24.074238822861922,
+        23.470678960165543
+      ],
+      "all_time_maximum_per_jaw_N": [
+        24.074238822861922,
+        23.943822877039864
+      ],
+      "force_limit_window": "entire recorded execution including preparation and release",
+      "minimum_per_jaw_N": [
+        23.71269327264361,
+        23.156535130933964
+      ],
+      "positive_reaction_fraction": [
+        1.0,
+        1.0
+      ],
+      "limit_N": 40,
+      "limit_margin_N": 15.925761177138078,
+      "passed": true
+    },
+    "moving_manipulation": {
+      "maximum_per_jaw_N": [
+        24.28663204775442,
+        23.505779631278724
+      ],
+      "all_time_maximum_per_jaw_N": [
+        24.382019042302982,
+        23.941855585662697
+      ],
+      "force_limit_window": "entire recorded execution including preparation and release",
+      "minimum_per_jaw_N": [
+        23.94027576582592,
+        23.1297609900945
+      ],
+      "positive_reaction_fraction": [
+        1.0,
+        1.0
+      ],
+      "limit_N": 40,
+      "limit_margin_N": 15.617980957697018,
+      "passed": true
+    }
+  },
+  "minimum_actuator_margin_Nm": 1.2569417174691537,
+  "sampled_interface_wrench_capability": {
+    "sample_dt_s": 0.05,
+    "raw_native_contacts": true,
+    "continuous_certificate": false,
+    "interfaces": {
+      "base_grasp": {
+        "samples": 359,
+        "failed_samples": 0,
+        "maximum_residual": 4.440892098500626e-15,
+        "passed": true
+      },
+      "base_support": {
+        "samples": 359,
+        "failed_samples": 0,
+        "maximum_residual": 0.0,
+        "passed": true
+      },
+      "moving_manipulation": {
+        "samples": 359,
+        "failed_samples": 0,
+        "maximum_residual": 3.552713678800501e-15,
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  "unexpected_loaded_contact_penetrations_m": {},
+  "reference_geometry": {
+    "passed": true,
+    "samples": 913,
+    "continuous_certificate": false,
+    "reference_interpolation": "object_SE3_and_conditioned_joint_Hermite_with_dense_IK",
+    "reference_id": "b5a828f7519a3e3ba332578b428e8cad0ae8431f37c2b52e8111bec0246102e3",
+    "reference_mesh": {
+      "minimum_spacing_s": 0.015625,
+      "maximum_joint_acceleration_rad_s2": 3.836613967651472,
+      "optimized_node_velocities_preserved": true
+    },
+    "released_gripper_reference": "native URDF open configuration after stationary opening dwell",
+    "projection_limit_rad": 0.02,
+    "projection_max_rad": 1.3680069069321732e-05,
+    "compliant_pad_allowance_m": 0.001,
+    "unintended_clearance_m": 0.001,
+    "violations": []
+  },
+  "object_pose_prescribed": false,
+  "object_equality_constraints_used": 0,
+  "internal_gripper_equalities": 6,
+  "controller": "hybrid_feedback",
+  "arm_measured_force_feedback": true,
+  "arm_force_selection": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0
+  ],
+  "joint_nullspace_impedance": {
+    "stiffness": 40.0,
+    "damping": 8.0
+  },
+  "arm_reaction_feedforward": true,
+  "measured_jaw_force_feedback": true,
+  "jaw_force_fraction": 0.6,
+  "jaw_force_target_N": {
+    "base_grasp": 24.0,
+    "moving_manipulation": 24.0
+  },
+  "contacts_enabled": true,
+  "full_paper_pipeline_executed": false,
+  "new_physical_trial_executed": true,
+  "task": "box",
+  "baseline_execution_passed": false,
+  "plan_source": "outputs/framework-upgrade/parallel-full/box/full/result.json",
+  "plan_source_sha256": "d8e4c5f1710d88b8bd54fe080e934d719cfde147c8f6e82dc491a3e7d1aaa698",
+  "new_target_solver_executed": false,
+  "new_cito_solver_executed": false,
+  "physics_dt_s": 0.001,
+  "force_damping_contact": [
+    2.0,
+    2.0,
+    2.0,
+    40.0,
+    40.0,
+    160.0
+  ],
+  "force_feedforward": true,
+  "trial_wall_time_s": 194.02689926499988
+}

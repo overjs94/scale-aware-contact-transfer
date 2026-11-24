@@ -1,0 +1,26 @@
+panel ('P', 'P', 'P')/(0, 1, 2): key 0 grip_support
+panel ('P', 'P', 'P')/(0, 1, 2): key 1 grasp_settled
+panel ('P', 'P', 'P')/(0, 1, 2): key 2 lift
+panel ('P', 'P', 'P')/(0, 1, 2): key 3 reorient
+panel ('P', 'P', 'P')/(0, 1, 2): key 4 above_jig
+panel ('P', 'P', 'P')/(0, 1, 2): key 5 seat
+panel ('P', 'P', 'P')/(0, 1, 2): key 6 load_transfer
+panel ('P', 'P', 'P')/(0, 1, 2): key 7 open_gripper
+panel ('P', 'P', 'P')/(0, 1, 2): key 8 released
+panel ('P', 'P', 'P')/(0, 1, 2): CITO interval 0 / 16 nodes
+panel ('P', 'P', 'P')/(0, 1, 2): CITO interval 1 / 16 nodes
+panel ('P', 'P', 'P')/(0, 1, 2): CITO interval 2 / 16 nodes
+panel ('P', 'P', 'P')/(0, 1, 2): CITO interval 3 / 16 nodes
+panel ('P', 'P', 'P')/(0, 1, 2): CITO interval 4 / 16 nodes
+panel ('P', 'P', 'P')/(0, 1, 2): CITO interval 5 / 16 nodes
+panel ('P', 'P', 'P')/(0, 1, 2): CITO interval 6 / 16 nodes
+panel ('P', 'P', 'P')/(0, 1, 2): CITO interval 7 / 16 nodes
+panel/PPP: 0/30.6s
+panel/PPP: 5/30.6s
+panel/PPP: 10/30.6s
+panel/PPP: 15/30.6s
+panel/PPP: 20/30.6s
+panel/PPP: 25/30.6s
+panel/PPP: 30/30.6s
+panel/PPP: 31/30.6s
+panel PPP native_execution False

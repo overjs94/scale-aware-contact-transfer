@@ -1,0 +1,45 @@
+{
+  "independent": {
+    "passed": true,
+    "residuals": {
+      "momentum": 1.1774879404846672e-09,
+      "integration": 2.0078383400345956e-13,
+      "complementarity": 1.275398385668297e-13,
+      "dissipation": 7.440885687522633e-13,
+      "capability": 0.0,
+      "closure": 7.086020659130554e-11,
+      "rotation_closure": 9.839845875108499e-11,
+      "grasp_velocity": 9.999689041984179e-06,
+      "point_alignment": 8.97198407217162e-14,
+      "point_tangent_bounds": 0.0,
+      "limits": 0.0,
+      "endpoint_velocity": 1.0357322966841311e-11,
+      "quaternion_norm": 1.3877787807814457e-13
+    },
+    "configuration_update": "independent_midpoint",
+    "configuration_defect": {
+      "maximum_translation_component_m": 0.0,
+      "maximum_rotation_component_rad": 0.0,
+      "maximum_translation_norm_m": 0.0,
+      "maximum_rotation_norm_rad": 0.0,
+      "bounds": []
+    },
+    "contact_chart": {
+      "dependent_joint_midpoint_difference_rad": 0.0,
+      "minimum_native_singular_value": null
+    },
+    "independent": "native Pinocchio mass/bias/J and NumPy transforms"
+  },
+  "reference_geometry": {
+    "passed": true,
+    "samples": 303,
+    "continuous_certificate": false,
+    "reference_interpolation": "object_SE3_and_joint_Hermite_with_dense_robot_IK",
+    "released_gripper_reference": "native URDF open configuration after stationary opening dwell",
+    "projection_limit_rad": 0.02,
+    "projection_max_rad": 7.606810001892228e-07,
+    "compliant_pad_allowance_m": 0.001,
+    "unintended_clearance_m": 0.001,
+    "violations": []
+  }
+}

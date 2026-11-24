@@ -1,0 +1,64 @@
+digraph ContactTransfer {
+  graph [rankdir=TB, bgcolor="white", pad="0.3", nodesep="0.35", ranksep="0.45", splines=polyline, fontname="Noto Sans CJK KR", fontsize=18, labelloc=t, label="Contact Transfer — code architecture and verified execution paths\nCode baseline: 5ad6015 | 2026-11-12"];
+  node [shape=box, style="rounded,filled", fillcolor="#edf4fc", color="#6e8aa8", fontname="Noto Sans CJK KR", fontsize=11, margin="0.16,0.12"];
+  edge [color="#506783", arrowsize=0.7, fontname="Noto Sans CJK KR", fontsize=9];
+
+  subgraph cluster_inputs {
+    label="1. Assets and task inputs"; color="#a9bfd4";
+    assets [label="URDF / mesh / native gripper MJCF\nmodels/ · scenarios/ · tools/fetch_*\nMass, inertia, joints, limits, provenance"];
+    supplied [label="Supplied contact groups and keyframes\nscenarios/*.json · functional_contraction.py\nSynthetic / assumed network output"];
+    learning [label="III-A trained grouping / anchor network\nNot implemented in this package",style="rounded,dashed,filled",fillcolor="#fff5e6",color="#bc8c39"];
+    {rank=same; assets; supplied; learning;}
+  }
+  mechanics [label="2. Mechanical model\nurdf.py · robot.py · symbolic.py\nlie.py · system.py · embodiments.py\nPinocchio numerical / CasADi symbolic"];
+
+  subgraph cluster_planning {
+    label="3. Planning — multiple routes, separate validation scope"; color="#a9bfd4";
+    source [label="III-B source refinement / geometry transfer\nsource_transfer.py · pipeline.py · refinement.py\nCasADi + IPOPT"];
+    target [label="III-C robust target keyframes\npaper_panel.py · paper_keyframe.py\ncontacts.py · finger_grasp.py\nPosture + geometry + per-vertex forces / torques"];
+    search [label="III-D type / assignment enumeration\nsequence.choose_sequence\nCore available; full Panda search pending",style="rounded,dashed,filled",fillcolor="#fff5e6",color="#bc8c39"];
+    cito [label="IV fixed-endpoint restricted CITO\ntrajectory.py · optimization.py\nq, v, torque, impulse, duration\nVerified first lift: midpoint configuration variant"];
+    nominal [label="Nominal scenario routes\npanel_fixture · mobile_panel · free_articulated\ntable_assembly · articulated · fixed_path\nSupplied paths; not full paper CITO",fillcolor="#fff5e6",color="#bc8c39"];
+    freeadapter [label="Free-articulated paper adapter\npaper_free.py · generalized_load.py\nSource / robust keyframe builders\nFull sequence remains unqualified",style="rounded,dashed,filled",fillcolor="#fff5e6",color="#bc8c39"];
+    {rank=same; source; nominal; freeadapter;}
+    {rank=same; target; search;}
+  }
+  precheck [label="4. Independent plan checks\nClarabel: conic.py / generalized_conic.py\nPinocchio + NumPy: paper_validation.py\nSampled geometry: paper_geometry.py",fillcolor="#e7f5ed",color="#4e9470"];
+
+  subgraph cluster_execution {
+    label="5. Closed-loop physical execution"; color="#a9bfd4";
+    reference [label="CoupledEpisode / reference generation\npaper_execution.py\nJoint Hermite + holding-grasp FK reference"];
+    control [label="Low-level control\nhybrid_control.py · control.py · rb_position.py\nTorque impedance / position admittance\nRobotiq jaw-force servo · virtual PMI (pmi.py)"];
+    mj [label="MuJoCo native contact\ncontact_simulation.py · simulation.py\nurdf_scene.py · robotiq_panel.py\nFree objects; no prescribed object pose"];
+    crisp [label="Optional CRISP CANAL / SubADMM\ncrisp_simulation.py · backends/crisp/*.cpp\nVerified Panda-hand / free-panel FF baseline\nRobotiq closed-loop import not supported",fillcolor="#f0ebf9",color="#8a78ac"];
+    {rank=same; reference; control;}
+    {rank=same; mj; crisp;}
+  }
+  measured [label="6. Recorded state and execution acceptance\nexecution.py · paper_recording.py\nRaw contacts / jaw forces / effort / tracking\nSampled P/G wrench-capability checks",fillcolor="#e7f5ed",color="#4e9470"];
+
+  subgraph cluster_web {
+    label="7. Results and interfaces"; color="#a9bfd4";
+    viewer [label="Scenario exporters: *_view.py\nJSON + URDF / immutable mesh manifests\napp.js · urdf-view.js · library.js · studio.js"];
+    pages [label="GitHub Pages — static playback\ntools/export_public_viewer.py\nNo Python optimizer / physics server required"];
+    local [label="Optional local compute API\nweb/server.py · experiments.py · simulate.py\nExisting nominal presets; paper runner is CLI",fillcolor="#fff5e6",color="#bc8c39"];
+    {rank=same; viewer; pages; local;}
+  }
+
+  assets -> mechanics;
+  supplied -> source -> target -> cito -> precheck -> reference -> control;
+  supplied -> nominal; supplied -> freeadapter;
+  learning -> supplied [style=dashed,label="future integration"];
+  mechanics -> target; mechanics -> nominal;
+  mechanics -> precheck [style=dashed,label="independent dynamics"];
+  search -> target [style=dashed,constraint=false]; search -> cito [style=dashed,constraint=false];
+  freeadapter -> precheck [style=dashed];
+  precheck -> target [style=dashed,constraint=false,label="SOCP warm start / verification"];
+  control -> mj; control -> crisp;
+  nominal -> mj [label="scenario controllers"];
+  mj -> control [style=dashed,color="#39815c",constraint=false,label="measured state / wrench"];
+  crisp -> control [style=dashed,color="#39815c",constraint=false];
+  mj -> measured; crisp -> measured;
+  measured -> viewer -> pages;
+  local -> nominal [style=dashed,constraint=false,label="new jobs"];
+  note [shape=note,label="Solid: implemented route\nDashed: optional, feedback or incomplete integration\nExecution pass ≠ full Sec. III-B–IV validation",fillcolor="#fafafa",color="#a0a0a0",fontsize=10];
+}

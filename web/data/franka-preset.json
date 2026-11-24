@@ -1,0 +1,301 @@
+{
+  "schema_version": 1,
+  "prediction_source": "assumed_contracted_network_output",
+  "units": "SI",
+  "contact_frame": "object",
+  "quaternion_order": "xyzw",
+  "object": {
+    "name": "panel",
+    "size": [
+      0.5,
+      0.3,
+      0.04
+    ],
+    "mass": 1.0,
+    "com": [
+      0,
+      0,
+      0
+    ],
+    "inertia_diagonal": [
+      0.007633333333333333,
+      0.020966666666666665,
+      0.028333333333333332
+    ]
+  },
+  "keyframes": [
+    {
+      "id": "support",
+      "time": 0.0,
+      "object_pose": [
+        0,
+        0,
+        0.6,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "lift",
+      "time": 1.6,
+      "object_pose": [
+        0,
+        0,
+        0.64,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "transfer",
+      "time": 3.2,
+      "object_pose": [
+        0.04,
+        0,
+        0.64,
+        0,
+        0,
+        0,
+        1
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "point",
+      "urdf": "point_arm.urdf",
+      "base_position": [
+        0,
+        -0.7,
+        0
+      ],
+      "base_rpy": [
+        0,
+        0,
+        1.5707963267948966
+      ],
+      "tool_frame": "tip",
+      "capability": {
+        "kind": "P",
+        "mu": 0.5,
+        "normal_max": 30
+      },
+      "retract_world": [
+        0,
+        -0.12,
+        -0.04
+      ],
+      "q_initial": [
+        -0.6661968561850543,
+        0.599610580801043,
+        0.8514238359957835,
+        -1.8108427370635471,
+        2.604886419504643,
+        0.9794845961469287,
+        -1.9806289962545691
+      ],
+      "tool_quaternion_xyzw": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "tool_collision_links": [
+        "tool"
+      ]
+    },
+    {
+      "id": "gripper",
+      "urdf": "gripper_arm.urdf",
+      "base_position": [
+        -0.7,
+        0,
+        0
+      ],
+      "base_rpy": [
+        0,
+        0,
+        0.0
+      ],
+      "tool_frame": "tip",
+      "locked_joints": {
+        "panda_finger_joint1": 0.02,
+        "panda_finger_joint2": 0.02
+      },
+      "capability": {
+        "kind": "G",
+        "force_bounds": [
+          12,
+          12,
+          12
+        ]
+      },
+      "retract_world": [
+        -0.06,
+        0,
+        0
+      ],
+      "q_initial": [
+        0.2237424121643949,
+        -0.7533495912591711,
+        -0.25366628545189,
+        -2.3793520948647173,
+        -2.7041657617782944,
+        3.0558051640334423,
+        1.747535658038114
+      ],
+      "tool_quaternion_xyzw": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "tool_collision_links": [
+        "panda_hand",
+        "panda_leftfinger",
+        "panda_rightfinger"
+      ]
+    },
+    {
+      "id": "suction",
+      "urdf": "suction_arm.urdf",
+      "base_position": [
+        0.5,
+        0.4,
+        0
+      ],
+      "base_rpy": [
+        0,
+        0,
+        -2.4668517113662407
+      ],
+      "tool_frame": "tip",
+      "capability": {
+        "kind": "S",
+        "mu": 0.8,
+        "normal_max": 12,
+        "adhesion_max": 15
+      },
+      "retract_world": [
+        0,
+        0,
+        0.06
+      ],
+      "q_initial": [
+        1.7811895955693944,
+        -0.7387521549097485,
+        -1.0442043232953713,
+        -1.5843659950947362,
+        -0.6640553350301561,
+        1.2362254093007639,
+        -1.8416449501515175
+      ],
+      "tool_quaternion_xyzw": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tool_collision_links": [
+        "tool"
+      ]
+    }
+  ],
+  "contracted_contacts": [
+    {
+      "group_id": "support_sphere",
+      "arm_id": "point",
+      "point_object": [
+        -0.05,
+        -0.06,
+        -0.02
+      ],
+      "normal_object": [
+        0,
+        0,
+        -1
+      ]
+    },
+    {
+      "group_id": "jaw_hold",
+      "arm_id": "gripper",
+      "point_object": [
+        -0.25,
+        0,
+        0
+      ],
+      "normal_object": [
+        -1,
+        0,
+        0
+      ]
+    },
+    {
+      "group_id": "vacuum_hold",
+      "arm_id": "suction",
+      "point_object": [
+        0.15,
+        0.06,
+        0.02
+      ],
+      "normal_object": [
+        0,
+        0,
+        1
+      ]
+    }
+  ],
+  "optimization": {
+    "steps_per_interval": 8,
+    "rho_min": 0.05,
+    "disturbance_scale": [
+      0.15,
+      0.15,
+      0.15,
+      1,
+      1,
+      1
+    ],
+    "kinematic_tolerance": 0.002,
+    "tool_rotation_cost_tolerance": 1e-06,
+    "planner": "fixed_contact_path",
+    "path_samples_per_interval": 16
+  },
+  "simulation": {
+    "timestep": 0.001,
+    "preparation_seconds": 0.5,
+    "hold_seconds": 0.3,
+    "release_seconds": 0.9,
+    "fixture_top": 0.2,
+    "fixture_half_size": [
+      0.35,
+      0.25
+    ],
+    "arm_kp": 800,
+    "arm_kd": 55,
+    "finger_kp": 3000,
+    "finger_kd": 10,
+    "finger_open": 0.035,
+    "finger_closed_command": 0.017,
+    "tracking_tolerance_m": 0.02,
+    "tracking_tolerance_rad": 0.12,
+    "vacuum": {
+      "stiffness": 6000,
+      "damping": 35,
+      "acquire_gap": 0.001,
+      "break_gap": 0.006,
+      "seal_radius": 0.012,
+      "max_angle_rad": 0.15,
+      "pressure_pa": 35000,
+      "area_efficiency": 0.95
+    },
+    "fixture_thickness": 0.04,
+    "controller_type": "computed_torque",
+    "release_tools": false
+  },
+  "model_family": "franka_panda"
+}

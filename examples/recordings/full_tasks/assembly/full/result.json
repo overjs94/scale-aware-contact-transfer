@@ -1,0 +1,1876 @@
+{
+  "execution_passed": true,
+  "engine": "mujoco",
+  "duration_s": 30.392,
+  "object_tracking": {
+    "tabletop": {
+      "maximum_position_error_m": 0.0005391852489186725,
+      "final_position_error_m": 6.997812448700381e-05,
+      "maximum_rotation_error_rad": 0.0023163173784543903,
+      "final_rotation_error_rad": 0.0014328038427678948
+    },
+    "leg": {
+      "maximum_position_error_m": 0.000667057397955994,
+      "final_position_error_m": 0.0003204820493184444,
+      "maximum_rotation_error_rad": 0.003749899549746871,
+      "final_rotation_error_rad": 0.0014437435067415525
+    }
+  },
+  "task_metrics": {
+    "insertion_depth_m": 0.02500143825715001,
+    "lateral_error_m": 0.00045346088101364944,
+    "two_independent_free_bodies": true,
+    "leg_release_planned": true,
+    "leg_released": true,
+    "leg_support_from_tabletop_N": [
+      -1.7723278998001154e-05,
+      2.0565545212557678e-05,
+      3.924012197948891
+    ],
+    "leg_weight_N": 3.9240000000000004
+  },
+  "task_passed": true,
+  "tracking_passed": true,
+  "maintained_contact_fraction": {
+    "top_gripper": 1.0,
+    "point_support": 1.0,
+    "leg_gripper": 1.0
+  },
+  "contact_retention_passed": true,
+  "jaw_force": {
+    "top_gripper": {
+      "maximum_per_jaw_N": [
+        24.016006384324093,
+        32.09604812336084
+      ],
+      "minimum_per_jaw_N": [
+        22.59733026490394,
+        26.553996064571013
+      ],
+      "positive_reaction_fraction": [
+        1.0,
+        1.0
+      ],
+      "limit_N": 40,
+      "limit_margin_N": 7.903951876639162,
+      "passed": true,
+      "all_time_maximum_per_jaw_N": [
+        24.21562654960335,
+        32.09604812336084
+      ],
+      "force_limit_window": "entire recorded execution including preparation and release"
+    },
+    "leg_gripper": {
+      "maximum_per_jaw_N": [
+        28.673861920438508,
+        28.558983688470704
+      ],
+      "minimum_per_jaw_N": [
+        26.98548580786354,
+        26.41357395087548
+      ],
+      "positive_reaction_fraction": [
+        1.0,
+        1.0
+      ],
+      "limit_N": 40,
+      "limit_margin_N": 11.326138079561492,
+      "passed": true,
+      "all_time_maximum_per_jaw_N": [
+        28.673861920438508,
+        28.558983688470704
+      ],
+      "force_limit_window": "entire recorded execution including preparation and release"
+    }
+  },
+  "minimum_actuator_margin_Nm": 0.0,
+  "sampled_interface_wrench_capability": {
+    "sample_dt_s": 0.05,
+    "raw_native_contacts": true,
+    "continuous_certificate": false,
+    "interfaces": {
+      "top_gripper": {
+        "samples": 566,
+        "failed_samples": 0,
+        "maximum_residual": 6.217248937900877e-15,
+        "passed": true
+      },
+      "point_support": {
+        "samples": 566,
+        "failed_samples": 0,
+        "maximum_residual": 0.0,
+        "passed": true
+      },
+      "leg_gripper": {
+        "samples": 509,
+        "failed_samples": 0,
+        "maximum_residual": 1.3322676295501878e-15,
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  "unexpected_loaded_contact_penetrations_m": {},
+  "reference_geometry": {
+    "passed": true,
+    "samples": 1510,
+    "continuous_certificate": false,
+    "reference_interpolation": "object_SE3_and_joint_Hermite_with_dense_robot_IK",
+    "released_gripper_reference": "native URDF open configuration after stationary opening dwell",
+    "projection_limit_rad": 0.02,
+    "projection_max_rad": 0.005136883210355547,
+    "compliant_pad_allowance_m": 0.001,
+    "unintended_clearance_m": 0.001,
+    "violations": []
+  },
+  "object_pose_prescribed": false,
+  "object_equality_constraints_used": 0,
+  "internal_gripper_equalities": 6,
+  "controller": "impedance_feedforward",
+  "arm_measured_force_feedback": false,
+  "arm_force_selection": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "joint_nullspace_impedance": {
+    "stiffness": 40.0,
+    "damping": 8.0
+  },
+  "arm_reaction_feedforward": true,
+  "measured_jaw_force_feedback": true,
+  "contacts_enabled": true,
+  "full_paper_pipeline_executed": false,
+  "variant": "full",
+  "selection": {
+    "selection_executed": true,
+    "selection_method": "exhaustive configured hardware-compatible P/G and fixed-through-sequence injective assignment candidates",
+    "candidate_count": 24,
+    "accepted_candidates": [
+      {
+        "types": [
+          "G",
+          "P",
+          "G"
+        ],
+        "assignment": [
+          0,
+          1,
+          2
+        ],
+        "objective": -54.94566369515949
+      }
+    ],
+    "rejections": [
+      {
+        "types": [
+          "P",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ]
+        ],
+        "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+      },
+      {
+        "types": [
+          "P",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ]
+        ],
+        "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+      },
+      {
+        "types": [
+          "P",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ]
+        ],
+        "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+      },
+      {
+        "types": [
+          "P",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ]
+        ],
+        "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+      },
+      {
+        "types": [
+          "P",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ]
+        ],
+        "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+      },
+      {
+        "types": [
+          "P",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ]
+        ],
+        "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+      },
+      {
+        "types": [
+          "P",
+          "P",
+          "G"
+        ],
+        "assignments": [
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ]
+        ],
+        "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+      },
+      {
+        "types": [
+          "P",
+          "P",
+          "G"
+        ],
+        "assignments": [
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ]
+        ],
+        "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+      },
+      {
+        "types": [
+          "P",
+          "P",
+          "G"
+        ],
+        "assignments": [
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ]
+        ],
+        "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+      },
+      {
+        "types": [
+          "P",
+          "P",
+          "G"
+        ],
+        "assignments": [
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ]
+        ],
+        "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+      },
+      {
+        "types": [
+          "P",
+          "P",
+          "G"
+        ],
+        "assignments": [
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ]
+        ],
+        "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+      },
+      {
+        "types": [
+          "P",
+          "P",
+          "G"
+        ],
+        "assignments": [
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ]
+        ],
+        "reason": "Structurally insufficient contact-type wrench span on free tabletop: maximum rank 5<6 before assembly"
+      },
+      {
+        "types": [
+          "G",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ]
+        ],
+        "reason": "Structurally insufficient contact-type wrench span on free leg: maximum rank 3<6 before assembly"
+      },
+      {
+        "types": [
+          "G",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ]
+        ],
+        "reason": "Structurally insufficient contact-type wrench span on free leg: maximum rank 3<6 before assembly"
+      },
+      {
+        "types": [
+          "G",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ]
+        ],
+        "reason": "Structurally insufficient contact-type wrench span on free leg: maximum rank 3<6 before assembly"
+      },
+      {
+        "types": [
+          "G",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ]
+        ],
+        "reason": "Structurally insufficient contact-type wrench span on free leg: maximum rank 3<6 before assembly"
+      },
+      {
+        "types": [
+          "G",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ]
+        ],
+        "reason": "Structurally insufficient contact-type wrench span on free leg: maximum rank 3<6 before assembly"
+      },
+      {
+        "types": [
+          "G",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ]
+        ],
+        "reason": "Structurally insufficient contact-type wrench span on free leg: maximum rank 3<6 before assembly"
+      },
+      {
+        "types": [
+          "G",
+          "P",
+          "G"
+        ],
+        "assignments": [
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ]
+        ],
+        "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+      },
+      {
+        "types": [
+          "G",
+          "P",
+          "G"
+        ],
+        "assignments": [
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ]
+        ],
+        "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+      },
+      {
+        "types": [
+          "G",
+          "P",
+          "G"
+        ],
+        "assignments": [
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ]
+        ],
+        "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+      },
+      {
+        "types": [
+          "G",
+          "P",
+          "G"
+        ],
+        "assignments": [
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ]
+        ],
+        "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+      },
+      {
+        "types": [
+          "G",
+          "P",
+          "G"
+        ],
+        "assignments": [
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ]
+        ],
+        "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+      }
+    ],
+    "selected_types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "selected_assignment": [
+      0,
+      1,
+      2
+    ],
+    "objective": -54.94566369515949,
+    "objective_definition": "sum keyframe geometry/posture minus robustness plus sum interval motion costs; no type penalty",
+    "planning_wall_time_s": 209.29675531300018,
+    "source_refinement_enabled": true,
+    "source_certificates": [
+      {
+        "synthetic_input": true,
+        "network_inference_executed": false,
+        "source_refinement_enabled": true,
+        "source_status": "failed_source_solve",
+        "source_certificate": false,
+        "source_rho": null,
+        "source_failure": "NLP rejected [ipopt]: Not_Enough_Degrees_Of_Freedom",
+        "source_geometry_fallback": true,
+        "source_forces_transferred": false,
+        "source_to_target_scale": 4.0
+      },
+      {
+        "synthetic_input": true,
+        "network_inference_executed": false,
+        "source_refinement_enabled": true,
+        "source_status": "failed_source_solve",
+        "source_certificate": false,
+        "source_rho": null,
+        "source_failure": "NLP rejected [ipopt]: Not_Enough_Degrees_Of_Freedom",
+        "source_geometry_fallback": true,
+        "source_forces_transferred": false,
+        "source_to_target_scale": 4.0
+      },
+      {
+        "synthetic_input": true,
+        "network_inference_executed": false,
+        "source_refinement_enabled": true,
+        "source_status": "failed_source_solve",
+        "source_certificate": false,
+        "source_rho": null,
+        "source_failure": "NLP rejected [ipopt]: Not_Enough_Degrees_Of_Freedom",
+        "source_geometry_fallback": true,
+        "source_forces_transferred": false,
+        "source_to_target_scale": 4.0
+      },
+      {
+        "synthetic_input": true,
+        "network_inference_executed": false,
+        "source_refinement_enabled": true,
+        "source_status": "failed_source_solve",
+        "source_certificate": false,
+        "source_rho": null,
+        "source_failure": "NLP rejected [ipopt]: Not_Enough_Degrees_Of_Freedom",
+        "source_geometry_fallback": true,
+        "source_forces_transferred": false,
+        "source_to_target_scale": 4.0
+      },
+      {
+        "synthetic_input": true,
+        "network_inference_executed": false,
+        "source_refinement_enabled": true,
+        "source_status": "failed_source_solve",
+        "source_certificate": false,
+        "source_rho": null,
+        "source_failure": "NLP rejected [ipopt]: Not_Enough_Degrees_Of_Freedom",
+        "source_geometry_fallback": true,
+        "source_forces_transferred": false,
+        "source_to_target_scale": 4.0
+      },
+      {
+        "synthetic_input": true,
+        "network_inference_executed": false,
+        "source_refinement_enabled": true,
+        "source_status": "failed_source_solve",
+        "source_certificate": false,
+        "source_rho": null,
+        "source_failure": "NLP rejected [ipopt]: Not_Enough_Degrees_Of_Freedom",
+        "source_geometry_fallback": true,
+        "source_forces_transferred": false,
+        "source_to_target_scale": 4.0
+      },
+      {
+        "synthetic_input": true,
+        "network_inference_executed": false,
+        "source_refinement_enabled": true,
+        "source_status": "failed_source_solve",
+        "source_certificate": false,
+        "source_rho": null,
+        "source_failure": "NLP rejected [ipopt]: Not_Enough_Degrees_Of_Freedom",
+        "source_geometry_fallback": true,
+        "source_forces_transferred": false,
+        "source_to_target_scale": 4.0
+      },
+      {
+        "synthetic_input": true,
+        "network_inference_executed": false,
+        "source_refinement_enabled": true,
+        "source_status": "failed_source_solve",
+        "source_certificate": false,
+        "source_rho": null,
+        "source_failure": "NLP rejected [ipopt]: Not_Enough_Degrees_Of_Freedom",
+        "source_geometry_fallback": true,
+        "source_forces_transferred": false,
+        "source_to_target_scale": 4.0
+      },
+      {
+        "synthetic_input": true,
+        "network_inference_executed": false,
+        "source_refinement_enabled": true,
+        "source_status": "failed_source_solve",
+        "source_certificate": false,
+        "source_rho": null,
+        "source_failure": "NLP rejected [ipopt]: Not_Enough_Degrees_Of_Freedom",
+        "source_geometry_fallback": true,
+        "source_forces_transferred": false,
+        "source_to_target_scale": 4.0
+      },
+      {
+        "synthetic_input": true,
+        "network_inference_executed": false,
+        "source_refinement_enabled": true,
+        "source_status": "failed_source_solve",
+        "source_certificate": false,
+        "source_rho": null,
+        "source_failure": "NLP rejected [ipopt]: Not_Enough_Degrees_Of_Freedom",
+        "source_geometry_fallback": true,
+        "source_forces_transferred": false,
+        "source_to_target_scale": 4.0
+      }
+    ],
+    "target_keyframe_margins": [
+      7.3218282291458054,
+      7.3218282291458054,
+      7.3218282291457815,
+      8.013607541216375,
+      8.013607541215494,
+      8.013607541215443,
+      10.971093239140579,
+      0.3543110546113271,
+      0.3543110546113271,
+      0.3543109645808832
+    ],
+    "target_methods": [
+      {
+        "method": "legacy_target_record",
+        "same_rho_force_polish": {
+          "witness_applied": true,
+          "status": "AlmostSolved",
+          "rho": 7.3218282291458054,
+          "primal_residual": 1.849856179347853e-08
+        }
+      },
+      {
+        "method": "legacy_target_record",
+        "same_rho_force_polish": {
+          "witness_applied": true,
+          "status": "AlmostSolved",
+          "rho": 7.3218282291458054,
+          "primal_residual": 1.849856179347853e-08
+        }
+      },
+      {
+        "method": "legacy_target_record",
+        "same_rho_force_polish": {
+          "witness_applied": true,
+          "status": "AlmostSolved",
+          "rho": 7.3218282291457815,
+          "primal_residual": 5.389223289853362e-09
+        }
+      },
+      {
+        "method": "legacy_target_record",
+        "same_rho_force_polish": {
+          "witness_applied": true,
+          "status": "AlmostSolved",
+          "rho": 8.013607541216375,
+          "primal_residual": 1.4336607030429604e-06
+        }
+      },
+      {
+        "method": "legacy_target_record",
+        "same_rho_force_polish": {
+          "witness_applied": false,
+          "rejected_reason": "Condensed allocation rejected: AlmostSolved"
+        }
+      },
+      {
+        "method": "legacy_target_record",
+        "same_rho_force_polish": {
+          "witness_applied": true,
+          "status": "AlmostSolved",
+          "rho": 8.013607541215443,
+          "primal_residual": 1.5460562252656018e-06
+        }
+      },
+      {
+        "method": "legacy_target_record",
+        "same_rho_force_polish": {
+          "witness_applied": false,
+          "rejected_reason": "Condensed allocation rejected: AlmostSolved"
+        }
+      },
+      {
+        "method": "declared_fixed_posture_robust_SOCP",
+        "same_rho_force_polish": {
+          "witness_applied": true,
+          "status": "Solved",
+          "rho": 0.3543110546113271,
+          "primal_residual": 9.924255861548659e-11
+        }
+      },
+      {
+        "method": "declared_fixed_posture_robust_SOCP",
+        "same_rho_force_polish": {
+          "witness_applied": true,
+          "status": "Solved",
+          "rho": 0.3543110546113271,
+          "primal_residual": 9.924255861548659e-11
+        }
+      },
+      {
+        "method": "declared_fixed_posture_robust_SOCP",
+        "same_rho_force_polish": {
+          "witness_applied": true,
+          "status": "Solved",
+          "rho": 0.3543109645808832,
+          "primal_residual": 4.266776376660175e-10
+        }
+      }
+    ],
+    "actual_interval_nodes": [
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16
+    ],
+    "solver_configuration": {
+      "max_iterations": 1000,
+      "tolerance": 1e-06,
+      "acceptance_tolerance": 2e-06,
+      "backend": "ipopt",
+      "options": {
+        "expand": false,
+        "ipopt.max_cpu_time": 180.0,
+        "ipopt.mu_strategy": "adaptive",
+        "ipopt.mu_init": 1e-05,
+        "ipopt.bound_push": 1e-08,
+        "ipopt.bound_frac": 1e-08,
+        "ipopt.slack_bound_push": 1e-08,
+        "ipopt.slack_bound_frac": 1e-08,
+        "ipopt.acceptable_tol": 0.0001,
+        "ipopt.acceptable_constr_viol_tol": 1e-06,
+        "ipopt.acceptable_compl_inf_tol": 0.0001,
+        "ipopt.acceptable_dual_inf_tol": 0.001,
+        "ipopt.acceptable_obj_change_tol": 1e-06,
+        "ipopt.acceptable_iter": 8
+      }
+    },
+    "stage_cache_counts": {
+      "cached": 13,
+      "fresh": 6
+    },
+    "all_keyframes_optimized": true,
+    "all_intervals_cito_optimized": false,
+    "all_moving_object_intervals_cito_optimized": true,
+    "interval_methods": [
+      "stationary_dwell_conic_QP",
+      "motion_cost",
+      "motion_cost",
+      "motion_cost",
+      "motion_cost",
+      "motion_cost",
+      "stationary_contact_conic_QP",
+      "stationary_contact_conic_QP",
+      "stationary_objects_release_NLP"
+    ],
+    "keyframes": 10,
+    "intervals": 9,
+    "restricted_contact_candidates": true,
+    "sampled_geometry": true,
+    "continuous_certificate": false,
+    "configuration_update": [
+      "independent_midpoint",
+      "independent_midpoint",
+      "independent_midpoint",
+      "independent_midpoint",
+      "independent_midpoint",
+      "independent_midpoint",
+      "independent_midpoint",
+      "independent_midpoint",
+      "independent_midpoint"
+    ],
+    "manuscript_literal_equations_passed": false,
+    "extension": "two independent floating bodies and equal/opposite inter-object contacts",
+    "full_paper_pipeline_executed": false
+  },
+  "full_variant_pipeline_executed": true,
+  "all_intervals_cito_optimized": false,
+  "interval_methods": [
+    "stationary_dwell_conic_QP",
+    "motion_cost",
+    "motion_cost",
+    "motion_cost",
+    "motion_cost",
+    "motion_cost",
+    "stationary_contact_conic_QP",
+    "stationary_contact_conic_QP",
+    "stationary_objects_release_NLP"
+  ],
+  "fixed_path_integration_residuals": null,
+  "trial_wall_time_s": 888.367373230998,
+  "jaw_force_fraction": 0.7,
+  "jaw_force_target_N": {
+    "top_gripper": 28.0,
+    "leg_gripper": 28.0
+  }
+}

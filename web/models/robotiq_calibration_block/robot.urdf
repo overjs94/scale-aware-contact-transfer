@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="free_calibration_block">
+  <link name="block">
+    <visual>
+      <geometry>
+        <box size="0.06 0.04 0.028" />
+      </geometry>
+      <material name="block">
+        <color rgba=".66 .43 .22 1" />
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.06 0.04 0.028" />
+      </geometry>
+    </collision>
+  </link>
+</robot>

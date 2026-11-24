@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="hinged_door">
+  <link name="fixture">
+    <visual>
+      <origin xyz="-0.12 -0.4 0.35" />
+      <geometry>
+        <box size="0.045 0.045 0.7" />
+      </geometry>
+      <material name="fixture">
+        <color rgba=".23 .29 .34 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-0.12 -0.4 0.35" />
+      <geometry>
+        <box size="0.045 0.045 0.7" />
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="-0.12 0.4 0.35" />
+      <geometry>
+        <box size="0.045 0.045 0.7" />
+      </geometry>
+      <material name="fixture">
+        <color rgba=".23 .29 .34 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="-0.12 0.4 0.35" />
+      <geometry>
+        <box size="0.045 0.045 0.7" />
+      </geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.4 -0.3 0.125" />
+      <geometry>
+        <box size="0.3 0.3 0.25" />
+      </geometry>
+      <material name="fixture">
+        <color rgba=".23 .29 .34 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.4 -0.3 0.125" />
+      <geometry>
+        <box size="0.3 0.3 0.25" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="moving">
+    <inertial>
+      <origin xyz="0.3 0 0.2" />
+      <mass value="2.0" />
+      <inertia ixx="0.026933333333333337" iyy="0.08666666666666667" izz="0.06026666666666666" ixy="0" ixz="0" iyz="0" />
+    </inertial>
+    <visual>
+      <origin xyz="0.3 0 0.2" />
+      <geometry>
+        <box size="0.6 0.04 0.4" />
+      </geometry>
+      <material name="wood">
+        <color rgba=".65 .39 .18 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0.3 0 0.2" />
+      <geometry>
+        <box size="0.6 0.04 0.4" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="object_joint" type="revolute">
+    <parent link="fixture" />
+    <child link="moving" />
+    <origin xyz="0 0 0.7" />
+    <axis xyz="0 0 1" />
+    <limit lower="0" upper="1.5" effort="0" velocity="2" />
+    <dynamics damping="0.4" friction="0.05" />
+  </joint>
+</robot>

@@ -1,0 +1,256 @@
+{
+  "schema_version": 1,
+  "task": "box",
+  "parent_full_plan": "outputs/research-study/full-common/box/full/result.json",
+  "optimized_keyframe_index": 2,
+  "optimized_keyframe_id": "lift_done",
+  "parent_full_execution_passed": {
+    "on": true,
+    "off": true
+  },
+  "source": "accepted mid-task keyframe from independently validated complete plans",
+  "target_robustness_only_ablated": true,
+  "candidate_fixed": true,
+  "physical_scene_sha256": {
+    "on": "7cb7d7fbe9cfa64bf4667c20e0d3314142ce95a32d9f9a23be9357a483c7a159",
+    "off": "7cb7d7fbe9cfa64bf4667c20e0d3314142ce95a32d9f9a23be9357a483c7a159"
+  },
+  "controller": {
+    "control_mode": "hybrid_feedback",
+    "jaw_force_fraction": 0.6,
+    "reference_dt_s": 0.02,
+    "reference_projection_limit_rad": 0.02,
+    "physics_dt_s": 0.001,
+    "joint_k": 40.0,
+    "joint_d": 8.0,
+    "motion_k": [
+      40.0,
+      40.0,
+      40.0,
+      3000.0,
+      3000.0,
+      3000.0
+    ],
+    "motion_d": [
+      2.0,
+      2.0,
+      2.0,
+      40.0,
+      40.0,
+      40.0
+    ],
+    "force_k": 0.25,
+    "force_i": 1.0,
+    "force_d": [
+      2,
+      2,
+      2,
+      40,
+      40,
+      160
+    ],
+    "admittance_mass": [
+      0.2,
+      0.2,
+      0.2,
+      2.0,
+      2.0,
+      2.0
+    ],
+    "admittance_damping": [
+      4.0,
+      4.0,
+      4.0,
+      40.0,
+      40.0,
+      40.0
+    ]
+  },
+  "rho_on_optimized_and_independently_checked": 18.443235659618804,
+  "rho_off_independently_checked": 18.443235660240752,
+  "direction_selection": "maximum challenge/OFF certified directional bound over the six signed force axes before native trials; failed ray solves excluded",
+  "certified_direction_selection_available": true,
+  "nonzero_common_control_available": true,
+  "directional_candidates": [
+    {
+      "direction": [
+        -1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "on": {
+        "certified": true,
+        "maximum_coefficient": 114.60789098741006,
+        "status": "Solved",
+        "residual": 7.460698725481052e-14
+      },
+      "off": {
+        "certified": true,
+        "maximum_coefficient": 114.60772992044298,
+        "status": "Solved",
+        "residual": 6.512124173241318e-12
+      },
+      "challenge_to_off_directional_bound": 0.1287399073163495
+    },
+    {
+      "direction": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "on": {
+        "certified": true,
+        "maximum_coefficient": 96.43797813255368,
+        "status": "Solved",
+        "residual": 1.7813306385505712e-09
+      },
+      "off": {
+        "certified": true,
+        "maximum_coefficient": 96.43785785735106,
+        "status": "Solved",
+        "residual": 2.0170443093547874e-09
+      },
+      "challenge_to_off_directional_bound": 0.1529958136307811
+    },
+    {
+      "direction": [
+        0.0,
+        -1.0,
+        0.0,
+        0.0
+      ],
+      "on": {
+        "certified": true,
+        "maximum_coefficient": 67.73359218520183,
+        "status": "Solved",
+        "residual": 1.4210854715202004e-13
+      },
+      "off": {
+        "certified": true,
+        "maximum_coefficient": 67.73144930169964,
+        "status": "Solved",
+        "residual": 3.2862601528904634e-14
+      },
+      "challenge_to_off_directional_bound": 0.21783955134302427
+    },
+    {
+      "direction": [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      "on": {
+        "certified": true,
+        "maximum_coefficient": 67.36740598380322,
+        "status": "Solved",
+        "residual": 5.866418462119327e-12
+      },
+      "off": {
+        "certified": true,
+        "maximum_coefficient": 67.36821509244608,
+        "status": "Solved",
+        "residual": 5.497131638776409e-10
+      },
+      "challenge_to_off_directional_bound": 0.21901409303256808
+    },
+    {
+      "direction": [
+        0.0,
+        0.0,
+        -1.0,
+        0.0
+      ],
+      "on": {
+        "certified": true,
+        "maximum_coefficient": 58.27553549001719,
+        "status": "Solved",
+        "residual": 4.702194189576403e-09
+      },
+      "off": {
+        "certified": true,
+        "maximum_coefficient": 58.27598870385233,
+        "status": "Solved",
+        "residual": 1.1926459819733282e-10
+      },
+      "challenge_to_off_directional_bound": 0.25318469674834865
+    },
+    {
+      "direction": [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "on": {
+        "certified": true,
+        "maximum_coefficient": 35.225202362969284,
+        "status": "Solved",
+        "residual": 2.4868995751603507e-14
+      },
+      "off": {
+        "certified": true,
+        "maximum_coefficient": 35.22520236305811,
+        "status": "Solved",
+        "residual": 2.5757174171303632e-14
+      },
+      "challenge_to_off_directional_bound": 0.4188645497511376
+    }
+  ],
+  "selected_direction": {
+    "direction": [
+      0.0,
+      0.0,
+      1.0,
+      0.0
+    ],
+    "on": {
+      "certified": true,
+      "maximum_coefficient": 35.225202362969284,
+      "status": "Solved",
+      "residual": 2.4868995751603507e-14
+    },
+    "off": {
+      "certified": true,
+      "maximum_coefficient": 35.22520236305811,
+      "status": "Solved",
+      "residual": 2.5757174171303632e-14
+    },
+    "challenge_to_off_directional_bound": 0.4188645497511376
+  },
+  "cases": {
+    "nominal": [
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "common_interior": [
+      0.0,
+      0.0,
+      4.610808914904701,
+      0.0
+    ],
+    "on_interior": [
+      0.0,
+      0.0,
+      14.754588527695043,
+      0.0
+    ],
+    "opposite_interior": [
+      -0.0,
+      -0.0,
+      -14.754588527695043,
+      -0.0
+    ]
+  },
+  "hold_duration_s": 6.0,
+  "load_start_s": 4.0,
+  "load_duration_s": 3.0,
+  "ramp_s": 0.5,
+  "certificate_scope": "fixed optimized reference pose; not a dynamic or closed-loop stability guarantee",
+  "nominal_trials_per_condition": 1,
+  "statistical_success_rate_claimed": false
+}

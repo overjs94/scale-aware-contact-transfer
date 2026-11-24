@@ -1,0 +1,293 @@
+{
+  "id": "panel_fixture",
+  "schema_version": 1,
+  "units": "SI",
+  "quaternion_order": "xyzw",
+  "arms": [
+    {
+      "id": "edge_gripper",
+      "kind": "G",
+      "model": "franka_panda",
+      "urdf": "gripper_arm.urdf",
+      "base_position": [
+        -0.65,
+        0,
+        0
+      ],
+      "base_rpy": [
+        0,
+        0,
+        0.0
+      ],
+      "tool_frame": "tip",
+      "group_id": "edge_grip",
+      "q_initial": [
+        -1.4469655206325354,
+        -1.6816842382509338,
+        0.4492445405745906,
+        -2.6386537066117484,
+        1.7231519373921858,
+        1.7647194611285604,
+        -1.7222366944875083
+      ],
+      "controller": "torque",
+      "locked_joints": {
+        "panda_finger_joint1": 0.02,
+        "panda_finger_joint2": 0.02
+      },
+      "tool_quaternion_xyzw": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ],
+      "retract_world": [
+        -0.08,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "support_left",
+      "kind": "P",
+      "model": "franka_panda",
+      "urdf": "point_arm.urdf",
+      "base_position": [
+        0.05,
+        -0.7,
+        0
+      ],
+      "base_rpy": [
+        0,
+        0,
+        1.5707963267948966
+      ],
+      "tool_frame": "tip",
+      "group_id": "under_left",
+      "q_initial": [
+        1.2299186885040472,
+        1.3762111450804329,
+        -1.5869247259928863,
+        -1.9926685434509044,
+        -1.6031058663878628,
+        1.6502395027783292,
+        -0.8135807279677935
+      ],
+      "controller": "torque",
+      "locked_joints": {},
+      "tool_quaternion_xyzw": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "retract_world": [
+        0,
+        -0.04,
+        -0.055
+      ]
+    },
+    {
+      "id": "support_right",
+      "kind": "P",
+      "model": "franka_panda",
+      "urdf": "point_arm.urdf",
+      "base_position": [
+        0.55,
+        0.5,
+        0
+      ],
+      "base_rpy": [
+        0,
+        0,
+        -2.4037775934693286
+      ],
+      "tool_frame": "tip",
+      "group_id": "under_right",
+      "q_initial": [
+        2.1325834189512043,
+        -0.807965440298633,
+        -2.090021714593677,
+        -1.8324106779295146,
+        2.0773775689994896,
+        0.9405644048207574,
+        1.5525258966113311
+      ],
+      "controller": "torque",
+      "locked_joints": {},
+      "tool_quaternion_xyzw": [
+        0.0,
+        0.0,
+        -0.1634159864309509,
+        0.9865572539791085
+      ],
+      "retract_world": [
+        0,
+        0.04,
+        -0.055
+      ]
+    }
+  ],
+  "keyframes": [
+    {
+      "id": "grip_support",
+      "time": 0,
+      "object_pose": [
+        0,
+        0,
+        0.58,
+        0.0,
+        0.10452846326765347,
+        0.0,
+        0.9945218953682733
+      ]
+    },
+    {
+      "id": "grasp_settled",
+      "time": 2,
+      "object_pose": [
+        0,
+        0,
+        0.58,
+        0.0,
+        0.10452846326765347,
+        0.0,
+        0.9945218953682733
+      ]
+    },
+    {
+      "id": "lift",
+      "time": 7,
+      "object_pose": [
+        0,
+        0,
+        0.66,
+        0.0,
+        0.10452846326765347,
+        0.0,
+        0.9945218953682733
+      ]
+    },
+    {
+      "id": "reorient",
+      "time": 12,
+      "object_pose": [
+        0,
+        0,
+        0.66,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "above_jig",
+      "time": 18,
+      "object_pose": [
+        0.04,
+        0.04,
+        0.6,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "seat",
+      "time": 22,
+      "object_pose": [
+        0.04,
+        0.04,
+        0.48,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "load_transfer",
+      "time": 25,
+      "object_pose": [
+        0.04,
+        0.04,
+        0.48,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "released",
+      "time": 30,
+      "object_pose": [
+        0.04,
+        0.04,
+        0.48,
+        0,
+        0,
+        0,
+        1
+      ]
+    }
+  ],
+  "panel_urdf": "panel.urdf",
+  "jig_urdf": "jig.urdf",
+  "source_file": "source_contacts.json",
+  "source_refinement": true,
+  "source_to_target_scale": 4.0,
+  "panel_mass": 2.0,
+  "optimization": {
+    "sample_dt": 0.25,
+    "point_mu": 0.8,
+    "point_normal_max": 40,
+    "gripper_force_bounds": [
+      20,
+      20,
+      30
+    ],
+    "gripper_moment_bounds": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "disturbance_scale": [
+      0.15,
+      0.15,
+      0.15,
+      1,
+      1,
+      1
+    ]
+  },
+  "simulation": {
+    "duration": 30,
+    "timestep": 0.001,
+    "grasp_seconds": 1.2,
+    "seat_time": 22,
+    "load_transfer_end": 25,
+    "release_time": 26,
+    "release_seconds": 0.6,
+    "retract_end": 29,
+    "arm_kp": 900,
+    "arm_kd": 60,
+    "cartesian_kp": 3000,
+    "cartesian_kd": 40,
+    "orientation_kp": 40,
+    "orientation_kd": 2,
+    "finger_kp": 3000,
+    "finger_kd": 10,
+    "finger_open": 0.035,
+    "finger_closed": 0.017,
+    "pad_friction": 0.9,
+    "pad_torsional_friction_m": 0.008,
+    "friction_impratio": 100,
+    "position_kp": 3000,
+    "position_kd": 80,
+    "tracking_tolerance_m": 0.008,
+    "tracking_tolerance_rad": 0.06
+  }
+}

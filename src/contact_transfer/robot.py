@@ -1,12 +1,22 @@
 """Fast numerical Pinocchio model with angular-first/mixed API adapters."""
 
 from pathlib import Path
+from copy import copy,deepcopy
+from functools import lru_cache
+import hashlib
 import xml.etree.ElementTree as ET
 
 import numpy as np
 import pinocchio as pin
 
 from .urdf import URDFTree
+
+
+@lru_cache(maxsize=16)
+def _symbolic_template(path, digest, floating_base, locked, base_pose, gravity):
+    from .symbolic import SymbolicRobot
+    return SymbolicRobot(path,floating_base=floating_base,locked_joints=dict(locked),
+                         base_pose=np.asarray(base_pose).reshape(4,4),gravity=gravity)
 
 
 class Robot:
@@ -22,6 +32,7 @@ class Robot:
                  base_pose=None, gravity=(0, 0, -9.81)):
         self.tree = URDFTree(urdf, locked_joints)
         self.path = Path(urdf).resolve()
+        self._urdf_digest = hashlib.sha256(self.path.read_bytes()).hexdigest()
         self.floating_base = bool(floating_base)
         self.n = self.tree.n
         self.nq = self.n + (7 if floating_base else 0)
@@ -67,6 +78,9 @@ class Robot:
         return np.r_[0., 0., 0., 0., 0., 0., 1., joints] if self.floating_base else joints
 
     def _qpin(self, q):
+        # The public base pose / world gravity may be updated by a workcell
+        # adapter. Keep native dynamics consistent with the symbolic cache key.
+        self.model.gravity.linear=(self.gravity_world if self.floating_base else self.base_pose[:3,:3].T@self.gravity_world)
         q = np.asarray(q, float).reshape(self.nq)
         if not np.isfinite(q).all():
             raise ValueError("q must be finite")
@@ -126,7 +140,7 @@ class Robot:
     def jacobian(self, q, frame, convention="mixed"):
         qp = self._qpin(q)
         J = np.array(pin.computeFrameJacobian(self.model, self.data, qp,
-                    self._frame(frame), pin.LOCAL_WORLD_ALIGNED)) @ self.B
+                    self._frame(frame), pin.LOCAL_WORLD_ALIGNED)).reshape(6,self.model.nv) @ self.B
         if not self.floating_base:
             J = np.vstack((self.base_pose[:3, :3] @ J[:3],
                            self.base_pose[:3, :3] @ J[3:]))
@@ -148,8 +162,15 @@ class Robot:
                                 if j.nq == 2 else qp[j.idx_q])
         return np.r_[qp[:7], joint_values] if self.floating_base else np.array(joint_values)
 
-    def symbolic(self):
+    def symbolic(self, *, reuse=True):
         from .symbolic import SymbolicRobot
-        return SymbolicRobot(self.path, floating_base=self.floating_base,
-                             locked_joints=self.tree.locked, base_pose=self.base_pose,
-                             gravity=self.gravity_world)
+        if hashlib.sha256(self.path.read_bytes()).hexdigest()!=self._urdf_digest:
+            raise ValueError('URDF changed after Robot construction; reload Robot before planning')
+        if not reuse:return SymbolicRobot(self.path,floating_base=self.floating_base,locked_joints=self.tree.locked,base_pose=self.base_pose,gravity=self.gravity_world)
+        template=_symbolic_template(str(self.path),self._urdf_digest,self.floating_base,
+                                    tuple(sorted(self.tree.locked.items())),tuple(self.base_pose.ravel()),tuple(self.gravity_world))
+        # CasADi graphs are shared; mutable metadata and model limits are not.
+        model=copy(template);model.tree=deepcopy(template.tree);model._fk=dict(template._fk);model._jac=dict(template._jac)
+        for name in ('base_pose','gravity_world','lower','upper','effort','velocity'):
+            setattr(model,name,np.asarray(getattr(self,name)).copy())
+        return model

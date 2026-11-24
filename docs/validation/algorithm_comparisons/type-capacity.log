@@ -1,0 +1,5 @@
+panel [(['P', 'P', 'P'], 3.0240315498195365, True), (['G', 'P', 'P'], 8.249982955758542, True)]
+/workspace/scale-aware-contact-transfer/src/contact_transfer/full_scenario.py:261: UserWarning: Gimbal lock detected. Setting third angle to zero since it is not possible to uniquely determine all angles.
+  tree=ET.parse(r.path);ET.SubElement(tree.getroot(),'link',name='paper_interface');j=ET.SubElement(tree.getroot(),'joint',name='paper_interface_mount',type='fixed');ET.SubElement(j,'parent',link='tip');ET.SubElement(j,'child',link='paper_interface');ET.SubElement(j,'origin',xyz=' '.join(map(str,Tti[:3,3])),rpy=' '.join(map(str,Rotation.from_matrix(Tti[:3,:3]).as_euler('xyz'))));path=out/f'gripper_{i}_interface.urdf';ET.indent(tree);tree.write(path,encoding='utf-8',xml_declaration=True);r=Robot(path,base_pose=arm.base_pose);full.append(r)
+box [(['P', 'P', 'P'], None, False), (['P', 'P', 'G'], 5.6380405342106075, True), (['G', 'P', 'P'], 0.9509344528543575, True), (['G', 'P', 'G'], 15.150593333112417, True)]
+assembly [(['P', 'P', 'P'], None, False), (['P', 'P', 'G'], None, False), (['G', 'P', 'P'], None, False), (['G', 'P', 'G'], 8.013608013936572, True)]

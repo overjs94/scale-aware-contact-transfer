@@ -1,0 +1,542 @@
+[
+  {
+    "task": "panel",
+    "keyframe": "grip_support",
+    "artifact": "outputs/research-study/sources-final/panel/representative/key0-source-witness.npz",
+    "rho": 0.5320674463017788,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 6.331324353681111e-13,
+        "circular_friction": 1.9129656192440336e-11,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 64,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "panel",
+    "keyframe": "grasp_settled",
+    "artifact": "outputs/research-study/sources-final/panel/representative/key1-source-witness.npz",
+    "rho": 0.5320674463017788,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 6.331324353681111e-13,
+        "circular_friction": 1.9129656192440336e-11,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 64,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "panel",
+    "keyframe": "lift",
+    "artifact": "outputs/research-study/sources-final/panel/representative/key2-source-witness.npz",
+    "rho": 0.5320674463017788,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 6.331324353681111e-13,
+        "circular_friction": 1.9129656192440336e-11,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 64,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "panel",
+    "keyframe": "reorient",
+    "artifact": "outputs/research-study/sources-final/panel/representative/key3-source-witness.npz",
+    "rho": 1.115643837008035,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 1.4120232760816975e-12,
+        "circular_friction": 6.179488865054594e-11,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 64,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "panel",
+    "keyframe": "above_jig",
+    "artifact": "outputs/research-study/sources-final/panel/representative/key4-source-witness.npz",
+    "rho": 1.115643837008035,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 1.4120232760816975e-12,
+        "circular_friction": 6.179488865054594e-11,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 64,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "panel",
+    "keyframe": "seat",
+    "artifact": "outputs/research-study/sources-final/panel/representative/key5-source-witness.npz",
+    "rho": 1.115643837008035,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 1.4120232760816975e-12,
+        "circular_friction": 6.179488865054594e-11,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 64,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "panel",
+    "keyframe": "load_transfer",
+    "artifact": "outputs/research-study/sources-final/panel/representative/key6-source-witness.npz",
+    "rho": 1.115643837008035,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 1.4120232760816975e-12,
+        "circular_friction": 6.179488865054594e-11,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 64,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "panel",
+    "keyframe": "open_gripper",
+    "artifact": "outputs/research-study/sources-final/panel/representative/key7-source-witness.npz",
+    "rho": 1.115643837008035,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 1.4120232760816975e-12,
+        "circular_friction": 6.179488865054594e-11,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 64,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "panel",
+    "keyframe": "released",
+    "artifact": "outputs/research-study/sources-final/panel/representative/key8-source-witness.npz",
+    "rho": 1.115643837008035,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 1.4120232760816975e-12,
+        "circular_friction": 6.179488865054594e-11,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 64,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "box",
+    "keyframe": "initial",
+    "artifact": "outputs/research-study/sources-final/box/functional_sites/key0-source-witness.npz",
+    "rho": 14.258952608105304,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 5.153100168797664e-13,
+        "circular_friction": 1.1143051426021344e-08,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 16,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "box",
+    "keyframe": "lift_start",
+    "artifact": "outputs/research-study/sources-final/box/functional_sites/key1-source-witness.npz",
+    "rho": 14.258952608105304,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 5.153100168797664e-13,
+        "circular_friction": 1.1143051426021344e-08,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 16,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "box",
+    "keyframe": "lift_done",
+    "artifact": "outputs/research-study/sources-final/box/functional_sites/key2-source-witness.npz",
+    "rho": 14.194251556887412,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 3.3151259515307174e-13,
+        "circular_friction": 2.07468594526361e-08,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 16,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "box",
+    "keyframe": "open_start",
+    "artifact": "outputs/research-study/sources-final/box/functional_sites/key3-source-witness.npz",
+    "rho": 14.194251556887412,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 3.3151259515307174e-13,
+        "circular_friction": 2.07468594526361e-08,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 16,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "box",
+    "keyframe": "opening",
+    "artifact": "outputs/research-study/sources-final/box/functional_sites/key4-source-witness.npz",
+    "rho": 8.668440814853684,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 3.158473482756108e-12,
+        "circular_friction": 1.776125357899616e-10,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 16,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "box",
+    "keyframe": "opening_late",
+    "artifact": "outputs/research-study/sources-final/box/functional_sites/key5-source-witness.npz",
+    "rho": 6.481828421655451,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 1.555366946348613e-12,
+        "circular_friction": 4.527664909659279e-10,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 16,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "box",
+    "keyframe": "open_done",
+    "artifact": "outputs/research-study/sources-final/box/functional_sites/key6-source-witness.npz",
+    "rho": 7.057843317945347,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 2.2011281686218354e-12,
+        "circular_friction": 7.012795899541402e-11,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 16,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "box",
+    "keyframe": "hold_final",
+    "artifact": "outputs/research-study/sources-final/box/functional_sites/key7-source-witness.npz",
+    "rho": 7.057843317945347,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 2.2011281686218354e-12,
+        "circular_friction": 7.012795899541402e-11,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 16,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "assembly",
+    "keyframe": "grip_and_support",
+    "artifact": "outputs/research-study/sources-final/assembly/functional_sites/key0-source-witness.npz",
+    "rho": 3.5132918870068135,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 2.2612467454052876e-13,
+        "circular_friction": 1.7134660357243092e-10,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 64,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "assembly",
+    "keyframe": "grasp_settled",
+    "artifact": "outputs/research-study/sources-final/assembly/functional_sites/key1-source-witness.npz",
+    "rho": 3.5132918870068135,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 2.2612467454052876e-13,
+        "circular_friction": 1.7134660357243092e-10,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 64,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "assembly",
+    "keyframe": "lift_tabletop",
+    "artifact": "outputs/research-study/sources-final/assembly/functional_sites/key2-source-witness.npz",
+    "rho": 3.5132918870068135,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 2.2612467454052876e-13,
+        "circular_friction": 1.7134660357243092e-10,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 64,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "assembly",
+    "keyframe": "reorient_tabletop",
+    "artifact": "outputs/research-study/sources-final/assembly/functional_sites/key3-source-witness.npz",
+    "rho": 3.833050100097785,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 3.1230573682705653e-13,
+        "circular_friction": 4.959420096817269e-10,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 64,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "assembly",
+    "keyframe": "approach_socket",
+    "artifact": "outputs/research-study/sources-final/assembly/functional_sites/key4-source-witness.npz",
+    "rho": 3.833050100097785,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 3.1230573682705653e-13,
+        "circular_friction": 4.959420096817269e-10,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 64,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "assembly",
+    "keyframe": "align_leg",
+    "artifact": "outputs/research-study/sources-final/assembly/functional_sites/key5-source-witness.npz",
+    "rho": 3.833050100097785,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 3.1230573682705653e-13,
+        "circular_friction": 4.959420096817269e-10,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 64,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "assembly",
+    "keyframe": "insert_leg",
+    "artifact": "outputs/research-study/sources-final/assembly/functional_sites/key6-source-witness.npz",
+    "rho": 3.833050100097785,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 3.1230573682705653e-13,
+        "circular_friction": 4.959420096817269e-10,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 64,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "assembly",
+    "keyframe": "unload_leg",
+    "artifact": "outputs/research-study/sources-final/assembly/functional_sites/key7-source-witness.npz",
+    "rho": 3.833050100097785,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 3.1230573682705653e-13,
+        "circular_friction": 4.959420096817269e-10,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 64,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "assembly",
+    "keyframe": "open_leg_gripper",
+    "artifact": "outputs/research-study/sources-final/assembly/functional_sites/key8-source-witness.npz",
+    "rho": 3.833050100097785,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 3.1230573682705653e-13,
+        "circular_friction": 4.959420096817269e-10,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 64,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  },
+  {
+    "task": "assembly",
+    "keyframe": "assembled_and_released",
+    "artifact": "outputs/research-study/sources-final/assembly/functional_sites/key9-source-witness.npz",
+    "rho": 3.833050100097785,
+    "independent": {
+      "passed": true,
+      "tolerance": 2e-06,
+      "residuals": {
+        "equilibrium": 3.1230573682705653e-13,
+        "circular_friction": 4.959420096817269e-10,
+        "normal_bounds": 0.0,
+        "point_moments": 0.0
+      },
+      "vertices_checked": 64,
+      "mechanics": "native Pinocchio point maps and unscaled NumPy circular-cone checks"
+    },
+    "conic_status": "Solved",
+    "new_geometry_optimization_executed": false
+  }
+]

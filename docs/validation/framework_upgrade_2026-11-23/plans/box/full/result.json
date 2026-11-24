@@ -1,0 +1,1724 @@
+{
+  "execution_passed": false,
+  "engine": "mujoco",
+  "duration_s": 20.001,
+  "object_tracking": {
+    "base": {
+      "maximum_position_error_m": 0.0015688934388433061,
+      "final_position_error_m": 0.0006264641055094206,
+      "maximum_rotation_error_rad": 0.006681311951792224,
+      "final_rotation_error_rad": 0.003091124220949802
+    },
+    "moving": {
+      "maximum_position_error_m": 0.0027551376530950593,
+      "final_position_error_m": 0.0011690589536588,
+      "maximum_rotation_error_rad": 0.006423896077915036,
+      "final_rotation_error_rad": 0.0008339634269171041
+    }
+  },
+  "task_metrics": {
+    "final_hinge_angle_rad": 1.0449132317537797,
+    "target_hinge_angle_rad": 1.0471975511965976,
+    "hinge_error_rad": 0.002284319442817928,
+    "floating_box": true,
+    "passive_hinge": true
+  },
+  "task_passed": true,
+  "tracking_passed": true,
+  "maintained_contact_fraction": {
+    "base_grasp": 0.9999441371990392,
+    "base_support": 0.9998324115971174,
+    "moving_manipulation": 1.0
+  },
+  "geometric_holding_contact_fraction": {
+    "base_grasp": 0.9999441371990392,
+    "base_support": 0.9998324115971174,
+    "moving_manipulation": 1.0
+  },
+  "required_loaded_contact_samples": {
+    "base_grasp": 17901,
+    "base_support": 17901,
+    "moving_manipulation": 17901
+  },
+  "contact_retention_definition": "P: stored planned normal reaction >0.1 N; G: attached holding gripper. Zero-force handoff remains in geometric_holding_contact_fraction.",
+  "contact_retention_passed": true,
+  "jaw_force": {
+    "base_grasp": {
+      "maximum_per_jaw_N": [
+        31.815407317638567,
+        44.76072684668375
+      ],
+      "all_time_maximum_per_jaw_N": [
+        31.815407317638567,
+        44.76072684668375
+      ],
+      "force_limit_window": "entire recorded execution including preparation and release",
+      "minimum_per_jaw_N": [
+        0.0,
+        0.0
+      ],
+      "positive_reaction_fraction": [
+        0.9997765487961566,
+        0.9998324115971174
+      ],
+      "limit_N": 40,
+      "limit_margin_N": -4.7607268466837525,
+      "passed": false
+    },
+    "moving_manipulation": {
+      "maximum_per_jaw_N": [
+        39.908749950650176,
+        35.67441661436817
+      ],
+      "all_time_maximum_per_jaw_N": [
+        39.908749950650176,
+        35.67441661436817
+      ],
+      "force_limit_window": "entire recorded execution including preparation and release",
+      "minimum_per_jaw_N": [
+        0.0,
+        0.0
+      ],
+      "positive_reaction_fraction": [
+        0.9999441371990392,
+        0.9998882743980784
+      ],
+      "limit_N": 40,
+      "limit_margin_N": 0.09125004934982428,
+      "passed": true
+    }
+  },
+  "minimum_actuator_margin_Nm": 0.0,
+  "sampled_interface_wrench_capability": {
+    "sample_dt_s": 0.05,
+    "raw_native_contacts": true,
+    "continuous_certificate": false,
+    "interfaces": {
+      "base_grasp": {
+        "samples": 359,
+        "failed_samples": 0,
+        "maximum_residual": 4.141167408988622e-09,
+        "passed": true
+      },
+      "base_support": {
+        "samples": 359,
+        "failed_samples": 0,
+        "maximum_residual": 0.0,
+        "passed": true
+      },
+      "moving_manipulation": {
+        "samples": 359,
+        "failed_samples": 0,
+        "maximum_residual": 3.1086244689504383e-15,
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  "unexpected_loaded_contact_penetrations_m": {},
+  "reference_geometry": {
+    "passed": true,
+    "samples": 959,
+    "continuous_certificate": false,
+    "reference_interpolation": "object_SE3_and_joint_Hermite_with_dense_robot_IK",
+    "released_gripper_reference": "native URDF open configuration after stationary opening dwell",
+    "projection_limit_rad": 0.02,
+    "projection_max_rad": 1.3531833888191791e-05,
+    "compliant_pad_allowance_m": 0.001,
+    "unintended_clearance_m": 0.001,
+    "violations": []
+  },
+  "object_pose_prescribed": false,
+  "object_equality_constraints_used": 0,
+  "internal_gripper_equalities": 6,
+  "controller": "impedance_feedforward",
+  "arm_measured_force_feedback": false,
+  "arm_force_selection": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "joint_nullspace_impedance": {
+    "stiffness": 40.0,
+    "damping": 8.0
+  },
+  "arm_reaction_feedforward": true,
+  "measured_jaw_force_feedback": true,
+  "jaw_force_fraction": 0.6,
+  "jaw_force_target_N": {
+    "base_grasp": 24.0,
+    "moving_manipulation": 24.0
+  },
+  "contacts_enabled": true,
+  "full_paper_pipeline_executed": false,
+  "variant": "full",
+  "selection": {
+    "selection_executed": true,
+    "selection_method": "exhaustive configured hardware-compatible P/G and fixed-through-sequence injective assignment candidates",
+    "candidate_count": 24,
+    "accepted_candidates": [
+      {
+        "types": [
+          "G",
+          "P",
+          "G"
+        ],
+        "assignment": [
+          0,
+          1,
+          2
+        ],
+        "objective": -124.69726108903862
+      }
+    ],
+    "rejections": [
+      {
+        "types": [
+          "G",
+          "P",
+          "G"
+        ],
+        "assignments": [
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ]
+        ],
+        "reason": "Point position/axis IK failed at tip"
+      },
+      {
+        "types": [
+          "G",
+          "P",
+          "G"
+        ],
+        "assignments": [
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ]
+        ],
+        "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+      },
+      {
+        "types": [
+          "G",
+          "P",
+          "G"
+        ],
+        "assignments": [
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ]
+        ],
+        "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+      },
+      {
+        "types": [
+          "G",
+          "P",
+          "G"
+        ],
+        "assignments": [
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ]
+        ],
+        "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+      },
+      {
+        "types": [
+          "G",
+          "P",
+          "G"
+        ],
+        "assignments": [
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ]
+        ],
+        "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+      },
+      {
+        "types": [
+          "G",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ]
+        ],
+        "reason": "Point position/axis IK failed at tip"
+      },
+      {
+        "types": [
+          "G",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ]
+        ],
+        "reason": "Point position/axis IK failed at tip"
+      },
+      {
+        "types": [
+          "G",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ]
+        ],
+        "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+      },
+      {
+        "types": [
+          "G",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ]
+        ],
+        "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+      },
+      {
+        "types": [
+          "G",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ]
+        ],
+        "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+      },
+      {
+        "types": [
+          "G",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ]
+        ],
+        "reason": "IK failed at paper_interface: position/orientation target is unreachable with this seed"
+      },
+      {
+        "types": [
+          "P",
+          "P",
+          "G"
+        ],
+        "assignments": [
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ]
+        ],
+        "reason": "Point position/axis IK failed at tip"
+      },
+      {
+        "types": [
+          "P",
+          "P",
+          "G"
+        ],
+        "assignments": [
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ]
+        ],
+        "reason": "Point position/axis IK failed at tip"
+      },
+      {
+        "types": [
+          "P",
+          "P",
+          "G"
+        ],
+        "assignments": [
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ]
+        ],
+        "reason": "Point position/axis IK failed at tip"
+      },
+      {
+        "types": [
+          "P",
+          "P",
+          "G"
+        ],
+        "assignments": [
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ]
+        ],
+        "reason": "Point position/axis IK failed at tip"
+      },
+      {
+        "types": [
+          "P",
+          "P",
+          "G"
+        ],
+        "assignments": [
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ]
+        ],
+        "reason": "Point position/axis IK failed at tip"
+      },
+      {
+        "types": [
+          "P",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ]
+        ],
+        "reason": "Point position/axis IK failed at tip"
+      },
+      {
+        "types": [
+          "P",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ],
+          [
+            0,
+            2,
+            1
+          ]
+        ],
+        "reason": "Point position/axis IK failed at tip"
+      },
+      {
+        "types": [
+          "P",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ],
+          [
+            1,
+            0,
+            2
+          ]
+        ],
+        "reason": "Point position/axis IK failed at tip"
+      },
+      {
+        "types": [
+          "P",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ],
+          [
+            1,
+            2,
+            0
+          ]
+        ],
+        "reason": "Point position/axis IK failed at tip"
+      },
+      {
+        "types": [
+          "P",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ],
+          [
+            2,
+            0,
+            1
+          ]
+        ],
+        "reason": "Point position/axis IK failed at tip"
+      },
+      {
+        "types": [
+          "P",
+          "P",
+          "P"
+        ],
+        "assignments": [
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            2,
+            1,
+            0
+          ]
+        ],
+        "reason": "Point position/axis IK failed at tip"
+      }
+    ],
+    "pruned_candidates": [
+      {
+        "types": [
+          "P",
+          "P",
+          "G"
+        ],
+        "assignments": [
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ],
+          [
+            0,
+            1,
+            2
+          ]
+        ],
+        "reason": "Dominated cost bound for these realized keyframes; no physical infeasibility claim",
+        "realized_keyframe_cost": -48.26608061893515,
+        "transition_cost_lower_bound": 0.0,
+        "sequence_cost_lower_bound": -48.26608061893515,
+        "incumbent_objective": -124.69726108903862
+      }
+    ],
+    "transition_cost_bound_scope": "Nonnegative interval objective conditional on each realized keyframe sequence; not a global IK bound",
+    "selected_types": [
+      "G",
+      "P",
+      "G"
+    ],
+    "selected_assignment": [
+      0,
+      1,
+      2
+    ],
+    "objective": -124.69726108903862,
+    "objective_definition": "sum keyframe geometry/posture minus robustness plus sum interval motion costs; no type penalty",
+    "planning_wall_time_s": 285.4950591779998,
+    "source_refinement_enabled": true,
+    "source_certificates": [
+      {
+        "synthetic_input": true,
+        "network_inference_executed": false,
+        "source_refinement_enabled": true,
+        "source_status": "failed_source_solve",
+        "source_certificate": false,
+        "source_rho": null,
+        "source_failure": "NLP rejected [ipopt]: Infeasible_Problem_Detected",
+        "source_failure_kind": "local_infeasibility_or_numerical_failure",
+        "source_diagnostics": {
+          "frozen_anchor_status": "PrimalInfeasible",
+          "frozen_anchor_certificate": false,
+          "frozen_anchor_rho": 1.673961083481433e-10,
+          "scope": "fixed anchors only; not global surface-refinement feasibility"
+        },
+        "source_geometry_fallback": true,
+        "source_forces_transferred": false,
+        "source_to_target_scale": 4.0,
+        "source_problem_identity": "ct-source-v2:1d81864c2a8451102df34ca2904da799579072bd24ba3ae91e340b785453fb1b",
+        "source_cache_hit": false,
+        "new_source_solver_executed": true
+      },
+      {
+        "synthetic_input": true,
+        "network_inference_executed": false,
+        "source_refinement_enabled": true,
+        "source_status": "failed_source_solve",
+        "source_certificate": false,
+        "source_rho": null,
+        "source_failure": "NLP rejected [ipopt]: Infeasible_Problem_Detected",
+        "source_failure_kind": "local_infeasibility_or_numerical_failure",
+        "source_diagnostics": {
+          "frozen_anchor_status": "PrimalInfeasible",
+          "frozen_anchor_certificate": false,
+          "frozen_anchor_rho": 1.673961083481433e-10,
+          "scope": "fixed anchors only; not global surface-refinement feasibility"
+        },
+        "source_geometry_fallback": true,
+        "source_forces_transferred": false,
+        "source_to_target_scale": 4.0,
+        "source_problem_identity": "ct-source-v2:1d81864c2a8451102df34ca2904da799579072bd24ba3ae91e340b785453fb1b",
+        "source_cache_hit": false,
+        "new_source_solver_executed": true
+      },
+      {
+        "synthetic_input": true,
+        "network_inference_executed": false,
+        "source_refinement_enabled": true,
+        "source_status": "failed_source_solve",
+        "source_certificate": false,
+        "source_rho": null,
+        "source_failure": "NLP rejected [ipopt]: Maximum_Iterations_Exceeded",
+        "source_failure_kind": "numerical_failure",
+        "source_diagnostics": {
+          "frozen_anchor_status": "PrimalInfeasible",
+          "frozen_anchor_certificate": false,
+          "frozen_anchor_rho": 1.8607005523619273e-12,
+          "scope": "fixed anchors only; not global surface-refinement feasibility"
+        },
+        "source_geometry_fallback": true,
+        "source_forces_transferred": false,
+        "source_to_target_scale": 4.0,
+        "source_problem_identity": "ct-source-v2:2cf293cd7614983a6ea9087107b88eeaba7d4cffd10061313504d8fe54da8b31",
+        "source_cache_hit": false,
+        "new_source_solver_executed": true
+      },
+      {
+        "synthetic_input": true,
+        "network_inference_executed": false,
+        "source_refinement_enabled": true,
+        "source_status": "failed_source_solve",
+        "source_certificate": false,
+        "source_rho": null,
+        "source_failure": "NLP rejected [ipopt]: Maximum_Iterations_Exceeded",
+        "source_failure_kind": "numerical_failure",
+        "source_diagnostics": {
+          "frozen_anchor_status": "PrimalInfeasible",
+          "frozen_anchor_certificate": false,
+          "frozen_anchor_rho": 1.8607005523619273e-12,
+          "scope": "fixed anchors only; not global surface-refinement feasibility"
+        },
+        "source_geometry_fallback": true,
+        "source_forces_transferred": false,
+        "source_to_target_scale": 4.0,
+        "source_problem_identity": "ct-source-v2:2cf293cd7614983a6ea9087107b88eeaba7d4cffd10061313504d8fe54da8b31",
+        "source_cache_hit": false,
+        "new_source_solver_executed": true
+      },
+      {
+        "synthetic_input": true,
+        "network_inference_executed": false,
+        "source_refinement_enabled": true,
+        "source_status": "failed_source_solve",
+        "source_certificate": false,
+        "source_rho": null,
+        "source_failure": "NLP rejected [ipopt]: Maximum_Iterations_Exceeded",
+        "source_failure_kind": "numerical_failure",
+        "source_diagnostics": {
+          "frozen_anchor_status": "PrimalInfeasible",
+          "frozen_anchor_certificate": false,
+          "frozen_anchor_rho": 4.868089380377295e-12,
+          "scope": "fixed anchors only; not global surface-refinement feasibility"
+        },
+        "source_geometry_fallback": true,
+        "source_forces_transferred": false,
+        "source_to_target_scale": 4.0,
+        "source_problem_identity": "ct-source-v2:92c86157ef058a8202f0a56d72f5d6391b6fd5bd644cf5a157df9f50ef9df64c",
+        "source_cache_hit": false,
+        "new_source_solver_executed": true
+      },
+      {
+        "synthetic_input": true,
+        "network_inference_executed": false,
+        "source_refinement_enabled": true,
+        "source_status": "failed_source_solve",
+        "source_certificate": false,
+        "source_rho": null,
+        "source_failure": "NLP rejected [ipopt]: Infeasible_Problem_Detected",
+        "source_failure_kind": "local_infeasibility_or_numerical_failure",
+        "source_diagnostics": {
+          "frozen_anchor_status": "PrimalInfeasible",
+          "frozen_anchor_certificate": false,
+          "frozen_anchor_rho": 5.284463120773359e-11,
+          "scope": "fixed anchors only; not global surface-refinement feasibility"
+        },
+        "source_geometry_fallback": true,
+        "source_forces_transferred": false,
+        "source_to_target_scale": 4.0,
+        "source_problem_identity": "ct-source-v2:4351df96805db7f335058259906d2f9f7a7ad8a99f75e66ebce0dccc961cb68f",
+        "source_cache_hit": false,
+        "new_source_solver_executed": true
+      },
+      {
+        "synthetic_input": true,
+        "network_inference_executed": false,
+        "source_refinement_enabled": true,
+        "source_status": "failed_source_solve",
+        "source_certificate": false,
+        "source_rho": null,
+        "source_failure": "NLP rejected [ipopt]: Infeasible_Problem_Detected",
+        "source_failure_kind": "local_infeasibility_or_numerical_failure",
+        "source_diagnostics": {
+          "frozen_anchor_status": "PrimalInfeasible",
+          "frozen_anchor_certificate": false,
+          "frozen_anchor_rho": 9.200366193163195e-11,
+          "scope": "fixed anchors only; not global surface-refinement feasibility"
+        },
+        "source_geometry_fallback": true,
+        "source_forces_transferred": false,
+        "source_to_target_scale": 4.0,
+        "source_problem_identity": "ct-source-v2:2c31f074d5d7ab83043a1193100c0785adb2e783f892d51b825998a5c3017f89",
+        "source_cache_hit": false,
+        "new_source_solver_executed": true
+      },
+      {
+        "synthetic_input": true,
+        "network_inference_executed": false,
+        "source_refinement_enabled": true,
+        "source_status": "failed_source_solve",
+        "source_certificate": false,
+        "source_rho": null,
+        "source_failure": "NLP rejected [ipopt]: Infeasible_Problem_Detected",
+        "source_failure_kind": "local_infeasibility_or_numerical_failure",
+        "source_diagnostics": {
+          "frozen_anchor_status": "PrimalInfeasible",
+          "frozen_anchor_certificate": false,
+          "frozen_anchor_rho": 9.200366193163195e-11,
+          "scope": "fixed anchors only; not global surface-refinement feasibility"
+        },
+        "source_geometry_fallback": true,
+        "source_forces_transferred": false,
+        "source_to_target_scale": 4.0,
+        "source_problem_identity": "ct-source-v2:2c31f074d5d7ab83043a1193100c0785adb2e783f892d51b825998a5c3017f89",
+        "source_cache_hit": false,
+        "new_source_solver_executed": true
+      }
+    ],
+    "target_keyframe_margins": [
+      18.708623147234288,
+      18.708623147234288,
+      18.443235659833558,
+      18.443235659833558,
+      15.150593332866379,
+      12.61193163535067,
+      12.278455197704071,
+      12.278455197704071
+    ],
+    "target_methods": [
+      {
+        "method": "coupled_target_NLP",
+        "static_torques_eliminated": true,
+        "posture_reference_rule": "hardware_seed",
+        "same_rho_force_polish": {
+          "witness_applied": true,
+          "status": "Solved",
+          "rho": 18.708623147234288,
+          "primal_residual": 2.9312552385363233e-10
+        }
+      },
+      {
+        "method": "coupled_target_NLP",
+        "static_torques_eliminated": true,
+        "posture_reference_rule": "hardware_seed",
+        "same_rho_force_polish": {
+          "witness_applied": true,
+          "status": "Solved",
+          "rho": 18.708623147234288,
+          "primal_residual": 2.9312552385363233e-10
+        },
+        "identical_keyframe_reuse": true,
+        "new_target_solver_executed": false,
+        "reuse_scope": "identical pose, transferred prior, force mode, environment and posture reference"
+      },
+      {
+        "method": "fixed_geometry_separable_target",
+        "posture_solver": "Solve_Succeeded",
+        "torque_free_rho_upper_bound": 18.443235659833558,
+        "same_rho_torque_feasibility": true,
+        "posture_global_optimality_claimed": false,
+        "posture_reference_rule": "hardware_seed",
+        "same_rho_force_polish": {
+          "witness_applied": true,
+          "status": "AlmostSolved",
+          "rho": 18.443235659833558,
+          "primal_residual": 7.008489788518091e-08
+        }
+      },
+      {
+        "method": "fixed_geometry_separable_target",
+        "posture_solver": "Solve_Succeeded",
+        "torque_free_rho_upper_bound": 18.443235659833558,
+        "same_rho_torque_feasibility": true,
+        "posture_global_optimality_claimed": false,
+        "posture_reference_rule": "hardware_seed",
+        "same_rho_force_polish": {
+          "witness_applied": true,
+          "status": "AlmostSolved",
+          "rho": 18.443235659833558,
+          "primal_residual": 7.008489788518091e-08
+        },
+        "identical_keyframe_reuse": true,
+        "new_target_solver_executed": false,
+        "reuse_scope": "identical pose, transferred prior, force mode, environment and posture reference"
+      },
+      {
+        "method": "fixed_geometry_separable_target",
+        "posture_solver": "Solve_Succeeded",
+        "torque_free_rho_upper_bound": 15.150593332866379,
+        "same_rho_torque_feasibility": true,
+        "posture_global_optimality_claimed": false,
+        "posture_reference_rule": "hardware_seed",
+        "same_rho_force_polish": {
+          "witness_applied": true,
+          "status": "AlmostSolved",
+          "rho": 15.150593332866379,
+          "primal_residual": 8.528980544042497e-08
+        }
+      },
+      {
+        "method": "coupled_target_NLP",
+        "static_torques_eliminated": true,
+        "posture_reference_rule": "hardware_seed",
+        "same_rho_force_polish": {
+          "witness_applied": false,
+          "rejected_reason": "Condensed allocation rejected: AlmostSolved"
+        }
+      },
+      {
+        "method": "coupled_target_NLP",
+        "static_torques_eliminated": true,
+        "posture_reference_rule": "hardware_seed",
+        "same_rho_force_polish": {
+          "witness_applied": true,
+          "status": "AlmostSolved",
+          "rho": 12.278455197704071,
+          "primal_residual": 7.133894612820768e-07
+        }
+      },
+      {
+        "method": "coupled_target_NLP",
+        "static_torques_eliminated": true,
+        "posture_reference_rule": "hardware_seed",
+        "same_rho_force_polish": {
+          "witness_applied": true,
+          "status": "AlmostSolved",
+          "rho": 12.278455197704071,
+          "primal_residual": 7.133894612820768e-07
+        },
+        "identical_keyframe_reuse": true,
+        "new_target_solver_executed": false,
+        "reuse_scope": "identical pose, transferred prior, force mode, environment and posture reference"
+      }
+    ],
+    "actual_interval_nodes": [
+      16,
+      16,
+      16,
+      16,
+      16,
+      16,
+      16
+    ],
+    "solver_configuration": {
+      "max_iterations": 1000,
+      "tolerance": 1e-06,
+      "acceptance_tolerance": 2e-06,
+      "backend": "ipopt",
+      "options": {
+        "expand": false,
+        "ipopt.max_cpu_time": 180.0,
+        "ipopt.mu_strategy": "adaptive",
+        "ipopt.mu_init": 1e-05,
+        "ipopt.bound_push": 1e-08,
+        "ipopt.bound_frac": 1e-08,
+        "ipopt.slack_bound_push": 1e-08,
+        "ipopt.slack_bound_frac": 1e-08,
+        "ipopt.acceptable_tol": 0.0001,
+        "ipopt.acceptable_constr_viol_tol": 1e-06,
+        "ipopt.acceptable_compl_inf_tol": 0.0001,
+        "ipopt.acceptable_dual_inf_tol": 0.001,
+        "ipopt.acceptable_obj_change_tol": 1e-06,
+        "ipopt.acceptable_iter": 8
+      },
+      "allow_experimental": false
+    },
+    "stage_cache_counts": {
+      "cached": 0,
+      "fresh": 23
+    },
+    "all_keyframes_optimized": true,
+    "all_intervals_cito_optimized": false,
+    "all_moving_object_intervals_cito_optimized": true,
+    "interval_methods": [
+      "stationary_contact_conic_QP",
+      "motion_cost",
+      "stationary_contact_conic_QP",
+      "motion_cost",
+      "motion_cost",
+      "motion_cost",
+      "stationary_contact_conic_QP"
+    ],
+    "keyframes": 8,
+    "intervals": 7,
+    "restricted_contact_candidates": true,
+    "sampled_geometry": true,
+    "continuous_certificate": false,
+    "configuration_update": [
+      "independent_midpoint",
+      "contact_coordinate_midpoint",
+      "independent_midpoint",
+      "contact_coordinate_midpoint",
+      "contact_coordinate_midpoint",
+      "contact_coordinate_midpoint",
+      "independent_midpoint"
+    ],
+    "manuscript_literal_equations_passed": false,
+    "extension": "free articulated object",
+    "full_paper_pipeline_executed": false
+  },
+  "full_variant_pipeline_executed": true,
+  "all_intervals_cito_optimized": false,
+  "interval_methods": [
+    "stationary_contact_conic_QP",
+    "motion_cost",
+    "stationary_contact_conic_QP",
+    "motion_cost",
+    "motion_cost",
+    "motion_cost",
+    "stationary_contact_conic_QP"
+  ],
+  "fixed_path_integration_residuals": null,
+  "trial_wall_time_s": 481.68042645100013,
+  "new_physical_trial_executed": true
+}
