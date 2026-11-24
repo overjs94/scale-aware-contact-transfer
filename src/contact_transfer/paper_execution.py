@@ -152,7 +152,7 @@ class CoupledContactController:
         for i,R in enumerate(rotations):self.measured[i]=np.r_[R.T@self.filtered[i,:3],self.filtered[i,3:]]
 
     def command(self,q,v,qd,vd,ad):
-        i,k,_=self.episode.phase(self.t);reactions=self.episode.reactions(self.t);out=[];force_error=[];jaw=[];saturation=[]
+        i,k,_=self.episode.phase(self.t);reactions=self.desired_reactions(q,v,qd,vd,ad);out=[];force_error=[];jaw=[];saturation=[]
         for j,(r,servo,spec,cap,frame,point,R,a,b,fingers) in enumerate(zip(self.robots,self.servos,self.case.data['arms'],self.problem.capabilities,self.problem.frames,self.episode.keyframes[i].positions,self.episode.keyframes[i].rotations,self.offsets[:-1],self.offsets[1:],self.fingers)):
             T=r.fk(q[a:b],frame);object_R=self.object_rotations[j];object_p=self.object_positions[j];Rc=object_R@R;w=reactions[j];F=Rc@w[3:];M=Rc@w[:3]
             active=self.episode.attached(j,self.t)
@@ -163,7 +163,7 @@ class CoupledContactController:
             if isinstance(servo,HybridPositionAdmittance):tau=servo.command(q[a:b],qd[a:b],vd[a:b],**inputs)
             else:tau=servo.command(q[a:b],v[a:b],qd[a:b],vd[a:b],ad[a:b],**inputs)
             if self.gripper_servos[j]:
-                profile=spec['gripper_profile'];positions=dict(zip(r.joint_names,q[a:b]));velocities=dict(zip(r.joint_names,v[a:b]));theta=self.gripper_servos[j].command(positions,velocities,self.jaw_measured[j],self.episode.jaw_force_fraction*cap.closing_force_per_finger,self.dt,active)
+                profile=spec['gripper_profile'];positions=dict(zip(r.joint_names,q[a:b]));velocities=dict(zip(r.joint_names,v[a:b]));theta=self.gripper_servos[j].command(positions,velocities,self.jaw_measured[j],self.jaw_target(j,cap),self.dt,active)
                 for finger in fingers:tau[finger]=theta if r.joint_names[finger] in profile['drivers'] else 0.
             elif fingers:
                 maximum_force=float(np.max(self.jaw_measured[j]));mean_velocity=float(np.mean(v[a+np.asarray(fingers)]));center_error=q[a+fingers[0]]-q[a+fingers[1]];center_velocity=v[a+fingers[0]]-v[a+fingers[1]]
@@ -184,6 +184,13 @@ class CoupledContactController:
             out.extend(tau);force_error.append(contact_coordinates(T[:3,:3],Rc)@(self.measured[j]-desired));jaw.append(self.jaw_measured[j].tolist());saturation.append(servo.last.get('saturated',False))
         self.logs.append(dict(time=self.t,force_error=np.asarray(force_error).tolist(),jaw_force=jaw,saturated=saturation))
         return np.asarray(out)
+
+    def desired_reactions(self,q,v,qd,vd,ad):
+        return self.episode.reactions(self.t)
+
+    def jaw_target(self,arm,cap):
+        hardware=getattr(self.problem,'hardware_capabilities',self.problem.capabilities)[arm]
+        return self.episode.jaw_force_fraction*hardware.closing_force_per_finger
 
 
 def run_coupled_episode(episode,output):

@@ -259,7 +259,8 @@ Peak base-position error is 98.03 mm; required contact fractions remain at
 least 99.49%, sampled interface admissibility passes, jaw peaks remain below
 40 N and minimum actuator headroom is 1.10 Nm. This does not reproduce a
 fixed-pose conic infeasibility. It exposes a closed-loop tracking limitation.
-The nominal jaw target is 18 N while the planning capability allows up to
+The recorded box nominal jaw target is **24 N** (fraction 0.6), while the
+planning capability allows up to
 40 N per jaw; the controller does not implement an online optimal allocation
 for every disturbance vertex. These facts motivate checking preload/allocation
 consistency and feedback under load. They do not identify a unique cause or

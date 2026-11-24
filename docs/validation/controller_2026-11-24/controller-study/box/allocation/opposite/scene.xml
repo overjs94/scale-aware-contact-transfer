@@ -1,0 +1,464 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mujoco model="full_box">
+  <compiler angle="radian" inertiafromgeom="false" fusestatic="false" />
+  <option timestep="0.001" gravity="0 0 -9.81" integrator="implicitfast" cone="elliptic" impratio="100" iterations="100" tolerance="1e-10" />
+  <asset>
+    <mesh name="arm0_panda_link0_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link0.stl" scale="1 1 1" />
+    <mesh name="arm0_panda_link1_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link1.stl" scale="1 1 1" />
+    <mesh name="arm0_panda_link2_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link2.stl" scale="1 1 1" />
+    <mesh name="arm0_panda_link3_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link3.stl" scale="1 1 1" />
+    <mesh name="arm0_panda_link4_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link4.stl" scale="1 1 1" />
+    <mesh name="arm0_panda_link5_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link5.stl" scale="1 1 1" />
+    <mesh name="arm0_panda_link6_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link6.stl" scale="1 1 1" />
+    <mesh name="arm0_panda_link7_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link7.stl" scale="1 1 1" />
+    <mesh name="arm0_base_mount_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/robotiq_2f85/assets/base_mount.stl" scale="0.001 0.001 0.001" />
+    <mesh name="arm0_base_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/robotiq_2f85/assets/base.stl" scale="0.001 0.001 0.001" />
+    <mesh name="arm0_right_driver_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/robotiq_2f85/assets/driver.stl" scale="0.001 0.001 0.001" />
+    <mesh name="arm0_right_coupler_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/robotiq_2f85/assets/coupler.stl" scale="0.001 0.001 0.001" />
+    <mesh name="arm0_right_spring_link_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/robotiq_2f85/assets/spring_link.stl" scale="0.001 0.001 0.001" />
+    <mesh name="arm0_right_follower_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/robotiq_2f85/assets/follower.stl" scale="0.001 0.001 0.001" />
+    <mesh name="arm0_left_driver_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/robotiq_2f85/assets/driver.stl" scale="0.001 0.001 0.001" />
+    <mesh name="arm0_left_coupler_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/robotiq_2f85/assets/coupler.stl" scale="0.001 0.001 0.001" />
+    <mesh name="arm0_left_spring_link_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/robotiq_2f85/assets/spring_link.stl" scale="0.001 0.001 0.001" />
+    <mesh name="arm0_left_follower_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/robotiq_2f85/assets/follower.stl" scale="0.001 0.001 0.001" />
+    <mesh name="arm1_panda_link0_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link0.stl" scale="1 1 1" />
+    <mesh name="arm1_panda_link1_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link1.stl" scale="1 1 1" />
+    <mesh name="arm1_panda_link2_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link2.stl" scale="1 1 1" />
+    <mesh name="arm1_panda_link3_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link3.stl" scale="1 1 1" />
+    <mesh name="arm1_panda_link4_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link4.stl" scale="1 1 1" />
+    <mesh name="arm1_panda_link5_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link5.stl" scale="1 1 1" />
+    <mesh name="arm1_panda_link6_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link6.stl" scale="1 1 1" />
+    <mesh name="arm1_panda_link7_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link7.stl" scale="1 1 1" />
+    <mesh name="arm2_panda_link0_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link0.stl" scale="1 1 1" />
+    <mesh name="arm2_panda_link1_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link1.stl" scale="1 1 1" />
+    <mesh name="arm2_panda_link2_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link2.stl" scale="1 1 1" />
+    <mesh name="arm2_panda_link3_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link3.stl" scale="1 1 1" />
+    <mesh name="arm2_panda_link4_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link4.stl" scale="1 1 1" />
+    <mesh name="arm2_panda_link5_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link5.stl" scale="1 1 1" />
+    <mesh name="arm2_panda_link6_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link6.stl" scale="1 1 1" />
+    <mesh name="arm2_panda_link7_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/panda_meshes/link7.stl" scale="1 1 1" />
+    <mesh name="arm2_base_mount_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/robotiq_2f85/assets/base_mount.stl" scale="0.001 0.001 0.001" />
+    <mesh name="arm2_base_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/robotiq_2f85/assets/base.stl" scale="0.001 0.001 0.001" />
+    <mesh name="arm2_right_driver_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/robotiq_2f85/assets/driver.stl" scale="0.001 0.001 0.001" />
+    <mesh name="arm2_right_coupler_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/robotiq_2f85/assets/coupler.stl" scale="0.001 0.001 0.001" />
+    <mesh name="arm2_right_spring_link_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/robotiq_2f85/assets/spring_link.stl" scale="0.001 0.001 0.001" />
+    <mesh name="arm2_right_follower_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/robotiq_2f85/assets/follower.stl" scale="0.001 0.001 0.001" />
+    <mesh name="arm2_left_driver_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/robotiq_2f85/assets/driver.stl" scale="0.001 0.001 0.001" />
+    <mesh name="arm2_left_coupler_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/robotiq_2f85/assets/coupler.stl" scale="0.001 0.001 0.001" />
+    <mesh name="arm2_left_spring_link_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/robotiq_2f85/assets/spring_link.stl" scale="0.001 0.001 0.001" />
+    <mesh name="arm2_left_follower_mesh_0" file="/workspace/scale-aware-contact-transfer/.cache/robotiq_2f85/assets/follower.stl" scale="0.001 0.001 0.001" />
+  </asset>
+  <worldbody>
+    <body name="arm0_urdf_panda_link0" pos="-0.55 -0.45 0" quat="0.9417954393612555 0 0 0.3361864815817844">
+      <body name="arm0_panda_link1" pos="0 0 0.333" quat="1 0 0 0">
+        <joint name="arm0_panda_joint1" type="hinge" axis="0 0 1" damping="0" armature="0" limited="true" range="-2.8973 2.8973" />
+        <body name="arm0_panda_link2" pos="0 0 0" quat="-0.7071067811865475 0.7071067811865475 0 0">
+          <joint name="arm0_panda_joint2" type="hinge" axis="0 0 1" damping="0" armature="0" limited="true" range="-1.7628 1.7628" />
+          <body name="arm0_panda_link3" pos="0 -0.316 0" quat="0.7071067811865475 0.7071067811865475 0 0">
+            <joint name="arm0_panda_joint3" type="hinge" axis="0 0 1" damping="0" armature="0" limited="true" range="-2.8973 2.8973" />
+            <body name="arm0_panda_link4" pos="0.0825 0 0" quat="0.7071067811865475 0.7071067811865475 0 0">
+              <joint name="arm0_panda_joint4" type="hinge" axis="0 0 1" damping="0" armature="0" limited="true" range="-3.0718 -0.0698" />
+              <body name="arm0_panda_link5" pos="-0.0825 0.384 0" quat="-0.7071067811865475 0.7071067811865475 0 0">
+                <joint name="arm0_panda_joint5" type="hinge" axis="0 0 1" damping="0" armature="0" limited="true" range="-2.8973 2.8973" />
+                <body name="arm0_panda_link6" pos="0 0 0" quat="0.7071067811865475 0.7071067811865475 0 0">
+                  <joint name="arm0_panda_joint6" type="hinge" axis="0 0 1" damping="0" armature="0" limited="true" range="-0.0175 3.7525" />
+                  <body name="arm0_panda_link7" pos="0.08799999999999999 0 0" quat="0.7071067811865475 0.7071067811865475 0 0">
+                    <joint name="arm0_panda_joint7" type="hinge" axis="0 0 1" damping="0" armature="0" limited="true" range="-2.8973 2.8973" />
+                    <body name="arm0_panda_link8" pos="0 0 0.107" quat="1 0 0 0">
+                      <body name="arm0_base_mount" pos="0 0 0.007" quat="-0.3826834323650901 0 0 0.9238795325112867">
+                        <body name="arm0_base" pos="0 0 0.0038" quat="0.7071067811865479 0 0 -0.7071067811865472">
+                          <body name="arm0_right_driver" pos="0 0.0306011 0.054904" quat="1 0 0 0">
+                            <joint name="arm0_right_driver_joint" type="hinge" axis="1 0 0" damping="0.1" armature="0.005" limited="true" range="0 0.8" stiffness="0.0" springref="0.0" />
+                            <body name="arm0_right_coupler" pos="0 0.0315 -0.0041" quat="1 0 0 0">
+                              <joint name="arm0_right_coupler_joint" type="hinge" axis="1 0 0" damping="0.0" armature="0.001" limited="true" range="-1.57 0" stiffness="0.0" springref="0.0" />
+                              <inertial pos="0 0.00301209 0.0232175" mass="0.0140974" fullinertia="3.52216e-06 4.107847881858289e-06 9.423431181417108e-07 6.502441716830111e-23 -4.638389984076993e-23 -4.177890280777638e-07" />
+                              <geom name="arm0_right_coupler_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm0_right_coupler_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                            </body>
+                            <inertial pos="2.96931e-12 0.0177547 0.00107314" mass="0.00899563" fullinertia="1.72352e-06 3.286147391312248e-07 1.602451260868775e-06 0 0 -9.198982933397988e-08" />
+                            <geom name="arm0_right_driver_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm0_right_driver_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                          </body>
+                          <body name="arm0_right_spring_link" pos="0 0.0132 0.0609" quat="1 0 0 0">
+                            <joint name="arm0_right_spring_link_joint" type="hinge" axis="1 0 0" damping="0.00125" armature="0.001" limited="true" range="-0.29670597283 0.8" stiffness="0.05" springref="2.62" />
+                            <body name="arm0_right_follower" pos="0 0.03700000000000001 0.044" quat="1 0 0 0">
+                              <joint name="arm0_right_follower_joint" type="hinge" axis="1 0 0" damping="0.0" armature="0.001" limited="true" range="-0.872664 0.872664" stiffness="0.0" springref="0.0" />
+                              <body name="arm0_right_pad" pos="0 -0.0009000000000000015 0.007020000000000001" quat="1 0 0 0">
+                                <body name="arm0_right_silicone_pad" pos="0 0 0" quat="1 0 0 0">
+                                  <inertial pos="-4.761896082112331e-19 -0.00579999995231628 0.01851737527478257" mass="0.001302811839479651" fullinertia="1.495360064459362e-07 2.008043211325311e-07 5.182418100517515e-08 1.707577901963573e-23 0 0" />
+                                </body>
+                                <inertial pos="0 -0.0025 0.0185" mass="0.0035" fullinertia="3.64583e-07 4.73958e-07 1.23958e-07 3.642919299551296e-23 0 0" />
+                                <geom name="arm0_right_pad_collision_0" pos="0 -0.0026 0.028125" quat="1 0 0 0" mass="0" type="box" size="0.011 0.004 0.009375" contype="2" conaffinity="3" rgba="0 0 0 0" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                                <geom name="arm0_right_pad_collision_1" pos="0 -0.0026 0.009375" quat="1 0 0 0" mass="0" type="box" size="0.011 0.004 0.009375" contype="2" conaffinity="3" rgba="0 0 0 0" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                              </body>
+                              <inertial pos="0 0.006953999999999998 0.0059786" mass="0.0125222" fullinertia="2.67415e-06 2.26148834591832e-06 7.964426540816798e-07 0 0 5.679945840392977e-07" />
+                              <geom name="arm0_right_follower_collision_0" pos="0 0.018 -0.0065" quat="1 0 0 0" mass="0" type="mesh" mesh="arm0_right_follower_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                            </body>
+                            <inertial pos="-8.650050000000001e-09 0.0181624 0.0212658" mass="0.0221642" fullinertia="6.71733e-06 6.299061790003087e-06 5.308778209996913e-06 -4.643709972073225e-23 -3.470151394199613e-22 -3.125634505167317e-06" />
+                            <geom name="arm0_right_spring_link_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm0_right_spring_link_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                          </body>
+                          <body name="arm0_left_driver" pos="0 -0.0306011 0.054904" quat="6.123233995736766e-17 0 0 1">
+                            <joint name="arm0_left_driver_joint" type="hinge" axis="1 0 0" damping="0.1" armature="0.005" limited="true" range="0 0.8" stiffness="0.0" springref="0.0" />
+                            <body name="arm0_left_coupler" pos="0 0.0315 -0.0041" quat="1 0 0 0">
+                              <joint name="arm0_left_coupler_joint" type="hinge" axis="1 0 0" damping="0.0" armature="0.001" limited="true" range="-1.57 0" stiffness="0.0" springref="0.0" />
+                              <inertial pos="0 0.00301209 0.0232175" mass="0.0140974" fullinertia="3.52216e-06 4.107847881858289e-06 9.423431181417108e-07 6.502441716830111e-23 -4.638389984076993e-23 -4.177890280777638e-07" />
+                              <geom name="arm0_left_coupler_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm0_left_coupler_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                            </body>
+                            <inertial pos="0 0.0177547 0.00107314" mass="0.00899563" fullinertia="1.72352e-06 3.286147391312248e-07 1.602451260868775e-06 0 0 -9.198982933397988e-08" />
+                            <geom name="arm0_left_driver_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm0_left_driver_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                          </body>
+                          <body name="arm0_left_spring_link" pos="0 -0.0132 0.0609" quat="6.123233995736766e-17 0 0 1">
+                            <joint name="arm0_left_spring_link_joint" type="hinge" axis="1 0 0" damping="0.00125" armature="0.001" limited="true" range="-0.29670597283 0.8" stiffness="0.05" springref="2.62" />
+                            <body name="arm0_left_follower" pos="0 0.03700000000000001 0.044" quat="1 0 0 0">
+                              <joint name="arm0_left_follower_joint" type="hinge" axis="1 0 0" damping="0.0" armature="0.001" limited="true" range="-0.872664 0.872664" stiffness="0.0" springref="0.0" />
+                              <body name="arm0_left_pad" pos="0 -0.0009000000000000015 0.007020000000000001" quat="1 0 0 0">
+                                <body name="arm0_left_silicone_pad" pos="0 0 0" quat="1 0 0 0">
+                                  <inertial pos="-4.761896082112331e-19 -0.00579999995231628 0.01851737527478257" mass="0.001302811839479651" fullinertia="1.495360064459362e-07 2.008043211325311e-07 5.182418100517515e-08 1.707577901963573e-23 0 0" />
+                                </body>
+                                <inertial pos="0 -0.0025 0.0185" mass="0.0035" fullinertia="3.64583e-07 4.73958e-07 1.23958e-07 3.642919299551296e-23 0 0" />
+                                <geom name="arm0_left_pad_collision_0" pos="0 -0.0026 0.028125" quat="1 0 0 0" mass="0" type="box" size="0.011 0.004 0.009375" contype="2" conaffinity="3" rgba="0 0 0 0" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                                <geom name="arm0_left_pad_collision_1" pos="0 -0.0026 0.009375" quat="1 0 0 0" mass="0" type="box" size="0.011 0.004 0.009375" contype="2" conaffinity="3" rgba="0 0 0 0" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                              </body>
+                              <inertial pos="0 0.006953999999999998 0.0059786" mass="0.0125222" fullinertia="2.67415e-06 2.26148834591832e-06 7.964426540816798e-07 0 0 5.679945840392977e-07" />
+                              <geom name="arm0_left_follower_collision_0" pos="0 0.018 -0.0065" quat="1 0 0 0" mass="0" type="mesh" mesh="arm0_left_follower_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                            </body>
+                            <inertial pos="-8.650050000000001e-09 0.0181624 0.0212658" mass="0.0221642" fullinertia="6.71733e-06 6.299061790003087e-06 5.308778209996913e-06 -4.643709972073225e-23 -3.470151394199613e-22 -3.125634505167317e-06" />
+                            <geom name="arm0_left_spring_link_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm0_left_spring_link_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                          </body>
+                          <inertial pos="0 -2.70394e-05 0.0354675" mass="0.777441" fullinertia="0.000260285 0.0002253803208647791 0.0001527086791352208 0 0 -2.221583504616969e-07" />
+                          <geom name="arm0_base_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm0_base_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                        </body>
+                        <body name="arm0_tip" pos="-5.979591821692054e-15 3.469446951953614e-18 0.1458996219755222" quat="0.7071067811865477 -7.304855164026266e-14 -7.304855164026261e-14 0.7071067811865474">
+                          <body name="arm0_paper_interface" pos="1.232595164407831e-32 -0.02 0.001000000000000001" quat="-0.7071067811865475 0.7071067811865475 -7.850462293418875e-17 -7.850462293418873e-17" />
+                        </body>
+                        <inertial pos="-0.0003605835958214157 8.536274800937428e-05 -5.919914145050651e-05" mass="0.15000285516377976" fullinertia="5.217217254326269e-05 5.359968409474151e-05 0.0001023450827039944 -2.115785307883065e-09 -1.427799658450661e-07 1.27515898763773e-09" />
+                        <geom name="arm0_base_mount_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm0_base_mount_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                      </body>
+                    </body>
+                    <inertial pos="0.010517 -0.004252 0.061597" mass="0.735522" fullinertia="0.012516 0.010027 0.004815 -0.000428 -0.001196 -0.000741" />
+                    <geom name="arm0_panda_link7_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm0_panda_link7_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                  </body>
+                  <inertial pos="0.060149 -0.014117 -0.010517" mass="1.666555" fullinertia="0.001964 0.004354 0.005433 0.000109 -0.001158 0.000341" />
+                  <geom name="arm0_panda_link6_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm0_panda_link6_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                </body>
+                <inertial pos="-0.011953 0.041065 -0.038437" mass="1.225946" fullinertia="0.035549 0.029474 0.008626999999999999 -0.002117 -0.004037 0.000229" />
+                <geom name="arm0_panda_link5_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm0_panda_link5_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+              </body>
+              <inertial pos="-0.05317 0.104419 0.027454" mass="3.587895" fullinertia="0.025853 0.019552 0.028323 0.007796 -0.001332 0.008640999999999999" />
+              <geom name="arm0_panda_link4_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm0_panda_link4_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+            </body>
+            <inertial pos="0.027518 0.039252 -0.06650200000000001" mass="3.228604" fullinertia="0.037242 0.036155 0.01083 -0.004761 -0.011396 -0.012805" />
+            <geom name="arm0_panda_link3_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm0_panda_link3_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+          </body>
+          <inertial pos="-0.003141 -0.02872 0.003495" mass="0.646926" fullinertia="0.007962 0.02811 0.025995 -0.003925 0.010254 0.000704" />
+          <geom name="arm0_panda_link2_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm0_panda_link2_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+        </body>
+        <inertial pos="0.003875 0.002081 -0.04762" mass="4.970684" fullinertia="0.7033700000000001 0.70661 0.009117 -0.000139 0.006772 0.019169" />
+        <geom name="arm0_panda_link1_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm0_panda_link1_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+      </body>
+      <inertial pos="-0.041018 -0.00014 0.049974" mass="0.629769" fullinertia="0.00315 0.00388 0.004285 8.2904e-07 0.00015 8.229900000000001e-06" />
+      <geom name="arm0_panda_link0_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm0_panda_link0_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+    </body>
+    <body name="arm1_urdf_panda_link0" pos="0.45 -0.55 0" quat="0.4282302007931816 0 0 0.9036696825326339">
+      <body name="arm1_panda_link1" pos="0 0 0.333" quat="1 0 0 0">
+        <joint name="arm1_panda_joint1" type="hinge" axis="0 0 1" damping="0" armature="0" limited="true" range="-2.8973 2.8973" />
+        <body name="arm1_panda_link2" pos="0 0 0" quat="-0.7071067811865475 0.7071067811865475 0 0">
+          <joint name="arm1_panda_joint2" type="hinge" axis="0 0 1" damping="0" armature="0" limited="true" range="-1.7628 1.7628" />
+          <body name="arm1_panda_link3" pos="0 -0.316 0" quat="0.7071067811865475 0.7071067811865475 0 0">
+            <joint name="arm1_panda_joint3" type="hinge" axis="0 0 1" damping="0" armature="0" limited="true" range="-2.8973 2.8973" />
+            <body name="arm1_panda_link4" pos="0.0825 0 0" quat="0.7071067811865475 0.7071067811865475 0 0">
+              <joint name="arm1_panda_joint4" type="hinge" axis="0 0 1" damping="0" armature="0" limited="true" range="-3.0718 -0.0698" />
+              <body name="arm1_panda_link5" pos="-0.0825 0.384 0" quat="-0.7071067811865475 0.7071067811865475 0 0">
+                <joint name="arm1_panda_joint5" type="hinge" axis="0 0 1" damping="0" armature="0" limited="true" range="-2.8973 2.8973" />
+                <body name="arm1_panda_link6" pos="0 0 0" quat="0.7071067811865475 0.7071067811865475 0 0">
+                  <joint name="arm1_panda_joint6" type="hinge" axis="0 0 1" damping="0" armature="0" limited="true" range="-0.0175 3.7525" />
+                  <body name="arm1_panda_link7" pos="0.08799999999999999 0 0" quat="0.7071067811865475 0.7071067811865475 0 0">
+                    <joint name="arm1_panda_joint7" type="hinge" axis="0 0 1" damping="0" armature="0" limited="true" range="-2.8973 2.8973" />
+                    <body name="arm1_panda_link8" pos="0 0 0.107" quat="1 0 0 0">
+                      <body name="arm1_extension" pos="0 0 0" quat="1 0 0 0">
+                        <body name="arm1_tool" pos="0 0 0.14" quat="1 0 0 0">
+                          <body name="arm1_tip" pos="0 0 0.025" quat="1 0 0 0" />
+                          <inertial pos="0 0 0" mass="0.05" fullinertia="1.25001075e-05 1.25001075e-05 1.25001075e-05 0 0 0" />
+                          <geom name="arm1_tool_visual_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="sphere" size=".025" contype="0" conaffinity="0" rgba=".9 .55 .2 1" />
+                          <geom name="arm1_tool_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="sphere" size=".025" contype="2" conaffinity="3" rgba="0 0 0 0" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                        </body>
+                        <inertial pos="0 0 0.07000000000000001" mass="0.05" fullinertia="8.247e-05 8.247e-05 1.6e-06 0 0 0" />
+                        <geom name="arm1_extension_visual_0" pos="0 0 0.07000000000000001" quat="1 0 0 0" mass="0" type="cylinder" size="0.008 0.07000000000000001" contype="0" conaffinity="0" rgba=".2 .22 .25 1" />
+                        <geom name="arm1_extension_collision_0" pos="0 0 0.07000000000000001" quat="1 0 0 0" mass="0" type="cylinder" size="0.008 0.07000000000000001" contype="2" conaffinity="3" rgba="0 0 0 0" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                      </body>
+                    </body>
+                    <inertial pos="0.010517 -0.004252 0.061597" mass="0.735522" fullinertia="0.012516 0.010027 0.004815 -0.000428 -0.001196 -0.000741" />
+                    <geom name="arm1_panda_link7_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm1_panda_link7_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                  </body>
+                  <inertial pos="0.060149 -0.014117 -0.010517" mass="1.666555" fullinertia="0.001964 0.004354 0.005433 0.000109 -0.001158 0.000341" />
+                  <geom name="arm1_panda_link6_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm1_panda_link6_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                </body>
+                <inertial pos="-0.011953 0.041065 -0.038437" mass="1.225946" fullinertia="0.035549 0.029474 0.008626999999999999 -0.002117 -0.004037 0.000229" />
+                <geom name="arm1_panda_link5_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm1_panda_link5_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+              </body>
+              <inertial pos="-0.05317 0.104419 0.027454" mass="3.587895" fullinertia="0.025853 0.019552 0.028323 0.007796 -0.001332 0.008640999999999999" />
+              <geom name="arm1_panda_link4_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm1_panda_link4_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+            </body>
+            <inertial pos="0.027518 0.039252 -0.06650200000000001" mass="3.228604" fullinertia="0.037242 0.036155 0.01083 -0.004761 -0.011396 -0.012805" />
+            <geom name="arm1_panda_link3_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm1_panda_link3_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+          </body>
+          <inertial pos="-0.003141 -0.02872 0.003495" mass="0.646926" fullinertia="0.007962 0.02811 0.025995 -0.003925 0.010254 0.000704" />
+          <geom name="arm1_panda_link2_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm1_panda_link2_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+        </body>
+        <inertial pos="0.003875 0.002081 -0.04762" mass="4.970684" fullinertia="0.7033700000000001 0.70661 0.009117 -0.000139 0.006772 0.019169" />
+        <geom name="arm1_panda_link1_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm1_panda_link1_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+      </body>
+      <inertial pos="-0.041018 -0.00014 0.049974" mass="0.629769" fullinertia="0.00315 0.00388 0.004285 8.2904e-07 0.00015 8.229900000000001e-06" />
+      <geom name="arm1_panda_link0_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm1_panda_link0_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+    </body>
+    <body name="arm2_urdf_panda_link0" pos="0.1 0.5 0.4" quat="-0.6407474392457674 0 0 0.767751730118527">
+      <body name="arm2_panda_link1" pos="0 0 0.333" quat="1 0 0 0">
+        <joint name="arm2_panda_joint1" type="hinge" axis="0 0 1" damping="0" armature="0" limited="true" range="-2.8973 2.8973" />
+        <body name="arm2_panda_link2" pos="0 0 0" quat="-0.7071067811865475 0.7071067811865475 0 0">
+          <joint name="arm2_panda_joint2" type="hinge" axis="0 0 1" damping="0" armature="0" limited="true" range="-1.7628 1.7628" />
+          <body name="arm2_panda_link3" pos="0 -0.316 0" quat="0.7071067811865475 0.7071067811865475 0 0">
+            <joint name="arm2_panda_joint3" type="hinge" axis="0 0 1" damping="0" armature="0" limited="true" range="-2.8973 2.8973" />
+            <body name="arm2_panda_link4" pos="0.0825 0 0" quat="0.7071067811865475 0.7071067811865475 0 0">
+              <joint name="arm2_panda_joint4" type="hinge" axis="0 0 1" damping="0" armature="0" limited="true" range="-3.0718 -0.0698" />
+              <body name="arm2_panda_link5" pos="-0.0825 0.384 0" quat="-0.7071067811865475 0.7071067811865475 0 0">
+                <joint name="arm2_panda_joint5" type="hinge" axis="0 0 1" damping="0" armature="0" limited="true" range="-2.8973 2.8973" />
+                <body name="arm2_panda_link6" pos="0 0 0" quat="0.7071067811865475 0.7071067811865475 0 0">
+                  <joint name="arm2_panda_joint6" type="hinge" axis="0 0 1" damping="0" armature="0" limited="true" range="-0.0175 3.7525" />
+                  <body name="arm2_panda_link7" pos="0.08799999999999999 0 0" quat="0.7071067811865475 0.7071067811865475 0 0">
+                    <joint name="arm2_panda_joint7" type="hinge" axis="0 0 1" damping="0" armature="0" limited="true" range="-2.8973 2.8973" />
+                    <body name="arm2_panda_link8" pos="0 0 0.107" quat="1 0 0 0">
+                      <body name="arm2_base_mount" pos="0 0 0.007" quat="-0.3826834323650901 0 0 0.9238795325112867">
+                        <body name="arm2_base" pos="0 0 0.0038" quat="0.7071067811865479 0 0 -0.7071067811865472">
+                          <body name="arm2_right_driver" pos="0 0.0306011 0.054904" quat="1 0 0 0">
+                            <joint name="arm2_right_driver_joint" type="hinge" axis="1 0 0" damping="0.1" armature="0.005" limited="true" range="0 0.8" stiffness="0.0" springref="0.0" />
+                            <body name="arm2_right_coupler" pos="0 0.0315 -0.0041" quat="1 0 0 0">
+                              <joint name="arm2_right_coupler_joint" type="hinge" axis="1 0 0" damping="0.0" armature="0.001" limited="true" range="-1.57 0" stiffness="0.0" springref="0.0" />
+                              <inertial pos="0 0.00301209 0.0232175" mass="0.0140974" fullinertia="3.52216e-06 4.107847881858289e-06 9.423431181417108e-07 6.502441716830111e-23 -4.638389984076993e-23 -4.177890280777638e-07" />
+                              <geom name="arm2_right_coupler_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm2_right_coupler_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                            </body>
+                            <inertial pos="2.96931e-12 0.0177547 0.00107314" mass="0.00899563" fullinertia="1.72352e-06 3.286147391312248e-07 1.602451260868775e-06 0 0 -9.198982933397988e-08" />
+                            <geom name="arm2_right_driver_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm2_right_driver_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                          </body>
+                          <body name="arm2_right_spring_link" pos="0 0.0132 0.0609" quat="1 0 0 0">
+                            <joint name="arm2_right_spring_link_joint" type="hinge" axis="1 0 0" damping="0.00125" armature="0.001" limited="true" range="-0.29670597283 0.8" stiffness="0.05" springref="2.62" />
+                            <body name="arm2_right_follower" pos="0 0.03700000000000001 0.044" quat="1 0 0 0">
+                              <joint name="arm2_right_follower_joint" type="hinge" axis="1 0 0" damping="0.0" armature="0.001" limited="true" range="-0.872664 0.872664" stiffness="0.0" springref="0.0" />
+                              <body name="arm2_right_pad" pos="0 -0.0009000000000000015 0.007020000000000001" quat="1 0 0 0">
+                                <body name="arm2_right_silicone_pad" pos="0 0 0" quat="1 0 0 0">
+                                  <inertial pos="-4.761896082112331e-19 -0.00579999995231628 0.01851737527478257" mass="0.001302811839479651" fullinertia="1.495360064459362e-07 2.008043211325311e-07 5.182418100517515e-08 1.707577901963573e-23 0 0" />
+                                </body>
+                                <inertial pos="0 -0.0025 0.0185" mass="0.0035" fullinertia="3.64583e-07 4.73958e-07 1.23958e-07 3.642919299551296e-23 0 0" />
+                                <geom name="arm2_right_pad_collision_0" pos="0 -0.0026 0.028125" quat="1 0 0 0" mass="0" type="box" size="0.011 0.004 0.009375" contype="2" conaffinity="3" rgba="0 0 0 0" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                                <geom name="arm2_right_pad_collision_1" pos="0 -0.0026 0.009375" quat="1 0 0 0" mass="0" type="box" size="0.011 0.004 0.009375" contype="2" conaffinity="3" rgba="0 0 0 0" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                              </body>
+                              <inertial pos="0 0.006953999999999998 0.0059786" mass="0.0125222" fullinertia="2.67415e-06 2.26148834591832e-06 7.964426540816798e-07 0 0 5.679945840392977e-07" />
+                              <geom name="arm2_right_follower_collision_0" pos="0 0.018 -0.0065" quat="1 0 0 0" mass="0" type="mesh" mesh="arm2_right_follower_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                            </body>
+                            <inertial pos="-8.650050000000001e-09 0.0181624 0.0212658" mass="0.0221642" fullinertia="6.71733e-06 6.299061790003087e-06 5.308778209996913e-06 -4.643709972073225e-23 -3.470151394199613e-22 -3.125634505167317e-06" />
+                            <geom name="arm2_right_spring_link_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm2_right_spring_link_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                          </body>
+                          <body name="arm2_left_driver" pos="0 -0.0306011 0.054904" quat="6.123233995736766e-17 0 0 1">
+                            <joint name="arm2_left_driver_joint" type="hinge" axis="1 0 0" damping="0.1" armature="0.005" limited="true" range="0 0.8" stiffness="0.0" springref="0.0" />
+                            <body name="arm2_left_coupler" pos="0 0.0315 -0.0041" quat="1 0 0 0">
+                              <joint name="arm2_left_coupler_joint" type="hinge" axis="1 0 0" damping="0.0" armature="0.001" limited="true" range="-1.57 0" stiffness="0.0" springref="0.0" />
+                              <inertial pos="0 0.00301209 0.0232175" mass="0.0140974" fullinertia="3.52216e-06 4.107847881858289e-06 9.423431181417108e-07 6.502441716830111e-23 -4.638389984076993e-23 -4.177890280777638e-07" />
+                              <geom name="arm2_left_coupler_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm2_left_coupler_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                            </body>
+                            <inertial pos="0 0.0177547 0.00107314" mass="0.00899563" fullinertia="1.72352e-06 3.286147391312248e-07 1.602451260868775e-06 0 0 -9.198982933397988e-08" />
+                            <geom name="arm2_left_driver_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm2_left_driver_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                          </body>
+                          <body name="arm2_left_spring_link" pos="0 -0.0132 0.0609" quat="6.123233995736766e-17 0 0 1">
+                            <joint name="arm2_left_spring_link_joint" type="hinge" axis="1 0 0" damping="0.00125" armature="0.001" limited="true" range="-0.29670597283 0.8" stiffness="0.05" springref="2.62" />
+                            <body name="arm2_left_follower" pos="0 0.03700000000000001 0.044" quat="1 0 0 0">
+                              <joint name="arm2_left_follower_joint" type="hinge" axis="1 0 0" damping="0.0" armature="0.001" limited="true" range="-0.872664 0.872664" stiffness="0.0" springref="0.0" />
+                              <body name="arm2_left_pad" pos="0 -0.0009000000000000015 0.007020000000000001" quat="1 0 0 0">
+                                <body name="arm2_left_silicone_pad" pos="0 0 0" quat="1 0 0 0">
+                                  <inertial pos="-4.761896082112331e-19 -0.00579999995231628 0.01851737527478257" mass="0.001302811839479651" fullinertia="1.495360064459362e-07 2.008043211325311e-07 5.182418100517515e-08 1.707577901963573e-23 0 0" />
+                                </body>
+                                <inertial pos="0 -0.0025 0.0185" mass="0.0035" fullinertia="3.64583e-07 4.73958e-07 1.23958e-07 3.642919299551296e-23 0 0" />
+                                <geom name="arm2_left_pad_collision_0" pos="0 -0.0026 0.028125" quat="1 0 0 0" mass="0" type="box" size="0.011 0.004 0.009375" contype="2" conaffinity="3" rgba="0 0 0 0" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                                <geom name="arm2_left_pad_collision_1" pos="0 -0.0026 0.009375" quat="1 0 0 0" mass="0" type="box" size="0.011 0.004 0.009375" contype="2" conaffinity="3" rgba="0 0 0 0" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                              </body>
+                              <inertial pos="0 0.006953999999999998 0.0059786" mass="0.0125222" fullinertia="2.67415e-06 2.26148834591832e-06 7.964426540816798e-07 0 0 5.679945840392977e-07" />
+                              <geom name="arm2_left_follower_collision_0" pos="0 0.018 -0.0065" quat="1 0 0 0" mass="0" type="mesh" mesh="arm2_left_follower_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                            </body>
+                            <inertial pos="-8.650050000000001e-09 0.0181624 0.0212658" mass="0.0221642" fullinertia="6.71733e-06 6.299061790003087e-06 5.308778209996913e-06 -4.643709972073225e-23 -3.470151394199613e-22 -3.125634505167317e-06" />
+                            <geom name="arm2_left_spring_link_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm2_left_spring_link_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                          </body>
+                          <inertial pos="0 -2.70394e-05 0.0354675" mass="0.777441" fullinertia="0.000260285 0.0002253803208647791 0.0001527086791352208 0 0 -2.221583504616969e-07" />
+                          <geom name="arm2_base_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm2_base_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                        </body>
+                        <body name="arm2_tip" pos="-5.979591821692054e-15 3.469446951953614e-18 0.1458996219755222" quat="0.7071067811865477 -7.304855164026266e-14 -7.304855164026261e-14 0.7071067811865474">
+                          <body name="arm2_paper_interface" pos="0 -0.02 0.001000000000000001" quat="0.5000000000000001 -0.5 0.5 0.5" />
+                        </body>
+                        <inertial pos="-0.0003605835958214157 8.536274800937428e-05 -5.919914145050651e-05" mass="0.15000285516377976" fullinertia="5.217217254326269e-05 5.359968409474151e-05 0.0001023450827039944 -2.115785307883065e-09 -1.427799658450661e-07 1.27515898763773e-09" />
+                        <geom name="arm2_base_mount_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm2_base_mount_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                      </body>
+                    </body>
+                    <inertial pos="0.010517 -0.004252 0.061597" mass="0.735522" fullinertia="0.012516 0.010027 0.004815 -0.000428 -0.001196 -0.000741" />
+                    <geom name="arm2_panda_link7_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm2_panda_link7_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                  </body>
+                  <inertial pos="0.060149 -0.014117 -0.010517" mass="1.666555" fullinertia="0.001964 0.004354 0.005433 0.000109 -0.001158 0.000341" />
+                  <geom name="arm2_panda_link6_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm2_panda_link6_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+                </body>
+                <inertial pos="-0.011953 0.041065 -0.038437" mass="1.225946" fullinertia="0.035549 0.029474 0.008626999999999999 -0.002117 -0.004037 0.000229" />
+                <geom name="arm2_panda_link5_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm2_panda_link5_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+              </body>
+              <inertial pos="-0.05317 0.104419 0.027454" mass="3.587895" fullinertia="0.025853 0.019552 0.028323 0.007796 -0.001332 0.008640999999999999" />
+              <geom name="arm2_panda_link4_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm2_panda_link4_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+            </body>
+            <inertial pos="0.027518 0.039252 -0.06650200000000001" mass="3.228604" fullinertia="0.037242 0.036155 0.01083 -0.004761 -0.011396 -0.012805" />
+            <geom name="arm2_panda_link3_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm2_panda_link3_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+          </body>
+          <inertial pos="-0.003141 -0.02872 0.003495" mass="0.646926" fullinertia="0.007962 0.02811 0.025995 -0.003925 0.010254 0.000704" />
+          <geom name="arm2_panda_link2_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm2_panda_link2_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+        </body>
+        <inertial pos="0.003875 0.002081 -0.04762" mass="4.970684" fullinertia="0.7033700000000001 0.70661 0.009117 -0.000139 0.006772 0.019169" />
+        <geom name="arm2_panda_link1_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm2_panda_link1_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+      </body>
+      <inertial pos="-0.041018 -0.00014 0.049974" mass="0.629769" fullinertia="0.00315 0.00388 0.004285 8.2904e-07 0.00015 8.229900000000001e-06" />
+      <geom name="arm2_panda_link0_collision_0" pos="0 0 0" quat="1 0 0 0" mass="0" type="mesh" mesh="arm2_panda_link0_mesh_0" contype="2" conaffinity="3" rgba=".75 .8 .85 1" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+    </body>
+    <geom name="arm2_pedestal" type="box" pos="0.1 0.5 0.2" size="0.15 0.15 0.2" contype="1" conaffinity="3" />
+    <body name="object_urdf_base" pos="0 0 0.5750000000000001" quat="0.9990482215818578 0 0.043619387365336 0">
+      <freejoint name="object_floating_base" />
+      <body name="object_moving" pos="-0.25 0 0.1" quat="1 0 0 0">
+        <joint name="object_articulation" type="hinge" axis="0 -1 0" damping="0.05" armature="0" limited="true" range="0 1.5" frictionloss="0.02" />
+        <inertial pos="0.25 0 0" mass="0.5" fullinertia="0.004283333333333333 0.01043333333333333 0.01468333333333333 0 0 0" />
+        <geom name="object_moving_visual_0" pos="0.25 0 0" quat="1 0 0 0" mass="0" type="box" size="0.25 0.16 0.01" contype="0" conaffinity="0" rgba=".65 .39 .18 1" />
+        <geom name="object_moving_visual_1" pos="0.4 0 0.04" quat="1 0 0 0" mass="0" type="box" size="0.02 0.02 0.03" contype="0" conaffinity="0" rgba=".3 .33 .36 1" />
+        <geom name="object_moving_collision_0" pos="0.25 0 0" quat="1 0 0 0" mass="0" type="box" size="0.25 0.16 0.01" contype="2" conaffinity="3" rgba="0 0 0 0" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+        <geom name="object_moving_collision_1" pos="0.4 0 0.04" quat="1 0 0 0" mass="0" type="box" size="0.02 0.02 0.03" contype="2" conaffinity="3" rgba="0 0 0 0" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+      </body>
+      <inertial pos="0 0 0" mass="2.0" fullinertia="0.02373333333333334 0.04833333333333334 0.05873333333333333 0 0 0" />
+      <geom name="object_base_visual_0" pos="0 0 -0.09" quat="1 0 0 0" mass="0" type="box" size="0.25 0.16 0.01" contype="0" conaffinity="0" rgba=".65 .39 .18 1" />
+      <geom name="object_base_visual_1" pos="-0.24 0 0" quat="1 0 0 0" mass="0" type="box" size="0.01 0.16 0.09" contype="0" conaffinity="0" rgba=".65 .39 .18 1" />
+      <geom name="object_base_visual_2" pos="0.24 0 0" quat="1 0 0 0" mass="0" type="box" size="0.01 0.16 0.09" contype="0" conaffinity="0" rgba=".65 .39 .18 1" />
+      <geom name="object_base_visual_3" pos="0 -0.15 0" quat="1 0 0 0" mass="0" type="box" size="0.23 0.01 0.09" contype="0" conaffinity="0" rgba=".65 .39 .18 1" />
+      <geom name="object_base_visual_4" pos="0 0.15 0" quat="1 0 0 0" mass="0" type="box" size="0.23 0.01 0.09" contype="0" conaffinity="0" rgba=".65 .39 .18 1" />
+      <geom name="object_base_visual_5" pos="-0.32 0 0" quat="1 0 0 0" mass="0" type="box" size="0.02 0.02 0.03" contype="0" conaffinity="0" rgba=".3 .33 .36 1" />
+      <geom name="object_base_visual_6" pos="-0.271 0 0" quat="1 0 0 0" mass="0" type="box" size="0.031 0.008 0.008999999999999999" contype="0" conaffinity="0" rgba=".4 .6 .8 1" />
+      <geom name="object_base_collision_0" pos="0 0 -0.09" quat="1 0 0 0" mass="0" type="box" size="0.25 0.16 0.01" contype="2" conaffinity="3" rgba="0 0 0 0" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+      <geom name="object_base_collision_1" pos="-0.24 0 0" quat="1 0 0 0" mass="0" type="box" size="0.01 0.16 0.09" contype="2" conaffinity="3" rgba="0 0 0 0" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+      <geom name="object_base_collision_2" pos="0.24 0 0" quat="1 0 0 0" mass="0" type="box" size="0.01 0.16 0.09" contype="2" conaffinity="3" rgba="0 0 0 0" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+      <geom name="object_base_collision_3" pos="0 -0.15 0" quat="1 0 0 0" mass="0" type="box" size="0.23 0.01 0.09" contype="2" conaffinity="3" rgba="0 0 0 0" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+      <geom name="object_base_collision_4" pos="0 0.15 0" quat="1 0 0 0" mass="0" type="box" size="0.23 0.01 0.09" contype="2" conaffinity="3" rgba="0 0 0 0" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+      <geom name="object_base_collision_5" pos="-0.32 0 0" quat="1 0 0 0" mass="0" type="box" size="0.02 0.02 0.03" contype="2" conaffinity="3" rgba="0 0 0 0" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+      <geom name="object_base_collision_6" pos="-0.271 0 0" quat="1 0 0 0" mass="0" type="box" size="0.031 0.008 0.008999999999999999" contype="2" conaffinity="3" rgba="0 0 0 0" condim="3" friction=".8 0 0" solref=".006 1" solimp=".95 .99 .001" />
+    </body>
+    <geom name="floor" type="plane" size="3 3 .1" contype="1" conaffinity="3" />
+  </worldbody>
+  <actuator>
+    <motor name="arm0_motor_panda_joint1" joint="arm0_panda_joint1" gear="1" ctrllimited="true" ctrlrange="-87 87" />
+    <motor name="arm0_motor_panda_joint2" joint="arm0_panda_joint2" gear="1" ctrllimited="true" ctrlrange="-87 87" />
+    <motor name="arm0_motor_panda_joint3" joint="arm0_panda_joint3" gear="1" ctrllimited="true" ctrlrange="-87 87" />
+    <motor name="arm0_motor_panda_joint4" joint="arm0_panda_joint4" gear="1" ctrllimited="true" ctrlrange="-87 87" />
+    <motor name="arm0_motor_panda_joint5" joint="arm0_panda_joint5" gear="1" ctrllimited="true" ctrlrange="-12 12" />
+    <motor name="arm0_motor_panda_joint6" joint="arm0_panda_joint6" gear="1" ctrllimited="true" ctrlrange="-12 12" />
+    <motor name="arm0_motor_panda_joint7" joint="arm0_panda_joint7" gear="1" ctrllimited="true" ctrlrange="-12 12" />
+    <position name="arm0_motor_right_driver_joint" joint="arm0_right_driver_joint" gear="1" ctrllimited="true" ctrlrange="0 0.8" kp="50.0" kv="5.0" forcelimited="true" forcerange="-2.5 2.5" />
+    <position name="arm0_motor_left_driver_joint" joint="arm0_left_driver_joint" gear="1" ctrllimited="true" ctrlrange="0 0.8" kp="50.0" kv="5.0" forcelimited="true" forcerange="-2.5 2.5" />
+    <motor name="arm1_motor_panda_joint1" joint="arm1_panda_joint1" gear="1" ctrllimited="true" ctrlrange="-87 87" />
+    <motor name="arm1_motor_panda_joint2" joint="arm1_panda_joint2" gear="1" ctrllimited="true" ctrlrange="-87 87" />
+    <motor name="arm1_motor_panda_joint3" joint="arm1_panda_joint3" gear="1" ctrllimited="true" ctrlrange="-87 87" />
+    <motor name="arm1_motor_panda_joint4" joint="arm1_panda_joint4" gear="1" ctrllimited="true" ctrlrange="-87 87" />
+    <motor name="arm1_motor_panda_joint5" joint="arm1_panda_joint5" gear="1" ctrllimited="true" ctrlrange="-12 12" />
+    <motor name="arm1_motor_panda_joint6" joint="arm1_panda_joint6" gear="1" ctrllimited="true" ctrlrange="-12 12" />
+    <motor name="arm1_motor_panda_joint7" joint="arm1_panda_joint7" gear="1" ctrllimited="true" ctrlrange="-12 12" />
+    <motor name="arm2_motor_panda_joint1" joint="arm2_panda_joint1" gear="1" ctrllimited="true" ctrlrange="-87 87" />
+    <motor name="arm2_motor_panda_joint2" joint="arm2_panda_joint2" gear="1" ctrllimited="true" ctrlrange="-87 87" />
+    <motor name="arm2_motor_panda_joint3" joint="arm2_panda_joint3" gear="1" ctrllimited="true" ctrlrange="-87 87" />
+    <motor name="arm2_motor_panda_joint4" joint="arm2_panda_joint4" gear="1" ctrllimited="true" ctrlrange="-87 87" />
+    <motor name="arm2_motor_panda_joint5" joint="arm2_panda_joint5" gear="1" ctrllimited="true" ctrlrange="-12 12" />
+    <motor name="arm2_motor_panda_joint6" joint="arm2_panda_joint6" gear="1" ctrllimited="true" ctrlrange="-12 12" />
+    <motor name="arm2_motor_panda_joint7" joint="arm2_panda_joint7" gear="1" ctrllimited="true" ctrlrange="-12 12" />
+    <position name="arm2_motor_right_driver_joint" joint="arm2_right_driver_joint" gear="1" ctrllimited="true" ctrlrange="0 0.8" kp="50.0" kv="5.0" forcelimited="true" forcerange="-2.5 2.5" />
+    <position name="arm2_motor_left_driver_joint" joint="arm2_left_driver_joint" gear="1" ctrllimited="true" ctrlrange="0 0.8" kp="50.0" kv="5.0" forcelimited="true" forcerange="-2.5 2.5" />
+  </actuator>
+  <contact>
+    <exclude body1="arm0_base" body2="arm0_left_driver" />
+    <exclude body1="arm0_base" body2="arm0_right_driver" />
+    <exclude body1="arm0_base" body2="arm0_left_spring_link" />
+    <exclude body1="arm0_base" body2="arm0_right_spring_link" />
+    <exclude body1="arm0_right_coupler" body2="arm0_right_follower" />
+    <exclude body1="arm0_left_coupler" body2="arm0_left_follower" />
+    <exclude body1="arm0_urdf_panda_link0" body2="arm0_panda_link1" />
+    <exclude body1="arm0_urdf_panda_link0" body2="arm0_panda_link2" />
+    <exclude body1="arm0_urdf_panda_link0" body2="arm0_panda_link3" />
+    <exclude body1="arm0_urdf_panda_link0" body2="arm0_panda_link4" />
+    <exclude body1="arm0_panda_link1" body2="arm0_panda_link2" />
+    <exclude body1="arm0_panda_link1" body2="arm0_panda_link3" />
+    <exclude body1="arm0_panda_link1" body2="arm0_panda_link4" />
+    <exclude body1="arm0_panda_link2" body2="arm0_panda_link3" />
+    <exclude body1="arm0_panda_link2" body2="arm0_panda_link4" />
+    <exclude body1="arm0_panda_link3" body2="arm0_panda_link4" />
+    <exclude body1="arm0_panda_link3" body2="arm0_panda_link5" />
+    <exclude body1="arm0_panda_link3" body2="arm0_panda_link6" />
+    <exclude body1="arm0_panda_link3" body2="arm0_panda_link7" />
+    <exclude body1="arm0_panda_link4" body2="arm0_panda_link5" />
+    <exclude body1="arm0_panda_link4" body2="arm0_panda_link6" />
+    <exclude body1="arm0_panda_link4" body2="arm0_panda_link7" />
+    <exclude body1="arm0_panda_link5" body2="arm0_panda_link6" />
+    <exclude body1="arm0_panda_link5" body2="arm0_panda_link7" />
+    <exclude body1="arm0_panda_link6" body2="arm0_panda_link7" />
+    <exclude body1="arm1_urdf_panda_link0" body2="arm1_panda_link1" />
+    <exclude body1="arm1_urdf_panda_link0" body2="arm1_panda_link2" />
+    <exclude body1="arm1_urdf_panda_link0" body2="arm1_panda_link3" />
+    <exclude body1="arm1_urdf_panda_link0" body2="arm1_panda_link4" />
+    <exclude body1="arm1_panda_link1" body2="arm1_panda_link2" />
+    <exclude body1="arm1_panda_link1" body2="arm1_panda_link3" />
+    <exclude body1="arm1_panda_link1" body2="arm1_panda_link4" />
+    <exclude body1="arm1_panda_link2" body2="arm1_panda_link3" />
+    <exclude body1="arm1_panda_link2" body2="arm1_panda_link4" />
+    <exclude body1="arm1_panda_link3" body2="arm1_panda_link4" />
+    <exclude body1="arm1_panda_link3" body2="arm1_panda_link5" />
+    <exclude body1="arm1_panda_link3" body2="arm1_panda_link6" />
+    <exclude body1="arm1_panda_link3" body2="arm1_panda_link7" />
+    <exclude body1="arm1_panda_link4" body2="arm1_panda_link5" />
+    <exclude body1="arm1_panda_link4" body2="arm1_panda_link6" />
+    <exclude body1="arm1_panda_link4" body2="arm1_panda_link7" />
+    <exclude body1="arm1_panda_link5" body2="arm1_panda_link6" />
+    <exclude body1="arm1_panda_link5" body2="arm1_panda_link7" />
+    <exclude body1="arm1_panda_link6" body2="arm1_panda_link7" />
+    <exclude body1="arm2_base" body2="arm2_left_driver" />
+    <exclude body1="arm2_base" body2="arm2_right_driver" />
+    <exclude body1="arm2_base" body2="arm2_left_spring_link" />
+    <exclude body1="arm2_base" body2="arm2_right_spring_link" />
+    <exclude body1="arm2_right_coupler" body2="arm2_right_follower" />
+    <exclude body1="arm2_left_coupler" body2="arm2_left_follower" />
+    <exclude body1="arm2_urdf_panda_link0" body2="arm2_panda_link1" />
+    <exclude body1="arm2_urdf_panda_link0" body2="arm2_panda_link2" />
+    <exclude body1="arm2_urdf_panda_link0" body2="arm2_panda_link3" />
+    <exclude body1="arm2_urdf_panda_link0" body2="arm2_panda_link4" />
+    <exclude body1="arm2_panda_link1" body2="arm2_panda_link2" />
+    <exclude body1="arm2_panda_link1" body2="arm2_panda_link3" />
+    <exclude body1="arm2_panda_link1" body2="arm2_panda_link4" />
+    <exclude body1="arm2_panda_link2" body2="arm2_panda_link3" />
+    <exclude body1="arm2_panda_link2" body2="arm2_panda_link4" />
+    <exclude body1="arm2_panda_link3" body2="arm2_panda_link4" />
+    <exclude body1="arm2_panda_link3" body2="arm2_panda_link5" />
+    <exclude body1="arm2_panda_link3" body2="arm2_panda_link6" />
+    <exclude body1="arm2_panda_link3" body2="arm2_panda_link7" />
+    <exclude body1="arm2_panda_link4" body2="arm2_panda_link5" />
+    <exclude body1="arm2_panda_link4" body2="arm2_panda_link6" />
+    <exclude body1="arm2_panda_link4" body2="arm2_panda_link7" />
+    <exclude body1="arm2_panda_link5" body2="arm2_panda_link6" />
+    <exclude body1="arm2_panda_link5" body2="arm2_panda_link7" />
+    <exclude body1="arm2_panda_link6" body2="arm2_panda_link7" />
+    <pair geom1="arm0_right_pad_collision_0" geom2="object_base_collision_5" condim="3" friction="0.6 0.6 0 0 0" solref=".004 1" solimp=".95 .99 .001" />
+    <pair geom1="arm0_right_pad_collision_1" geom2="object_base_collision_5" condim="3" friction="0.6 0.6 0 0 0" solref=".004 1" solimp=".95 .99 .001" />
+    <pair geom1="arm0_left_pad_collision_0" geom2="object_base_collision_5" condim="3" friction="0.6 0.6 0 0 0" solref=".004 1" solimp=".95 .99 .001" />
+    <pair geom1="arm0_left_pad_collision_1" geom2="object_base_collision_5" condim="3" friction="0.6 0.6 0 0 0" solref=".004 1" solimp=".95 .99 .001" />
+    <pair geom1="arm1_tool_collision_0" geom2="object_base_collision_0" condim="3" friction="0.8 0.8 0 0 0" solref=".008 1" solimp=".95 .99 .001" />
+    <pair geom1="arm2_right_pad_collision_0" geom2="object_moving_collision_1" condim="3" friction="0.6 0.6 0 0 0" solref=".004 1" solimp=".95 .99 .001" />
+    <pair geom1="arm2_right_pad_collision_1" geom2="object_moving_collision_1" condim="3" friction="0.6 0.6 0 0 0" solref=".004 1" solimp=".95 .99 .001" />
+    <pair geom1="arm2_left_pad_collision_0" geom2="object_moving_collision_1" condim="3" friction="0.6 0.6 0 0 0" solref=".004 1" solimp=".95 .99 .001" />
+    <pair geom1="arm2_left_pad_collision_1" geom2="object_moving_collision_1" condim="3" friction="0.6 0.6 0 0 0" solref=".004 1" solimp=".95 .99 .001" />
+  </contact>
+  <equality>
+    <connect anchor="-0 0.017999999999999999 -0.0064999999999999997" body1="arm0_right_follower" body2="arm0_right_coupler" solimp="0.95 0.99 0.001" solref="0.005 1" />
+    <connect anchor="-0 0.017999999999999999 -0.0064999999999999997" body1="arm0_left_follower" body2="arm0_left_coupler" solimp="0.95 0.99 0.001" solref="0.005 1" />
+    <joint joint1="arm0_right_driver_joint" joint2="arm0_left_driver_joint" polycoef="0 1 0 0 0" solimp="0.95 0.99 0.001" solref="0.005 1" />
+    <connect anchor="-0 0.017999999999999999 -0.0064999999999999997" body1="arm2_right_follower" body2="arm2_right_coupler" solimp="0.95 0.99 0.001" solref="0.005 1" />
+    <connect anchor="-0 0.017999999999999999 -0.0064999999999999997" body1="arm2_left_follower" body2="arm2_left_coupler" solimp="0.95 0.99 0.001" solref="0.005 1" />
+    <joint joint1="arm2_right_driver_joint" joint2="arm2_left_driver_joint" polycoef="0 1 0 0 0" solimp="0.95 0.99 0.001" solref="0.005 1" />
+  </equality>
+</mujoco>

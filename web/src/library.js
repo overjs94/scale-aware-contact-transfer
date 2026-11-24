@@ -44,6 +44,7 @@ const catalog = new Map(entries.map(([id, category, group, title, detail, preset
   [id, { id, category, group, title, detail, preset: preset === true ? id : preset, order }]));
 
 export function libraryEntry(model) {
+  if(model.id.startsWith('research_controller_'))return {id:model.id,category:'diagnostic',group:0,title:model.title,detail:'Controller replay · accepted plan and measured-state wrench allocation',order:-1};
   const research=model.id.match(/^research_full_(panel|box|assembly)$/);
   if(research)return {id:model.id,category:'paper',group:{panel:0,box:2,assembly:3}[research[1]],title:model.title,detail:'Certified source → selected hardware → restricted planning → native execution',order:-1};
   if(/^research_full_(panel|box|assembly)_/.test(model.id))return {id:model.id,category:'diagnostic',group:1,title:model.title,detail:'Controlled current-framework ablation · all outcomes retained',order:entries.length};
@@ -84,6 +85,7 @@ export function recordingScope(data) {
     }
     if(probe){status=`Target robustness probe · ${probe.outcome.replaceAll('_',' ')}`;detail=`Separate stationary test of an optimized mid-task pose. Applied load / ON margin = ${probe.inside_on_certificate.load_to_margin_ratio.toFixed(3)}. Scene, controller and loads match across ON/OFF. The certificate concerns the fixed reference pose; it does not prove dynamic stability.`;}
     if(loaded)detail=`Complete task with a six-second stationary load interval after lift. Applied load / ON margin = ${loaded.inside_on_reference_certificate.load_to_margin_ratio.toFixed(3)}. The static reference certificate and measured task completion are reported separately. Zero-load pause controls are retained.`;
+    if(report.controller_replay){status='Controller replay · '+(report.execution_passed?'PASS':'FAIL');detail='Fresh native execution of an accepted plan. Source refinement, hardware selection and trajectory optimization were not rerun. Online allocation uses measured object state/contact forces; hardware limits and physical loads remain fixed. Static feasibility and closed-loop execution are separate checks.';}
   } else if (data.full_task_recording) {
     status = "Complete sequence · " + (report.execution_passed ? "execution checks passed" : "failed checks retained");
     detail = "Recorded contact-type/arm-assignment selection, moving-object CITO, load-transfer QPs, release dynamics, and native contact execution. The implementation uses midpoint variants; source geometric fallback and ablation results are stated explicitly.";

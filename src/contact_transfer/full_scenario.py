@@ -250,6 +250,9 @@ class FullProblem:
             self._branch_references=references
         return self._branch_references[k].copy()
     @property
+    def hardware_capabilities(self):
+        return getattr(self,'_hardware_capabilities',self.capabilities)
+    @property
     def case(self):
         if not hasattr(self,'_case'):self._case=SimpleNamespace(path=self.task_definition.original.path,panel=self.task_definition.object,full_robots=self.full_robots,data={'arms':list(self.specs),'simulation':{'timestep':self.task_definition.configuration.execution.physics_dt_s}})
         return self._case
@@ -277,7 +280,11 @@ class FullProblem:
             cfg=task.original.data
             passive=lambda q,v:ca.vertcat(ca.DM.zeros(obj.nv-1),cfg['damping']*v[-1]+cfg['frictionloss']*ca.tanh(v[-1]/.001))
         system=MechanicalSystem([r.symbolic() for r in robots],obj,object_passive_bias=passive)
-        return cls(task,out,tuple(types),tuple(assignment),tuple(robots),tuple(full),tuple(caps),tuple(frames),tuple(specs),system,refine_source,source_settings,conic_settings or ConicSettings())
+        from .online_wrench import operating_capabilities
+        physical_caps=tuple(caps);caps=operating_capabilities(physical_caps,task.configuration.target.gripper_force_fraction)
+        result=cls(task,out,tuple(types),tuple(assignment),tuple(robots),tuple(full),caps,tuple(frames),tuple(specs),system,refine_source,source_settings,conic_settings or ConicSettings())
+        result._hardware_capabilities=physical_caps
+        return result
 
     def task_load(self,qobj,*,source_object=None):
         obj=self.task_definition.object if source_object is None else source_object;cfg=self.task_definition.configuration.disturbance

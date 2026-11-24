@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "samples": 1457,
+  "continuous_certificate": false,
+  "reference_interpolation": "object_SE3_and_conditioned_joint_Hermite_with_dense_IK",
+  "reference_id": "8b07317ee05ce8871d8fd8b9b70571138119c93f19fd9960d91f081a29194079",
+  "reference_mesh": {
+    "minimum_spacing_s": 0.015625,
+    "maximum_joint_acceleration_rad_s2": 1.856567262146357,
+    "optimized_node_velocities_preserved": true
+  },
+  "released_gripper_reference": "native URDF open configuration after stationary opening dwell",
+  "projection_limit_rad": 0.02,
+  "projection_max_rad": 1.1933232231253754e-06,
+  "compliant_pad_allowance_m": 0.001,
+  "unintended_clearance_m": 0.001,
+  "violations": []
+}

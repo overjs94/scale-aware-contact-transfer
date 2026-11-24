@@ -1,0 +1,129 @@
+{
+  "controller": {
+    "control_mode": "hybrid_feedback",
+    "jaw_force_fraction": 0.7,
+    "reference_dt_s": 0.02,
+    "reference_projection_limit_rad": 0.02,
+    "physics_dt_s": 0.001,
+    "joint_k": 40.0,
+    "joint_d": 8.0,
+    "motion_k": [
+      40.0,
+      40.0,
+      40.0,
+      3000.0,
+      3000.0,
+      3000.0
+    ],
+    "motion_d": [
+      2.0,
+      2.0,
+      2.0,
+      40.0,
+      40.0,
+      40.0
+    ],
+    "force_k": 0.25,
+    "force_i": 1.0,
+    "force_d": [
+      2,
+      2,
+      2,
+      40,
+      40,
+      160
+    ],
+    "admittance_mass": [
+      0.2,
+      0.2,
+      0.2,
+      2.0,
+      2.0,
+      2.0
+    ],
+    "admittance_damping": [
+      4.0,
+      4.0,
+      4.0,
+      40.0,
+      40.0,
+      40.0
+    ],
+    "online_allocation": true,
+    "allocation_dt_s": 0.02,
+    "disturbance_filter_s": 0.08,
+    "object_acceleration_k": 100.0,
+    "object_acceleration_d": 20.0,
+    "allocation_grip_fraction": 0.6,
+    "adaptive_jaw_force": true,
+    "jaw_reserve_factor": 1.25,
+    "jaw_target_max_fraction": 0.8,
+    "jaw_target_rate_N_s": 40.0
+  },
+  "parent_plan": "outputs/research-study/full-common/assembly/full",
+  "new_source_or_target_NLP_executed": false,
+  "old_hardware_certificate": {
+    "inside": true,
+    "rho_certified": 7.319767707847246,
+    "maximum_coefficient_bound": 3.659883853923625,
+    "load_to_margin_ratio": 0.5000000000000002,
+    "temporal_groups": [
+      {
+        "start": 2.4,
+        "end": 3.5999999999999996,
+        "profile": "smooth_hold",
+        "inside": true,
+        "subspace_residual": 1.3322676295501878e-15,
+        "normalized_coefficient": [
+          0.0,
+          0.0,
+          0.0,
+          1.306144734853126e-16,
+          0.0,
+          3.659883853923625
+        ],
+        "coefficient_infinity_norm": 3.659883853923625,
+        "rho_certified": 7.319767707847246,
+        "load_to_margin_ratio": 0.5000000000000002,
+        "certificate_scope": "fixed reference pose static wrench box"
+      }
+    ],
+    "overlap_check": "componentwise interval triangle bound; identical profiles summed before projection",
+    "certificate_scope": "optimized static reference pose only",
+    "continuous_time_load_membership_bound": true,
+    "closed_loop_stability_certificate": false
+  },
+  "certificate_scope": "reference pose and original hardware; operating allocation envelope is separately derated",
+  "independent_keyframe": {
+    "passed": true,
+    "residuals": {
+      "equilibrium": 6.568079413682426e-11,
+      "capability": 1.0031460107029488e-08,
+      "torque": 0.0,
+      "closure": 2.220446049250313e-16,
+      "rotation_closure": 4.228339220141766e-15,
+      "rho_margin": 0.0
+    },
+    "frozen_conic": {
+      "rho": 7.319767707906043,
+      "certificate": true,
+      "residual": 1.0031460107029488e-08,
+      "status": "AlmostSolved",
+      "maximum_margin_status": "NumericalError",
+      "fixed_rho_feasibility": true,
+      "solver_attempts": [
+        {
+          "status": "AlmostSolved",
+          "witness_regularization": 2e-06,
+          "backend": "clarabel",
+          "solver_tolerance": 1e-09,
+          "iterations": 20,
+          "wall_time_s": 0.15506268999888562
+        }
+      ]
+    },
+    "independent": "native Pinocchio, NumPy and frozen Clarabel"
+  },
+  "case": "early",
+  "scene_sha256": "8d16519296dae95c487e47a8dbf0d8c18fc9fd0e1433249f9790e54a4e779cc6"
+}

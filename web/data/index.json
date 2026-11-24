@@ -1,6 +1,69 @@
 {
   "models": [
     {
+      "id": "research_controller_assembly_adaptive_early",
+      "title": "Assembly \u00b7 adaptive controller \u00b7 early",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "research_controller_assembly_adaptive_full",
+      "title": "Assembly \u00b7 adaptive controller \u00b7 full",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "research_controller_panel_adaptive_early",
+      "title": "Panel \u00b7 adaptive controller \u00b7 early",
+      "engine": "mujoco_contact_recording",
+      "dof": 29,
+      "floating_base": false
+    },
+    {
+      "id": "research_controller_panel_adaptive_full",
+      "title": "Panel \u00b7 adaptive controller \u00b7 full",
+      "engine": "mujoco_contact_recording",
+      "dof": 29,
+      "floating_base": false
+    },
+    {
+      "id": "research_controller_box_adaptive_full",
+      "title": "Box \u00b7 adaptive controller \u00b7 full",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "research_controller_box_preload_opposite",
+      "title": "Box \u00b7 preload controller \u00b7 opposite",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "research_controller_box_baseline_opposite",
+      "title": "Box \u00b7 baseline controller \u00b7 opposite",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "research_controller_box_adaptive_opposite",
+      "title": "Box \u00b7 adaptive controller \u00b7 opposite",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
+      "id": "research_controller_box_allocation_opposite",
+      "title": "Box \u00b7 allocation controller \u00b7 opposite",
+      "engine": "mujoco_contact_recording",
+      "dof": 37,
+      "floating_base": false
+    },
+    {
       "id": "research_loaded_assembly_off",
       "title": "Tabletop\u2013leg insertion and release \u00b7 full task with load \u00b7 OFF",
       "engine": "mujoco_contact_recording",

@@ -32,6 +32,7 @@ class TargetPolicy:
     characteristic_length_m: float = .6
     posture_weight: float = .01
     rho_min: float = .1
+    gripper_force_fraction: float = 1.
 
 
 @dataclass(frozen=True)
@@ -61,6 +62,17 @@ class ExecutionPolicy:
     force_d: tuple = (2.,2.,2.,40.,40.,40.)
     admittance_mass: tuple = (.2,.2,.2,2.,2.,2.)
     admittance_damping: tuple = (4.,4.,4.,40.,40.,40.)
+    online_allocation: bool = False
+    allocation_dt_s: float = .02
+    disturbance_filter_s: float = .08
+    object_acceleration_k: float = 100.
+    object_acceleration_d: float = 20.
+    # The operating envelope is explicit and distinct from the hardware limit.
+    allocation_grip_fraction: float = .6
+    adaptive_jaw_force: bool = False
+    jaw_reserve_factor: float = 1.25
+    jaw_target_max_fraction: float = .8
+    jaw_target_rate_N_s: float = 40.
 
 
 @dataclass(frozen=True)
@@ -116,6 +128,18 @@ class TaskConfiguration:
             raise ValueError('Unsupported control_mode')
         if not 0 < e.jaw_force_fraction <= 1:
             raise ValueError('jaw_force_fraction must be in (0, 1]')
+        if not np.isfinite(target.gripper_force_fraction) or not 0<target.gripper_force_fraction<=1:
+            raise ValueError('Target gripper operating fraction must be in (0,1]')
+        if not isinstance(e.online_allocation,bool) or not isinstance(e.adaptive_jaw_force,bool):
+            raise ValueError('Online allocation and adaptive jaw switches must be boolean')
+        if not np.isfinite([e.allocation_dt_s,e.disturbance_filter_s,e.object_acceleration_k,e.object_acceleration_d,e.allocation_grip_fraction,e.jaw_reserve_factor,e.jaw_target_max_fraction,e.jaw_target_rate_N_s]).all() or min(e.allocation_dt_s,e.disturbance_filter_s,e.jaw_target_rate_N_s)<=0 or min(e.object_acceleration_k,e.object_acceleration_d)<0:
+            raise ValueError('Invalid online allocation gains/times')
+        if not 0<e.allocation_grip_fraction<=1 or not 0<e.jaw_target_max_fraction<=1 or e.jaw_reserve_factor<1:
+            raise ValueError('Invalid gripper operating envelope')
+        if e.adaptive_jaw_force and (not e.online_allocation or e.jaw_force_fraction>e.jaw_target_max_fraction or e.allocation_grip_fraction*e.jaw_reserve_factor>e.jaw_target_max_fraction+1e-12):
+            raise ValueError('Adaptive jaw targets must cover the allocation envelope plus reserve within their declared maximum')
+        if e.online_allocation and not e.adaptive_jaw_force and e.allocation_grip_fraction>e.jaw_force_fraction:
+            raise ValueError('Fixed jaw command must cover the online allocation budget')
         for vector in (e.motion_k,e.motion_d,e.force_d,e.admittance_mass,e.admittance_damping):
             if len(vector)!=6 or not np.isfinite(vector).all() or min(vector)<0:raise ValueError('Controller vectors need six finite nonnegative entries')
         if min(e.admittance_mass)<=0:raise ValueError('Admittance mass must be positive')

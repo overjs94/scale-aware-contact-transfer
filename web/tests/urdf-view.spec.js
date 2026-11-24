@@ -556,6 +556,39 @@ test('current inside-margin box counterexample preserves the failed tracking and
  await expect(page.locator('#result-tracking')).toContainText('FAIL');
 });
 
+test('controller replay preserves the matched load and separates pass from the original failure',async({page})=>{
+ const errors=[];page.on('pageerror',error=>errors.push(error.message));
+ const id='research_controller_box_allocation_opposite';await page.goto('/?model='+id);
+ await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+ await expect(page.locator('#scenario-status')).toHaveText('Controller replay · PASS');
+ const data=await(await page.request.get('/data/'+id+'.json')).json();
+ expect(data.report.controller_replay.new_NLP_executed).toBe(false);
+ expect(data.report.controller_replay.rejected_solves).toBe(0);
+ expect(data.report.jaw_force_fraction).toBe(.6);
+ await page.getByRole('button',{name:/Peak external force · arrow/}).click();
+ await expect(page.locator('#disturbance-state')).toHaveAttribute('data-force-count','1');
+ await expect(page.locator('#disturbance-state')).toContainText('14.75 N');
+ await expect(page.locator('#algorithm-comparison-results')).toContainText('95.84 mm');
+ await page.goto('/?model=research_controller_box_baseline_opposite');
+ await expect(page.locator('#scenario-status')).toHaveText('Controller replay · FAIL');
+ await expect(page.locator('#result-tracking')).toContainText('FAIL');
+ expect(errors).toEqual([]);
+});
+
+test('controller complete assembly reports passive release and all accepted controlled QPs',async({page})=>{
+ const errors=[];page.on('pageerror',error=>errors.push(error.message));
+ const id='research_controller_assembly_adaptive_full';await page.goto('/?model='+id);
+ await expect(page.locator('#geometry-status')).toHaveAttribute('data-state','ready');
+ await expect(page.locator('#scenario-status')).toHaveText('Controller replay · PASS');
+ const data=await(await page.request.get('/data/'+id+'.json')).json();
+ expect(data.report.task_metrics.leg_released).toBe(true);
+ expect(data.report.task_metrics.insertion_depth_m).toBeCloseTo(.025,4);
+ expect(data.report.controller_replay.all_solves_accepted).toBe(true);
+ expect(data.report.full_paper_pipeline_executed).toBe(false);
+ await expect(page.locator('#source-result')).toContainText('no new source');
+ expect(errors).toEqual([]);
+});
+
 test('current source-margin comparison retains the matched controls and recovery failure',async({page})=>{
  await page.goto('/robustness-comparison.html?study=current');
  await expect(page.locator('#on-outcome')).toHaveText('Bounded tracking');

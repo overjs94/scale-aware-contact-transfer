@@ -1,0 +1,4 @@
+{
+  "status": "interrupted_superseded_diagnostic",
+  "reason": "Partial-release controller defect already retained in the completed v2 trial. The v5 trial uses the corrected reachable-subspace controller. This unfinished duplicate is not a physical pass or failure."
+}

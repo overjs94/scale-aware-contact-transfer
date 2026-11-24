@@ -80,6 +80,14 @@ class FullContactController(CoupledContactController):
         self.scene=scene
         for s in episode.problem.specs:s['allowed_object_geoms']=scene.allowed_by_group[s['group_id']]
         super().__init__(episode)
+        self.allocation_logs=[];self.allocation_scope_logs=[];self.last_active=None;self.allocated=None;self.next_allocation=0.
+        self.jaw_targets=np.array([episode.jaw_force_fraction*c.closing_force_per_finger if c.kind=='G' else 0. for c in self.problem.hardware_capabilities])
+        self.policy=task_configuration(episode.problem.task_definition).execution
+        if self.policy.online_allocation:
+            from .online_wrench import WrenchAllocator,operating_capabilities
+            self.allocator=WrenchAllocator(operating_capabilities(self.problem.hardware_capabilities,self.policy.allocation_grip_fraction),settings=self.problem.conic_settings,characteristic_length=self.problem.task_definition.configuration.target.characteristic_length_m,project_unactuated=True)
+            self.disturbance=np.zeros(self.problem.task_definition.object.nv);self.previous_object_v=None
+            self.geom_frames={geom:frame for frame,geoms in scene.object_geometries.items() for geom in geoms}
     def observe(self,mj,model,data,t):
         contacts=[]
         for idx in range(data.ncon):
@@ -88,6 +96,84 @@ class FullContactController(CoupledContactController):
         for frame,body in self.scene.object_frames.items():
             idx=mj.mj_name2id(model,mj.mjtObj.mjOBJ_BODY,body);frames[frame]=np.r_[data.xpos[idx],data.xquat[idx][[1,2,3,0]]]
         self.observe_contacts(data.qpos[addresses],next(iter(frames.values())),contacts,frame_poses=frames)
+        if self.policy.online_allocation:self.observe_object(mj,model,data,frames,contacts)
+
+    def observe_object(self,mj,model,data,frames,contacts):
+        """State/contact sensors only: never read applied-force arrays or schedule.
+
+        Native free-joint velocity is [linear_world; angular_body]. The public
+        mechanics model uses [angular_body; linear_body]. All object contacts,
+        including environmental and internal contacts, enter the observer.
+        """
+        from .full_validation import numeric_object_point,bias_object
+        obj=self.problem.task_definition.object;qs=[];vs=[]
+        components=obj.bodies if isinstance(obj,RigidCollection) else {'object':obj}
+        for name,component in components.items():
+            body=mj.mj_name2id(model,mj.mjtObj.mjOBJ_BODY,self.scene.object_roots[name]);joint=model.body_jntadr[body];dof=model.jnt_dofadr[joint]
+            pose=np.r_[data.xpos[body],data.xquat[body][[1,2,3,0]]];R=Rotation.from_quat(pose[3:]).as_matrix()
+            joints=[mj.mj_name2id(model,mj.mjtObj.mjOBJ_JOINT,self.scene.object_joints[n]) for n in component.joint_names]
+            qs.extend(np.r_[pose,[data.qpos[model.jnt_qposadr[j]] for j in joints]])
+            vs.extend(np.r_[data.qvel[dof+3:dof+6],R.T@data.qvel[dof:dof+3],[data.qvel[model.jnt_dofadr[j]] for j in joints]])
+        q=np.array(qs);v=np.array(vs);total=np.zeros(obj.nv);environment=total.copy()
+        for c in contacts:
+            for side,geom in enumerate(c['pair']):
+                frame=self.geom_frames.get(geom)
+                if frame is None:continue
+                T=obj.fk(q,frame);point=T[:3,:3].T@(c['position']-T[:3,3]);_,J=numeric_object_point(obj,q,frame,point)
+                generalized=J.T@(np.asarray(c['wrench'])*(1 if side==1 else -1));total+=generalized
+                if not c['pair'][1-side].startswith(tuple(s['id']+'_' for s in self.problem.specs)):environment+=generalized
+        M=obj.mass(q);bias=bias_object(self.problem,q,v)
+        if self.previous_object_v is not None:
+            raw=M@((v-self.previous_object_v)/self.dt)+bias-total
+            self.disturbance+=self.dt/(self.policy.disturbance_filter_s+self.dt)*(raw-self.disturbance)
+        self.previous_object_v=v.copy();self.object_state=(q,v,M,bias,environment)
+
+    def desired_reactions(self,q,v,qd,vd,ad):
+        planned=super().desired_reactions(q,v,qd,vd,ad)
+        if not self.policy.online_allocation or self.t<self.episode.preparation:return planned
+        i,k,local=self.episode.phase(self.t)
+        from .full_trajectory import phase_mode
+        active=tuple(self.episode.attached(j,self.t) and phase_mode(self.episode.keyframes[i].phase,f)=='holding' for j,f in enumerate(self.problem.task_definition.features))
+        if active!=self.last_active:self.next_allocation=self.t;self.last_active=active
+        if not any(active):
+            if np.max(abs(planned))>2e-5:raise RuntimeError('No holding interface, but the accepted plan requests robot reactions')
+            self.allocated=planned
+            if self.t+1e-10>=self.next_allocation:
+                self.allocation_scope_logs.append(dict(time=self.t,status='not_required_no_holding_interface',qp_executed=False))
+                self.next_allocation=self.t+self.policy.allocation_dt_s
+            return planned
+        if self.t+1e-10<self.next_allocation:return self.allocated if self.allocated is not None else planned
+        self.next_allocation=self.t+self.policy.allocation_dt_s
+        from .full_validation import numeric_contact
+        from .trajectory import Contact
+        obj=self.problem.task_definition.object;sys=self.problem.system;qo,vo,M,bias,environment=self.object_state
+        qref=self.episode.object_reference_local(local);r=self.episode.trajectories[i];vr=r.v[k,sys.object_v];ar=(r.v[k+1,sys.object_v]-vr)/r.dt[k]
+        if self.t>=self.episode.preparation+self.episode.time[-1]:vr=np.zeros_like(vr);ar=np.zeros_like(ar)
+        from .online_wrench import reference_tangent
+        error,vr,ar=reference_tangent(obj,qo,qref,vo,vr,ar)
+        acceleration=ar+self.policy.object_acceleration_k*error+self.policy.object_acceleration_d*(vr-vo)
+        rhs=self.disturbance+environment-bias-M@acceleration
+        state=np.r_[*[q[a:b][indices] for a,b,indices in zip(self.offsets[:-1],self.offsets[1:],self.reduced_indices)],qo]
+        maps=[];tmaps=[]
+        for j,(f,frame,cap,point,R) in enumerate(zip(self.problem.task_definition.features,self.problem.frames,self.problem.capabilities,self.episode.keyframes[i].positions,self.episode.keyframes[i].rotations)):
+            c=Contact(f.id,point,R[:,2],cap,robot_index=j,frame=frame,object_frame=f.frame,rotation_object=R)
+            _,J,_,_=numeric_contact(self.problem,c,state);X=np.c_[np.zeros((sys.nv,3)),J.T] if cap.kind=='P' else J.T
+            maps.append(-X[sys.object_v]);tmaps.append(np.asarray(sys.B).T@X)
+        rb=np.concatenate([robot.inverse_dynamics(q[a:b][indices],v[a:b][indices],ad[a:b][indices]) for robot,a,b,indices in zip(self.problem.robots,self.offsets[:-1],self.offsets[1:],self.reduced_indices)])
+        result=self.allocator.solve(maps,rhs,planned,tmaps,rb,sys.effort,active)
+        if result['accepted']:self.allocated=result['reactions']
+        else:self.allocated=planned  # Explicit fallback, not a certified allocation.
+        if self.policy.adaptive_jaw_force and result['accepted']:
+            for j,cap in enumerate(self.problem.hardware_capabilities):
+                if cap.kind!='G':continue
+                target=max(self.episode.jaw_force_fraction*cap.closing_force_per_finger,self.policy.jaw_reserve_factor*max(result['jaw_required'][j]))
+                target=min(target,self.policy.jaw_target_max_fraction*cap.closing_force_per_finger)
+                rate=self.policy.jaw_target_rate_N_s*self.policy.allocation_dt_s;self.jaw_targets[j]+=np.clip(target-self.jaw_targets[j],-rate,rate)
+        self.allocation_logs.append(dict(time=self.t,accepted=result['accepted'],status=result['status'],residual=result['residual'],controlled_dynamics_rank=result['controlled_dynamics_rank'],object_dynamics_dimension=result['object_dynamics_dimension'],full_dynamics_equality_enforced=result['full_dynamics_equality_enforced'],unactuated_request=result['unactuated_request'].tolist(),wall_time_s=result['wall_time_s'],disturbance_estimate=self.disturbance.tolist(),rhs=rhs.tolist(),reactions=self.allocated.tolist(),jaw_required_N=result['jaw_required'].tolist(),jaw_target_N=self.jaw_targets.tolist(),active=active))
+        return self.allocated
+
+    def jaw_target(self,arm,cap):
+        return self.jaw_targets[arm] if self.policy.adaptive_jaw_force else super().jaw_target(arm,cap)
 
 
 def reference_geometry(episode,scene):
@@ -112,8 +198,13 @@ def run_full_episode(episode,output,*,contacts_enabled=True,disturbances=(),prog
     if p.task_definition.id=='box':objects.append(scene.object_frames['moving']);articulated[scene.object_frames['moving']]=scene.object_joints['articulation']
     simulator=MujocoContactScene(scene.path,names,actuators,objects,actuator_modes=modes,articulated_object_joints=articulated);case_id,plan_id=episode.identity();schedule=WrenchSchedule(disturbances)
     trace=simulator.run(controller,controller.reference,episode.duration,initial_q=controller.reference(0)[0],case_id=case_id,plan_id=plan_id,external_forces=schedule,progress=progress);trace.metadata.update(object_pose_prescribed=False,object_equality_constraints_used=0,internal_gripper_equalities=int(simulator.model.neq),external_disturbances=schedule.to_list(),reference_interpolation=geometry['reference_interpolation'],contacts_enabled=contacts_enabled)
-    trace.metadata['controller_configuration']=dict(mode=episode.control_mode,arm_reaction_feedforward=episode.force_feedforward,jaw_force_fraction=episode.jaw_force_fraction,jaw_force_target_N={f.id:episode.jaw_force_fraction*c.closing_force_per_finger for f,c in zip(p.task_definition.features,p.capabilities) if c.kind=='G'},joint_nullspace_stiffness=task_configuration(p.task_definition).execution.joint_k,joint_nullspace_damping=task_configuration(p.task_definition).execution.joint_d)
+    trace.metadata['controller_configuration']=dict(mode=episode.control_mode,arm_reaction_feedforward=episode.force_feedforward,jaw_force_fraction=episode.jaw_force_fraction,jaw_force_target_N={f.id:episode.jaw_force_fraction*c.closing_force_per_finger for f,c in zip(p.task_definition.features,p.hardware_capabilities) if c.kind=='G'},jaw_targets_dynamic=controller.policy.adaptive_jaw_force,planning_gripper_fraction=p.task_definition.configuration.target.gripper_force_fraction,joint_nullspace_stiffness=task_configuration(p.task_definition).execution.joint_k,joint_nullspace_damping=task_configuration(p.task_definition).execution.joint_d)
     trace.metadata.update(reference_id=episode.reference_identity,reference_mesh=episode.reference_mesh_diagnostics)
+    if controller.policy.online_allocation:
+        from dataclasses import asdict
+        trace.metadata['online_allocation']=dict(policy=asdict(controller.policy),sensor_inputs='native object pose/velocity and all object contact wrenches; no applied-force/schedule input',passed_solves=sum(x['accepted'] for x in controller.allocation_logs),total_solves=len(controller.allocation_logs),no_holding_interface_updates=len(controller.allocation_scope_logs),offline_plan_reoptimized=False,hardware_validation=False)
+        (out/'allocation.json').write_text(json.dumps(controller.allocation_logs,separators=(',',':')))
+        (out/'allocation-scope.json').write_text(json.dumps(controller.allocation_scope_logs,separators=(',',':')))
     trace.save(out/'execution.npz');(out/'control.json').write_text(json.dumps(controller.logs,separators=(',',':')))
     # Task/capability assessment is provided separately; a trace alone is not a pass.
     return trace,controller,scene,geometry

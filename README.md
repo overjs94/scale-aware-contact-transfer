@@ -3,7 +3,7 @@
 URDF 기반 동역학·기구학과 논문의 Sec. III-B–IV를 위한 연구용 Python 패키지입니다.
 로봇별 System_Param의 질량·관성·축·링크 길이를 재작성하지 않고 URDF에서 읽습니다.
 
-`0.2.0a2` framework alpha는 원본 코드에 **Apache-2.0**을 적용하고, 공통 알고리즘과
+`0.2.0a3` framework alpha는 원본 코드에 **Apache-2.0**을 적용하고, 공통 알고리즘과
 task/solver/controller 설정, schema 2 캐시 provenance를 분리합니다.
 [설치·설정·solver 선택·배포 범위](docs/framework-deployment.md)를 확인하십시오.
 번들 로봇 모델과 선택적 CRISP/SNOPT의 upstream 조건은 별도로 유지됩니다.
@@ -15,7 +15,7 @@ task/solver/controller 설정, schema 2 캐시 provenance를 분리합니다.
 CRISP는 선택적 bridge이고 이 세 과제의 실행 엔진은 MuJoCo입니다.
 
 ```bash
-pip install 'dist/scale_aware_contact_transfer-0.2.0a2-py3-none-any.whl[full,alternative-solvers]'
+pip install 'dist/scale_aware_contact_transfer-0.2.0a3-py3-none-any.whl[full,alternative-solvers]'
 contact-transfer doctor
 contact-transfer assets
 contact-transfer config --task panel
@@ -24,6 +24,20 @@ contact-transfer run --task panel --solver ipopt --conic-solver clarabel
 
 Wheel은 `python -m build`로 생성합니다. 이 변경은 PyPI registry 공개를 의미하지 않습니다.
 이하의 실행 기록은 각각에 명시된 이전 revision과 검증 범위를 유지합니다.
+
+**온라인 반력 재분배:** [구조도·제어 수식·힘 예산·검증 범위](docs/controller-allocation-2026-11-24.md).
+측정 상태와 접촉력으로 외란을 추정하고, 공통 P/G cone QP로 팔 사이 힘을 배분합니다.
+그리퍼의 hardware 한계와 planning/online 운용 예산을 분리했으며 기본 동작은 보존합니다.
+박스의 기존 jaw 목표는 24 N이었습니다(이전 보고의 18 N 표기를 정정).
+기존 최적화 계획을 고정한 제어기 replay와 새 최적화 실행은 별도로 표시합니다.
+
+```bash
+python tools/run_controller_replay.py --task box --mode allocation --case opposite \
+  --root docs/validation/research_2026-11-24/plans --output outputs/my-controller-check
+```
+
+이 명령은 저장된 keyframe/CITO 해를 현재 native mechanics로 검산한 뒤 새 물리 실행을
+수행합니다. source/target/CITO NLP를 다시 풀었다고 주장하지 않습니다.
 
 **현재 전체 구조·개선·solver 보고:** [코드 구조도와 진행 보고서](docs/system-architecture-and-progress.md).
 Source/target/CITO, 저수준 제어, MuJoCo/CRISP, Robotiq 기구·렌더링, 검증 결과와

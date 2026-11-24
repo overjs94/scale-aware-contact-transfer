@@ -1,0 +1,70 @@
+
+> test
+> node tests/presentation.mjs && node tests/disturbance.mjs && node tests/controller.mjs && npm run build && node tests/build.mjs && playwright test
+
+English presentation checked: 129 recordings; original measurements and reports unchanged.
+Visualized force profiles match native schedule samples in 24 recordings.
+Controller replay scope checks passed
+
+> build
+> node build.mjs
+
+Built contact-transfer viewer.
+[WebServer] (node:22200) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 47 tests using 2 workers
+
+(node:22218) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22212) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   2 tests/urdf-view.spec.js:31:3 › franka_panda: recorded FK and both geometry modes (4.9s)
+  ✓   1 tests/urdf-view.spec.js:31:3 › rb3: recorded FK and both geometry modes (5.2s)
+  ✓   3 tests/urdf-view.spec.js:31:3 › rb5: recorded FK and both geometry modes (4.6s)
+  ✓   4 tests/urdf-view.spec.js:31:3 › kinova_gen3: recorded FK and both geometry modes (6.4s)
+  ✓   5 tests/urdf-view.spec.js:31:3 › unitree_g1: recorded FK and both geometry modes (5.2s)
+  ✓   6 tests/urdf-view.spec.js:31:3 › kuka_iiwa7: recorded FK and both geometry modes (5.2s)
+  ✓   7 tests/urdf-view.spec.js:31:3 › ur5e: recorded FK and both geometry modes (4.5s)
+  ✓   8 tests/urdf-view.spec.js:31:3 › xarm7: recorded FK and both geometry modes (4.8s)
+  ✓   9 tests/urdf-view.spec.js:55:1 › mesh origin, scale and joint rotation compose in URDF order (4.2s)
+  ✓  10 tests/urdf-view.spec.js:79:1 › missing mesh rejects the model and mode switching preserves playback (6.9s)
+  ✓  11 tests/urdf-view.spec.js:94:1 › three physical tools replay as three URDF instances with keyframe events (13.2s)
+  ✓  12 tests/urdf-view.spec.js:135:1 › library separates paper tasks, single embodiments and diagnostics with matching editors (14.9s)
+  ✓  14 tests/urdf-view.spec.js:181:1 › three Panda arms use actual articulated URDF recordings (4.9s)
+  ✓  13 tests/urdf-view.spec.js:165:1 › library deep links retain failed force tests and distinguish G1 preview on mobile (12.8s)
+  ✓  15 tests/urdf-view.spec.js:207:1 › native Robotiq linkage uses recorded passive joints and a free block (8.4s)
+  ✓  16 tests/urdf-view.spec.js:237:1 › three-arm Robotiq lift replays measured linkage and free-panel poses (10.1s)
+  ✓  17 tests/urdf-view.spec.js:262:1 › experiment form submits edits, polls and displays the completed recording (9.7s)
+  ✓  18 tests/urdf-view.spec.js:278:1 › experiment failures and cancellation stay visible (11.1s)
+  ✓  19 tests/urdf-view.spec.js:292:1 › table assembly renders three arms and two free URDF parts through all eight keyframes (10.3s)
+  ✓  20 tests/urdf-view.spec.js:326:1 › assembly duration submission uses the new Python scenario API (8.4s)
+  ✓  21 tests/urdf-view.spec.js:340:1 › primary panel recording refines source anchors, seats on a URDF jig and releases all tools (9.0s)
+  ✓  22 tests/urdf-view.spec.js:370:1 › panel API submits the source refinement ablation and duration (10.9s)
+  ✓  23 tests/urdf-view.spec.js:381:1 › mobile RBY1 and fixed Panda replay wheel-driven workspace extension (11.8s)
+  ✓  24 tests/urdf-view.spec.js:414:1 › mobile form submits the mixed embodiment and source JSON to Python (9.2s)
+  ✓  25 tests/urdf-view.spec.js:425:3 › hinged_door: passive measured joint and studio rendering preserve URDF FK (8.6s)
+  ✓  26 tests/urdf-view.spec.js:425:3 › folding_panel: passive measured joint and studio rendering preserve URDF FK (9.8s)
+  ✓  27 tests/urdf-view.spec.js:425:3 › drawer: passive measured joint and studio rendering preserve URDF FK (9.7s)
+  ✓  28 tests/urdf-view.spec.js:450:1 › external pulse shows measured recovery and preserves capability failure (8.3s)
+  ✓  29 tests/urdf-view.spec.js:463:2 › free_box_lid: contracted link-aware contacts realize on three arms and a free articulated body (9.7s)
+  ✓  30 tests/urdf-view.spec.js:463:2 › free_folding_object: contracted link-aware contacts realize on three arms and a free articulated body (10.0s)
+  ✓  31 tests/urdf-view.spec.js:463:2 › free_portable_drawer: contracted link-aware contacts realize on three arms and a free articulated body (10.6s)
+  ✓  32 tests/urdf-view.spec.js:482:1 › force peak event pauses with an explicitly visible force arrow (10.4s)
+  ✓  34 tests/urdf-view.spec.js:510:1 › simultaneous forces and a moment retain their bodies and units (10.1s)
+  ✓  33 tests/urdf-view.spec.js:493:1 › full assembly external push replays applied force and all controlled ablations (14.1s)
+  ✓  36 tests/urdf-view.spec.js:545:1 › current inside-margin box counterexample preserves the failed tracking and arrow (10.2s)
+  ✓  37 tests/urdf-view.spec.js:559:1 › controller replay preserves the matched load and separates pass from the original failure (14.8s)
+  ✓  35 tests/urdf-view.spec.js:527:1 › current framework records expose source certificates and model extensions (33.7s)
+  ✓  38 tests/urdf-view.spec.js:576:1 › controller complete assembly reports passive release and all accepted controlled QPs (12.9s)
+  ✓  40 tests/urdf-view.spec.js:604:1 › free-object form preserves edited dense groups while retiming (14.7s)
+  ✓  39 tests/urdf-view.spec.js:587:1 › current source-margin comparison retains the matched controls and recovery failure (25.4s)
+  ✓  41 tests/urdf-view.spec.js:615:3 › full assembly: optimized multi-arm task retains measured URDF and acceptance provenance (18.5s)
+  ✓  42 tests/urdf-view.spec.js:615:3 › full box: optimized multi-arm task retains measured URDF and acceptance provenance (17.2s)
+  ✓  43 tests/urdf-view.spec.js:615:3 › full panel: optimized multi-arm task retains measured URDF and acceptance provenance (18.9s)
+  ✓  44 tests/urdf-view.spec.js:669:1 › matched source-polytope ablation preserves both outcomes and the applied force arrow (24.1s)
+  ✓  45 tests/urdf-view.spec.js:688:59 › forced panel PPP: worse sequence and measured execution failure remain visible (14.2s)
+  ✓  46 tests/urdf-view.spec.js:688:59 › forced box PPG: worse sequence and measured execution failure remain visible (16.3s)
+  ✓  47 tests/urdf-view.spec.js:698:1 › inside-margin comparison synchronizes both native views and holds the force arrow (21.1s)
+
+  47 passed (4.6m)

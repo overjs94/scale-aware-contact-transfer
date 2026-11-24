@@ -1,0 +1,80 @@
+{
+  "controller": {
+    "control_mode": "hybrid_feedback",
+    "jaw_force_fraction": 0.45,
+    "reference_dt_s": 0.02,
+    "reference_projection_limit_rad": 0.02,
+    "physics_dt_s": 0.001,
+    "joint_k": 40.0,
+    "joint_d": 8.0,
+    "motion_k": [
+      40.0,
+      40.0,
+      40.0,
+      3000.0,
+      3000.0,
+      3000.0
+    ],
+    "motion_d": [
+      2.0,
+      2.0,
+      2.0,
+      40.0,
+      40.0,
+      40.0
+    ],
+    "force_k": 0.25,
+    "force_i": 1.0,
+    "force_d": [
+      2.0,
+      2.0,
+      2.0,
+      40.0,
+      40.0,
+      160.0
+    ],
+    "admittance_mass": [
+      0.2,
+      0.2,
+      0.2,
+      2.0,
+      2.0,
+      2.0
+    ],
+    "admittance_damping": [
+      4.0,
+      4.0,
+      4.0,
+      40.0,
+      40.0,
+      40.0
+    ],
+    "online_allocation": true,
+    "allocation_dt_s": 0.02,
+    "disturbance_filter_s": 0.08,
+    "object_acceleration_k": 100.0,
+    "object_acceleration_d": 20.0,
+    "allocation_grip_fraction": 0.6,
+    "adaptive_jaw_force": true,
+    "jaw_reserve_factor": 1.25,
+    "jaw_target_max_fraction": 0.8,
+    "jaw_target_rate_N_s": 40.0
+  },
+  "parent_plan": "outputs/research-study/full-common/panel/full",
+  "new_source_or_target_NLP_executed": false,
+  "old_hardware_certificate": {
+    "inside": true,
+    "rho_certified": 8.081945386080978,
+    "maximum_coefficient_bound": 0.0,
+    "load_to_margin_ratio": 0.0,
+    "temporal_groups": [],
+    "overlap_check": "componentwise interval triangle bound; identical profiles summed before projection",
+    "certificate_scope": "optimized static reference pose only",
+    "continuous_time_load_membership_bound": true,
+    "closed_loop_stability_certificate": false
+  },
+  "certificate_scope": "reference pose and original hardware; operating allocation envelope is separately derated",
+  "independent_keyframe": null,
+  "case": "full",
+  "scene_sha256": "5c34e38677574da36139178b0e9cb6d2452c2145ce5cb8144ae707a6c042a77e"
+}

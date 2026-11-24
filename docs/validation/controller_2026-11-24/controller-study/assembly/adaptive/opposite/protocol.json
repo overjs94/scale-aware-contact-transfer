@@ -1,0 +1,129 @@
+{
+  "controller": {
+    "control_mode": "hybrid_feedback",
+    "jaw_force_fraction": 0.7,
+    "reference_dt_s": 0.02,
+    "reference_projection_limit_rad": 0.02,
+    "physics_dt_s": 0.001,
+    "joint_k": 40.0,
+    "joint_d": 8.0,
+    "motion_k": [
+      40.0,
+      40.0,
+      40.0,
+      3000.0,
+      3000.0,
+      3000.0
+    ],
+    "motion_d": [
+      2.0,
+      2.0,
+      2.0,
+      40.0,
+      40.0,
+      40.0
+    ],
+    "force_k": 0.25,
+    "force_i": 1.0,
+    "force_d": [
+      2,
+      2,
+      2,
+      40,
+      40,
+      160
+    ],
+    "admittance_mass": [
+      0.2,
+      0.2,
+      0.2,
+      2.0,
+      2.0,
+      2.0
+    ],
+    "admittance_damping": [
+      4.0,
+      4.0,
+      4.0,
+      40.0,
+      40.0,
+      40.0
+    ],
+    "online_allocation": true,
+    "allocation_dt_s": 0.02,
+    "disturbance_filter_s": 0.08,
+    "object_acceleration_k": 100.0,
+    "object_acceleration_d": 20.0,
+    "allocation_grip_fraction": 0.6,
+    "adaptive_jaw_force": true,
+    "jaw_reserve_factor": 1.25,
+    "jaw_target_max_fraction": 0.8,
+    "jaw_target_rate_N_s": 40.0
+  },
+  "parent_plan": "outputs/research-study/full-common/assembly/full",
+  "new_source_or_target_NLP_executed": false,
+  "old_hardware_certificate": {
+    "inside": true,
+    "rho_certified": 7.3197677078776895,
+    "maximum_coefficient_bound": 5.855814166302153,
+    "load_to_margin_ratio": 0.8000000000000002,
+    "temporal_groups": [
+      {
+        "start": 4.0,
+        "end": 7.0,
+        "profile": "smooth_hold",
+        "inside": true,
+        "subspace_residual": 8.881784197001252e-16,
+        "normalized_coefficient": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          5.855814166302153,
+          0.0
+        ],
+        "coefficient_infinity_norm": 5.855814166302153,
+        "rho_certified": 7.3197677078776895,
+        "load_to_margin_ratio": 0.8000000000000002,
+        "certificate_scope": "fixed reference pose static wrench box"
+      }
+    ],
+    "overlap_check": "componentwise interval triangle bound; identical profiles summed before projection",
+    "certificate_scope": "optimized static reference pose only",
+    "continuous_time_load_membership_bound": true,
+    "closed_loop_stability_certificate": false
+  },
+  "certificate_scope": "reference pose and original hardware; operating allocation envelope is separately derated",
+  "independent_keyframe": {
+    "passed": true,
+    "residuals": {
+      "equilibrium": 1.6724399642953358e-12,
+      "capability": 4.551979415623464e-08,
+      "torque": 0.0,
+      "closure": 3.0531133177191805e-16,
+      "rotation_closure": 4.2745576510186233e-16,
+      "rho_margin": 0.0
+    },
+    "frozen_conic": {
+      "rho": 7.319767707879192,
+      "certificate": true,
+      "residual": 5.6987367713645654e-08,
+      "status": "AlmostSolved",
+      "maximum_margin_status": "NumericalError",
+      "fixed_rho_feasibility": true,
+      "solver_attempts": [
+        {
+          "status": "AlmostSolved",
+          "witness_regularization": 2e-06,
+          "backend": "clarabel",
+          "solver_tolerance": 1e-09,
+          "iterations": 20,
+          "wall_time_s": 0.2424721400020644
+        }
+      ]
+    },
+    "independent": "native Pinocchio, NumPy and frozen Clarabel"
+  },
+  "case": "opposite",
+  "scene_sha256": "7382d6e61d70e4dc7295dceae2ce63ba54d11e2972f67f5e4b92311c7fc96b62"
+}

@@ -22,6 +22,19 @@ export async function showAlgorithmComparisons(data){
  const current=++token;let root=document.getElementById('algorithm-comparison-results');
  if(!root){root=node('div');root.id='algorithm-comparison-results';document.getElementById('experiment-results').append(root);}
  root.hidden=!data.full_task_recording&&!data.comparison_recording;if(root.hidden)return;
+ if(data.report?.controller_replay){
+  try{
+   const response=await fetch('./data/controller-study-summary.json');if(!response.ok)throw Error('No controller summary');const study=await response.json();if(current!==token)return;root.replaceChildren();
+   root.append(node('h4','Controller allocation · matched physical load'));
+   note(root,'Fresh native replays of accepted plans; no new source/target/CITO optimization. The box challenge remains 14.755 N downward, inside the original static reference margin. All measured failures are retained. One trial per condition.');
+   const t=table(root,['Task / condition','Result','Peak position error','Allocation rejections']);
+   for(const r of study.trials)row(t,[r.recording_id?link(r.recording_id,r.title):r.title,r.passed?'PASS':'FAIL',number(1000*r.maximum_position_error_m,2)+' mm',r.allocation_count?`${r.rejected_solves} / ${r.allocation_count}`:'Not enabled']);
+   note(root,'P: normal force feedback and tangential motion. G: pose impedance, reaction feedforward and measured jaw-force control. Native jaw limit: 40 N. Online allocation budget: 24 N. Changes in the jaw target and the force-distribution controller are tested separately. A passed replay does not certify exact manuscript equations or real-time hardware control.');
+   note(root,'The early-load records retain the intermediate post-release QP rejections. The final complete-task records use corrected release handling; after leg release, the assembly controls the six directions reachable through the remaining tabletop contacts and logs the other six separately.');
+   const image=node('img');image.src='./data/controller-allocation-response.svg';image.alt='Measured box position errors under the same downward load for original, increased-preload and online allocation controllers';image.className='comparison-figure';root.append(image);
+  }catch{if(current===token)root.hidden=true;}
+  return;
+ }
  if(data.id.startsWith('research_')){
   try{
    const response=await fetch('./data/research-study-summary.json');if(!response.ok)throw Error('No current study summary');const study=await response.json();if(current!==token)return;root.replaceChildren();

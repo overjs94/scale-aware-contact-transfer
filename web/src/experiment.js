@@ -61,6 +61,7 @@ function fields(){
 function report(data){
   data=englishRecording(data);
   const r=data.report;if(!r)return;$('experiment-results').hidden=false;
+  $('result-residual-label').textContent='NLP RESIDUAL';
   showAlgorithmComparisons(data);
   let comparison=$('ablation-results');
   if(!comparison){comparison=document.createElement('div');comparison.id='ablation-results';$('experiment-results').append(comparison);}
@@ -69,6 +70,13 @@ function report(data){
     const errors=Object.values(r.object_tracking);$('result-tracking').textContent=`${r.tracking_passed?'PASS':'FAIL'} · ${(1000*Math.max(...errors.map(e=>e.maximum_position_error_m))).toFixed(2)} mm`;
     $('result-forces').textContent=r.sampled_interface_wrench_capability.passed&&Object.values(r.jaw_force).every(j=>j.passed)&&r.minimum_actuator_margin_Nm>=-1e-8?'PASS':'FAIL';
     $('result-seal-label').textContent='STABILITY / CONTACT';const fractions=Object.values(r.maintained_contact_fraction).filter(v=>v!==null);$('result-seal').textContent=`${r.execution_passed?'PASS':'FAIL'} · ${(100*Math.min(...fractions)).toFixed(1)}% contact`;
+    if(r.controller_replay){
+      const c=r.controller_replay;comparison.hidden=true;
+      $('result-residual-label').textContent='ONLINE ALLOCATION';
+      $('result-residual').textContent=c.allocation_count?`QP ${c.allocation_count-c.rejected_solves}/${c.allocation_count}`:'QP disabled';
+      $('source-result').hidden=false;$('source-result').textContent=`Controller replay · ${c.mode} · no new source, target, contact-type or CITO optimization. Physical load and hardware limits preserved. Allocation counts refer to the recorded controller version; release and passive-direction scope are reported separately.`;
+      for(const id of ['workspace-result','robustness-result'])$(id).hidden=true;$('report-json').textContent=JSON.stringify(r,null,2);return;
+    }
     const matched=r.robustness_probe||r.certified_full_disturbance;
     if(matched){
       const certificate=matched.inside_on_certificate||matched.inside_on_reference_certificate;
@@ -143,7 +151,7 @@ function showRecordingExperiment(data){
   const id=libraryEntry(data).preset;
   document.querySelector('.experiment-builder').hidden=!id&&!data.full_task_recording&&!data.comparison_recording;
   $('experiment-form').hidden=!id;
-  if(data.full_task_recording||data.comparison_recording){$('builder-title').textContent=data.title;$('builder-note').textContent='Measured planning/execution outcomes and controlled comparisons';$('preset-tag').textContent=data.report.selection?.selected_types.join(' / ')||'SOURCE ROBUSTNESS';$('source-refinement-control').hidden=true;}
+  if(data.full_task_recording||data.comparison_recording){$('builder-title').textContent=data.title;$('builder-note').textContent='Measured planning/execution outcomes and controlled comparisons';$('preset-tag').textContent=data.report.controller_replay?'CONTROLLER REPLAY':data.report.selection?.selected_types.join(' / ')||'SOURCE ROBUSTNESS';$('source-refinement-control').hidden=true;}
   $('experiment-results').hidden=!data.report;
   if(id){$('scenario-preset').value=id;if(presetId!==id)selectPreset(id).catch(error=>state(error.message));}
   report(data);
